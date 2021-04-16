@@ -15,7 +15,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Force Skin");
+        $this->setName("Tools: Force Skin");
         $this->setDescription("Forces a skin to be used for all player on a server");
         $this->setGroups(array('Tools'));
 

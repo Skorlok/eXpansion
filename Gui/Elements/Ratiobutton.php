@@ -20,18 +20,18 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->action = $this->createAction(array($this, 'toggleActive'));
         $config = Config::getInstance();
 
-        $this->button = new \ManiaLib\Gui\Elements\Label(12, 6);
+        $this->button = new \ManiaLib\Gui\Elements\Quad(12, 6);
         $this->button->setAlign('center', 'center');
         $this->button->setAction($this->action);
-        $this->button->setTextSize(2);
-        //$this->button->setScriptEvents(true);
+        $this->button->setScriptEvents(true);
+
         $this->addComponent($this->button);
 
 
         $this->label = new \ManiaLib\Gui\Elements\Label($textWidth, 4);
         $this->label->setAlign('left', 'center');
         $this->label->setTextSize(1);
-        //$this->label->setAttribute("textfont","Oswald");
+        //$this->label->setStyle("TextCardInfoSmall");
         $this->addComponent($this->label);
         $this->setSize(10 + $textWidth, 5);
     }
@@ -42,6 +42,8 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->button->setSize(5, 5);
         $this->button->setPosition(0, -0.5);
+        $this->button->setStyle('Icons64x64_1');
+        $this->button->setSubStyle('GenericButton');
         $this->label->setSize($this->textWidth, 6);
         $this->label->setPosition(4, 0);
     }
@@ -51,9 +53,9 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
         $config = Config::getInstance();
 
         if ($this->active) {
-            $this->button->setText("☑");
+            $this->button->setColorize("0f0");
         } else {
-            $this->button->setText("☐");
+            $this->button->setColorize("f00");
         }
     }
 

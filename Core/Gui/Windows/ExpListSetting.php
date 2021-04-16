@@ -1,77 +1,63 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
 
-
-use ManiaLib\Gui\Elements\Label;
-use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingListElement;
-use ManiaLivePlugins\eXpansion\Core\types\config\types\HashList;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 /**
  * Description of ExpSettings
  *
  * @author De Cramer Oliver
  */
-class ExpListSetting extends Window
+class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    /** @var OptimizedPager */
-    public $pagerFrame;
+    /**
+     *
+     * @var \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu
+     */
+    public $pagerFrame = null;
 
-    /** @var  Inputbox|null */
-    public $input_key;
+    public $insertFrame = null;
 
-    /** @var  Inputbox */
-    public $input_value;
+    public $input_key = null;
 
-    /** @var Button */
-    public $buttonAdd;
+    public $input_value = null;
+
+    public $buttonAdd = null;
 
     public $actions = array();
 
     public $items = array();
-    /** @var Variable */
-    public $var;
 
-    /** @var  Label */
+    public $var = null;
+
     public $label_help;
 
-    /**
-     *
-     */
     protected function onConstruct()
     {
         parent::onConstruct();
 
-        $this->pagerFrame = new OptimizedPager();
+        $this->pagerFrame = new \ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager();
         $this->pagerFrame->setPosY(-14);
         $this->mainFrame->addComponent($this->pagerFrame);
 
-        $this->label_help = new Label(120, 8);
+        $this->label_help = new \ManiaLib\Gui\Elements\Label(120, 8);
         $this->label_help->setPosY(5);
         $this->mainFrame->addComponent($this->label_help);
 
-        $this->input_value = new Inputbox("value");
+        $this->input_value = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("value");
         $this->input_value->setLabel('Value');
         $this->input_value->setPosY(-5);
         $this->mainFrame->addComponent($this->input_value);
 
-        $this->buttonAdd = new Button();
+        $this->buttonAdd = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
         $this->buttonAdd->setText("Add");
         $this->buttonAdd->setPosY(-5);
         $this->buttonAdd->setAction($this->createAction(array($this, "addValue")));
         $this->mainFrame->addComponent($this->buttonAdd);
     }
 
-    /**
-     * @param $oldX
-     * @param $oldY
-     */
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
@@ -89,9 +75,6 @@ class ExpListSetting extends Window
         }
     }
 
-    /**
-     * @param Variable $var
-     */
     public function populate(Variable $var)
     {
         $this->var = $var;
@@ -106,9 +89,9 @@ class ExpListSetting extends Window
         $this->pagerFrame->clearItems();
         $this->items = array();
 
-        if ($var instanceof HashList) {
+        if ($var instanceof \ManiaLivePlugins\eXpansion\Core\types\config\types\HashList) {
             if ($this->input_key == null) {
-                $this->input_key = new Inputbox("key", 50);
+                $this->input_key = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("key", 50);
                 $this->input_key->setPosY(-5);
                 $this->input_key->setLabel('Key');
                 $this->mainFrame->addComponent($this->input_key);
@@ -117,7 +100,7 @@ class ExpListSetting extends Window
             $this->input_value->setPosX(($this->getSizeX() - 25) / 2 + 1);
             $this->input_value->setSizeX(($this->getSizeX() - 25) / 2 - 1);
 
-            ExpSettingListElement::$large = true;
+            \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingListElement::$large = true;
         } else {
             if ($this->input_key != null) {
                 $this->removeComponent($this->input_key);
@@ -126,13 +109,14 @@ class ExpListSetting extends Window
             }
 
             $this->input_value->setSizeX($this->getSizeX() - 25);
-            ExpSettingListElement::$large = false;
+            \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingListElement::$large = false;
         }
 
+        $i = 0;
         $values = $var->getRawValue();
 
         if (!empty($this->actions)) {
-            $actionHandler = ActionHandler::getInstance();
+            $actionHandler = \ManiaLive\Gui\ActionHandler::getInstance();
             foreach ($this->actions as $action) {
                 $actionHandler->deleteAction($action);
             }
@@ -152,39 +136,26 @@ class ExpListSetting extends Window
         $this->pagerFrame->update($this->getRecipient());
     }
 
-    /**
-     * @param $login
-     * @param $groupName
-     */
     public function switchGroup($login, $groupName)
     {
         $this->populate($this->configManager, $groupName);
         $this->redraw();
     }
 
-    /**
-     * @param $login
-     * @param $entries
-     */
     public function addValue($login, $entries)
     {
-        if ($this->var instanceof HashList) {
+        if ($this->var instanceof \ManiaLivePlugins\eXpansion\Core\types\config\types\HashList) {
             $key = $entries['key'];
             if ($key != "") {
                 $this->var->setValue($key, $entries['value']);
             }
         } else {
-            /** @todo oliver can you check this, it points no where ?! */
             $this->var->addValue($entries['value']);
         }
         $this->populate($this->var);
         $this->redraw();
     }
 
-    /**
-     * @param $login
-     * @param $key
-     */
     public function removeValue($login, $key)
     {
         $this->var->removeValue($key);
@@ -192,9 +163,6 @@ class ExpListSetting extends Window
         $this->redraw();
     }
 
-    /**
-     *
-     */
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -203,7 +171,7 @@ class ExpListSetting extends Window
         $this->items = null;
 
         if (!empty($this->actions)) {
-            $actionHandler = ActionHandler::getInstance();
+            $actionHandler = \ManiaLive\Gui\ActionHandler::getInstance();
             foreach ($this->actions as $action) {
                 $actionHandler->deleteAction($action);
             }

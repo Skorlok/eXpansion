@@ -17,7 +17,6 @@ class Custom321Go extends ExpPlugin
         parent::eXpOnReady();
 
         $this->enableDedicatedEvents();
-
         $window = Gui\Hud\CountdownHud::create();
         $window->show();
     }
@@ -27,11 +26,14 @@ class Custom321Go extends ExpPlugin
         Gui\Hud\CountdownHud::EraseAll();
     }
 
-    public function onStatusChanged($statusCode, $statusName)
+    public function onBeginMatch()
     {
-        if ($statusCode == 4) {
-            $window = Gui\Hud\CountdownHud::create();
-            $window->show();
-        }
+        $window = Gui\Hud\CountdownHud::create();
+        $window->show();
+    }
+
+    public function eXpOnUnload()
+    {
+        Gui\Hud\CountdownHud::EraseAll();
     }
 }

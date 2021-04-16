@@ -1,7 +1,7 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core;
 
-use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Events\ConfigLoadEvent;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
@@ -54,22 +54,22 @@ class ConfigManager
     private $groupedVariables = array();
 
     /**
-     * @var bool Was the global variables updated? if yes need to save on next check
+     * @var Bool Was the global variables updated? if yes need to save on next check
      */
     private $globalsUpdated = false;
 
     /**
-     * @var bool Was the global variables updated? if yes need to save on next check
+     * @var Bool Was the global variables updated? if yes need to save on next check
      */
     private $fileUpdated = false;
 
     /**
-     * @var bool Was the server scoped variables updated? if yes need to save on next check
+     * @var Bool Was the server scoped variables updated? if yes need to save on next check
      */
     private $scopedUpdated = false;
 
     /**
-     * @var string The login of the server
+     * @var String The login of the server
      */
     private $serverLogin;
 
@@ -101,9 +101,9 @@ class ConfigManager
         $this->eXpCore = $eXpCore;
 
         /**
-         * @var Storage;
+         * @var \ManiaLive\Data\Storage;
          */
-        $storage = Storage::getInstance();
+        $storage = \ManiaLive\Data\Storage::getInstance();
         $this->serverLogin = $storage->serverLogin;
 
         if (!file_exists(self::DIRNAME)) {
@@ -123,7 +123,7 @@ class ConfigManager
     /**
      * Registers a varible to the config manager in order to allow it to be saved
      *
-     * @param Variable $var
+     * @param types\config\Variable $var
      * @param string $pluginId
      */
     public function registerVariable(Variable $var, $pluginId)
@@ -214,7 +214,8 @@ class ConfigManager
     /**
      * @param string $confName The name of the configuration. By default it is "main" for all settings that appears on
      *                         the main page. IF not the name of the plugin that might have specific plugin settings.
-     * @return Variable|Variable[]
+     *
+     * @return mixed[]
      */
     public function getGroupedVariables($confName = "main")
     {
@@ -255,7 +256,6 @@ class ConfigManager
 
     /**
      * Checks whatever a save is required, if it is not it will reload settings to be on the safe side.
-     * @param bool $forceSave
      */
     public function check($forceSave = false)
     {
@@ -300,8 +300,8 @@ class ConfigManager
     /**
      * Applies the settings to the current configuration
      *
-     * @param mixed $newSettings The settings to apply
-     * @param int $scope The scope the settings are from
+     * @param $newSettings The settings to apply
+     * @param $scope       The scope the settings are from
      */
     protected function applySettings($newSettings, $scope)
     {
@@ -350,6 +350,8 @@ class ConfigManager
      */
     public function loadSettingsFrom($fileName, $save = true)
     {
+        $fileS = array();
+
         $global = $this->getSettingsFromFile(self::DIRNAME . DIRECTORY_SEPARATOR . "settings.exp");
 
         $scoped = $this->getSettingsFromFile(
@@ -357,8 +359,10 @@ class ConfigManager
         );
 
         $this->applySettings($global, Variable::SCOPE_GLOBAL);
+
         $this->applySettings($scoped, Variable::SCOPE_SERVER);
 
+        $conf = Config::getInstance();
         $fileS = $this->getSettingsFromFile($fileName);
 
         $this->applySettings($fileS, Variable::SCOPE_FILE);

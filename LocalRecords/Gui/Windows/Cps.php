@@ -13,19 +13,19 @@ use ManiaLivePlugins\eXpansion\LocalRecords\LocalRecords;
  */
 class Cps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
-    protected $frame;
-    protected $label_rank;
-    protected $label_nick;
-    protected $label_score;
-    protected $frameCP;
-    protected $nextButton;
-    protected $prevButton;
-    protected $widths = array(0.5, 3, 10);
-    protected $pager;
-    protected $items = array();
-    protected $offset = 0;
-    protected $itemsPerPage = 6;
-    protected $recs;
+    private $frame;
+    private $label_rank;
+    private $label_nick;
+    private $label_score;
+    private $frameCP;
+    private $nextButton;
+    private $prevButton;
+    private $widths = array(0.5, 3, 10);
+    private $pager;
+    private $items = array();
+    private $offset = 0;
+    private $itemsPerPage = 6;
+    private $recs;
 
     protected function onConstruct()
     {
@@ -125,9 +125,6 @@ class Cps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function nextPage($offset)
     {
         $this->offset += $this->itemsPerPage;
-        if ($this->offset > count($this->recs)) {
-            $this->offset = count($this->recs) - $this->itemsPerPage;
-        }
         $this->updatePage($this->offset);
         $this->redraw($this->getRecipient());
     }
@@ -145,13 +142,13 @@ class Cps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function updatePage($offset)
     {
+        $this->pager->clearItems();
+
         foreach ($this->items as $item) {
             $item->erase();
         }
 
         $this->items = array();
-
-        $this->pager->clearItems();
 
         $this->frameCP->destroyComponents();
 

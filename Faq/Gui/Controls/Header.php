@@ -10,14 +10,14 @@ namespace ManiaLivePlugins\eXpansion\Faq\Gui\Controls;
 class Header extends FaqControl
 {
 
-    public function __construct($text, $level = 1)
+    public function __construct($text)
     {
+        $text = str_replace("#", "", $text);
         parent::__construct($text);
         $this->label->setStyle("TextRaceMessageBig");
-        $this->label->setTextSize(6 - $level);
+        $this->label->setTextSize(3);
         $this->label->setTextColor("fff");
-
-        $this->setSizeY(8 - $level);
+        $this->setSizeY(7);
         $this->setAlign("left", "top");
     }
 }

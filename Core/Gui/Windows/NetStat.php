@@ -1,31 +1,28 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
 
 use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Layouts\Line;
-use ManiaLib\Gui\Layouts\VerticalFlow;
 use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Tick\Event as TickEvent;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
-use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 
 /**
  * Description of widget_netstat
  *
  * @author Petri
  */
-class NetStat extends Window
+class Netstat extends Window
 {
 
-    /** @var  Frame */
     protected $frame;
 
     /** @var Storage */
     private $storage;
-    /** @var int */
     private $lastUpdate = 0;
 
     protected function onConstruct()
@@ -38,7 +35,7 @@ class NetStat extends Window
         $this->storage = Storage::getInstance();
 
         $this->frame = new Frame(5, -2);
-        $this->frame->setLayout(new VerticalFlow(50, 100));
+        $this->frame->setLayout(new \ManiaLib\Gui\Layouts\VerticalFlow(50, 100));
         $this->addComponent($this->frame);
         $this->lastUpdate = time();
     }
@@ -51,16 +48,13 @@ class NetStat extends Window
         }
     }
 
-    /**
-     *
-     */
     protected function onDraw()
     {
         parent::onDraw();
         $this->frame->clearComponents();
 
         $netstat = Core::$netStat;
-        ArrayOfObj::asortAsc($netstat, "login");
+        \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($netstat, "login");
         $index = 0;
 
         foreach ($netstat as $login => $stat) {

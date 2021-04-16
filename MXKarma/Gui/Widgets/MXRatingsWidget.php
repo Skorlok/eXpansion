@@ -34,6 +34,12 @@ class MXRatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->gauge = new \ManiaLive\Gui\Elements\Xml();
 
         $this->setName("MX Map Rating Widget");
+
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+        if ($storage->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
     }
 
     public function setRating($number, $total)
@@ -65,7 +71,7 @@ class MXRatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $info->setAlign("center", "center");
         $info->setTextEmboss();
         $info->setText(round($number, 1) . "% (" . $total . ")");
-        $info->setPosition(17, -7);
+        $info->setPosition(17, -7, 10);
         $this->frame->addComponent($info);
         $this->redraw();
     }

@@ -34,6 +34,18 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         self::$me = $this;
 
         $this->getRoundsPoints();
+        
+        $this->enableScriptEvents("Maniaplanet.StartRound_Start");
+    }
+    
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound(0);
+                break;
+        }
     }
 
 
@@ -89,15 +101,11 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function getRoundsPoints()
     {
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_SCRIPT) {
-            $points = $this->connection->getRoundCustomPoints();
-            if (empty($points)) {
-                self::$roundPoints = array(10, 6, 4, 3, 2, 1);
-            } else {
-                self::$roundPoints = $points;
-            }
-        } else {
+        $points = $this->connection->getRoundCustomPoints();
+        if (empty($points)) {
             self::$roundPoints = array(10, 6, 4, 3, 2, 1);
+        } else {
+            self::$roundPoints = $points;
         }
     }
 
@@ -107,7 +115,6 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         self::$raceOn = false;
         $this->forceUpdate = true;
         $this->hideAroundMe();
-        $this->updateAroundMe();
         self::$secondMap = true;
         self::$raceOn = true;
     }
@@ -130,6 +137,7 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         //We need to reset the panel for next Round
         self::$raceOn = false;
+        $this->getRoundsPoints();
         $this->hideAroundMe();
         $this->updateAroundMe();
         self::$raceOn = true;

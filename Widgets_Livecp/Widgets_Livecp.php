@@ -51,16 +51,14 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onTick()
     {
-
         if ($this->update && $this->lastSend <= time() - 2) {
             $this->update = false;
             CpProgress::EraseAll();
             $info = CpProgress::Create(null, true);
             $info->setData($this->players);
-            $info->setPosition(-160, 60);
+            $info->setPosition(120, -1);
             $info->show();
             $this->lastsend = time();
-
         }
     }
 
@@ -102,7 +100,6 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         } else {
             $this->players[$login] = new CpInfo($this->storage->currentMap->nbCheckpoints - 1, $timeOrScore);
         }
-
         $this->displayWidget();
     }
 
@@ -123,6 +120,12 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
+    {
+        $this->reset();
+        $this->displayWidget();
+    }
+
+    public function onBeginMatch()
     {
         $this->reset();
         $this->displayWidget();

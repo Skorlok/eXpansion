@@ -14,17 +14,10 @@
 
 namespace ManiaLivePlugins\eXpansion\Chat;
 
-use ManiaLib\Utils\Formatting;
-use ManiaLive\Data\Player;
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Chat\Gui\Widgets\ChatSelect;
-use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 
 /**
  * Redirects the chat in order to display it nicer.
@@ -34,7 +27,7 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
  *
  * @author  Reaby
  */
-class Chat extends ExpPlugin
+class Chat extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     /** Is the redirection enabled or not ?
      *
@@ -42,26 +35,16 @@ class Chat extends ExpPlugin
      */
     private $enabled = true;
 
-    public static $channels = array();
-    public static $playerChannels = array("Public");
-
     /** @var Config */
     private $config;
     private $exclude = array();
     private $badWords = array();
 
-    /**
-     *
-     */
     public function eXpOnLoad()
     {
         $this->loadProfanityList();
-        self::$channels = array_merge(array("Public"), Config::getInstance()->channels);
     }
 
-    /**
-     *
-     */
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents(Event::ON_PLAYER_CONNECT);
@@ -80,29 +63,9 @@ class Chat extends ExpPlugin
             $this->enabled = false;
         }
 
-        if (Config::getInstance()->useChannels) {
-            $this->initChat();
-        }
-
         $this->config = Config::getInstance();
     }
 
-
-    /**
-     *
-     */
-    public function initChat()
-    {
-        $all = $this->storage->players + $this->storage->spectators;
-        foreach ($all as $login => $player) {
-            self::$playerChannels[$login] = "Public";
-            $this->displayWidget($login);
-        }
-    }
-
-    /**
-     *
-     */
     private function loadProfanityList()
     {
         $ignore = array(".", "..", "LICENSE", "README.md", "USERS.md", ".git");
@@ -123,34 +86,6 @@ class Chat extends ExpPlugin
         }
     }
 
-    /**
-     * @param Variable $var
-     */
-    public function onSettingsChanged(Variable $var)
-    {
-
-        if ($var->getConfigInstance() instanceof Config) {
-            if ($var->getName() == "useChannels") {
-                if ($var->getRawValue() == true) {
-                    $this->initChat();
-                } else {
-                    ChatSelect::EraseAll();
-                }
-            }
-            if ($var->getName() == "channels") {
-                self::$channels = array_merge(array("Public"), $var->getRawValue());
-                if (Config::getInstance()->useChannels) {
-                    ChatSelect::EraseAll();
-                    $this->initChat();
-                }
-            }
-        }
-    }
-
-    /**
-     * @param $text
-     * @return string
-     */
     public function applyFilter($text)
     {
         $out = array();
@@ -166,10 +101,6 @@ class Chat extends ExpPlugin
         return implode(" ", $out);
     }
 
-    /**
-     * @param $login
-     * @param string $params
-     */
     public function cmdChat($login, $params = "help")
     {
         switch (strtolower($params)) {
@@ -177,22 +108,18 @@ class Chat extends ExpPlugin
                 if (array_key_exists($login, $this->exclude)) {
                     unset($this->exclude[$login]);
                 }
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
                 break;
             case "off":
                 $this->exclude[$login] = $login;
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
                 break;
             default:
-                $this->connection->chatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
                 break;
         }
     }
 
-    /**
-     * @param $login
-     * @param $params
-     */
     public function admChat($login, $params)
     {
         $command = array_shift($params);
@@ -219,17 +146,12 @@ class Chat extends ExpPlugin
      */
     public function onPlayerConnect($login, $isSpectator)
     {
-        self::$playerChannels[$login] = "Public";
-        if (Config::getInstance()->useChannels) {
-            $this->displayWidget($login);
-        }
         $player = $this->storage->getPlayerObject($login);
-        $nickLog = Formatting::stripStyles($player->nickName);
-        Logger::getLog('chat')->write(
+        $nickLog = \ManiaLib\Utils\Formatting::stripStyles($player->nickName);
+        \ManiaLive\Utilities\Logger::getLog('chat')->write(
             " (" . $player->iPAddress . ") [" . $login . "] Connect with nickname " . $nickLog
         );
     }
-
 
     /**
      * On player just disconnect
@@ -239,41 +161,22 @@ class Chat extends ExpPlugin
      */
     public function onPlayerDisconnect($login, $reason = null)
     {
-        if (isset(self::$playerChannels['login'])) {
-            unset(self::$playerChannels['login']);
-        }
         $player = $this->storage->getPlayerObject($login);
         if (empty($player)) {
             return;
         }
-        Logger::getLog('chat')->write(
+        \ManiaLive\Utilities\Logger::getLog('chat')->write(
             " (" . $player->iPAddress . ") [" . $login . "] Disconnected"
         );
-
-        ChatSelect::Erase($login);
     }
 
-    /**
-     * @param $login
-     */
-    public function displayWidget($login)
-    {
-        /** @var ChatSelect $widget */
-        $widget = ChatSelect::Create($login);
-        $widget->sync();
-        $widget->show();
-    }
-
-    /**
-     * @return array
-     */
     public function getRecepients()
     {
 
         $array = array_values(
-            array_merge($this->storage->spectators , AdminGroups::getAdminsByPermission(Permission::CHAT_ON_DISABLED))
+            $this->storage->spectators + AdminGroups::getAdminsByPermission(Permission::CHAT_ON_DISABLED)
         );
-        foreach (Core::$playerInfo as $login => $playerinfo) {
+        foreach (\ManiaLivePlugins\eXpansion\Core\Core::$playerInfo as $login => $playerinfo) {
             if ($playerinfo->hasRetired) {
                 $array[] = $playerinfo->login;
             }
@@ -281,7 +184,7 @@ class Chat extends ExpPlugin
 
         $recepients = array();
         foreach ($array as $player) {
-            if ($player instanceof Player) {
+            if ($player instanceof \ManiaLive\Data\Player) {
                 $recepients[$player->login] = $player->login;
             } else {
                 $recepients[$player] = $player;
@@ -310,17 +213,10 @@ class Chat extends ExpPlugin
      */
     public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
     {
-
-        if ($playerUid != 0 && substr($text, 0, 2) == " /") {
-            Dispatcher::dispatch(new Event("PlayerChat", array($playerUid, $login, ltrim($text), true)));
-            return;
-        }
-
         if ($playerUid != 0 && substr($text, 0, 1) != "/" && $this->enabled) {
             $config = Config::getInstance();
             $force = "";
             $source_player = $this->storage->getPlayerObject($login);
-            $nick = $source_player->nickName;
             if ($config->allowMPcolors) {
                 if (strstr($source_player->nickName, '$>')) {
                     $nick = $source_player->nickName;
@@ -341,7 +237,7 @@ class Chat extends ExpPlugin
             if ($source_player == null) {
                 return;
             }
-
+            $nick = $source_player->nickName;
             $nick = str_ireplace('$w', '', $nick);
             $nick = str_ireplace('$z', '$z$s', $nick);
             // fix for chat...
@@ -349,42 +245,18 @@ class Chat extends ExpPlugin
             $text = str_replace('$<', '', $text);
 
             if ($this->config->publicChatActive || AdminGroups::hasPermission($login, Permission::CHAT_ON_DISABLED)) {
-                $playersCombined = $this->storage->players + $this->storage->spectators;
-                $channels = array();
-                $currentChannel = self::$playerChannels[$login];
-
-                foreach (self::$playerChannels as $key => $value) {
-                    $channels[$value][] = $key;
-                }
-
-                // by default set global channel
-                $receivers = null;
-                $channel = "";
-
-                if (Config::getInstance()->useChannels) {
-                    // if group
-                    if (self::$playerChannels[$login] != "Public") {
-                        $channel = "[" . ucfirst($currentChannel) . "] ";
-                        $receivers = implode(",", array_intersect(array_keys($playersCombined),
-                                (AdminGroups::getAdminsByPermission(Permission::CHAT_ADMINCHAT)
-                                    + $channels[$currentChannel]))
-                        );
-                    }
-                }
 
                 try {
                     // change text color, if admin is defined at admingroups
-                    if (AdminGroups::isInList($login)) {
+                    if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::isInList($login)) {
                         $color = $config->adminChatColor;
 
                         if ($this->expStorage->isRelay) {
                             $color = $config->otherServerChatColor;
                         }
                         $this->connection->chatSendServerMessage(
-                            $channel .
                             $config->adminSign . '$fff$<' . $nick . '$z$s$> '
-                            . $config->chatSeparator . $color . $force . $text,
-                            $receivers
+                            . $config->chatSeparator . $color . $force . $text
                         );
                     } else {
                         $color = $config->publicChatColor;
@@ -393,13 +265,12 @@ class Chat extends ExpPlugin
                         }
 
                         $this->connection->chatSendServerMessage(
-                            $channel . '$fff$<' . $nick . '$z$s$> ' . $config->chatSeparator . $color . $force . $text,
-                            $receivers
+                            '$fff$<' . $nick . '$z$s$> ' . $config->chatSeparator . $color . $force . $text
                         );
                     }
-                    $nickLog = Formatting::stripStyles($nick);
+                    $nickLog = \ManiaLib\Utils\Formatting::stripStyles($nick);
 
-                    Logger::getLog('chat')->write("[" . $login . "] " . $nickLog . " - " . $text);
+                    \ManiaLive\Utilities\Logger::getLog('chat')->write("[" . $login . "] " . $nickLog . " - " . $text);
                 } catch (\Exception $e) {
                     $this->console(
                         __(
@@ -425,22 +296,20 @@ class Chat extends ExpPlugin
                             '$fff$<' . $nick . '$z$s$> ' . $config->chatSeparator . $color . $force . $text,
                             $recepient
                         );
-                        $nickLog = Formatting::stripStyles($nick);
-                        Logger::getLog('chat')->write(
+                        $nickLog = \ManiaLib\Utils\Formatting::stripStyles($nick);
+                        \ManiaLive\Utilities\Logger::getLog('chat')->write(
                             "[" . $login . "] " . $nickLog . " - " . $text
                         );
                     } else {
                         $this->eXpChatSendServerMessage(
-                            "#error#Chat is disabled at at the moment!!! "
-                            . "You can chat when you retire or go spectator. You may still use PM messages",
+                            "#error#Chat is disabled at at the moment!!! You can chat when you retire or go spectator. You may still use PM messages",
                             $login,
                             array()
                         );
                     }
                 } else {
                     $this->eXpChatSendServerMessage(
-                        "#error#Chat is disabled at at the moment!!! "
-                        . "Only admins may chat. You may still use PM messages",
+                        "#error#Chat is disabled at at the moment!!! Only admins may chat. You may still use PM messages",
                         $login,
                         array()
                     );
@@ -459,6 +328,5 @@ class Chat extends ExpPlugin
     {
         Dispatcher::unregister(Event::getClass(), $this, Event::ON_PLAYER_CHAT);
         $this->connection->chatEnableManualRouting(false);
-        ChatSelect::EraseAll();
     }
 }

@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Best runs");
+        $this->setName("Widget: Best runs");
         $this->setDescription("Provides Best runs widget");
         $this->setGroups(array('Records', 'Widgets'));
 
@@ -24,7 +24,5 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP);
-
-        $this->setScriptCompatibilityMode(false);
     }
 }

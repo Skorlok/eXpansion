@@ -10,7 +10,7 @@ namespace ManiaLivePlugins\eXpansion\Maps\Structures;
 class SortableMap
 {
 
-    /** @var DbMap */
+    /** @var \Maniaplanet\DedicatedServer\Structures\Map */
     public $map;
 
     /** @var string */

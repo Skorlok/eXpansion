@@ -13,13 +13,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Stunts Figures");
+        $this->setName("Widget: Stunts Figures");
         $this->setDescription("Displays the stunts you made for TM");
         $this->setGroups(array('Widgets'));
 
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
-        $this->setEnviAsTitle(false);
 
         $this->addGameModeCompability(
             \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,

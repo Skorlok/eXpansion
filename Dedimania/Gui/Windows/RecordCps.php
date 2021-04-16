@@ -120,9 +120,6 @@ class RecordCps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function nextPage($offset)
     {
         $this->offset += $this->itemsPerPage;
-        if ($this->offset > count($this->recs)) {
-            $this->offset = count($this->recs) - $this->itemsPerPage;
-        }
         $this->updatePage($this->offset);
         $this->redraw($this->getRecipient());
     }

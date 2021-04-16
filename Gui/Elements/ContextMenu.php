@@ -81,7 +81,7 @@ class ContextMenu extends Control implements ScriptedContainer
             $label->setTextSize(1);
             $label->setPosX(3);
             $label->setAlign("left", "center");
-            $label->setAttribute("textfont","Oswald");
+            $label->setStyle("TextCardScores2");
             $this->frame->addComponent($label);
             $i++;
         }

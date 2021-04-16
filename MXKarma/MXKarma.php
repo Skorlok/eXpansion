@@ -172,7 +172,7 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
         $widget->show();
     }
 
-    public function onBeginMatch()
+    public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         parent::onBeginMatch();
         $this->mxRatings = null;

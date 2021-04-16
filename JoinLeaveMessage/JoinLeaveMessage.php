@@ -4,9 +4,7 @@ namespace ManiaLivePlugins\eXpansion\JoinLeaveMessage;
 
 use DateTime;
 use Exception;
-use ManiaLive\Features\Admin\AdminGroup;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
@@ -137,7 +135,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
             if ($player === null) {
                 $msg = "#admin_error#a player with login '#variable#" . $login
                     . "#admin_error#' connected, but no player object for this login exist.";
-                AdminGroups::announceToPermission(Permission::SERVER_ADMIN, "");
+                AdminGroups::announceToPermission(\ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN, "");
 
                 return;
             }
@@ -153,14 +151,6 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
 
             $grpName = AdminGroups::getGroupName($login);
 
-            $admin = AdminGroups::getAdmin($login);
-            if ($admin) {
-                $group = $admin->getGroup();
-                if ($group->hasPermission(Permission::JOIN_MESSAGE_DISABLED) && $group->isMaster()) {
-                    return;
-                };
-            }
-
             $config = Config::getInstance();
             $playTime = Helper::formatPastTime($this->expStorage->getDbPlayer($login)->getPlayTime(), 2);
             $joinTimeArgs = array('$z$s' . $nick . '$z$s', $login, $country, $spec, $grpName, $playTime);
@@ -170,13 +160,13 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
                 $ag = AdminGroups::getInstance();
                 if ($config->showTotalPlayOnJoin) {
                     $ag->announceToPermission(
-                        Permission::SERVER_ADMIN,
+                        \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                         $this->joinMsgTime,
                         $joinTimeArgs
                     );
                 } else {
                     $ag->announceToPermission(
-                        Permission::SERVER_ADMIN,
+                        \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                         $this->joinMsg,
                         $joinArgs
                     );
@@ -210,7 +200,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
                 $msg = "#admin_error#a player with login '#variable#" . $login
                     . "#admin_error#' disconnected, but no player object for this login exist.";
                 $ag = AdminGroups::getInstance();
-                $ag->announceToPermission(Permission::SERVER_ADMIN, $msg);
+                $ag->announceToPermission(\ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN, $msg);
 
                 return;
             }
@@ -223,7 +213,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
             if ($config->hideFromPlayers) {
                 $ag = AdminGroups::getInstance();
                 $ag->announceToPermission(
-                    Permission::SERVER_ADMIN,
+                    \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                     $this->leaveMsg,
                     array('$z$s' . $nick . '$z$s', $login, $country, $grpName, $playtime)
                 );

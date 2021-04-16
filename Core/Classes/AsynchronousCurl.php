@@ -1,6 +1,4 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core\Classes;
-
 /**
  * @author       Oliver de Cramer (oliverde8 at gmail.com)
  * @copyright    GNU GENERAL PUBLIC LICENSE
@@ -22,18 +20,21 @@ namespace ManiaLivePlugins\eXpansion\Core\Classes;
  *  along with this program.  If not, see {http://www.gnu.org/licenses/}.
  */
 
-use ManiaLib\Utils\Singleton;
+namespace ManiaLivePlugins\eXpansion\Core\Classes;
+
 use ManiaLive\Application\Event as AppEvent;
-use ManiaLive\Application\Listener;
 use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Features\Tick\Listener as TickListener;
-use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\types\AsynchronousCurlData;
 use oliverde8\AsynchronousJobs\Job\CallbackCurl;
 use oliverde8\AsynchronousJobs\JobRunner;
 
-class AsynchronousCurl extends Singleton implements Listener, TickListener
+class AsynchronousCurl extends \ManiaLib\Utils\Singleton implements \ManiaLive\Application\Listener, \ManiaLive\Features\Tick\Listener
 {
+    protected $handle;
+
+    /** @var AsynchronousCurlData[] */
+    protected $_queries = array();
 
     public function start()
     {
@@ -48,9 +49,8 @@ class AsynchronousCurl extends Singleton implements Listener, TickListener
      *
      * @param string $url
      * @param callable $callback
-     * @param null $additionalData
+     * @param mixed $addionalData if you need to pass additional metadata with the query, like login do it here
      * @param array $options curl options array
-     * @internal param mixed $addionalData if you need to pass additional metadata with the query, like login do it here
      */
     public function query($url, $callback, $additionalData = null, $options = array())
     {
@@ -58,13 +58,9 @@ class AsynchronousCurl extends Singleton implements Listener, TickListener
         $curlJob->setCallback($callback);
         $curlJob->setUrl($url);
 
-        $options = array(
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_USERAGENT => "eXpansionPluginPack v " . Core::EXP_VERSION,
-            ) + $options;
+        $options = array(CURLOPT_SSL_VERIFYPEER => false, CURLOPT_USERAGENT => "eXpansionPluginPack v " . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION,) + $options;
 
         $curlJob->setOptions($options);
-        /** @var  mixed __additionalData */
         $curlJob->__additionalData = $additionalData;
 
         $curlJob->start();
@@ -100,6 +96,6 @@ class AsynchronousCurl extends Singleton implements Listener, TickListener
 
     public function onTerminate()
     {
-
+        curl_multi_close($this->handle);
     }
 }

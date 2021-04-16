@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Best Checkpoints");
+        $this->setName("Widget: Best Checkpoints");
         $this->setDescription("Provides Best checkpoints widget at the top of the screen.");
         $this->setGroups(array('Records', 'Widgets'));
 

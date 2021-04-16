@@ -1,16 +1,15 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\AutoUpdate;
 
-use ManiaLib\Utils\Singleton;
+namespace ManiaLivePlugins\eXpansion\AutoUpdate;
 
 /**
  * Description of Config
  *
  * @author Petri
  */
-class Config extends Singleton
+class Config extends \ManiaLib\Utils\Singleton
 {
     public $autoCheckUpdates = false;
     public $useGit = true;
-    public $branchName = "nightly";
+    public $branchName = "nighty";
 }

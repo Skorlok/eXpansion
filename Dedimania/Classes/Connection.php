@@ -232,38 +232,29 @@ class Connection extends Singleton implements AppListener, TickListener
      * @param string $greplay ghost Replay
      *
      */
-    public function setChallengeTimes(Map $map, $rankings, $vreplay, $greplay)
+    public function setChallengeTimes(Map $map, $rankings, $vreplay, $greplay, $AllCps)
     {
-
         // disabled for relay server
         if (eXpStorage::getInstance()->isRelay) {
             return;
         }
 
         // special rounds mode disabled
-        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS
-            && (!isset($map->lapRace) || $map->lapRace)
-            && $this->storage->gameInfos->roundsForcedLaps
-            && $this->storage->gameInfos->roundsForcedLaps != 0
-        ) {
+		$ScriptSettings = $this->connection->GetModeScriptSettings();
+		
+        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $ScriptSettings["S_ForceLapsNb"]!= -1) {
             $this->console("[Warning] Special rounds mode with forced laps ignored!");
-
             return;
         }
 
         // only special maps under 8 seconds are allowed
         if ($map->authorTime < 8000 && strtolower($map->author) != 'nadeo') {
             $this->console("[Notice] Author time under 8 seconds, will not send records.");
-
             return;
         }
 
         if ($this->dediUid != $map->uId) {
-            $this->console(
-                "[Warning] Map UId mismatch! Map UId differs from dedimania"
-                ." recieved uid for the map. Times are not sent."
-            );
-
+            $this->console("[Warning] Map UId mismatch! Map UId differs from dedimania recieved uid for the map. Times are not sent.");
             return;
         }
 
@@ -285,40 +276,29 @@ class Connection extends Singleton implements AppListener, TickListener
         usort($times, array($this, "dbsort"));
 
         if (sizeof($times) == 0) {
-            $this->debug("No new records, skipping dedimania send.");
-
+            $this->console("No new records, skipping dedimania send.");
             return;
         }
 
         $Vchecks = "";
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_LAPS) {
-            $Vchecks = implode(",", $rankings[0]['AllCheckpoints']);
+        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $Vchecks = $AllCps;
         }
 
         if (empty($vreplay)) {
             $this->console("Validation replay is empty, cancel sending times.");
-
             return;
         }
         $base64Vreplay = new IXR_Base64($vreplay);
 
         $base64Greplay = "";
-        if (($this->dediBest == null && sizeof($this->dediRecords['Records']) == 0)
-            || $times[0]['Best'] < $this->dediBest
-        ) {
+        if (($this->dediBest == null && sizeof($this->dediRecords['Records']) == 0) || $times[0]['Best'] < $this->dediBest) {
             $base64Greplay = new IXR_Base64($greplay);
         }
 
-
         $replays = array("VReplay" => $base64Vreplay, "VReplayChecks" => $Vchecks, "Top1GReplay" => $base64Greplay);
 
-        $args = array(
-            $this->sessionId,
-            $this->_getMapInfo($map),
-            $this->_getGameMode(),
-            $times,
-            $replays,
-        );
+        $args = array($this->sessionId,$this->_getMapInfo($map),$this->_getGameMode(),$times,$replays,);
 
         $request = new dediRequest("dedimania.SetChallengeTimes", $args);
         $this->send($request, array($this, "xSetChallengeTimes"));
@@ -330,15 +310,7 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function send(dediRequest $request, $callback)
     {
-        $this->webaccess->request(
-            $this->url,
-            array(array($this, '_process'), $callback),
-            $request->getXml(),
-            true,
-            600,
-            3,
-            5
-        );
+        $this->webaccess->request($this->url,array(array($this, '_process'), $callback),$request->getXml(),true,600,3,5);
     }
 
     /**

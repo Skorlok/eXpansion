@@ -41,8 +41,7 @@ Notice
 Notice
 
 Auto hide
-
-Masquage automatique
+Auto hide
 
 Show Diff
 Afficher Diff

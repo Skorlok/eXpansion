@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords;
 
 use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
  * Description of MetaData
@@ -16,24 +17,22 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Dedimania Records");
+        $this->setName("Widget: Dedimania Records");
         $this->setDescription("Provides dedimania records widget");
         $this->setGroups(array('Widgets', 'Records'));
 
+        $this->addGameModeCompability(GameInfos::GAMEMODE_TIMEATTACK);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_ROUNDS);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_TEAM);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_LAPS);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_CUP);
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP);
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            'TeamAttack.Script.txt'
-        );
 
         $config = Config::getInstance();
-
+        $var = new Boolean("isHorizontal", "Use horizontal (old) widget style", $config, false, false);
+        $var->setDefaultValue(false);
+        $this->registerVariable($var);
     }
 
 

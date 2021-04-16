@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Dedimania_Script;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
  * Description of MetaData
@@ -15,35 +16,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Dedimania for Scripted modes");
+        $this->setName("Dedimania (Deprecated !!!)");
         $this->setDescription("Dedimania, Global world records system integration");
         $this->setGroups(array('Records'));
 
+        $this->addGameModeCompability(GameInfos::GAMEMODE_ROUNDS);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_TEAM);
+        $this->addGameModeCompability(GameInfos::GAMEMODE_CUP);
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
         $this->setEnviAsTitle(true);
-
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            "TimeAttack.Script.txt"
-        );
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            "Rounds.Script.txt"
-        );
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            "Cup.Script.txt"
-        );
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            "Team.Script.txt"
-        );
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            "Laps.Script.txt"
-        );
-        $this->setScriptCompatibilityMode(false);
 
         $config = \ManiaLivePlugins\eXpansion\Dedimania\Config::getInstance();
 

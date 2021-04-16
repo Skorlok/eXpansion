@@ -1,6 +1,4 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
-
 /**
  * @author       Oliver de Cramer (oliverde8 at gmail.com)
  * @copyright    GNU GENERAL PUBLIC LICENSE
@@ -22,17 +20,17 @@ namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
  *  along with this program.  If not, see {http://www.gnu.org/licenses/}.
  */
 
+namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
+
+use ManiaLive\Gui\Controls\Pager;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Gui\Controls\ConfElement;
 use ManiaLivePlugins\eXpansion\Core\MetaData;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
-class ConfSwitcher extends Window
+class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
     /**
@@ -46,21 +44,18 @@ class ConfSwitcher extends Window
     private $configManager = null;
 
     /**
-     * @var ConfElement[]
+     * @var Plugin[]
      */
     protected $items = array();
 
-    /** @var  Inputbox */
     protected $input;
-
-    /** @var  Button */
     protected $buttonSave;
 
     protected function onConstruct()
     {
         parent::onConstruct();
 
-        $this->pagerFrame = new Pager();
+        $this->pagerFrame = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->pagerFrame->setPosY(-2);
 
         $this->mainFrame->addComponent($this->pagerFrame);
@@ -71,7 +66,7 @@ class ConfSwitcher extends Window
         $this->input->setScale(0.8);
         $this->mainFrame->addComponent($this->input);
 
-        $this->buttonSave = new Button(20, 5);
+        $this->buttonSave = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(20, 5);
         $this->buttonSave->setText(__("Save"));
         $this->buttonSave->setAction($this->createAction(array($this, 'saveAction')));
         $this->buttonSave->setScale(0.8);
@@ -106,7 +101,7 @@ class ConfSwitcher extends Window
         $this->populateFromDir($var, 'libraries/ManiaLivePlugins/eXpansion/Core/defaultConfigs', false);
     }
 
-    public function populateFromDir(Variable $var, $dir, $diff)
+    public function populateFromDir($var, $dir, $diff)
     {
         $helper = Helper::getPaths();
 

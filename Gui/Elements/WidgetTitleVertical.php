@@ -5,10 +5,11 @@ namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 use ManiaLivePlugins\eXpansion\Gui\Config;
 
 /**
+ * Description of ListBackGround
  *
  * @author oliverde8
  */
-class WidgetTitleVertical extends \ManiaLivePlugins\eXpansion\Gui\Control
+class WidgetTitle extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
     protected $bg;

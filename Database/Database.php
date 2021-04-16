@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Database;
 
 use ManiaLib\Utils\Formatting as StringFormatting;
-use ManiaLive\Data\Player;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
@@ -113,15 +112,9 @@ class Database extends ExpPlugin
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         $firstFound = false;
-
-        foreach ($rankings as $key => $playerArr) { // get players
-            /** @var Player $player */
-            $player = Player::fromArray($playerArr);
-            if (array_key_exists($player->login, $this->storage->players)) {
-                $this->updatePlayTime($this->storage->players[$player->login]);
-            }
-
-            if ($player->rank == 1 && sizeof($rankings) > 1 && !$firstFound) {
+        foreach ($this->storage->players as $login => $player) { // get players
+            $this->updatePlayTime($player);
+            if ($player->rank == 1 && sizeof($this->storage->players) > 1 && !$firstFound) {
                 $this->incrementWins($player);
                 $firstFound = true;
             }
@@ -140,9 +133,8 @@ class Database extends ExpPlugin
     public function updatePlayTime($player)
     {
         $time = time();
-        if (empty($player) || (!$player->spectator && $this->expStorage->isRelay)) {
+        if (empty($player) || (!$player->spectator && $this->expStorage->isRelay))
             return;
-        }
 
         if (isset($player->lastTimeUpdate)) {
             $playtime = $time - $player->lastTimeUpdate;
@@ -252,16 +244,10 @@ class Database extends ExpPlugin
         if (!$this->db->tableExists('exp_maps')) {
             $this->createMapTable();
         }
-
-        if ($this->getDatabaseVersion('exp_maps') == 1) {
+        if ($this->getDatabaseVersion('exp_maps') != 2) {
             $this->db->execute('ALTER TABLE exp_maps ADD KEY(challenge_uid);');
             $this->setDatabaseVersion('exp_maps', 2);
         }
-
-        if ($this->getDatabaseVersion('exp_maps') == 2) {
-            $this->updateMapsTableTo3();
-        }
-
     }
 
     public function createDatabaseTable()
@@ -335,51 +321,6 @@ class Database extends ExpPlugin
                                     ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = MYISAM ;";
         $this->db->execute($q);
     }
-
-
-    public function updateMapsTableTo3()
-    {
-
-        $sql = "ALTER TABLE `exp_maps` 
-              ADD `mx_trackID` INT UNSIGNED NULL , 
-              ADD `mx_userID` INT UNSIGNED NULL , 
-              ADD `mx_username` VARCHAR(100) NULL , 
-              ADD `mx_uploadedAt` DATETIME NULL , 
-              ADD `mx_updatedAt` DATETIME NULL , 
-              ADD `mx_typeName` VARCHAR(100) NULL , 
-              ADD `mx_mapType` VARCHAR(255) NULL , 
-              ADD `mx_titlePack` VARCHAR(255) NULL , 
-              ADD `mx_styleName` VARCHAR(255) NULL , 
-              ADD `mx_displayCost` INT NULL , 
-              ADD `mx_modName` VARCHAR(255) NULL , 
-              ADD `mx_lightMap` INT NULL ,
-              ADD `mx_exeVersion` VARCHAR(50) NULL ,
-              ADD `mx_exeBuild` VARCHAR(100) NULL , 
-              ADD `mx_environmentName` VARCHAR(255) NULL ,
-              ADD `mx_vehicleName` VARCHAR(255) NULL , 
-              ADD `mx_unlimiterRequired` BOOLEAN NULL , 
-              ADD `mx_routeName` VARCHAR(255) NULL , 
-              ADD `mx_lengthName` VARCHAR(100) NULL , 
-              ADD `mx_laps` INT NULL,
-              ADD `mx_difficultyName` VARCHAR(100) NULL,
-              ADD `mx_replayTypeName` VARCHAR(100) NULL,
-              ADD `mx_replayWRID` INT UNSIGNED NULL,
-              ADD `mx_replayWRTime` INT NULL,
-              ADD `mx_replayWRUserID` INT NULL,
-              ADD `mx_replayWRUsername` VARCHAR(255) NULL,
-              ADD `mx_ratingVoteCount` INT NULL,
-              ADD `mx_ratingVoteAverage` FLOAT NULL,                                          
-              ADD `mx_replayCount` INT NULL,
-              ADD `mx_trackValue` INT NULL,
-              ADD `mx_comments` TEXT NULL,
-              ADD `mx_commentsCount` INT NULL,
-              ADD `mx_awardCount` INT NULL,
-              ADD `mx_hasScreenshot` BOOLEAN NULL,
-              ADD `mx_hasThumbnail` BOOLEAN NULL;";
-        $this->db->execute($sql);
-        $this->setDatabaseVersion('exp_maps', 3);
-    }
-
 
     public function getPlayer($login)
     {

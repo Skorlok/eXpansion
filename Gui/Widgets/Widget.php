@@ -3,16 +3,9 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Widgets;
 
 use ManiaLib\Gui\Elements\Label;
-use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Core\ConfigManager;
-use ManiaLivePlugins\eXpansion\Gui\Config;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\MetaData;
-use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
-use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 
 /**
  * @abstract
@@ -20,36 +13,79 @@ use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 class Widget extends PlainWidget
 {
 
+    private $move;
+    private $_coord;
+    private $_input;
+    private $_save;
 
+    private $axisDisabled = "";
     private $script;
 
-    /** @var array */
+    /** @var Array */
     private $positions = array();
 
-    /** @var array */
+    /** @var Array */
     private $widgetVisible = array();
     private $visibleLayerInit = "normal";
 
     /** @var \ManiaLive\Data\Storage */
     private $storage;
-
     private static $config;
-
     public $currentSettings = array();
 
     protected function onConstruct()
     {
         parent::onConstruct();
-
         $this->eXpOnBeginConstruct();
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\WidgetScript");
+        $this->script->setParam(
+            'disablePersonalHud',
+            \ManiaLivePlugins\eXpansion\Gui\Config::getInstance()->disablePersonalHud ? 'True' : 'False'
+        );
         $this->registerScript($this->script);
 
+        $this->move = new \ManiaLib\Gui\Elements\Quad(45, 7);
+        $this->move->setStyle("Icons128x128_1");
+        $this->move->setSubStyle("ShareBlink");
+        $this->move->setScriptEvents();
+        $this->move->setId("enableMove");
+        $this->addComponent($this->move);
         $this->storage = \ManiaLive\Data\Storage::getInstance();
+        $this->xml = new \ManiaLive\Gui\Elements\Xml();
+
+        // @todo enable this when saving coordinates is redone.
+
+        /*
+        $this->_coord = new Label();
+        $this->_coord->setAlign("center", "center");
+        $this->_coord->setId("coordLabel");
+        $this->_coord->setAttribute('hidden', "true");
+        $this->addComponent($this->_coord);
+
+        $this->_input = new Inputbox("coordinates");
+        $this->_input->setPosition(900, 900);
+        $this->addComponent($this->_input);
+
+        $this->_save = new Label();
+        $this->_save->setStyle('CardButtonSmallXS');
+        $this->_save->setText("Save");
+        $this->_save->setAlign("center", "center");
+        $this->_save->setId("coordButton");
+        $this->_save->setAttribute('hidden', "true");
+        $this->_save->setAction($this->createAction(array($this, "_save")));
+        $this->_save->setScale(0.7);
+        $this->addComponent($this->_save); */
 
         $this->eXpOnEndConstruct();
         $this->eXpLoadSettings();
     }
+
+    public function _save($login, $entries)
+    {
+        echo $login . "\n";
+        print_r($entries);
+    }
+
 
     /**
      * When the Widget is being constructed.
@@ -74,71 +110,52 @@ class Widget extends PlainWidget
 
     private function eXpLoadSettings()
     {
-        $this->currentSettings = array();
-
         $widgetName = str_replace(" ", "", $this->getName());
 
-        $configFile = APP_ROOT.DIRECTORY_SEPARATOR."config".DIRECTORY_SEPARATOR."widgets.ini";
-        if (!file_exists($configFile)) {
-            $configFile = __DIR__ . '/../widgets.ini';
-        }
+        if (isset(self::$config[$widgetName])) {
 
-        $config = parse_ini_file($configFile, true,
-            INI_SCANNER_TYPED);
+            //Getting exact game mode
+            $gameMode = $this->storage->gameInfos->gameMode;
+            if ($gameMode == 0) {
+                $gameMode = $this->storage->gameInfos->scriptName;
+            }
 
-        //Getting exact game mode
-        $gameMode = $this->storage->gameInfos->gameMode;
-        if ($gameMode == 0) {
-            $gameMode = $this->storage->gameInfos->scriptName;
-        }
+            //Getting compatibility Game mode
+            $compoMode = Gui::eXpGetCurrentCompatibilityGameMode();
 
-        //Getting compatibility Game mode
-        $compoMode = Gui::eXpGetCurrentCompatibilityGameMode();
+            /**
+             * @var \ManiaLivePlugins\eXpansion\Helpers\Storage $storage
+             */
+            $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
 
-        /**
-         * @var \ManiaLivePlugins\eXpansion\Helpers\Storage $storage
-         */
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+            //Getting full title id
+            $titleid = $storage->version->titleId;
 
-        foreach ($config as $widgetName2 => $values) {
-            if ($widgetName2 == $widgetName) {
-                foreach ($values as $data => $value) {
-                    $modeVariable = explode(".", $data);
-                    $outCompo = "TM";
-                    $outMode = 0;
+            //Getting environnment based simple title id
+            $enviTitle = $storage->simpleEnviTitle;
 
-                    switch ($modeVariable[0]) {
-                        case "ta":
-                            $outMode = \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK;
-                            break;
-                        case "rounds":
-                            $outMode = \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS;
-                            break;
-                        case "team":
-                            $outMode = \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM;
-                            break;
-                        case "laps":
-                            $outMode = \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS;
-                            break;
-                        case "cup":
-                            $outMode = \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP;
-                            break;
-                        case "storm":
-                            if ($storage->simpleEnviTitle == "SM") {
-                                $this->currentSettings[$modeVariable[1]] = $value;
+
+            $this->currentSettings = array();
+            foreach (self::$config[$widgetName] as $name => $values) {
+                if (isset($values[$gameMode])) {
+                    $this->currentSettings[$name] = $values[$gameMode];
+                } else {
+                    if (isset($values[$compoMode])) {
+                        $this->currentSettings[$name] = $values[$compoMode];
+                    } else {
+                        if (isset($values[$titleid])) {
+                            $this->currentSettings[$name] = $values[$titleid];
+                        } else {
+                            if (isset($values[$enviTitle])) {
+                                $this->currentSettings[$name] = $values[$enviTitle];
+                            } else {
+                                if (isset($values[WConfig::config_default])) {
+                                    $this->currentSettings[$name] = $values[WConfig::config_default];
+                                }
                             }
-                            $outMode = -1;
-                            break;
-                        case "default":
-                            $this->currentSettings[$modeVariable[1]] = $value;
-                            break;
-                    }
-
-                    if ($outMode == $gameMode || $outMode == $compoMode) {
-                        $this->currentSettings[$modeVariable[1]] = $value;
+                        }
                     }
                 }
-
             }
         }
 
@@ -146,10 +163,11 @@ class Widget extends PlainWidget
         $this->eXpOnSettingsLoaded();
     }
 
-
     protected function onDraw()
     {
+
         $this->script->setParam("name", $this->getName());
+        $this->script->setParam("axisDisabled", $this->axisDisabled);
         $this->script->setParam("version", \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION);
 
         if ($this->storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
@@ -158,13 +176,19 @@ class Widget extends PlainWidget
             $this->script->setParam("gameMode", $this->storage->gameInfos->gameMode);
         }
 
+        $this->script->setParam("visibleLayerInit", $this->visibleLayerInit);
+        $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
+
         parent::onDraw();
+
     }
 
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-
+        $this->move->setSize($this->getSizeX(), $this->getSizeY());
+     /*   $this->_coord->setPosition($this->getSizeX() / 2, -$this->getSizeY() / 2);
+        $this->_save->setPosition($this->getSizeX() / 2, -($this->getSizeY() / 2) - 5); */
     }
 
     protected function autoSetPositions()
@@ -175,11 +199,6 @@ class Widget extends PlainWidget
         if ($posX != null && $posY != null) {
             $this->setPosition($posX, $posY);
         }
-
-        if ($this->getParameter('layer')) {
-            $this->setLayer($this->getParameter("layer"));
-        }
-
     }
 
     public function closeWindow()

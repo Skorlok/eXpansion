@@ -1,4 +1,5 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\types\config\types;
 
 /**
@@ -39,8 +40,8 @@ class BoundedTypeFloat extends TypeFloat
      * Prevents values of the Variable to be greater then this value
      *
      * @param int $max Sets the maximum value allowed
-     * @return BoundedTypeFloat
      *
+     * @return \ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt
      */
     public function setMax($max)
     {
@@ -54,7 +55,7 @@ class BoundedTypeFloat extends TypeFloat
      *
      * @param int $min Sets the minumum value allowed
      *
-     * @return BoundedTypeFloat
+     * @return \ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt
      */
     public function setMin($min)
     {
@@ -66,7 +67,7 @@ class BoundedTypeFloat extends TypeFloat
     public function basicValueCheck($value)
     {
         return ($this->max == null || $value <= $this->max)
-            && ($this->min == null || $value >= $this->min)
-            && parent::basicValueCheck($value);
+        && ($this->min == null || $value >= $this->min)
+        && parent::basicValueCheck($value);
     }
 }

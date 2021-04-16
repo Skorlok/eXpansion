@@ -3,63 +3,49 @@
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
 
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
-use ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSetting;
-use ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu;
-use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
-use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 /**
  * Description of ExpSettings
  *
  * @author De Cramer Oliver
  */
-class ExpSettings extends Window
+class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    /** @var ExpSettingsMenu */
+    /**
+     *
+     * @var \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu
+     */
     public $menuFrame = null;
-    /** @var Pager */
     public $pagerFrame = null;
     public $actions = array();
     public $items = array();
-    /** @var  ConfigManager */
     public $configManager;
-
-    /** @var string */
     protected $currentGroup = "";
     protected $first = false;
     protected $confName = "main";
 
-    /** @var  Button */
-    protected $button_validate;
-    /** @var  Button */
-    protected $button_cancel;
+    protected $button_validate = null;
+    protected $button_cancel = null;
 
     protected function onConstruct()
     {
         parent::onConstruct();
 
-        $this->menuFrame = new ExpSettingsMenu();
+        $this->menuFrame = new \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu();
 
-        $this->pagerFrame = new Pager();
+        $this->pagerFrame = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->pagerFrame->setPosY(3);
 
         $this->mainFrame->addComponent($this->pagerFrame);
         $this->mainFrame->addComponent($this->menuFrame);
 
-        $this->button_validate = new Button();
+        $this->button_validate = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
         $this->button_validate->setText("Save");
         $this->button_validate->setAction($this->createAction(array($this, 'applySettings')));
         $this->mainFrame->addComponent($this->button_validate);
     }
 
-    /**
-     * @param $oldX
-     * @param $oldY
-     */
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
@@ -91,6 +77,8 @@ class ExpSettings extends Window
 
     public function refreshInfo()
     {
+
+
         foreach ($this->items as $item) {
             $item->destroy();
         }
@@ -111,10 +99,9 @@ class ExpSettings extends Window
         $this->items = array();
         $i = 0;
         if (isset($groupVars[$this->currentGroup])) {
-            /** @var Variable $var */
             foreach ($groupVars[$this->currentGroup] as $var) {
                 if ($var->getVisible()) {
-                    $item = new ExpSetting($i, $var, $this->getRecipient(), $this);
+                    $item = new \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSetting($i, $var, $this->getRecipient(), $this);
                     $this->pagerFrame->addItem($item);
                     $this->items[] = $item;
                     $i++;
@@ -123,23 +110,14 @@ class ExpSettings extends Window
         }
     }
 
-    /**
-     * @param $login
-     * @param $groupName
-     */
     public function switchGroup($login, $groupName)
     {
         $this->populate($this->configManager, $groupName, $this->confName);
         $this->redraw();
     }
 
-    /**
-     * @param $login
-     * @param null $args
-     */
     public function applySettings($login, $args = null)
     {
-        /** @var ExpSetting $item */
         foreach ($this->items as $item) {
             $var = $item->getVar();
             if ($var != null) {
@@ -150,12 +128,9 @@ class ExpSettings extends Window
         $this->populate($this->configManager, $this->currentGroup, $this->confName);
         $this->redraw();
         $msg = eXpGetMessage("Settings are now saved!");
-        Gui::showNotice($msg, $login);
+        \ManiaLivePlugins\eXpansion\Gui\Gui::showNotice($msg, $login);
     }
 
-    /**
-     *
-     */
     public function destroy()
     {
         foreach ($this->items as $item) {

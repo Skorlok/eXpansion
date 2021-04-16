@@ -1,5 +1,4 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Gui;
 
 /*
  * Copyright (C) 2015 Reaby
@@ -17,9 +16,8 @@ namespace ManiaLivePlugins\eXpansion\Gui;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-use ManiaLive\Gui\Containable;
-use ManiaLive\Gui\Container;
 
+namespace ManiaLivePlugins\eXpansion\Gui;
 
 /**
  * Description of Control
@@ -36,8 +34,9 @@ class Control extends \ManiaLive\Gui\Control
         foreach ($this as $index => $value) {
             if (\is_object($value)) {
 
-                if ($value instanceof Containable || $value instanceof Container) {
+                if ($value instanceof \ManiaLive\Gui\Containable || $value instanceof \ManiaLive\Gui\Container) {
                     $value->destroyComponents();
+                    $value->destroy();
                     unset($this->$index);
                     continue;
                 }
@@ -46,8 +45,8 @@ class Control extends \ManiaLive\Gui\Control
                     unset($this->$index);
                     continue;
                 }
-                unset($this->$index);
 
+                unset($this->$index);
             } else {
                 unset($this->$index);
             }

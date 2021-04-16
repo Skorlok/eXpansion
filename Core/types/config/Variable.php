@@ -4,9 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types\config;
 
 use ManiaLib\Utils\Singleton;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLive\Utilities\Console;
-use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Events\PluginSettingChange;
 
 /**
@@ -56,18 +54,18 @@ abstract class Variable
 
     /**
      *
-     * @var ConfigManager
+     * @var \ManiaLivePlugins\eXpansion\Core\ConfigManager
      */
     private $confManager = null;
 
     /**
      *
-     * @param string $name The name of the variable in the config file
-     * @param string $visibleName The name the players should see
+     * @param String $name The name of the variable in the config file
+     * @param String $visibleName The name the players should see
      * @param Singleton $configInstance The config instance in which the value should be saved into
-     * @param int|bool $scope Is the scope of this variable global or server only
-     * @param bool $showMain Should the setting be shown in the main configuration or in the main expansion
-     *         configuration
+     * @param int | bool $scope Is the scope of this variable global or server only
+     * @param Boolean $showMain Should the setting be shown in the main configuration or in the main expansion
+     *                                   configuration
      */
     public function __construct($name, $visibleName = "", $configInstance = null, $scope = true, $showMain = true)
     {
@@ -76,7 +74,7 @@ abstract class Variable
         $this->setScope($scope);
         $this->showMain = $showMain;
         $this->configInstance = $configInstance;
-        $this->confManager = ConfigManager::getInstance();
+        $this->confManager = \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance();
     }
 
     /**
@@ -85,7 +83,7 @@ abstract class Variable
      *
      * @param mixed $value The value that can be set
      *
-     * @return Variable
+     * @return \ManiaLivePlugins\eXpansion\Core\types\config\Variable
      */
     public function addPossibleValue($value)
     {
@@ -110,7 +108,7 @@ abstract class Variable
      *
      * @param mixed $value The value this variable should have if not defined it the configuration.
      *
-     * @return Variable
+     * @return \ManiaLivePlugins\eXpansion\Core\types\config\Variable
      */
     public function setDefaultValue($value)
     {
@@ -125,7 +123,7 @@ abstract class Variable
      *
      * @param Boolean $canBe
      *
-     * @return Variable
+     * @return \ManiaLivePlugins\eXpansion\Core\types\config\Variable
      */
     public function setCanBeNull($canBe)
     {
@@ -281,7 +279,7 @@ abstract class Variable
     /**
      * The default value of this variable.
      *
-     * @return mixed
+     * @return type
      */
     public function getDefaultValue()
     {
@@ -309,10 +307,10 @@ abstract class Variable
             $core = $this->confManager->getCore();
 
             /**
-             * @var PluginHandler
+             * @var \ManiaLive\PluginHandler\PluginHandler
              */
             if ($core != null) {
-                $phandler = PluginHandler::getInstance();
+                $phandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
                 try {
                     $phandler->callPublicMethod($core, $this->pluginId, 'onSettingsChanged', array($this));
                 } catch (\Exception $ex) {

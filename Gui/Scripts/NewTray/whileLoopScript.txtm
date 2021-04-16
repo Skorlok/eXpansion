@@ -11,6 +11,7 @@ if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate) >= 500 ) {
              }
         }
 
+
         if (Speed > 51.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
             if (lastValue == False) {
                 edge_isMinimized = True;
@@ -25,9 +26,12 @@ if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate) >= 500 ) {
 }
 
 foreach (Event in PendingEvents) {
-    if (Event.Type == CMlEvent::Type::MouseClick && (Event.ControlId == "myWindow" || Event.ControlId == "minimizeButton" )) {
-        exp_trayId[id] = !exp_trayId[id];
-        start = Now;
+    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "myWindow" || Event.ControlId == "minimizeButton" )) {
+		if(eXp_lastClockUpdate != Now) {
+                     exp_trayId[id] = !exp_trayId[id];
+                     start = Now;
+        }
+        eXp_lastClockUpdate = Now;
     }
 }
 
@@ -58,16 +62,16 @@ if (edge_animatedId[id] == True) {
             value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 250.);
         }
         else {
-            value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 1., -1., 250.);
+            value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 250.);
         }
- }
+    }
 
 
  if (exp_trayId[id]) {
-    declare Real value2 = value + diff * AL::Ease("EaseInCirc", (Now - start) * 1., 0., 1., 250.);
-    Window.RelativePosition_V3.X = p.X + value2;
- }
- else {
-    declare Real value2 = value + diff * AL::Ease("EaseInCirc", (Now - start) * 1., 1., -1., 250.);
-    Window.RelativePosition_V3.X =  p.X + value2;
- }
+            declare Real value2 = value + diff * AL::Ease("EaseInCirc", (Now - start) * 1., 0., 1., 250.);
+            Window.RelativePosition.X = p.X + value2;
+        }
+        else {
+            declare Real value2 = value + diff * AL::Ease("EaseOutCirc", (Now - start) * 1., 1., -1., 250.);
+            Window.RelativePosition.X =  p.X + value2;
+    }

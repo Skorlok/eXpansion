@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Core",
+    "\\Dedimania",
+    "\\Widgets_BestCheckpoints",
+    "\\Widgets_BestCheckpoints\\Structures",
+    "\\Widgets_BestRuns",
+    "\\Widgets_BestRuns\\Gui",
+    "\\Widgets_BestRuns\\Structures",
+    "\\Widgets_TeamPlayerScores"
+  ],
+  "SelectedNode": "\\Widgets_BestRuns\\Structures\\Run.php",
+  "PreviewInSolutionExplorer": false
+}

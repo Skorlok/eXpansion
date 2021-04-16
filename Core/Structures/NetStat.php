@@ -1,14 +1,13 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Structures;
-use Maniaplanet\DedicatedServer\Structures\AbstractStructure;
-use Maniaplanet\DedicatedServer\Structures\PlayerNetInfo;
 
 /**
  * Description of NetStat
  *
  * @author Petri
  */
-class NetStat extends AbstractStructure
+class NetStat extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {
     public $login;
     public $updateLatency;
@@ -17,7 +16,7 @@ class NetStat extends AbstractStructure
     public $latestNetworkActivity;
     public $ipAddress;
 
-    public function __construct(PlayerNetInfo $player)
+    public function __construct(\Maniaplanet\DedicatedServer\Structures\PlayerNetInfo $player)
     {
         $this->login = $player->login;
         $this->updateLatency = $player->stateUpdateLatency;

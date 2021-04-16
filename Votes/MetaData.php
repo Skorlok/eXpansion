@@ -21,7 +21,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Votes");
+        $this->setName("Tools: Votes");
         $this->setDescription("Provides Votes handler");
         $this->setGroups(array('Tools'));
 
@@ -108,7 +108,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "Ban" => 30,
             "SetModeScriptSettingsAndCommands" => 60,
             "JumpToMapIdent" => 60,
-            "AutoTeamBalance" => 30,
+            "SetNextMapIdent" => 30,
             "AutoTeamBalance" => 30));
         $this->registerVariable($var);
 

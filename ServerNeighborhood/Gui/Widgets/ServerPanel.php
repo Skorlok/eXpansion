@@ -62,7 +62,11 @@ class ServerPanel extends Widget
 
     protected function eXpOnEndConstruct()
     {
-
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+        if ($storage->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
         $this->_mainWindow = new Frame();
         $this->_mainWindow->setPosZ(30);
         $this->_mainWindow->setAlign("left", "center");

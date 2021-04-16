@@ -64,7 +64,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         $this->setPublicMethod("isRunning");
         $this->config = Config::getInstance();
-
     }
 
     public function eXpOnLoad()
@@ -84,17 +83,11 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         Dispatcher::register(DediEvent::getClass(), $this);
         $this->dedimania = DediConnection::getInstance();
-        $this->msg_record = eXpGetMessage(
-            '%1$s #dedirecord#claims #rank#%2$s.#dedirecord# '
-            . 'Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)'
-        );
+        $this->msg_record = eXpGetMessage('%1$s #dedirecord#claims #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
         $this->msg_welcome = eXpGetMessage('#variable#Dedimania $0f0Connected! #variable#Top #rank#%1$s #variable#records enabled for you (%2$s #variable#account)');
         $this->msg_premium = eXpGetMessage('$FC3p$FD2r$FE1e$FF0m$FF0i$FE2u$FC3m');
         $this->msg_regular = eXpGetMessage('regular');
-
-        $this->msg_newRecord = eXpGetMessage(
-            '%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s'
-        );
+        $this->msg_newRecord = eXpGetMessage('%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s');
         $this->msg_norecord = eXpGetMessage('#dedirecord#No dedimania records found for the map!');
     }
 
@@ -271,9 +264,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
 
                 // update checkpoints for the record
+                $playerinfo = \ManiaLivePlugins\eXpansion\Core\Core::$playerInfo;
 
-              //  $playerinfo = \ManiaLivePlugins\eXpansion\Core\Core::$playerInfo;
-              //  $record->checkpoints = implode(",", $playerinfo[$login]->checkpoints);
+                $record->checkpoints = implode(",", $playerinfo[$login]->checkpoints);
 
                 // add record
                 $newrecords[$record->login] = $record;

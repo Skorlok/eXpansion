@@ -219,6 +219,7 @@ class AdminGroups extends ExpPlugin
 
         $this->registerChatCommand('admin', "adminCmd", -1, true);
         $this->registerChatCommand('adm', "adminCmd", -1, true);
+        $this->registerChatCommand('/', "adminCmd", -1, true);
 
         $cmd = $this->addAdminCommand('groups', $this, "windowGroups", null);
         $cmd->setHelp("Administrate the admin groups players and permissions.");

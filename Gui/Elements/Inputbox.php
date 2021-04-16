@@ -31,14 +31,12 @@ class Inputbox extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label = new \ManiaLib\Gui\Elements\Label(30, 3);
         $this->label->setAlign('left', 'top');
         $this->label->setTextSize(1);
-        $this->label->setAttribute("textfont","Oswald");
         $this->label->setStyle("SliderVolume");
         $this->label->setTextColor('fff');
         $this->label->setTextEmboss();
         $this->addComponent($this->label);
 
-        $this->sizeX = $sizeX;
-        $this->sizeY = 12;
+
         $this->setSize($sizeX, 12);
     }
 

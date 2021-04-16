@@ -1,19 +1,19 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\AutoUpdate;
 
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AutoUpdate\Gui\Windows\UpdateProgress;
+use ManiaLivePlugins\eXpansion\AutoUpdate\Structures\Repo;
 use ManiaLivePlugins\eXpansion\Core\ParalelExecution;
-use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Gui;
 
 /**
  * Auto update will check for updates and will update eXpansion if asked
  *
  * @author Petri & oliverde8
  */
-class AutoUpdate extends ExpPlugin
+class AutoUpdate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
     /**
@@ -26,7 +26,7 @@ class AutoUpdate extends ExpPlugin
     /**
      * Currently on going git updates or checks
      *
-     * @var boolean
+     * @var boolean[]
      */
     private $onGoing = false;
 
@@ -44,28 +44,13 @@ class AutoUpdate extends ExpPlugin
 
     public function eXpOnReady()
     {
-        $adm = AdminGroups::getInstance();
+        $adm = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
 
         $adm->addAdminCommand("update", $this, "autoUpdate", "server_update");
         $adm->addAdminCommand("check", $this, "checkUpdate", "server_update");
 
         $this->config = Config::getInstance();
         $this->enableDedicatedEvents();
-    }
-
-    /**
-     * Get composer command to use.
-     *
-     * @return string
-     */
-    public function getComposerName()
-    {
-        if(file_exists('composer.phar')) {
-            return PHP_BINARY . " composer.phar";
-        } else {
-            // Hope composer is installed.
-            return "composer";
-        }
     }
 
     /**
@@ -85,11 +70,10 @@ class AutoUpdate extends ExpPlugin
 
         $this->onGoing = true;
 
-        $composer = $this->getComposerName();
         if ($this->config->useGit) {
-            $cmds = array("$composer update --prefer-source --no-interaction --dry-run");
+            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-source --no-interaction --dry-run');
         } else {
-            $cmds = array("$composer update --prefer-dist --no-interaction --dry-run");
+            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-dist --no-interaction --dry-run');
         }
 
         $AdminGroups->announceToPermission(
@@ -116,7 +100,7 @@ class AutoUpdate extends ExpPlugin
         if ($ret != 0) {
             $this->console('Error while checking for updates eXpansion !!');
             $this->console($results);
-            Gui::showError(
+            \ManiaLivePlugins\eXpansion\Gui\Gui::showError(
                 $results,
                 AdminGroups::getAdminsByPermission(Permission::SERVER_UPDATE)
             );
@@ -162,11 +146,10 @@ class AutoUpdate extends ExpPlugin
 
         $this->onGoing = true;
 
-        $composer = $this->getComposerName();
         if ($this->config->useGit) {
-            $cmds = array("$composer update --no-interaction --prefer-source");
+            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --prefer-source');
         } else {
-            $cmds = array("$composer update --no-interaction --prefer-dist");
+            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --prefer-dist');
         }
 
         $AdminGroups->announceToPermission(
@@ -194,7 +177,7 @@ class AutoUpdate extends ExpPlugin
         if ($ret != 0) {
             $this->console('Error while updating eXpansion !!');
             $this->console($results);
-            Gui::showError(
+            \ManiaLivePlugins\eXpansion\Gui\Gui::showError(
                 $results,
                 AdminGroups::getAdminsByPermission(Permission::SERVER_UPDATE)
             );
@@ -217,6 +200,7 @@ class AutoUpdate extends ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
+        $this->onGoingSteps = array();
         UpdateProgress::EraseAll();
     }
 

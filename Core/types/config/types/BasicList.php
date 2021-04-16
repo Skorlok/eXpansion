@@ -13,7 +13,6 @@ use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 class BasicList extends Variable
 {
 
-    /** @var  Variable */
     protected $type;
 
     /**

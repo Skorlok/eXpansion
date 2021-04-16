@@ -29,7 +29,7 @@ class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->onPlayerConnect($login, false);
         } // force update...
         foreach ($this->storage->spectators as $login => $player) {
-            $this->onPlayerConnect($login, true);
+            $this->onPlayerConnect($login, false);
         } // force update...
     }
 

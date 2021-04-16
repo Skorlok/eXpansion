@@ -19,6 +19,7 @@
 
 namespace ManiaLivePlugins\eXpansion\KnockOut;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -80,6 +81,20 @@ class KnockOut extends ExpPlugin
         $adminGroups->addShortAlias($this->adm_ko, 'ko');
 
         $this->colorParser->registerCode("ko", Config::getInstance(), "koColor");
+
+        $this->enableScriptEvents(array("Maniaplanet.StartRound_Start", "Maniaplanet.EndRound_Start"));
+    }
+
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound(0);
+                break;
+            case "Maniaplanet.EndRound_Start":
+                $this->onEndRound(0);
+                break;
+        }
     }
 
     public function chatCommands($login, $params = array())
@@ -195,30 +210,30 @@ class KnockOut extends ExpPlugin
 
     public function sortAsc(&$array)
     {
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_TIMEATTACK) {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($array, "bestTime");
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
+            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($array, "best_race_time");
         } else {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($array, "score");
+            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($array, "round_points");
         }
     }
 
     public function sortDesc(&$array)
     {
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_TIMEATTACK) {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($array, "bestTime");
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
+            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($array, "best_race_time");
         } else {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($array, "score");
+            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($array, "round_points");
         }
     }
 
-    public function onEndMatch($rankings, $winnerTeamOrMap)
+    public function onEndRound()
     {
 
         if ($this->delay || !$this->isRunning || $this->isWarmup) {
             return;
         }
 
-        $ranking = $this->expStorage->getCurrentRanking();
+        $ranking = Core::$rankings;
         $this->sortAsc($ranking);
         $nbKo = 1;
 
@@ -242,9 +257,9 @@ class KnockOut extends ExpPlugin
 
         $this->sortDesc($ranking);
         $out = array();
-        $prop = 'score';
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_TIMEATTACK) {
-            $prop = "bestTime";
+        $prop = 'round_points';
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
+            $prop = "best_race_time";
         }
 
         print_r($ranking);
@@ -258,6 +273,7 @@ class KnockOut extends ExpPlugin
                     $out[] = $player->nickName;
                     unset($this->players[$player->login]);
                     $knockedOut++;
+                    $this->connection->forceSpectator($player->login, 1);
                 }
             }
         }
@@ -269,11 +285,12 @@ class KnockOut extends ExpPlugin
             reset($this->players);
             $player = current($this->players);
             $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
+            $this->koStop(); //delete this
         }
 
-        if (count($this->players) >= 1) {
+        /*if (count($this->players) >= 1) {
             $this->koStop();
-        }
+        }*/
     }
 
     /**
@@ -286,9 +303,9 @@ class KnockOut extends ExpPlugin
     {
         $outArray = array();
 
-        $prop = 'score';
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_TIMEATTACK) {
-            $prop = "bestTime";
+        $prop = 'round_points';
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
+            $prop = "best_race_time";
         }
 
         foreach ($array as $player) {

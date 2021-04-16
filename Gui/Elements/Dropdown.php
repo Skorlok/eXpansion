@@ -13,7 +13,6 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
     protected $xml;
     protected $values;
     protected $name;
-    protected $selectedIndex;
 
     /** @var \ManiaLivePlugins\eXpansion\Gui\Structures\Script */
     private $script = null;
@@ -98,12 +97,6 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
 
     }
 
-    public function getValueByIndex($index)
-    {
-        if (array_key_exists($index, $this->values))
-            return $this->values[$index];
-    }
-
     public function getDropdownItems()
     {
         return $this->values;
@@ -111,15 +104,8 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
 
     public function setSelected($index)
     {
-        $this->selectedIndex = $index;
         $this->label->setText($this->values[intval($index)]);
         $this->script->setParam("selected", intval($index));
-    }
-
-
-    public function getSelected()
-    {
-        return $this->selectedIndex;
     }
 
     public function onIsRemoved(\ManiaLive\Gui\Container $target)

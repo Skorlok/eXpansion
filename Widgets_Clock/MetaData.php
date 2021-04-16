@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Clock");
+        $this->setName("Widget: Clock");
         $this->setDescription("Provides Local Time display");
         $this->setGroups(array('Widgets'));
     }

@@ -41,7 +41,7 @@ class Widgets_CheckpointProgress extends \ManiaLivePlugins\eXpansion\Core\types\
         $info->show();
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $this->displayWidget();
     }

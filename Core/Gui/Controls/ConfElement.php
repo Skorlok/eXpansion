@@ -1,47 +1,34 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Controls;
 
-use ManiaLib\Gui\Elements\Label;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\MetaData;
-use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
-class ConfElement extends Control
+class ConfElement extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
-    /** @var ListBackGround */
     protected $bg;
-    /** @var Label */
     protected $label_name;
 
     /**
-     * @var Button | null
+     * @var \ManiaLivePlugins\eXpansion\Gui\Elements\Button | null
      */
     protected $button_save = null;
-    /** @var Button|null */
     protected $button_load = null;
-    /** @var Button|null */
     protected $button_select = null;
 
-    /** @var string */
     protected $path;
 
-    /**
-     * ConfElement constructor.
-     * @param int $indexNumber
-     * @param string $name
-     * @param bool $isCurrent
-     * @param bool $modify
-     * @param string $login
-     * @param string $path
-     */
+    protected $input;
+
     public function __construct($indexNumber, $name, $isCurrent, $modify, $login, $path)
     {
         $this->path = $path;
 
-        $this->label_name = new Label(40, 5);
+        $this->label_name = new \ManiaLib\Gui\Elements\Label(40, 5);
         $this->label_name->setPosY(4);
         $this->label_name->setPosX(7);
         $this->label_name->setText($name);
@@ -94,10 +81,6 @@ class ConfElement extends Control
         }
     }
 
-    /**
-     * @param $login
-     * @param $name
-     */
     public function saveAction($login, $name)
     {
         /** @var ConfigManager $confManager */
@@ -106,10 +89,6 @@ class ConfElement extends Control
         $confManager->saveSettingsIn($name);
     }
 
-    /**
-     * @param $login
-     * @param $name
-     */
     public function loadAction($login, $name)
     {
         /** @var ConfigManager $confManager */
@@ -118,10 +97,6 @@ class ConfElement extends Control
         $confManager->loadSettingsFrom($this->path . '/' . $name);
     }
 
-    /**
-     * @param $login
-     * @param $name
-     */
     public function selectAction($login, $name)
     {
         /** @var ConfigManager $confManager */
@@ -139,9 +114,6 @@ class ConfElement extends Control
         $confManager->check();
     }
 
-    /**
-     * @return int
-     */
     public function getNbTextColumns()
     {
         return 2;

@@ -31,6 +31,20 @@ class Widgets_TeamRoundScores extends ExpPlugin
         $this->enableDedicatedEvents();
         $this->reset();
         $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
+
+        $this->enableScriptEvents(array("Maniaplanet.StartRound_Start", "Maniaplanet.EndRound_Start"));
+    }
+
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound(0);
+                break;
+            case "Maniaplanet.EndRound_Start":
+                $this->onEndRound(0);
+                break;
+        }
     }
 
     public function onBeginRound()
@@ -76,7 +90,6 @@ class Widgets_TeamRoundScores extends ExpPlugin
 
     public function onEndRound()
     {
-
         // get players infos and create array for counting points...
         $teamScores = array(0 => 0, 1 => 0);
 
@@ -105,13 +118,13 @@ class Widgets_TeamRoundScores extends ExpPlugin
         }
 
         // assign total scores
-        foreach ($this->expStorage->getCurrentRanking() as $ranking) {
+        foreach (Core::$rankings as $ranking) {
             $team = 0;
             switch ($ranking->nickName) {
-                case "Red":
+                case '$F00Team Red':
                     $team = 1;
                     break;
-                case "Blue":
+                case "$00FTeam Blue":
                     $team = 0;
                     break;
             }
@@ -125,14 +138,14 @@ class Widgets_TeamRoundScores extends ExpPlugin
         $this->roundNumber++;
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $this->reset();
         $this->hideWidget();
         $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
     }
 
-    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
+    public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
         $this->roundNumber = 0;
     }

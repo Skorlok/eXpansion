@@ -30,27 +30,14 @@ class ForceMod extends ExpPlugin
         try {
             $rnd_mod = array();
             $mods = $this->getMods();
-            if ($this->expStorage->version->titleId == "Trackmania_2@nadeolabs") {
-
-                foreach ($mods as $env => $mod) {
-                    $index = mt_rand(0, (count($mod) - 1));
-                    if (array_key_exists($index, $mod)) {
-                        $rnd_mod[] = $mod[$index];
-                    }
-                }
-            } else {
-                $env = $this->fixEnv($this->expStorage->version->titleId);
-                if (array_key_exists($env, $mods)) {
-                    $mods = $mods[$env];
-                    if (count($mods) > 0) {
-                        $index = mt_rand(0, (count($mods) - 1));
-                        if (array_key_exists($index, $mods)) {
-                            $rnd_mod[] = $mods[$index];
-                            $this->console("Enabling forced mod at url: " . $rnd_mod[0]->url);
-                        }
-                    }
-                }
-            }
+			
+			
+			foreach ($mods as $env => $mod) {
+				$index = mt_rand(0, (count($mod) - 1));
+				if (array_key_exists($index, $mod)) {
+					$rnd_mod[] = $mod[$index];
+				}
+			}
 
             foreach ($rnd_mod as $key => $mod) {
                 $rnd_mod[$key] = $this->fixEnv($mod);

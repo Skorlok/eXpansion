@@ -24,7 +24,6 @@ class Widgets_MapSuggestion extends ExpPlugin
 
         $button = MapSuggestionButton::Create();
         $button->setActions($this->action);
-        $button->setPosition(120, -60);
         $button->setSize(10.0, 10.0);
         $button->show();
     }

@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_BestRuns;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Widgets_BestRuns\Gui\Widgets\BestRunPanel;
 use ManiaLivePlugins\eXpansion\Widgets_BestRuns\Structures\Run;
 
@@ -27,7 +28,7 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->onBeginMatch();
 
-        $this->onPlayerNewBestTime(null, -1, 0);
+        $this->onPlayerFinish(null, -1, 0);
     }
 
     public function onBeginMatch()
@@ -43,14 +44,20 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function onPlayerNewBestTime($player, $oldBest, $newBest)
+    public function onPlayerFinish($playerUid, $login, $time)
     {
-        // othervice if the players new best time is faster than the buffer, update
-        if ($this->bestTime == 0 || $newBest < $this->bestTime) {
+        // ignore finish without times
+        if ($time == 0) {
+            return;
+        }
 
-            $this->bestTime = $newBest;
+        // othervice if the players new best time is faster than the buffer, update
+        if ($this->bestTime == 0 || $time < $this->bestTime) {
+
+            $this->bestTime = $time;
             BestRunPanel::$bestRuns = array();
-            $ranking = $this->connection->getCurrentRanking($this->nbDisplay, 0);
+            $ranking = Core::$rankings;
+
             foreach ($ranking as $player) {
                 BestRunPanel::$bestRuns[] = new Run($player);
             }

@@ -2,63 +2,48 @@
 
 namespace ManiaLivePlugins\eXpansion\Maps\Gui\Widgets;
 
-use ManiaLib\Gui\Elements\Quad;
-use ManiaLib\Gui\Layouts\Column;
-use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
-use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
-use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
-use Maniaplanet\DedicatedServer\Structures\Map;
-
-class CurrentMapWidget extends Widget
+class CurrentMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
-    /** @var  WidgetBackGround */
-    protected $bg;
 
-    /** @var  DicoLabel */
+    protected $bg;
     protected $authorTime;
-    /** @var  Frame */
+    protected $logo;
     protected $leftFrame;
-    /** @var  Frame */
     protected $centerFrame;
-    /** @var  Frame */
     protected $rightFrame;
-    /** @var  DicoLabel */
     protected $environment;
-    /** @var  Quad */
     protected $country;
 
     protected function eXpOnBeginConstruct()
     {
-        $this->bg = new WidgetBackGround(90, 15);
+        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(90, 15);
         $this->addComponent($this->bg);
 
-        $column = new Column();
+        $column = new \ManiaLib\Gui\Layouts\Column();
 
-        $this->leftFrame = new Frame(4, -1);
+        $this->leftFrame = new \ManiaLive\Gui\Controls\Frame(4, -1);
         $this->leftFrame->setAlign("left", "top");
         $this->leftFrame->setLayout(clone $column);
         $this->addComponent($this->leftFrame);
 
-        $this->centerFrame = new Frame(45, -2);
+        $this->centerFrame = new \ManiaLive\Gui\Controls\Frame(45, -2);
         $column2 = clone $column;
         $column2->setMargin(0, 1);
         $this->centerFrame->setAlign("center", "top");
         $this->centerFrame->setLayout($column2);
         $this->addComponent($this->centerFrame);
 
-        $this->rightFrame = new Frame(88, -2);
+        $this->rightFrame = new \ManiaLive\Gui\Controls\Frame(88, -2);
         $this->rightFrame->setLayout(clone $column);
         $this->rightFrame->setAlign("right", "top");
         $this->addComponent($this->rightFrame);
 
-        $biglabel = new DicoLabel(45, 4);
+        $biglabel = new \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel(45, 4);
         $biglabel->setStyle("TextRankingsBig");
         $biglabel->setTextSize(2);
         $biglabel->setAlign("center", "center");
 
-        $label = new DicoLabel(45, 4);
+        $label = new \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel(45, 4);
         $label->setStyle("TextRaceMessage");
         $label->setAlign("center", "center");
         $label->setTextSize(2);
@@ -69,9 +54,10 @@ class CurrentMapWidget extends Widget
         $nowPlaying->setPosition(45, 3);
         $this->addComponent($nowPlaying);
 
-        $this->country = new Quad(14, 9);
+        $this->country = new \ManiaLib\Gui\Elements\Quad(14, 9);
         $this->country->setId("authorZone");
         $this->country->setImage("", true);
+        $this->country->setImage("http://reaby.kapsi.fi/ml/flags/Other%20Countries.dds", true);
         $this->country->setAlign("left", "top");
         $this->leftFrame->addComponent($this->country);
 
@@ -100,7 +86,7 @@ class CurrentMapWidget extends Widget
         $time->setAlign("right");
         $this->rightFrame->addComponent($time);
 
-        $script = new Script("Maps\\Gui\\Scripts_CurrentMap");
+        $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Maps\Gui\Scripts_CurrentMap");
         $this->registerScript($script);
 
         $this->setName("Current Map Widget");
@@ -111,7 +97,7 @@ class CurrentMapWidget extends Widget
         $this->setSize(90, 15);
     }
 
-    public function setMap(Map $map)
+    public function setMap(\Maniaplanet\DedicatedServer\Structures\Map $map)
     {
         $playerModel = "";
         if (isset($map->playerModel)) {
@@ -119,7 +105,7 @@ class CurrentMapWidget extends Widget
         }
         $this->environment->setText($map->environnement . $playerModel);
         if ($map->author == "Nadeo") {
-            $this->country->setImage("file://Media/Manialinks/flags/France.dds", true);
+            $this->country->setImage("http://reaby.kapsi.fi/ml/flags/France.dds", true);
         }
     }
 

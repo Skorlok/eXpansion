@@ -27,8 +27,8 @@ class CpProgress extends Widget
 
     protected function eXpOnBeginConstruct()
     {
-        $x = 44;
-        $y = 68;
+        $x = 42;
+        $y = 45;
         $this->setName("CpLive Widget");
         $this->storage = Storage::getInstance();
 
@@ -45,7 +45,7 @@ class CpProgress extends Widget
         $this->title->setText("LiveCP      - Total CP: " . $this->storage->currentMap->nbCheckpoints);
         $this->title->setId("minimizeButton");
         $this->title->setScriptEvents();
-        $this->title->setDirection("right");
+        $this->title->setDirection("left");
         $this->wframe->addComponent($this->title);
 
         $this->frame = new Frame();

@@ -38,7 +38,7 @@ class Timer
     public static function startNewTimer($message, $print = true, $log = true)
     {
         $id = self::$nbTimers++;
-        self::$times[$id] = microtime(true);
+        self::$times[$id] = microtime();
         if ($print) {
             Cnsole::println($message . ' Started ...');
         }
@@ -52,7 +52,7 @@ class Timer
     public static function endTimer($id, $message, $print = true, $log = true)
     {
         if (isset(self::$times[$id])) {
-            $time = microtime(true) - self::$times[$id];
+            $time = microtime() - self::$times[$id];
             if ($print) {
                 Cnsole::println($message . ' Ended in : ' . $time . 'ms');
             }

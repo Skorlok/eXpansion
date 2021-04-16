@@ -31,6 +31,20 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         $this->enableDedicatedEvents();
         $this->reset();
         $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
+
+        $this->enableScriptEvents(array("Maniaplanet.StartRound_Start", "Maniaplanet.EndRound_Start"));
+    }
+
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound(0);
+                break;
+            case "Maniaplanet.EndRound_Start":
+                $this->onEndRound(0);
+                break;
+        }
     }
 
     public function test()
@@ -120,7 +134,7 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         $this->showWidget(\ManiaLive\Gui\Window::LAYER_NORMAL);
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $this->reset();
         $this->hideWidget();

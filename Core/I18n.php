@@ -1,13 +1,12 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core;
 
-use ManiaLib\Utils\Singleton;
+namespace ManiaLivePlugins\eXpansion\Core;
 
 /**
  * a simple internationalization class for string texts
  *
  */
-class I18n extends Singleton
+class I18n extends \ManiaLib\Utils\Singleton
 {
 
     /**
@@ -50,7 +49,7 @@ class I18n extends Singleton
     /**
      * Registers a directory to look into for translations. If already started then it will load it immediately
      *
-     * @param string $dir Directory
+     * @param $dir Directory
      */
     public function registerDirectory($dir)
     {
@@ -79,7 +78,7 @@ class I18n extends Singleton
     /**
      * Read the files in order to register the translations found
      *
-     * @param string $dir the directory to load translations from
+     * @param $dir the directory to load translations from
      */
     protected function readFiles($dir)
     {
@@ -130,9 +129,9 @@ class I18n extends Singleton
     /**
      * Get language object from key
      *
-     * @param string $string Translation key
+     * @param $string Translation key
      *
-     * @return I18n\Message Found message, or new message
+     * @return I18n\Message FOund message, or new message
      */
     public function getObject($string)
     {
@@ -148,7 +147,7 @@ class I18n extends Singleton
     /**
      * Get the translation of a key in a certain language. If no language is defined default language
      *
-     * @param string $string Translation key
+     * @param      $string       Translation key
      * @param null $fromLanguage Language to get the translation for
      *
      * @return string the translation, if none find the translation key
@@ -177,6 +176,7 @@ class I18n extends Singleton
      * @param null $language
      *
      * @return mixed
+     * @todo check if this is actually used :S I don't understand what it does.
      */
     private function translate($string, $language = null)
     {

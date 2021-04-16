@@ -1,6 +1,4 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core;
-
 /**
  * @author       Oliver de Cramer (oliverde8 at gmail.com)
  * @copyright    GNU GENERAL PUBLIC LICENSE
@@ -22,17 +20,17 @@ namespace ManiaLivePlugins\eXpansion\Core;
  *  along with this program.  If not, see {http://www.gnu.org/licenses/}.
  */
 
+namespace ManiaLivePlugins\eXpansion\Core;
 
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Tick\Event as TickEvent;
-use ManiaLive\Features\Tick\Listener;
 
 /**
  * This class allows you to create executions that will run in paralel with the rest of the application
  *
  * @package ManiaLivePlugins\eXpansion\Core
  */
-class ParalelExecution implements Listener
+class ParalelExecution implements \ManiaLive\Features\Tick\Listener
 {
 
     private $pid;

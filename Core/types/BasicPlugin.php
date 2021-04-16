@@ -161,9 +161,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             Dispatcher::register(GlobalEvent::getClass(), $this);
         }
 
-        /**
-         *
-         */
         private function loadMetaData()
         {
             $pieces = explode('\\', get_class($this));
@@ -244,9 +241,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         {
         }
 
-        /**
-         *
-         */
         final public function onReady()
         {
             if (!$this->metaData->checkAll()) {
@@ -431,6 +425,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         private function eXpRedirectedChatSendServerMessage($msg, $login, $forceNoRedirect = false)
         {
             $sender = get_class($this);
+            $fromPlugin = explode("\\", $sender);
+            $fromPlugin = str_replace("_", " ", end($fromPlugin));
 
             if (isset(self::$eXpChatRedirected[$sender])) {
                 $message = $msg;
@@ -471,7 +467,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
 
         /**
          * Sends announcement through chat to the server or redirects it to another plugin
-         * @deprecated
+         *  @deprecated
          * @param MultiLangMsg $msg The message to send to all users
          * @param string $icon Icon for the message (might be used by some plugins)
          * @param callable $callback
@@ -481,6 +477,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         protected function eXpAnnounce($msg, $icon = null, $callback = null, $pluginid = null)
         {
             $sender = get_class($this);
+            $fromPlugin = explode("\\", $sender);
+            $fromPlugin = str_replace("_", " ", end($fromPlugin));
 
             if (isset(self::$eXpAnnounceRedirected[$sender])) {
                 $message = clone $msg;
@@ -514,7 +512,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          *
          * @param MultiLangMsg $msg
          * @param array $args
-         * @param bool $forceNoRedirect
          */
         protected function eXpMultilangAnnounce(MultiLangMsg $msg, array $args, $forceNoRedirect = false)
         {
@@ -525,12 +522,10 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                     try {
                         $msg->setArgs($args);
                         $this->connection->chatSendServerMessage($msg->getMultiLangArray(), null);
-                    } catch (UnknownPlayerException $ex) {
+                    } catch (LoginUnknownException $ex) {
                         $this->console("Attempt to send Multilang Announce to a login failed. Login unknown");
                     } catch (Exception $e) {
-                        $this->console(
-                            "Error while sending Multilang Announce message => Server said:" . $e->getMessage()
-                        );
+                        $this->console("Error while sending Multilang Announce message => Server said:" . $e->getMessage());
                     }
                     return;
                 }
@@ -549,7 +544,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                 try {
                     $msg->setArgs($args);
                     $this->connection->chatSendServerMessage($msg->getMultiLangArray(), null);
-                } catch (UnknownPlayerException $ex) {
+                } catch (LoginUnknownException $ex) {
                     $this->console("Attempt to send Multilang Announce to a login failed. Login unknown");
                 } catch (Exception $e) {
                     $this->console("Error while sending Multilang Announce message => Server said:" . $e->getMessage());
@@ -711,6 +706,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          */
         final public static function eXpGetScriptCompatibilityMode($scriptName)
         {
+            $class = get_called_class();
             $soft = true;
 
             $compatibility = explode(".", $scriptName);
@@ -916,8 +912,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
 
 namespace {
 
-    use ManiaLive\Data\Storage;
-    use ManiaLivePlugins\eXpansion\Core\I18n;
     use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
     /**
@@ -977,7 +971,7 @@ namespace {
             $language = null;
             if (sizeof($args) > 0) {
                 $login = array_shift($args);
-                $player = Storage::getInstance()->getPlayerObject($login);
+                $player = \ManiaLive\Data\Storage::getInstance()->getPlayerObject($login);
                 if ($player == null) {
                     $language = null;
                 } else {
@@ -990,7 +984,7 @@ namespace {
             if (is_object($message)) {
                 $lang = $message->getMessage($language);
             } else {
-                $lang = I18n::getInstance()->getString($message, $language);
+                $lang = \ManiaLivePlugins\eXpansion\Core\I18n::getInstance()->getString($message, $language);
             }
 
             array_unshift($args, $lang);
@@ -1017,6 +1011,6 @@ namespace {
      */
     function eXpGetMessage($string)
     {
-        return I18n::getInstance()->getObject($string);
+        return \ManiaLivePlugins\eXpansion\Core\I18n::getInstance()->getObject($string);
     }
 }

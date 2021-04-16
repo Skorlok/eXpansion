@@ -2,11 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLivePlugins\eXpansion\Gui\Control;
+use ManiaLivePlugins\eXpansion\Gui\Config;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer;
 
-class OptimizedPager extends Control implements ScriptedContainer
+class OptimizedPager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
 {
 
     protected $frame;
@@ -51,28 +50,32 @@ class OptimizedPager extends Control implements ScriptedContainer
 
         $this->scrollBg = new \ManiaLib\Gui\Elements\Quad(4, 40);
         $this->scrollBg->setAlign("center", "top");
+        $this->scrollBg->setStyle("Bgs1InRace");
+        $this->scrollBg->setSubStyle('BgPlayerCard');
         $this->scrollBg->setId("ScrollBg");
-        $this->scrollBg->setBgcolor("fff");
-        $this->scrollBg->setOpacity(0.3);
+        $this->scrollBg->setOpacity(0.9);
         $this->addComponent($this->scrollBg);
 
         $this->scroll = new \ManiaLib\Gui\Elements\Quad(3, 15);
         $this->scroll->setAlign("center", "top");
-        $this->scroll->setBgcolor("fff");
+        $this->scroll->setStyle("BgsPlayerCard");
+        $this->scroll->setSubStyle('BgRacePlayerName');
         $this->scroll->setId("ScrollBar");
         $this->scroll->setScriptEvents();
         $this->addComponent($this->scroll);
 
-        $this->scrollDown = new \ManiaLib\Gui\Elements\Label(6.5, 6.5);
+        $this->scrollDown = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
         $this->scrollDown->setAlign("center", "top");
-        $this->scrollDown->setText('▼');
+        $this->scrollDown->setStyle("Icons64x64_1");
+        $this->scrollDown->setSubStyle("ArrowDown");
         $this->scrollDown->setId("ScrollDown");
         $this->scrollDown->setScriptEvents();
         $this->addComponent($this->scrollDown);
 
-        $this->scrollUp = new \ManiaLib\Gui\Elements\Label(6.5, 6.5);
+        $this->scrollUp = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
         $this->scrollUp->setAlign("center", "bottom");
-        $this->scrollUp->setText('▲');
+        $this->scrollUp->setStyle("Icons64x64_1");
+        $this->scrollUp->setSubStyle("ArrowUp");
         $this->scrollUp->setId("ScrollUp");
         $this->scrollUp->setScriptEvents();
         $this->addComponent($this->scrollUp);
@@ -123,11 +126,12 @@ class OptimizedPager extends Control implements ScriptedContainer
         $args = func_get_args();
         $this->sizeX = $args[0];
         $this->sizeY = $args[1];
-        $this->scroll->setPosition($this->sizeX - 3, 0, 2);
-        $this->scrollBg->setPosition($this->sizeX - 3, 0, 1);
-        $this->scrollBg->setSizeY($this->sizeY-4);
-        $this->scrollDown->setPosition($this->sizeX - 3, -($this->sizeY - 4));
-        $this->scrollUp->setPosition($this->sizeX - 3, -0);
+        $this->scroll->setPosition($this->sizeX - 3, 0);
+        $this->scrollBg->setPosition($this->sizeX - 3);
+        $this->scrollBg->setSizeY($this->sizeY - 4);
+
+        $this->scrollDown->setPosition($this->sizeX - 3, -($this->sizeY - 5));
+        $this->scrollUp->setPosition($this->sizeX - 3, -1);
     }
 
     public function setContentLayout($className)

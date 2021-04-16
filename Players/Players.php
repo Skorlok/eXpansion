@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Players;
 
-use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
+use ManiaLivePlugins\MatchMakingLobby\Windows\PlayerList;
 
 class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -100,11 +100,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window = \ManiaLivePlugins\eXpansion\Players\Gui\Windows\Playerlist::Create($login);
         $window->setTitle('Players');
 
-        if (AdminGroups::isInList($login)) {
-            $window->setSize(130, 100);
-        } else {
-            $window->setSize(90, 100);
-        }
+        $window->setSize(140, 100);
         $window->centerOnScreen();
         $window->show();
     }

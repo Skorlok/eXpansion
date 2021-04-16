@@ -58,7 +58,7 @@ class Paths
 
     public function getDownloadMapsPath()
     {
-        return $this->mapsDirectory . $this->getBaseMap() . 'Downloaded' . DIRECTORY_SEPARATOR;
+        return $this->mapsDirectory . $this->getBaseMap() . 'Downloaded'. DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -68,7 +68,7 @@ class Paths
      */
     public function getGameDataPath()
     {
-        return dirname($this->gameDataDirectory) . DIRECTORY_SEPARATOR . "GameData" . DIRECTORY_SEPARATOR;
+        return $this->gameDataDirectory;
     }
 
     public function fileHasExtension($fileName, $extension)

@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Server infos");
+        $this->setName("Widget: Server infos");
         $this->setDescription("Provides server infos widget");
         $this->setGroups(array('Widgets'));
     }

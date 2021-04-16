@@ -35,11 +35,22 @@ class TM_Stunts extends ExpPlugin
 
     public function eXpOnReady()
     {
-
         $this->stuntWindow = Gui\Widgets\StuntWidget::Create(null, true);
         $this->stuntWindow->setSize(60, 12);
         $this->stuntWindow->setPosition(-30, 58);
         $this->enableScriptEvents("LibXmlRpc_OnStunt");
+        $this->enableScriptEvents("Trackmania.Event.Stunt");
+    }
+
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Trackmania.Event.Stunt":
+                call_user_func_array(array($this, "LibXmlRpc_OnStunt"),
+                    json_decode($array[0], true)
+                );
+                break;
+        }
     }
 
     public function onTick()
@@ -56,26 +67,26 @@ class TM_Stunts extends ExpPlugin
         $login,
         $points,
         $combo,
-        $totalScore,
+        $stuntsscore,
         $factor,
-        $stuntname,
+        $figure,
         $angle,
-        $isStraight,
-        $isReversed,
-        $isMasterJump
+        $isstraight,
+        $isreversed,
+        $ismasterjump
     ) {
-        $stuntname = str_replace("::EStuntFigure::", "", $stuntname);
+        $figure = str_replace("::EStuntFigure::", "", $figure);
 
-        if ($angle || ($stuntname != "StraightJump" && $stuntname != "RespawnPenalty")) {
-            if ($isReversed) {
-                $stuntname = "Reversed" . $stuntname;
+        if ($angle || ($figure != "StraightJump" && $figure != "RespawnPenalty")) {
+            if ($isreversed) {
+                $figure = "Reversed" . $figure;
             }
             if ($angle == 0) {
                 $angle = "";
             }
-            $split = preg_split('/(?=\p{Lu})/u', $stuntname);
-            $stuntname = implode(" ", $split) . " " . $angle;
-            $this->stuntWindow->setLabels($stuntname, $points);
+            $split = preg_split('/(?=\p{Lu})/u', $figure);
+            $figure = implode(" ", $split) . " " . $angle;
+            $this->stuntWindow->setLabels($figure, $points);
             $this->stuntWindow->show($login);
         }
     }

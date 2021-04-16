@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Custom321Go\Gui\Hud;
 
 use ManiaLib\Gui\Elements\Quad;
-use ManiaLib\Gui\Elements\Video;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget;
 
@@ -16,7 +15,7 @@ class CountdownHud extends PlainWidget
 {
 
     protected $sprite;
-    protected $video;
+    protected $sprite2;
 
     public function onConstruct()
     {
@@ -24,15 +23,23 @@ class CountdownHud extends PlainWidget
         $this->setName("countdown");
         $config = \ManiaLivePlugins\eXpansion\Custom321Go\Config::getInstance();
 
-        $this->video = new Video(60, 30);
-        $this->video->setPosition(0, 20);
-        $this->video->setId("Countdown");
-        $this->video->setAttribute("hidden", "1");
-        $this->video->setAttribute("looping", "0");
-        $this->video->setAttribute("play", "1");
-        $this->video->setAlign("center", "center");
-        $this->video->setData($config->video, true);
-        $this->addComponent($this->video);
+        $this->sprite = new Quad(60, 60);
+        $this->sprite->setStyle("Bgs1InRace");
+        $this->sprite->setSubStyle("BgEmpty");
+        $this->sprite->setImage($config->sprite1, true);
+
+
+        $this->sprite->setAlign("center", "center");
+        $this->sprite->setId("sprite1");
+        $this->addComponent($this->sprite);
+
+        $this->sprite2 = new Quad(60, 60);
+        $this->sprite2->setStyle("Bgs1InRace");
+        $this->sprite2->setSubStyle("BgEmpty");
+        $this->sprite2->setAlign("center", "center");
+        $this->sprite2->setImage($config->sprite2, true);
+        $this->sprite2->setId("sprite2");
+        $this->addComponent($this->sprite2);
 
         $script = new Script("Custom321Go/Gui/Scripts");
         $this->registerScript($script);

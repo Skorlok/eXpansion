@@ -1,9 +1,8 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Events;
 
-use ManiaLive\Event\Event;
-
-class ExpansionEvent extends Event
+class ExpansionEvent extends \ManiaLive\Event\Event
 {
 
     const ON_RESTART_START = 1;

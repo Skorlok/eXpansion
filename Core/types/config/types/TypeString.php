@@ -1,14 +1,13 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core\types\config\types;
 
-use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
+namespace ManiaLivePlugins\eXpansion\Core\types\config\types;
 
 /**
  * Description of String
  *
  * @author De Cramer Oliver
  */
-class TypeString extends Variable
+class TypeString extends \ManiaLivePlugins\eXpansion\Core\types\config\Variable
 {
 
     /**
@@ -16,29 +15,27 @@ class TypeString extends Variable
      *
      * @param $value
      *
-     * @return string|false
+     * @return bool
      */
     public function setValue($value)
     {
         if ($this->basicValueCheck($value)) {
             return $this->setRawValue($value);
         }
+
         return false;
     }
 
     /**
      * Returns value to preview;
      *
-     * @return string
+     * @return mixed
      */
     public function getPreviewValues()
     {
         return $this->getRawValue();
     }
 
-    /**
-     * forces class to string
-     */
     public function __toString()
     {
         return strval($this->getRawValue());

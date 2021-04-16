@@ -12,4 +12,5 @@ class Config extends \ManiaLib\Utils\Singleton
     public $disableMessages = false;
     public $noRedirectTreshold = 30;
     public $allowBannedPlayersToJoin = false;
+
 }

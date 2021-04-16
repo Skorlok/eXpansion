@@ -1,9 +1,8 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\ChatBackground;
 
-use ManiaLib\Utils\Singleton;
-
-class Config extends Singleton
+class Config extends \ManiaLib\Utils\Singleton
 {
     public $width = 330;
     public $height = 27;

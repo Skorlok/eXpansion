@@ -1,9 +1,8 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Events;
 
-use ManiaLive\Event\Event;
-
-class ConfigLoadEvent extends Event
+class ConfigLoadEvent extends \ManiaLive\Event\Event
 {
 
     const ON_CONFIG_FILE_LOADED = 1;
@@ -18,9 +17,6 @@ class ConfigLoadEvent extends Event
         $this->params = $params;
     }
 
-    /**
-     * @param $listener
-     */
     public function fireDo($listener)
     {
         switch ($this->onWhat) {

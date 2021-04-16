@@ -2,51 +2,39 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
-use ManiaLive\Data\Storage;
-use ManiaLivePlugins\eXpansion\Adm\Adm;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Controls\CustomPointctrl;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Controls\CustomPointEntry;
 use ManiaLivePlugins\eXpansion\Adm\Structures\CustomPoint;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
-use ManiaLivePlugins\eXpansion\Helpers\Singletons;
-use Maniaplanet\DedicatedServer\Connection;
 
-class RoundPoints extends Window
+class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
-    /**
-     * @var Adm
-     */
-    public static $plugin;
 
-    /** @var  Pager */
-    protected $pager;
+    public static $plugin = null;
 
-    /** @var Connection */
-    protected $connection;
+    private $pager;
 
-    /** @var Storage */
-    protected $storage;
+    /** @var \Maniaplanet\DedicatedServer\Connection */
+    private $connection;
 
-    protected $items = array();
+    /** @var \ManiaLive\Data\Storage */
+    private $storage;
 
-    /** @var  OkButton */
-    protected $cancel;
+    private $items = array();
 
-    protected $actionCancel;
+    private $cancel;
 
-    protected $rpoints = array();
+    private $actionCancel;
+
+    private $rpoints = array();
 
     protected function onConstruct()
     {
         parent::onConstruct();
         $login = $this->getRecipient();
 
-        $this->connection = Singletons::getInstance()->getDediConnection();
-        $this->storage = Storage::getInstance();
+        $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
+        $this->storage = \ManiaLive\Data\Storage::getInstance();
 
-        $this->pager = new Pager();
+        $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
 
         $this->actionCancel = $this->createAction(array($this, "cancel"));
@@ -111,7 +99,7 @@ class RoundPoints extends Window
         $x = 0;
 
         $points = implode(",", $this->connection->getRoundCustomPoints());
-        $this->items[$x] = new CustomPointEntry(
+        $this->items[$x] = new \ManiaLivePlugins\eXpansion\Adm\Gui\Controls\CustomPointEntry(
             $x,
             $points,
             $this,
@@ -122,7 +110,7 @@ class RoundPoints extends Window
         $x++;
 
         foreach ($this->rpoints as $points) {
-            $this->items[$x] = new CustomPointctrl(
+            $this->items[$x] = new \ManiaLivePlugins\eXpansion\Adm\Gui\Controls\CustomPointctrl(
                 $x,
                 $points,
                 $this,
@@ -137,7 +125,6 @@ class RoundPoints extends Window
     public function setPoints($login, $points, $entry)
     {
         if ($points === null) {
-            $intPoints = array();
             if (!empty($entry['customPoints'])) {
                 $points = explode(",", $entry['customPoints']);
                 rsort($points, SORT_NUMERIC);

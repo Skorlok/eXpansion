@@ -35,8 +35,7 @@ class Menu extends ExpPlugin implements Listener
         Dispatcher::register(Event::getClass(), $this);
         $this->prepareMenu();
         $this->enableDedicatedEvents();
-
-
+        $this->registerChatCommand("menu", "prepareMenu", 0, false);
     }
 
     public function eXpAdminAdded($login)
@@ -110,9 +109,7 @@ class Menu extends ExpPlugin implements Listener
         $this->menuGroups = [];
         MenuWidget::EraseAll();
 
-        $adminGroups = AdminGroups::getInstance();
-
-        foreach ($adminGroups->getGroupList() as $group) {
+        foreach (AdminGroups::getGroupList() as $group) {
             $this->menuGroups[$group->getGroupName()] = Group::Create($group->getGroupName());
             foreach ($group->getGroupUsers() as $user) {
                 $this->menuGroups[$group->getGroupName()]->add($user->getLogin());
@@ -139,18 +136,19 @@ class Menu extends ExpPlugin implements Listener
     {
         $menu = MenuWidget::Create($this->menuGroups[$group->getGroupName()], false);
         if ($this->pluginLoaded("Faq")) {
-            $menu->addItem(" Help", "!help", $this);
+            $menu->addItem("Help", "!help", $this);
         }
 
         if ($this->pluginLoaded("Players")) {
-            $menu->addItem(" Players", "!players", $this);
+            $menu->addItem("Players", "!players", $this);
         }
 
         // Maps
-        $mapsGroup = $menu->addGroup(' Maps');
+        $mapsGroup = $menu->addGroup("Maps");
 
         if ($this->pluginLoaded("Maps")) {
-            $mapsGroup->addItem('Show Maps', "!maplist", $this);
+            $mapsGroup->addItem("Show Maps", "!maplist", $this);
+            $mapsGroup->addItem('Show Jukebox', "!jukebox", $this);
         }
         if ($group->hasPermission(Permission::MAP_ADD_LOCAL)) {
             if ($this->pluginLoaded("Maps")) {
@@ -159,18 +157,17 @@ class Menu extends ExpPlugin implements Listener
         }
         if ($group->hasPermission(Permission::MAP_ADD_MX)) {
             if ($this->pluginLoaded("ManiaExchange")) {
-                $mapsGroup->addItem('ManiaExchange', "!mx", $this);
+                $mapsGroup->addItem("ManiaExchange", "!mx", $this);
             }
         }
         if ($group->hasPermission(Permission::MAP_REMOVE_MAP)) {
             if ($this->pluginLoaded("Maps")) {
-                $mapsGroup->addItem('', null, $this);
                 $mapsGroup->addItem('$f00Remove this', "!admremovemap", $this);
                 $mapsGroup->addItem('$f00Trash this', "!admtrashmap", $this);
             }
         }
         // records
-        $recGroup = $menu->addGroup(' Records');
+        $recGroup = $menu->addGroup("Records");
         if ($this->pluginLoaded("Dedimania") || $this->pluginLoaded("Dedimania_Script")) {
             $recGroup->addItem("Dedimania", "!dedirecs", $this);
         }
@@ -183,11 +180,11 @@ class Menu extends ExpPlugin implements Listener
 
         // statistics
         if ($this->pluginLoaded("Statistics")) {
-            $menu->addItem(' Statistics', "!stats", $this);
+            $menu->addItem("Statistics", "!stats", $this);
         }
 
         // Vote
-        $voteGroup = $menu->addGroup(' Vote');
+        $voteGroup = $menu->addGroup("Vote");
         $voteGroup->addItem("Skip", "!voteskip", $this);
         $voteGroup->addItem("Res", "!voteres", $this);
         if ($group->hasPermission(Permission::SERVER_VOTES)) {
@@ -195,16 +192,16 @@ class Menu extends ExpPlugin implements Listener
             $voteGroup->addItem('$f00Cancel', "!admcancel", $this);
         }
 
-        /*    $hudGroup = $menu->addGroup(' Hud');
-            $hudGroup->addItem("Move", "!hudMove", $this);
-            $hudGroup->addItem("Lock", "!hudLock", $this);
-            $hudGroup->addItem("Reset", "!hudReset", $this);
-            $hudGroup->addItem("Config...", "!hudConfig", $this); */
+        $hudGroup = $menu->addGroup("Hud");
+        $hudGroup->addItem("Move", "!hudMove", $this);
+        $hudGroup->addItem("Lock", "!hudLock", $this);
+        $hudGroup->addItem("Reset", "!hudReset", $this);
+        $hudGroup->addItem("Config...", "!hudConfig", $this);
 
         // admin
 
         if ($group->hasPermission(Permission::TEAM_BALANCE) || $group->hasPermission(Permission::MAP_END_ROUND) || $group->hasPermission(Permission::MAP_RES) || $group->hasPermission(Permission::MAP_SKIP)) {
-            $admGroup = $menu->addGroup('🔑 Admin');
+            $admGroup = $menu->addGroup('$f00Admin');
 
             if ($group->hasPermission(Permission::MAP_RES)) {
                 $admGroup->addItem("Instant Res", "!admres", $this);
@@ -221,6 +218,14 @@ class Menu extends ExpPlugin implements Listener
             if ($group->hasPermission(Permission::MAP_END_ROUND)) {
                 $admGroup->addItem("End Round", "!admer", $this);
             }
+			
+			if ($group->hasPermission(Permission::MAP_END_ROUND)) {
+                $admGroup->addItem("End WarmUp", "!admewu", $this);
+            }
+			
+			if ($group->hasPermission(Permission::MAP_END_ROUND)) {
+                $admGroup->addItem("End Round WarmUp", "!admewur", $this);
+            }
 
             if ($group->hasPermission(Permission::TEAM_BALANCE)) {
                 $admGroup->addItem("Balance Teams", "!teambalance", $this);
@@ -228,7 +233,7 @@ class Menu extends ExpPlugin implements Listener
         }
 
         if ($group->hasPermission(Permission::SERVER_CONTROL_PANEL)) {
-            $serverGroup = $menu->addGroup('🔧 Server Control');
+            $serverGroup = $menu->addGroup("Server Control");
             $serverGroup->addItem('Control Panel', "!admcontrol", $this);
             if ($group->hasPermission(Permission::EXPANSION_PLUGIN_SETTINGS)) {
                 $serverGroup->addItem('$fffe$3afX$fffpansion Config', "!adm_settings", $this);
@@ -238,7 +243,7 @@ class Menu extends ExpPlugin implements Listener
             }
         }
 
-        $menu->addItem('💡 Server Info', "!serverinfo", $this);
+        $menu->addItem("Server Info", "!serverinfo", $this);
         $this->menuWindows[$group->getGroupName()] = $menu;
         $this->menuWindows[$group->getGroupName()]->show();
     }
@@ -255,6 +260,9 @@ class Menu extends ExpPlugin implements Listener
             switch ($action) {
                 case "!maplist":
                     $this->callPublicMethod($this->getPluginClass("Maps"), "showMapList", $login);
+                    break;
+                case "!jukebox":
+                    $this->callPublicMethod($this->getPluginClass("Maps"), "showJukeList", $login);
                     break;
                 case "!addMaps":
                     $this->callPublicMethod($this->getPluginClass("Maps"), "addMaps", $login);
@@ -273,6 +281,12 @@ class Menu extends ExpPlugin implements Listener
                     break;
                 case "!admer":
                     $adminGrp->adminCmd($login, "er");
+                    break;
+				case "!admewu":
+                    $adminGrp->adminCmd($login, "ewu");
+                    break;
+				case "!admewur":
+                    $adminGrp->adminCmd($login, "ewur");
                     break;
                 case "!admcancel":
                     $adminGrp->adminCmd($login, "cancel");
@@ -369,12 +383,7 @@ class Menu extends ExpPlugin implements Listener
                     if ($this->isPluginLoaded($plugin)) {
                         $this->callPublicMethod($plugin, "vote_restart", $login);
                     } else {
-                        $data = $this->getVoteRatio('RestartMap');
-                        if ($data->ratio != -1) {
-                            $this->connection->callVoteRestartMap($data->ratio);
-                        } else {
-                            $this->eXpChatSendServerMessage(eXpGetMessage("#error#Restart vote is disabled!"), $login);
-                        }
+                        $this->connection->callVoteRestartMap();
                     }
                     break;
                 case "!voteskip":
@@ -382,21 +391,16 @@ class Menu extends ExpPlugin implements Listener
                     if ($this->isPluginLoaded($plugin)) {
                         $this->callPublicMethod($plugin, "vote_skip", $login);
                     } else {
-                        $data = $this->getVoteRatio('NextMap');
-                        if ($data->ratio != -1) {
-                            $this->connection->callVoteNextMap($data->ratio);
-                        } else {
-                            $this->eXpChatSendServerMessage(eXpGetMessage("#error#Skip vote is disabled!"), $login);
-                        }
+                        $this->connection->callVoteNextMap();
                     }
                     break;
                 default:
-                    $this->eXpChatSendServerMessage("not found: ".$action, $login);
-                    Logger::info("menu command not found: ".$action);
+                    $this->eXpChatSendServerMessage("not found: " . $action, $login);
+                    Logger::info("menu command not found: " . $action);
                     break;
             }
         } catch (Exception $ex) {
-            Logger::error("Error in Menu while running action : ".$action);
+            Logger::error("Error in Menu while running action : " . $action);
         }
     }
 
@@ -408,22 +412,6 @@ class Menu extends ExpPlugin implements Listener
      */
     private function getPluginClass($plugin)
     {
-        return "\\ManiaLivePlugins\\eXpansion\\".$plugin."\\".$plugin;
+        return "\\ManiaLivePlugins\\eXpansion\\" . $plugin . "\\" . $plugin;
     }
-
-    /**
-     * @param string $name
-     * @return \Maniaplanet\DedicatedServer\Structures\VoteRatio
-     */
-    private function getVoteRatio($name)
-    {
-        $voteRatios = $this->connection->getCallVoteRatios();
-        foreach ($voteRatios as $ratio) {
-            if ($ratio->command == $name) {
-                return $ratio;
-            }
-        }
-    }
-
-
 }

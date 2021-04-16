@@ -69,6 +69,10 @@ class ChatAdmin extends ExpPlugin
         $this->setPublicMethod("showBlackList");
         $this->setPublicMethod("showIgnoreList");
         $this->setPublicMethod("forceEndRound");
+        $this->setPublicMethod("forceEndWu");
+        $this->setPublicMethod("forceEndWuR");
+        $this->setPublicMethod("forcePointsRounds");
+        $this->setPublicMethod("forcePointsTeam");
         $this->setPublicMethod("shuffleMaps");
     }
 
@@ -78,10 +82,6 @@ class ChatAdmin extends ExpPlugin
     public function eXpOnLoad()
     {
         $adminGroup = AdminGroups::getInstance();
-
-        $cmd = AdminGroups::addAdminCommand('game script', $this, 'fastScript', Permission::GAME_SETTINGS);
-        $cmd->setHelp('/script load TimeAttack.script.txt will load the Time Attack script script.');
-        $adminGroup->addShortAlias($cmd, 'script');
 
         $cmd = AdminGroups::addAdminCommand('game ta', $this, 'fastTa', Permission::GAME_SETTINGS);
         $cmd->setHelp('/ta limit; Sets timelimit for TimeAttack');
@@ -454,28 +454,16 @@ Other server might use the same blacklist file!!'
         $cmd->setHelp("Restarts this map and resets the scores");
 
         $cmd = AdminGroups::addAdminCommand('set game mode', $this, 'setGameMode', Permission::GAME_GAMEMODE);
-        $cmd->setHelp('Sets next mode {ta,rounds,team,laps,stunts,cup}')
+        $cmd->setHelp('Sets next mode {ta,rounds,team,laps,cup,reload}')
+            ->addLineHelpMore('$w\admin set game mode reload$z will reload the current gamemode.')
             ->addLineHelpMore('$w\admin set game mode ta$z will change gamemode to TimeAttack.')
             ->addLineHelpMore('$w\admin set game mode rounds$z will change gamemode to Rounds mode.')
             ->addLineHelpMore('$w\admin set game mode team$z will change gamemode to Team mode.')
             ->addLineHelpMore('$w\admin set game mode laps$z will change gamemode to Laps mode.')
-            ->addLineHelpMore('$w\admin set game mode cup$z will change gamemode to Cup mode.')
-            ->addLineHelpMore('$w\admin set game mode stunts$z will change gamemode to Stunts mode.');
+            ->addLineHelpMore('$w\admin set game mode cup$z will change gamemode to Cup mode.');
         $cmd->setMinParam(1);
         AdminGroups::addAlias($cmd, 'setgamemode'); //xaseco
         AdminGroups::addAlias($cmd, 'mode'); //fast
-
-        $cmd = AdminGroups::addAdminCommand('load script', $this, 'loadScript', Permission::GAME_GAMEMODE);
-        $cmd->setHelp('Loads script for the next game.')
-            ->addLineHelpMore('$w\admin script load TimeAttack.script.txt will switch to TA script mode.');
-        $cmd->setMinParam(1);
-        AdminGroups::addAlias($cmd, 'loadscript'); //xaseco
-
-        $cmd = AdminGroups::addAdminCommand('reload script', $this, 'reloadScript', Permission::GAME_GAMEMODE);
-        $cmd->setHelp('ReLoads same script for the next game.')
-            ->addLineHelpMore('$w\admin script reload Reloads current script. (Usefull if script was changed).');
-        $cmd->setMinParam(1);
-        AdminGroups::addAlias($cmd, 'reloadscript'); //xaseco
 
         $cmd = AdminGroups::addAdminCommand(
             'set game AllWarmUpDuration',
@@ -485,6 +473,7 @@ Other server might use the same blacklist file!!'
         );
         $cmd->setHelp('Set the warmup duration at the begining of the maps for all gamemodes')
             ->addchecker(1, Integer::getInstance());
+            $cmd->addchecker(1, Time_ms::getInstance());
         AdminGroups::addAlias($cmd, 'setAllWarmUpDuration');
 
         $cmd = AdminGroups::addAdminCommand(
@@ -530,11 +519,35 @@ Other server might use the same blacklist file!!'
         $cmd->addchecker(1, Integer::getInstance());
 
         //rounds
-        $cmd = AdminGroups::addAdminCommand('set game rounds end', $this, 'forceEndRound', Permission::MAP_END_ROUND);
+        $cmd = AdminGroups::addAdminCommand('endround', $this, 'forceEndRound', Permission::MAP_END_ROUND);
         $cmd->setHelp('Ends a round. Only work in round mode');
         AdminGroups::addAlias($cmd, 'end'); // fast
         AdminGroups::addAlias($cmd, 'endround'); // xaseco
         AdminGroups::addAlias($cmd, 'er'); // xaseco
+		
+		//rounds warmup
+        $cmd = AdminGroups::addAdminCommand('endwu', $this, 'forceEndWu', Permission::MAP_END_ROUND);
+        $cmd->setHelp('Ends the WarmUp. Only work in round mode');
+        AdminGroups::addAlias($cmd, 'endwu');
+        AdminGroups::addAlias($cmd, 'ewu');
+		
+		//rounds warmup on round
+        $cmd = AdminGroups::addAdminCommand('endwuround', $this, 'forceEndWuR', Permission::MAP_END_ROUND);
+        $cmd->setHelp('Ends the round of the WarmUp. Only work in round mode');
+        AdminGroups::addAlias($cmd, 'endwuround');
+        AdminGroups::addAlias($cmd, 'ewur');
+
+        //forcescores in rounds
+        $cmd = AdminGroups::addAdminCommand('forceroundpoints', $this, 'forcePointsRounds', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Force the current scores of one player');
+        AdminGroups::addAlias($cmd, 'forceroundpoints');
+        AdminGroups::addAlias($cmd, 'frpts');
+
+        //forcescores in team
+        $cmd = AdminGroups::addAdminCommand('forceteampoints', $this, 'forcePointsTeam', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Force the current scores of one team');
+        AdminGroups::addAlias($cmd, 'forceteampoints');
+        AdminGroups::addAlias($cmd, 'ftpts');
 
         $cmd = AdminGroups::addAdminCommand(
             'set game rounds PointsLimit',
@@ -723,7 +736,7 @@ Other server might use the same blacklist file!!'
         $cmd = AdminGroups::addAdminCommand(
             'set game cup WarmUpDuration',
             $this,
-            'setCupWarmUpDuration',
+            'setAllWarmUpDuration',
             Permission::GAME_SETTINGS
         );
         $cmd->setHelp('Changes the Cup WarmUpDuration of Cup mode');
@@ -863,36 +876,6 @@ Other server might use the same blacklist file!!'
      * @param $fromLogin
      * @param $params
      */
-    public function fastScript($fromLogin, $params)
-    {
-
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_SCRIPT) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Not in script mode!", $fromLogin);
-
-            return;
-        }
-
-        try {
-            $command = array_shift($params);
-            switch (strtolower($command)) {
-                case "reload":
-                    $this->reloadScript($fromLogin);
-                    break;
-                case "load":
-                    $this->loadScript($fromLogin, $params);
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception $e) {
-            $this->eXpChatSendServerMessage('#admin_error#Error:' . $e->getMessage(), $fromLogin);
-        }
-    }
-
-    /**
-     * @param $fromLogin
-     * @param $params
-     */
     public function fastTa($fromLogin, $params)
     {
 
@@ -913,6 +896,10 @@ Other server might use the same blacklist file!!'
                 case "wu":
                 case "warmupduration":
                     $this->setAllWarmUpDuration($fromLogin, $params);
+                    break;
+                case "wunb":
+                case "warmupnumber":
+                    $this->setNbWarmUp($fromLogin, $params);
                     break;
                 default:
                     $msg = eXpGetMessage("possible parameters: limit, dynamic, wu");
@@ -950,6 +937,10 @@ Other server might use the same blacklist file!!'
                 case "warmupduration":
                     $this->setAllWarmUpDuration($fromLogin, $params);
                     break;
+                case "wunb":
+                case "warmupnumber":
+                    $this->setNbWarmUp($fromLogin, $params);
+                    break;
                 case "fto":
                 case "ftimeout":
                 case "finishtimeout":
@@ -986,6 +977,14 @@ Other server might use the same blacklist file!!'
                 case "wu":
                 case "warmupduration":
                     $this->setAllWarmUpDuration($fromLogin, $params);
+                    break;
+                case "wunb":
+                case "warmupnumber":
+                    $this->setNbWarmUp($fromLogin, $params);
+                    break;
+                case "dtd":
+                case "displaytimediff":
+                    $this->setDisplayTimeDiff($fromLogin, $params);
                     break;
                 case "fto":
                 case "ftimeout":
@@ -1037,7 +1036,15 @@ Other server might use the same blacklist file!!'
                 case "wud":
                 case "wu":
                 case "warmupduration":
-                    $this->setCupWarmUpDuration($fromLogin, $params);
+                    $this->setAllWarmUpDuration($fromLogin, $params);
+                    break;
+                case "wunb":
+                case "warmupnumber":
+                    $this->setNbWarmUp($fromLogin, $params);
+                    break;
+                case "dtd":
+                case "displaytimediff":
+                    $this->setDisplayTimeDiff($fromLogin, $params);
                     break;
                 case "fto":
                 case "ftimeout":
@@ -1085,6 +1092,14 @@ Other server might use the same blacklist file!!'
                 case "wu":
                 case "warmupduration":
                     $this->setAllWarmUpDuration($fromLogin, $params);
+                    break;
+                case "wunb":
+                case "warmupnumber":
+                    $this->setNbWarmUp($fromLogin, $params);
+                    break;
+                case "dtd":
+                case "displaytimediff":
+                    $this->setDisplayTimeDiff($fromLogin, $params);
                     break;
                 case "fto":
                 case "ftimeout":
@@ -1170,7 +1185,6 @@ Other server might use the same blacklist file!!'
     public function setTeamBalance($fromLogin, $params)
     {
         try {
-
             $adminNick = $this->storage->getPlayerObject($fromLogin)->nickName;
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin #variable#%s $z$s#admin_action# AutoBalances the Teams!',
@@ -1247,7 +1261,6 @@ Other server might use the same blacklist file!!'
      */
     public function onBeginMatch()
     {
-
     }
 
     /**
@@ -1389,34 +1402,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setCupWarmUpDuration(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_NbOfWinners" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets cup winners to#variable# %s #admin_action#.',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
-        }
-    }
-
-    /**
-     * @param $fromLogin
-     * @param $params
-     */
-    public function setCupWarmUpDuration($fromLogin, $params)
-    {
-        $admin = $this->storage->getPlayerObject($fromLogin);
-        try {
-            $this->connection->setCupWarmUpDuration(intval($params[0]));
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets use new '
-                . 'warmup duration to#variable# %s #admin_action#.',
-                null,
-                array($admin->nickName, $params[0])
-            );
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1428,14 +1422,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setCupRoundsPerMap(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_RoundsPerMap" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets use new rounds to#variable# %s #admin_action#.',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1447,7 +1442,7 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setCupPointsLimit(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets use '
                 . 'new cup points limit to#variable# %s #admin_action#.',
@@ -1455,7 +1450,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1505,7 +1501,7 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setMaxPointsTeam(filter_var($params[0], FILTER_VALIDATE_BOOLEAN));
+            $this->connection->setModeScriptSettings(["S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets use '
                 . 'new team rules to#variable# %s #admin_action#.',
@@ -1513,7 +1509,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1525,14 +1522,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setMaxPointsTeam(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_MaxPointsPerRound" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets Team max points to#variable# %s #admin_action#.',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1544,14 +1542,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setTeamPointsLimit(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets Team points limit to#variable# %s #admin_action#.',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1561,9 +1560,11 @@ Other server might use the same blacklist file!!'
      */
     public function setFinishTimeout($fromLogin, $params)
     {
+        $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
+
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setFinishTimeout(TimeConversion::MStoTM($params[0]));
+            $this->connection->setModeScriptSettings(["S_FinishTimeout" => intval($newLimit)]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets new'
                 . ' finish timeout to#variable# %s #admin_action#minutes.',
@@ -1571,7 +1572,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1583,7 +1585,7 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setNbLaps(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_ForceLapsNb" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets '
                 . 'new number of laps to#variable# %s',
@@ -1591,7 +1593,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1601,9 +1604,11 @@ Other server might use the same blacklist file!!'
      */
     public function setLapsTimeLimit($fromLogin, $params)
     {
+        $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
+
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setLapsTimeLimit(TimeConversion::MStoTM($params[0]));
+            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($newLimit)]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets '
                 . 'new laps timelimit to#variable# %s #admin_action#minutes.',
@@ -1611,7 +1616,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1623,14 +1629,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setRoundPointsLimit(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets rounds points limits to#variable# %s.',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1642,11 +1649,7 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
-            } else {
-                $this->connection->forceEndRound();
-            }
+            $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
 
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#forces the round to end.',
@@ -1655,6 +1658,135 @@ Other server might use the same blacklist file!!'
             );
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+	
+	public function forceEndWu($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', array((string)time()));
+
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.',
+                null,
+                array($admin->nickName)
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+	
+	public function forceEndWuR($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound', array((string)time()));
+
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.',
+                null,
+                array($admin->nickName)
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    public function forcePointsRounds($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        $player = $this->storage->getPlayerObject($params[0]);
+        if ($params[0] == null){
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the login of the player'), $fromLogin);
+            return;
+        }
+        if ($params[1] == null){
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the player'), $fromLogin);
+            return;
+        }
+        try {
+            $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
+
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.',
+                null,
+                array($admin->nickName, $player->nickName, $params[1])
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    public function forcePointsTeam($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        if ($params[0] == null){
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the id of the team (red or blue) !'), $fromLogin);
+            return;
+        }
+        if ($params[1] == null){
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the team'), $fromLogin);
+            return;
+        }
+
+        if ($params[0] == blue){
+            $teampts = 0;
+        }
+        if ($params[0] == red){
+            $teampts = 1;
+        }
+
+        try {
+            $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
+
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.',
+                null,
+                array($admin->nickName, $params[0], $params[1])
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    /**
+     * @param $fromLogin
+     * @param $params
+     */
+    public function setNbWarmUp($fromLogin, $params)
+    {
+        try {
+            $this->connection->setModeScriptSettings(["S_WarmUpNb" => intval($params[0])]);
+            $admin = $this->storage->getPlayerObject($fromLogin);
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin #variable# %s #admin_action#sets all game modes warmup number to#variable# %s',
+                null,
+                array($admin->nickName, $params[0])
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
+        }
+    }
+
+    /**
+     * @param $fromLogin
+     * @param $params
+     */
+    public function setDisplayTimeDiff($fromLogin, $params)
+    {
+        try {
+            $this->connection->setModeScriptSettings(["S_DisplayTimeDiff" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
+            $admin = $this->storage->getPlayerObject($fromLogin);
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin #variable# %s #admin_action#sets the display time diff to#variable# %s',
+                null,
+                array($admin->nickName, $params[0])
+            );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1666,14 +1798,15 @@ Other server might use the same blacklist file!!'
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setUseNewRulesRound(filter_var($params[0], FILTER_VALIDATE_BOOLEAN));
+            $this->connection->setModeScriptSettings(["S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets new round rules to#variable# %s',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1683,17 +1816,17 @@ Other server might use the same blacklist file!!'
      */
     public function setRoundForcedLaps($fromLogin, $params)
     {
-
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setRoundForcedLaps(intval($params[0]));
+            $this->connection->setModeScriptSettings(["S_ForceLapsNb" => intval($params[0])]);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets new round forced laps to#variable# %s',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -1808,33 +1941,10 @@ Other server might use the same blacklist file!!'
 
     /**
      * @param $fromLogin
-     */
-    public function reloadScript($fromLogin)
-    {
-
-        $scriptNameArr = $this->connection->getScriptName();
-        $scriptName = $scriptNameArr['CurrentValue'];
-
-        // Workaround for a 'bug' in setModeScriptText.
-        if ($scriptName === '<in-development>') {
-            $scriptName = $scriptNameArr['NextValue'];
-        }
-
-        $this->loadScript($fromLogin, array($scriptName));
-    }
-
-    /**
-     * @param $fromLogin
      * @param $params
      */
     public function loadScript($fromLogin, $params)
     {
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_SCRIPT) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Not in script mode!", $fromLogin);
-
-            return;
-        }
-
         $dataDir = Helper::getPaths()->getGameDataPath();
         $mode = "TrackMania";
         if ($this->expStorage->simpleEnviTitle == "SM") {
@@ -1849,9 +1959,13 @@ Other server might use the same blacklist file!!'
         }
 
         try {
-            //   $this->connection->setModeScriptText($data);
+            $admin = $this->storage->getPlayerObject($fromLogin);
             $this->connection->setScriptName($scriptName);
-            $this->eXpChatSendServerMessage("Script " . $scriptName . " will be loaded after this map!");
+            $this->eXpChatSendServerMessage(
+                '#admin_action#Admin#variable# %s #admin_action#sets game mode to#variable# %s',
+                null,
+                array($admin->nickName, $scriptName)
+            );
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage("#admin_error#" . $e->getMessage(), $fromLogin);
         }
@@ -2362,14 +2476,14 @@ Other server might use the same blacklist file!!'
      */
     public function setserverchattime($fromLogin, $params)
     {
-        $newLimit = TimeConversion::MStoTM($params[0]) - 8000;
+        $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
 
         if ($newLimit < 0) {
             $newLimit = 0;
         }
 
         try {
-            $this->connection->SetChatTime($newLimit);
+            $this->connection->setModeScriptSettings(["S_ChatTime" => intval($newLimit)]);
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin #variable#%s $z#admin_action#sets '
@@ -2378,7 +2492,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -2400,7 +2515,7 @@ Other server might use the same blacklist file!!'
                 $this->eXpChatSendServerMessage(
                     '#admin_action#Static timelimit is set to #variable#5:00 #admin_action#minutes.'
                 );
-                $this->connection->setTimeAttackLimit(300000);
+                $this->connection->setModeScriptSettings(["S_TimeLimit" => 300]);
 
                 return;
             }
@@ -2411,8 +2526,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            print $e->getMessage();
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -2422,8 +2537,11 @@ Other server might use the same blacklist file!!'
      */
     public function setTAlimit($fromLogin, $params)
     {
+
+        $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
+
         try {
-            $this->connection->setTimeAttackLimit(TimeConversion::MStoTM($params[0]));
+            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($newLimit)]);
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#sets '
@@ -2432,8 +2550,8 @@ Other server might use the same blacklist file!!'
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            print $e->getMessage();
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
         }
     }
 
@@ -2689,7 +2807,6 @@ Other server might use the same blacklist file!!'
         }
     }
 
-
     /**
      * @param $fromLogin
      * @param $params
@@ -2698,62 +2815,45 @@ Other server might use the same blacklist file!!'
     {
         $gamemode = null;
 
-        // if gamemode is script
-        if ($this->storage->gameInfos->gameMode == 0) {
-            $gamemode = $params[0];
-            if (strtolower($gamemode) == "ta") {
-                $gamemode = "timeattack";
+        $gamemode = $params[0];
+
+        if (strtolower($gamemode) == "reload") {
+            $scriptNameArr = $this->connection->getScriptName();
+            $scriptName = $scriptNameArr['CurrentValue'];
+
+            // Workaround for a 'bug' in setModeScriptText.
+            if ($scriptName === '<in-development>') {
+                $scriptName = $scriptNameArr['NextValue'];
             }
-            $this->loadScript($fromLogin, [ucfirst($gamemode)]);
+
+            $this->loadScript($fromLogin, array($scriptName));
             return;
         }
 
-        if (is_numeric($params[0])) {
-            $gamemode = $params[0];
-        } else {
-            $param1 = $params[0];
-            if (strtolower($param1) == "script") {
-                $gamemode = GameInfos::GAMEMODE_SCRIPT;
-            }
-            if (strtolower($param1) == "rounds") {
-                $gamemode = GameInfos::GAMEMODE_ROUNDS;
-            }
-            if (strtolower($param1) == "timeattack" || strtolower($param1) == "ta") {
-                $gamemode = GameInfos::GAMEMODE_TIMEATTACK;
-            }
-            if (strtolower($param1) == "team") {
-                $gamemode = GameInfos::GAMEMODE_TEAM;
-            }
-            if (strtolower($param1) == "laps") {
-                $gamemode = GameInfos::GAMEMODE_LAPS;
-            }
-            if (strtolower($param1) == "stunts") {
-                $gamemode = GameInfos::GAMEMODE_STUNTS;
-            }
-            if (strtolower($param1) == "cup") {
-                $gamemode = GameInfos::GAMEMODE_CUP;
-            }
-            if ($gamemode === null) {
-                $this->sendErrorChat(
-                    $fromLogin,
-                    'Invalid parameter. Valid parameteres are: script,team,timeattack,ta,rounds,laps,stunts,cup.'
-                );
-
-                return;
-            }
+        if (strtolower($gamemode) == "ta") {
+            $gamemode = "TimeAttack";
+        }
+        if (strtolower($gamemode) == "timeattack") {
+            $gamemode = "TimeAttack";
+        }
+        if (strtolower($gamemode) == "rounds") {
+            $gamemode = "Rounds";
+        }
+        if (strtolower($gamemode) == "team") {
+            $gamemode = "Team";
+        }
+        if (strtolower($gamemode) == "cup") {
+            $gamemode = "Cup";
+        }
+        if (strtolower($gamemode) == "laps") {
+            $gamemode = "Laps";
+        }
+        if (strtolower($gamemode) == "grav") {
+            $gamemode = "Gravity";
         }
 
-        try {
-            $this->connection->setGameMode($gamemode);
-            $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets game mode to#variable# %s',
-                null,
-                array($admin->nickName, $params[0])
-            );
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
-        }
+        $this->loadScript($fromLogin, [ucfirst($gamemode)]);
+        return;
     }
 
     /**
@@ -2762,18 +2862,18 @@ Other server might use the same blacklist file!!'
      */
     public function setAllWarmUpDuration($fromLogin, $params)
     {
+        $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
 
         try {
-            $this->connection->setAllWarmUpDuration($params[0]);
+            $this->connection->setModeScriptSettings(["S_WarmUpDuration" => intval($newLimit)]);
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage(
-                '#admin_action#Admin #variable# %s #admin_action#sets all game modes warmup duration to#variable# %s',
+                '#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes',
                 null,
                 array($admin->nickName, $params[0])
             );
         } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
-
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
         }
     }
@@ -3007,41 +3107,39 @@ Other server might use the same blacklist file!!'
      * @param $statusCode
      * @param $statusName
      */
-    public function onStatusChanged($statusCode, $statusName)
+    public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        if ($this->expStorage->simpleEnviTitle == Storage::TITLE_SIMPLE_TM
-            && $statusCode == 6 && $this->dynamicTime > 0
-        ) {
-            if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TIMEATTACK) {
-                $map = $this->connection->getNextMapInfo();
-                $laps = $map->nbLaps;
-                if ($map->nbLaps <= 1) {
-                    $laps = 1;
-                }
+        try {
+            if ($this->expStorage->simpleEnviTitle == Storage::TITLE_SIMPLE_TM && $this->dynamicTime > 0) {
+                if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TIMEATTACK) {
+                    $map = $this->connection->getCurrentMapInfo();
+                    $laps = $map->nbLaps;
+                    if ($map->nbLaps <= 1) {
+                        $laps = 1;
+                    }
 
-                $newLimit = floor((intval($map->authorTime) / intval($laps)) * floatval($this->dynamicTime));
+                    $newLimit = floor((intval($map->authorTime) / intval($laps)) * floatval($this->dynamicTime));
 
-                $max = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_max);
-                $min = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_min);
+                    $max = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_max);
+                    $min = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_min);
 
-                if ($newLimit > $max) {
-                    $newLimit = $max;
-                }
-                if ($newLimit < $min) {
-                    $newLimit = $min;
-                }
-                if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_SCRIPT) {
+                    if ($newLimit > $max) {
+                        $newLimit = $max;
+                    }
+                    if ($newLimit < $min) {
+                        $newLimit = $min;
+                    }
                     $scriptLimit = $newLimit / 1000;
-                    $this->connection->setModeScriptSettings(array("S_TimeLimit" => $scriptLimit));
-                } else {
-                    $this->connection->setTimeAttackLimit(intval($newLimit));
-                }
+                    $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($scriptLimit)]);
 
-                $this->eXpChatSendServerMessage(
-                    '#admin_action#Dynamic time limit set to: #variable#' . Time::fromTM($newLimit),
-                    null
-                );
+                    $this->eXpChatSendServerMessage(
+                        '#admin_action#Dynamic time limit set to: #variable#' . Time::fromTM($newLimit),
+                        null
+                    );
+                }
             }
+        } catch (Exception $e) {
+            $this->console($e->getMessage());
         }
     }
 

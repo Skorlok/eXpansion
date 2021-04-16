@@ -25,6 +25,11 @@ class MxWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnBeginConstruct()
     {
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+        if ($storage->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
         $this->setName("ManiaExchange Panel");
 
         $login = $this->getRecipient();

@@ -13,7 +13,6 @@ use ManiaLive\DedicatedApi\Config;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
@@ -26,51 +25,31 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions as Dedicated_ServerOpti
 
 class ServerOptions extends Window
 {
-    /** @var Inputbox */
+
     protected $serverName;
-    /** @var Inputbox */
     protected $serverComment;
-    /** @var TextEdit */
     protected $serverCommentE;
-    /** @var Inputbox */
     protected $maxPlayers;
-    /** @var Inputbox */
     protected $maxSpec;
-    /** @var Inputbox */
     protected $minLadder;
-    /** @var Inputbox */
     protected $maxLadder;
-    /** @var Inputbox */
     protected $serverPass;
-    /** @var Inputbox */
     protected $serverSpecPass;
-    /** @var Inputbox */
     protected $refereePass;
 
-    /** @var  Checkbox */
     protected $cbPublicServer;
-    /** @var  Checkbox */
     protected $cbLadderServer;
-    /** @var  Checkbox */
     protected $cbAllowMapDl;
-    /** @var  Checkbox */
     protected $cbAllowp2pDown;
-    /** @var  Checkbox */
     protected $cbAllowp2pUp;
-    /** @var  Checkbox */
     protected $cbReferee;
-    /** @var  Frame */
-    protected $frameCb;
-    /** @var  Frame */
-    protected $frameInputbox;
-    /** @var  Frame */
-    protected $frameLadder;
-    /** @var  Frame */
-    protected $framePlayers;
 
-    /** @var  Button */
+    protected $frameCb;
+
+    protected $frameInputbox;
+    protected $frameLadder;
+
     protected $buttonOK;
-    /** @var  Button */
     protected $buttonCancel;
 
     /** @var Connection */
@@ -201,12 +180,9 @@ class ServerOptions extends Window
     }
 
     // Generate all checkboxes
-    /**
-     *
-     */
     private function checkboxes()
     {
-
+        /** @var ServerOptions2 */
         $server = $this->connection->getServerOptions();
         $login = $this->getRecipient();
 
@@ -329,7 +305,7 @@ class ServerOptions extends Window
     public function destroy()
     {
         $this->connection = null;
-
+        $this->storage = null;
         parent::destroy();
     }
 
@@ -415,6 +391,6 @@ class ServerOptions extends Window
 
     public function serverOptionsCancel($login)
     {
-        $this->Erase($login);
+        $this->Erase($this->getRecipient());
     }
 }

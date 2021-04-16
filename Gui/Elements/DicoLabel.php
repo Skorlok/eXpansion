@@ -56,7 +56,7 @@ class DicoLabel extends \ManiaLib\Gui\Elements\Label
             $text->setArgs($args);
             $this->messages = $text->getMultiLangArray();
             $this->setTextid('x' . md5(spl_object_hash($this)));
-        } elseif (is_string($text)) {
+        } else if (is_string($text)) {
             parent::setText($text);
         }
     }

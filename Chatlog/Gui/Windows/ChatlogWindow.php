@@ -1,32 +1,23 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Chatlog\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Chatlog\Gui\Controls\Message;
-use ManiaLivePlugins\eXpansion\Chatlog\Structures\ChatMessage;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
-
-class ChatlogWindow extends Window
+class ChatlogWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    /** @var  Pager */
+    /** @var  \ManiaLivePlugins\eXpansion\Gui\Elements\Pager */
     protected $pager;
-
     private $items = array();
-    /** @var  Button */
     protected $btn_close;
-
     protected $actionClose;
-    /** @var  Button */
     protected $ok;
-
     private $widths = array(2, 5, 25);
 
     public function onConstruct()
     {
         parent::onConstruct();
-        $this->pager = new Pager();
+
+        $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
         $this->actionClose = $this->createAction(array($this, "Close"));
 
@@ -42,7 +33,7 @@ class ChatlogWindow extends Window
 
     /**
      *
-     * @param ChatMessage[] $messages
+     * @param \ManiaLivePlugins\eXpansion\Chatlog\Structures\ChatMessage[] $messages
      */
     public function populateList($messages)
     {
@@ -52,10 +43,11 @@ class ChatlogWindow extends Window
         $this->pager->clearItems();
         $this->items = array();
 
+        $login = $this->getRecipient();
         $x = 0;
 
         foreach ($messages as $message) {
-            $this->items[$x] = new Message(
+            $this->items[$x] = new \ManiaLivePlugins\eXpansion\Chatlog\Gui\Controls\Message(
                 $x,
                 $message,
                 $this->widths,

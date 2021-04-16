@@ -1,16 +1,15 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Core\Gui\Controls;
 
-use ManiaLib\Gui\Elements\Label;
-use ManiaLivePlugins\eXpansion\Gui\Control;
+namespace ManiaLivePlugins\eXpansion\Core\Gui\Controls;
 
 /**
  * Description of InfoLine
  *
  * @author Reaby
  */
-class InfoLine extends Control
+class InfoLine extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
+
 
     protected $label;
 
@@ -18,7 +17,7 @@ class InfoLine extends Control
     {
         $this->setSize(240, 4);
         $this->setAlign("left");
-        $this->label = new Label(240, 5);
+        $this->label = new \ManiaLib\Gui\Elements\Label(240, 5);
         $this->label->setAlign("left", "center");
         $this->label->setStyle("TextCardMedium");
         $this->label->setText($text);

@@ -1,4 +1,5 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\AutoLoad;
 
 use ManiaLive\Event\Dispatcher;
@@ -9,11 +10,9 @@ use ManiaLivePlugins\eXpansion\AutoLoad\Gui\Windows\PluginList;
 use ManiaLivePlugins\eXpansion\AutoLoad\Structures\PluginNotFoundException;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Events\ConfigLoadEvent;
-use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\config\MetaData as MetaDataType;
-use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 
-class AutoLoad extends ExpPlugin
+class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     /**
      * @var string[] Plugins to be loaded.
@@ -86,15 +85,16 @@ class AutoLoad extends ExpPlugin
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while loading Core plugins!" . $ex->getMessage());
             AdminGroups::getInstance()
-                ->announceToPermission(Permission::SERVER_ADMIN,
-                    '[AutoLoad] Error while starting expansion core. See console for more info.'
+                ->announceToPermission(
+                    '[AutoLoad] Error while starting expansion core. See console for more info.',
+                    Permission::SERVER_ADMIN
                 );
         }
 
         // do event to inform autoload is complete;
         Dispatcher::dispatch(
-            new GlobalEvent(
-                GlobalEvent::ON_AUTOLOAD_COMPLETE
+            new \ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent(
+                \ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent::ON_AUTOLOAD_COMPLETE
             )
         );
     }
@@ -209,7 +209,7 @@ class AutoLoad extends ExpPlugin
      *
      * This method will try and solve dependecies, so start plugins needed to start the plugins asked.
      *
-     * @param string[] $plugins List of plugins to autoload
+     * @param string[]      $plugins  List of plugins to autoload
      * @param PluginHandler $pHandler The manialive plugin handler
      *
      * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
@@ -239,7 +239,7 @@ class AutoLoad extends ExpPlugin
             );
             $this->console(
                 "Not all required plugins were loaded, "
-                . "due to unmet dependencies or errors. list of not loaded plugins: "
+                ."due to unmet dependencies or errors. list of not loaded plugins: "
             );
             foreach ($recheck as $pname) {
                 $this->console($pname);
@@ -255,7 +255,7 @@ class AutoLoad extends ExpPlugin
     /**
      * Try to load multiple plugins.
      *
-     * @param string[] $list List of plugins to load.
+     * @param string[]      $list     List of plugins to load.
      * @param PluginHandler $pHandler The manialive plugin handler.
      *
      * @return array list of plugins that couldn't be loaded due to dependencies
@@ -281,13 +281,13 @@ class AutoLoad extends ExpPlugin
     /**
      * Try and load a plugin. Will check for dependecies all the other criteries that allows a plugin to start.
      *
-     * @param string $pluginName The name of the plugin to load
+     * @param string        $pname    The name of the plugin to load
      * @param PluginHandler $pHandler The manialive plugin handler.
      *
      * @return bool
      * @throws PluginNotFoundException
      */
-    public function loadPlugin($pluginName, PluginHandler $pHandler)
+    public function loadPlugin($pname, PluginHandler $pHandler)
     {
         //List of plugins that were disabled
         $disabled = Config::getInstance()->disable;
@@ -296,32 +296,32 @@ class AutoLoad extends ExpPlugin
         }
 
         try {
-            if (!$pHandler->isLoaded($pluginName)) {
-                if (in_array($pluginName, $disabled)) {
-                    $this->console("[" . $pluginName . "]...Disabled -> not loading");
+            if (!$pHandler->isLoaded($pname)) {
+                if (in_array($pname, $disabled)) {
+                    $this->console("[" . $pname . "]...Disabled -> not loading");
                 } else {
-                    if (!class_exists($pluginName)) {
-                        $this->console("[" . $pluginName . "]...Doesen't exist -> not loading");
-                        throw new PluginNotFoundException($pluginName);
+                    if (!class_exists($pname)) {
+                        $this->console("[" . $pname . "]...Doesen't exist -> not loading");
+                        throw new PluginNotFoundException($pname);
                     }
                     /** @var MetaDataType $metaData */
-                    $metaData = $pluginName::getMetaData();
+                    $metaData = $pname::getMetaData();
 
-                    $this->availablePlugins[$pluginName] = $metaData;
-                    self::$allAvailablePlugins[$pluginName] = $metaData;
+                    $this->availablePlugins[$pname] = $metaData;
+                    self::$allAvailablePlugins[$pname] = $metaData;
 
                     if (!$metaData->checkForPluginIncompatibility($pHandler->getLoadedPluginsList())) {
                         $this->console(
-                            "[" . $pluginName . "]...Disabled -> Not Compatible : either can't run with a certain plugin "
-                            . "or a loaded plugin can't with this plugin"
+                            "[" . $pname . "]...Disabled -> Not Compatible : either can't run with a certain plugin "
+                            ."or a loaded plugin can't with this plugin"
                         );
                         return false;
                     } elseif ($metaData->checkAll()) {
                         try {
-                            $status = $pHandler->load($pluginName, false);
+                            $status = $pHandler->load($pname, false);
                         } catch (\Exception $ex) {
                             try {
-                                $pHandler->unload($pluginName);
+                                $pHandler->unload($pname);
                             } catch (\Exception $ex) {
 
                             }
@@ -329,21 +329,21 @@ class AutoLoad extends ExpPlugin
                         }
 
                         if (!$status) {
-                            $this->console("[" . $pluginName . "]...FAIL -> will retry");
-                            $recheck[] = $pluginName;
+                            $this->console("[" . $pname . "]...FAIL -> will retry");
+                            $recheck[] = $pname;
                         } else {
-                            $this->debug("[" . $pluginName . "]...SUCCESS");
+                            $this->debug("[" . $pname . "]...SUCCESS");
                         }
                     } else {
                         // @TODO display in the logs why not compatible.
-                        $this->console("[" . $pluginName . "]...Disabled -> Not Compatible");
+                        $this->console("[" . $pname . "]...Disabled -> Not Compatible");
                     }
                 }
             }
         } catch (PluginNotFoundException $ex) {
             throw $ex;
         } catch (\Exception $ex) {
-            $this->console("[" . $pluginName . "]...FAIL -> will retry");
+            $this->console("[" . $pname . "]...FAIL -> will retry");
             return false;
         }
 
@@ -353,7 +353,7 @@ class AutoLoad extends ExpPlugin
     /**
      * Start or stop a certain plugin.
      *
-     * @param string $login Login of the user that tries to start or stop the process.
+     * @param string       $login    Login of the user that tries to start or stop the process.
      * @param MetaDataType $metaData The metadata of the plugin we try to start.
      */
     public function togglePlugin($login, MetaDataType $metaData)
@@ -449,13 +449,12 @@ class AutoLoad extends ExpPlugin
     /**
      * Loads plugin metadata using plugins path.
      *
-     * @param string $path
+     * @param $path
      */
     protected function loadAvailablePluginMetaDataFromPath($path)
     {
         $classes = get_declared_classes();
-
-        require_once($path . DIRECTORY_SEPARATOR . 'MetaData.php');
+        require_once $path . '/MetaData.php';
         $diff = array_diff(get_declared_classes(), $classes);
         $className = reset($diff);
 
@@ -512,11 +511,10 @@ class AutoLoad extends ExpPlugin
     public function showPluginsWindow($login)
     {
         PluginList::Erase($login);
-        /** @var PluginList $win */
         $win = PluginList::Create($login);
         $win->setTitle("Plugin List");
         $win->centerOnScreen();
-        $win->setSize(172, 90);
+        $win->setSize(140, 100);
         $win->populate($this, $this->availablePlugins);
         $win->show();
     }

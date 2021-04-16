@@ -47,7 +47,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     /**
      * Activating the debug mode of the plugin
      *
-     * @var int
+     * @var type int
      */
     protected $debug = self::DEBUG_NONE;
 
@@ -199,7 +199,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
         $this->msg_secure = eXpGetMessage('#variable#%1$s #record#secures #rank#%2$s. #record#Local Record!'
-            . ' #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
+            . '#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
         // %1$s - nickname; %2$s - rank; %3$s - time
         $this->msg_new = eXpGetMessage('#variable#%1$s #record#new #rank#%2$s.#record# Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time
@@ -502,8 +502,15 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $count = 0;
         $uids = "";
         foreach ($this->storage->maps as $map) {
-            $uids .= $this->db->quote($map->uId) . ",";
-            $count++;
+            if (!isset($map->localRecords)) {
+                $map->localRecords = array();
+            }
+            if (!isset($map->localRecords[$login])) {
+                $count++;
+
+                $uids .= $this->db->quote($map->uId) . ",";
+                $mapsByUid[$map->uId] = $map;
+            }
         }
 
         if ($count > 0) {
@@ -515,12 +522,10 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 . '	AND rank_playerlogin = ' . $this->db->quote($login);
             $data = $this->db->execute($q);
 
-            $mapsByUid = array();
             while ($row = $data->fetchObject()) {
-                $mapsByUid[$row->uid] = $row->rank;
+                $mapsByUid[$row->uid]->localRecords[$login] = $row->rank;
             }
         }
-        return $mapsByUid;
     }
 
     public function onTick()
@@ -1587,7 +1592,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     protected function calcCP($totalcps)
     {
-        $cpsect = floor($totalcps * 0.33);
+        $cpsect = floor($totalcps * 0.001);
         $sect = 0;
         $cp = 0;
         $array = array();
@@ -1702,7 +1707,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 FROM exp_records r1
                 WHERE record_challengeuid = \'' . $challengeId . '\'
                                 AND record_nbLaps = ' . $nbLaps . '
-                GROUP BY record_playerlogin, record_challengeuid, record_nbLaps, record_score, record_date
+                GROUP BY record_playerlogin, record_challengeuid, record_nbLaps, record_score
                 ORDER BY ' . $this->getDbOrderCriteria() . '
                 LIMIT 0, ' . $this->config->recordsCount;
 
@@ -1849,7 +1854,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                             ' . $nbTrack . ' as nbMaps
                FROM exp_ranks
                WHERE rank_challengeuid IN (' . $uids . ')                                       
-               GROUP BY login
+               GROUP BY rank_playerlogin                            
                ORDER BY tscore ASC
                LIMIT 0,100';
 

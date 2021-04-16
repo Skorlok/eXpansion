@@ -22,16 +22,10 @@
 
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
+
 class LocalRecords extends LocalBase
 {
-
-    /**
-     * The last time of the players past the checkpoints
-     *
-     * @var array login => array( int => int)
-     */
-    protected $checkpoints = array();
-
     /**
      * onPlayerFinish()
      * Function called when a player finishes.
@@ -50,23 +44,20 @@ class LocalRecords extends LocalBase
 
             //If laps mode we need to ignore. Laps has it's own end map event(end finish lap)
             //Laps mode has it own on Player finish event
-            if ($gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS
-                && $this->config->lapsModeCount1lap
-            ) {
+            if ($gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCount1lap) {
                 return;
             }
 
+            $playerinfo = Core::$playerInfo;
+
             $time = microtime();
             //We add the record to the buffer
-            $this->addRecord($login, $timeOrScore, $gamemode, $this->checkpoints[$login]);
+            $this->addRecord($login, $timeOrScore, $gamemode, $playerinfo[$login]->checkpoints);
 
             if (($this->debug & self::DEBUG_RECPROCESSTIME) == self::DEBUG_RECPROCESSTIME) {
                 $this->debug("#### NEW RANK IN : " . (microtime() - $time) . "s BAD?");
             }
         }
-        //We reset the checkPoints
-        $this->checkpoints[$login] = array();
-
         parent::onPlayerFinish($playerUid, $login, $timeOrScore);
     }
 
@@ -78,7 +69,6 @@ class LocalRecords extends LocalBase
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-
         if ($this->config->lapsModeCount1lap && isset($this->storage->players[$player->login]) && $time > 0) {
             $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
@@ -93,28 +83,9 @@ class LocalRecords extends LocalBase
                 return;
             }
 
-            $this->addRecord($player->login, $time, $gamemode, $this->checkpoints[$player->login]);
-            $this->checkpoints[$player->login] = array();
+            $this->addRecord($player->login, $time, $gamemode, $checkpoints);
         }
-
         parent::onPlayerFinishLap($player, $time, $checkpoints, $nbLap);
-    }
-
-
-    /**
-     * Function called when someone passes a checkpoint.
-     *
-     * @param $playerUid
-     * @param $login
-     * @param $score
-     * @param $curLap
-     * @param $checkpointIndex
-     *
-     * turn void
-     */
-    public function onPlayerCheckpoint($playerUid, $login, $score, $curLap, $checkpointIndex)
-    {
-        $this->checkpoints[$login][$checkpointIndex] = $score;
     }
 
     /**
@@ -124,8 +95,6 @@ class LocalRecords extends LocalBase
     public function onPlayerConnect($login, $isSpectator)
     {
         parent::onPlayerConnect($login, $isSpectator);
-
-        $this->checkpoints[$login] = array();
     }
 
     /**
@@ -135,10 +104,6 @@ class LocalRecords extends LocalBase
     public function onPlayerDisconnect($login, $reason = null)
     {
         parent::onPlayerDisconnect($login, $reason);
-
-        //Remove all checkpoints data
-        $this->checkpoints[$login] = array();
-        unset($this->checkpoints[$login]);
     }
 
     /**

@@ -33,8 +33,18 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         self::$me = $this;
 
         $this->getRoundsPoints();
+    
+        $this->enableScriptEvents("Maniaplanet.StartRound_Start");
+    }
+	
+	public function eXpOnModeScriptCallback($callback, $array)
+    {
 
-
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound(0);
+                break;
+        }
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -131,16 +141,11 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function getRoundsPoints()
     {
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_SCRIPT) {
-            $points = $this->connection->getRoundCustomPoints();
-            if (empty($points)) {
-                self::$roundPoints = array(10, 6, 4, 3, 2, 1);
-            } else {
-                self::$roundPoints = $points;
-            }
-        } else {
+        $points = $this->connection->getRoundCustomPoints();
+        if (empty($points)) {
             self::$roundPoints = array(10, 6, 4, 3, 2, 1);
-            //points = $this->connection->triggerModeScriptEvent('Rounds_GetPointsRepartition',"");
+        } else {
+            self::$roundPoints = $points;
         }
     }
 
@@ -182,6 +187,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         //We need to reset the panel for next Round
         self::$raceOn = false;
+        $this->getRoundsPoints();
         $this->hideLivePanel();
         $this->updateLivePanel();
         self::$raceOn = true;

@@ -2,31 +2,15 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Controls;
 
-use ManiaLib\Gui\Elements\Icons64x64_1;
-use ManiaLib\Gui\Elements\Label;
-use ManiaLib\Gui\Elements\Quad;
-use ManiaLib\Gui\Layouts\Line;
-use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
-
-class ScriptSetting extends Control
+class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
-    /** @var ListBackGround */
+
     private $bg;
-    /** @var Label */
     private $label;
-    /** @var Inputbox */
     private $inputbox;
-    /** @var Frame */
     private $frame;
-    /** @var Checkbox|null */
     public $checkBox = null;
-    /** @var string */
     public $settingName;
-    /** @var null|string */
     public $type = null;
 
     /**
@@ -42,46 +26,46 @@ class ScriptSetting extends Control
         $this->settingName = $settingName;
         $this->type = gettype($value);
 
-        $this->bg = new ListBackGround($indexNumber, $sizeX, $sizeY);
+        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround($indexNumber, $sizeX, $sizeY);
         $this->addComponent($this->bg);
 
-        $this->frame = new Frame();
+        $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setSize($sizeX, $sizeY);
-        $this->frame->setLayout(new Line());
+        $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
 
 
-        $spacer = new Quad();
+        $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
         $spacer->setAlign("center", "center2");
         $spacer->setStyle("Icons128x128_1");
         $spacer->setSubStyle("Challenge");
         $this->frame->addComponent($spacer);
 
-        $spacer = new Quad();
+        $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
-        $spacer->setStyle(Icons64x64_1::EmptyIcon);
+        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         //$this->frame->addComponent($spacer);
 
-        $this->label = new Label(120, 4);
+        $this->label = new \ManiaLib\Gui\Elements\Label(120, 4);
         $this->label->setAlign('left', 'center');
         $this->label->setText($settingName);
         $this->label->setScale(0.8);
         $this->frame->addComponent($this->label);
 
 
-        $spacer = new Quad();
+        $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
-        $spacer->setStyle(Icons64x64_1::EmptyIcon);
+        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
 
         $this->frame->addComponent($spacer);
 
         if (is_bool($value) === true) {
-            $this->checkBox = new Checkbox(4, 4);
+            $this->checkBox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox(4, 4);
             $this->checkBox->setStatus($value);
 
             $this->frame->addComponent($this->checkBox);
         } else {
-            $this->inputbox = new Inputbox($settingName, 20);
+            $this->inputbox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox($settingName, 20);
             $this->inputbox->setText($value);
             $this->frame->addComponent($this->inputbox);
         }

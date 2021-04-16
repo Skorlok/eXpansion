@@ -24,6 +24,7 @@ class Faq extends ExpPlugin
         $this->setPublicMethod("showFaq");
 
         $langs = new DirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . "Topics");
+
         foreach ($langs as $lang) {
             if ($lang->isDot()) {
                 continue;
@@ -38,14 +39,6 @@ class Faq extends ExpPlugin
         }
     }
 
-
-    public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
-    {
-        if ($text == "/help") {
-            $this->showFaq($login);
-        }
-    }
-
     public function eXpOnReady()
     {
         $this->registerChatCommand("faq", "showFaq", 0, true);
@@ -57,8 +50,7 @@ class Faq extends ExpPlugin
 
     public function showFaq($login, $topic = "toc", $recipient = null)
     {
-        FaqWindow::Erase($login);
-        $topic = str_replace(".md", "", $topic);
+
         $showTo = $login;
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
             if (!empty($recipient)) {
@@ -70,10 +62,9 @@ class Faq extends ExpPlugin
             }
         }
         $player = $this->storage->getPlayerObject($login);
-        /** @var FaqWindow $window */
-        $window = FaqWindow::Create($showTo);
+        $window = FaqWindow::Create($showTo, true);
         $window->setLanguage($player->language);
-        $window->setTopic($topic . ".md");
+        $window->setTopic($topic);
         $window->setSize(160, 90);
         $window->show();
     }
