@@ -66,6 +66,8 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = $this->registerChatCommand("endround", "vote_EndRound", 0, true);
         $cmd->help = 'Start a vote to endround';
 
+        $cmd = $this->registerChatCommand("ext", "vote_Extend", 0, true);
+        $cmd->help = 'Start a vote to extend timelimit';
         $cmd = $this->registerChatCommand("extend", "vote_Extend", 0, true);
         $cmd->help = 'Start a vote to extend timelimit';
 
@@ -83,6 +85,8 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->timer = time();
         $this->setPublicMethod("vote_restart");
         $this->setPublicMethod("vote_skip");
+        $this->setPublicMethod("vote_extend");
+        $this->setPublicMethod("vote_endround");
         $this->setPublicMethod("showVotesConfig");
 
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {

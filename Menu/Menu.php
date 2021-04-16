@@ -187,6 +187,10 @@ class Menu extends ExpPlugin implements Listener
         $voteGroup = $menu->addGroup("Vote");
         $voteGroup->addItem("Skip", "!voteskip", $this);
         $voteGroup->addItem("Res", "!voteres", $this);
+        if ($this->pluginLoaded("Votes")) {
+            $voteGroup->addItem("Extend Time", "!voteextend", $this);
+            $voteGroup->addItem("End Round", "!voteend", $this);
+        }
         if ($group->hasPermission(Permission::SERVER_VOTES)) {
             $voteGroup->addItem("Config...", "!adm_votes", $this);
             $voteGroup->addItem('$f00Cancel', "!admcancel", $this);
@@ -392,6 +396,18 @@ class Menu extends ExpPlugin implements Listener
                         $this->callPublicMethod($plugin, "vote_skip", $login);
                     } else {
                         $this->connection->callVoteNextMap();
+                    }
+                    break;
+                case "!voteextend":
+                    $plugin = $this->getPluginClass("Votes");
+                    if ($this->isPluginLoaded($plugin)) {
+                        $this->callPublicMethod($plugin, "vote_extend", $login);
+                    }
+                    break;
+                case "!voteend":
+                    $plugin = $this->getPluginClass("Votes");
+                    if ($this->isPluginLoaded($plugin)) {
+                        $this->callPublicMethod($plugin, "vote_endround", $login);
                     }
                     break;
                 default:
