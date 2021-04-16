@@ -63,18 +63,7 @@ class TM_Stunts extends ExpPlugin
         $this->counter++;
     }
 
-    public function LibXmlRpc_OnStunt(
-        $login,
-        $points,
-        $combo,
-        $stuntsscore,
-        $factor,
-        $figure,
-        $angle,
-        $isstraight,
-        $isreversed,
-        $ismasterjump
-    ) {
+    public function LibXmlRpc_OnStunt($points,$login,$combo,$stuntsscore,$factor,$figure,$angle,$isstraight,$isreversed,$ismasterjump) {
         $figure = str_replace("::EStuntFigure::", "", $figure);
 
         if ($angle || ($figure != "StraightJump" && $figure != "RespawnPenalty")) {
