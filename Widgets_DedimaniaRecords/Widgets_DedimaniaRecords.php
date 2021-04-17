@@ -32,9 +32,7 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
     public function eXpOnLoad()
     {
-        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')
-            || $this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania_Script\\Dedimania_Script')
-        ) {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             Dispatcher::register(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         }
 
@@ -72,14 +70,11 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     public function updateDediPanel($login = null)
     {
 
-        $dedi1 = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
-        $dedi2 = '\ManiaLivePlugins\\eXpansion\\Dedimania_Script\\Dedimania_Script';
+        $dedi = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
         try {
-            if (($this->isPluginLoaded($dedi1) && $this->callPublicMethod($dedi1, 'isRunning'))
-                || ($this->isPluginLoaded($dedi2) && $this->callPublicMethod($dedi2, 'isRunning'))
-            ) {
+            if (($this->isPluginLoaded($dedi) && $this->callPublicMethod($dedi, 'isRunning'))) {
                 $localRecs = DediPanel::GetAll();
                 if (!isset($localRecs[0])) {
                     //Gui\Widgets\DediPanel::EraseAll();

@@ -1,15 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Core",
-    "\\Dedimania",
-    "\\Widgets_BestCheckpoints",
-    "\\Widgets_BestCheckpoints\\Structures",
+    "\\Autotime",
+    "\\AutoUpdate",
+    "\\Menu",
+    "\\Votes",
     "\\Widgets_BestRuns",
     "\\Widgets_BestRuns\\Gui",
     "\\Widgets_BestRuns\\Structures",
-    "\\Widgets_TeamPlayerScores"
+    "\\Widgets_TeamPlayerScores",
+    "\\Widgets_TeamRoundScores"
   ],
-  "SelectedNode": "\\Widgets_BestRuns\\Structures\\Run.php",
+  "SelectedNode": "\\Votes\\Votes.php",
   "PreviewInSolutionExplorer": false
 }
