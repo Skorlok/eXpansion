@@ -11,7 +11,7 @@ if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500 ) {
         }
 
 
-        if (Speed > 30.1 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
+        if (Speed > 30.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
             if (lastValue == False) {
                 edge_isMinimized = True;
                 lastValue = True;

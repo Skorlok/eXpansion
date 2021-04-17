@@ -1,16 +1,15 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Autotime",
-    "\\AutoUpdate",
-    "\\Menu",
+    "\\Core",
     "\\Votes",
     "\\Widgets_BestRuns",
     "\\Widgets_BestRuns\\Gui",
     "\\Widgets_BestRuns\\Structures",
     "\\Widgets_TeamPlayerScores",
-    "\\Widgets_TeamRoundScores"
+    "\\Widgets_TeamRoundScores",
+    "\\Widgets_Times"
   ],
-  "SelectedNode": "\\Votes\\Votes.php",
+  "SelectedNode": "\\Core\\Core.php",
   "PreviewInSolutionExplorer": false
 }
