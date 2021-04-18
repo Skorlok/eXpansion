@@ -1,8 +1,6 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Core",
-    "\\Votes",
     "\\Widgets_BestRuns",
     "\\Widgets_BestRuns\\Gui",
     "\\Widgets_BestRuns\\Structures",
@@ -10,6 +8,6 @@
     "\\Widgets_TeamRoundScores",
     "\\Widgets_Times"
   ],
-  "SelectedNode": "\\Core\\Core.php",
+  "SelectedNode": "\\Widgets_BestRuns\\Widgets_BestRuns.php",
   "PreviewInSolutionExplorer": false
 }
