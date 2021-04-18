@@ -314,7 +314,7 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
 
     protected function getSimpleTitleByEnvironment($enviName)
     {
-        if ($enviName == "Stadium" || $enviName == "Valley" || $enviName == "Canyon") {
+        if ($enviName == "Stadium" || $enviName == "Valley" || $enviName == "Canyon" || $enviName == "Lagoon") {
             return self::TITLE_SIMPLE_TM;
         } else {
             return self::TITLE_SIMPLE_SM;

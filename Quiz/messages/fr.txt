@@ -23,7 +23,7 @@ Annuler
 #quiz#Le quiz a été mis a zéro!
 
 Correct from
-Correct from
+Correct de
 
 #quiz#Right answers: $o#question#%s
 #quiz#Bonne réponse: $o#question#%s
@@ -59,4 +59,4 @@ Url de l'image
 #quiz#$Impossible d'afficher l'image, type de support non pris en charge.
 
 Ask hidden
-#translate# Ask hidden
+Demande cachée

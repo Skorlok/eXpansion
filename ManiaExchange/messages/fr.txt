@@ -20,7 +20,7 @@ Search Maps
 Chercher Maps
 
 Usage.. /mx queue [id] or /mx search "your search terms here"
-Usage.. /mx queue [id] ou /mx search "vos termes à chercher"
+Utilisation.. /mx queue [id] ou /mx search "vos termes à chercher"
 
 Error: %s
 Erreur: %s
@@ -61,8 +61,11 @@ Le circuit n'est pas compatible avec les paramètres du serveur actuels, pas ajo
 The Map is not compatible with current server settings, map not added.
 Le circuit n'est pas compatible avec les paramètres du serveur actuels, pas ajouté.
 
-$iYou don't have permission to do that!
+$iYou don\'t have permission to do that!
 $iVous n'êtes pas autorisé faire cela!
 
  is not a numeric value.
  n'est pas une valeur numérique.
+
+Map author has declined the permission to download this map!
+L'auteur de la carte a refusé l'autorisation de télécharger cette carte !

@@ -35,10 +35,10 @@ Cancel
 Abondonner
 
 Time Attack
-Time Attack
+Contre-la-montre
 
 Rounds
-Rounds
+Tours
 
 Cup
 Coupe
@@ -47,7 +47,7 @@ Laps
 Tours
 
 Team
-Team
+Équipe
 
 Error in filename
 Erreur de nom du fichier
@@ -140,7 +140,7 @@ Enable Referee-mode
 Permettre arbitrage
 
 ForceScores can be used only with rounds or team mode
-ForceScores peut seulment etre utilisé en mode rounds ou equipe(team)
+ForceScores peut seulement etre utilisé en mode rounds ou equipe(team)
 
 ScriptSettings available only in script mode
 Les reglages ScriptSettings sont disponible uniquement end mode script
@@ -149,7 +149,7 @@ Database plugin not loaded!
 L'extension Database n'est pas chargée!
 
 #admin_action#Admin %s $z$s#admin_action#sets custom round points to #variable#%s
-#admin_action#Admin %s $z$s#admin_action# definie les point custom de rounds point a #variable#%s
+#admin_action#Admin %s $z$s#admin_action# a definie les point personnalisé de rounds a #variable#%s
 
 Podium Chat time
 Temps de Chat au Podium
@@ -170,7 +170,7 @@ roundsPointsLimit
 roundsPointsLimit
 
 roundsForcedLaps
- roundsForcedLaps
+roundsForcedLaps
 
 roundsPointsLimitNewRules
 roundsPointsLimitNewRules
@@ -194,7 +194,7 @@ cupRoundsPerMap
 cupRoundsPerMap
 
 Choose Gamemode:
-Choose Gamemode:
+Choix du mode de jeu:
 
 Additional Options:
 Option Additionnelle:
@@ -308,7 +308,7 @@ Autosave Validation Replays
 Sauvegardé automatiquement des Replays de validation
 
 Laps: Time Limit
-Laps: Time Limit
+Laps: Limite de Temps
 
 #error#The map has already been restarted. Limit reached!
 #error#Le circuit a déjà été redémarrer. Limite atteinte!
@@ -347,10 +347,10 @@ Settings not changed.
 Paramètres inchangé
 
 Server Control
-#translate# Server Control
+Panneau de configuration
 
 Custom Round Points
-#translate# Custom Round Points
+point personnalisé de rounds
 
 #admin_error#Error: %s
 #admin_error#Erreur: %s

@@ -20,30 +20,33 @@ class Autotime extends ExpPlugin
 
     function onBeginMatch()
     {
+        $this->config = Config::getInstance();
+
         $map = $this->connection->getCurrentMapInfo();
-            $laps = $map->nbLaps;
-            if ($map->nbLaps <= 1) {
-                $laps = 1;
-            }
+        $laps = $map->nbLaps;
 
-            $newLimit = floor((intval($map->bronzeTime)) * floatval($this->config->timelimit_multiplier));
+        if ($map->nbLaps <= 1) {
+            $laps = 1;
+        }
 
-            $max = TimeConversion::MStoTM(Config::getInstance()->max_timelimit);
-            $min = TimeConversion::MStoTM(Config::getInstance()->min_timelimit);
+        $newLimit = floor((intval($map->bronzeTime)) * floatval($this->config->timelimit_multiplier));
 
-            if ($newLimit > $max) {
-                $newLimit = $max;
-            }
-            if ($newLimit < $min) {
-                $newLimit = $min;
-            }
+        $max = TimeConversion::MStoTM($this->config->max_timelimit);
+        $min = TimeConversion::MStoTM($this->config->min_timelimit);
+
+        if ($newLimit > $max) {
+            $newLimit = $max;
+        }
+        if ($newLimit < $min) {
+            $newLimit = $min;
+        }
             
-            $tatime = $newLimit/1000;
+        $tatime = $newLimit/1000;
 
-            if ($this->config->message == true){
-                $this->eXpChatSendServerMessage('$ff0$iNew time limit: $fff' . Time::fromTM($newLimit) . ' $ff0seconds.');
-            }
-            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($tatime)]);
+        if ($this->config->message == true){
+            $this->eXpChatSendServerMessage('$ff0$iNew time limit: $fff' . Time::fromTM($newLimit) . ' $ff0seconds.');
+        }
+        $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($tatime)]);
     }
 
     public function eXpOnUnload()

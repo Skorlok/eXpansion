@@ -2,7 +2,7 @@ Ignore
 Ignorer
 
 Kick
-Renvoyer
+Expulser
 
 Ban
 Bannir
@@ -41,16 +41,16 @@ Show Players
 Montrer les joueurs
 
 Admin has released you from specate to play.
-Admin has released you from specate to play.
+L'admin t'a libéré du mode spectateur pour que tu puisse jouer.
 
 NickName
-NickName
+Pseudo
 
 Login
 Login
 
 Error:
-Error:
+Erreur:
 
 %s$1 $z$s$fff is $f00broadcasting$fff at $lwww.twitch.tv$l, say hello to all the viewers :)
 %s$1 $z$s$fff est $f00broadcasting$fff à $lwww.twitch.tv$l, Dites bonjour au joueurs :)
@@ -65,7 +65,7 @@ Ban List
 Liste des bannis
 
 Black List
-Black List
+Black noir
 
 Ignore player %1$s 
 #translate# Ignore player %1$s 

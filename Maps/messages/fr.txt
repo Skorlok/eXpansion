@@ -161,7 +161,7 @@ Vider la liste des circuits
 #admin_error# $iA payement pour la demande d'un circuit est en progrès, veuillez vous essayer plus tard.
 
 Are you sure you want to wish this map to be played
-Ete vous sure de vouloir faire jouer ce circuit
+Etes vous sure de vouloir faire jouer ce circuit
 
 #admin_error# $iYOu can't wish for a map at the moment.
 #admin_error# $iVous ne pouvez pas souhaiter un circuit en ce moment

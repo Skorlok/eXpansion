@@ -43,7 +43,7 @@ class JoinLeaveMessage extends ExpPlugin
 
     public function eXpOnReady()
     {
-        $cmd = $this->registerChatCommand("played", "showPlaytime", 0, true);
+        $cmd = $this->registerChatCommand("played", "showPlayTime", 0, true);
 
 
         foreach ($this->storage->players as $login => $player) {

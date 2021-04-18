@@ -11,7 +11,7 @@ File d'attente
 #variable# %1$s#music# by#variable#  %2$s #music# va être joué prochainement, demande par #variable# %3$s 
 
 #music#Next song: $z$s#variable# %1$s #music#by#variable# %2$s
-#music#Prochaine chanson: $z$s#variable# %1$s #music#by#variable# %2$s
+#music#Prochaine chanson: $z$s#variable# %1$s #music#de#variable# %2$s
 
 MusicBox error http-code: %s
 MusicBox erreur http-code: %s

@@ -26,7 +26,6 @@ This plugin isn't compatible with the current Game mode
 Ce plugin n'est pas compatible avec le mode de jeux courant
 
 This plugin is is compatible with current installation
-This plugin is is compatible with current installation
 Ce plugin est compatible avec l'installation courante
 
 Settings

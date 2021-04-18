@@ -31,7 +31,7 @@ $FF0Fé$FE0li$FD0ci$FC0ta$FB0ti$FA0on$F90s! #variable#%1$s  #record_top#a améli
 #record#Current record on #variable#%1$s  #record#is #time#%2$s #record#by #variable#%3$s
 #record#Le record actuel sur #variable#%1$s  #record#est #time#%2$s #record#by #variable#%3$s
 
-#record#Personal Best: #time#%1$s  #record#($n #rank#%2$s$n #record#)  Average: #time#%3$s #record#($n #variable#%4$s #record#$n finishes $m)
+#record#Personal Best: #time#%1$s  #record#($n #rank#%2$s$n #record#)  Average: #time#%3$s #record#($n #variable#%4$s #record#$n finishes $n)
 #record#Record personnel: #time#%1$s  #record#($n #rank#%2$s$n #record#)  Moyenne: #time#%3$s #record#($n #variable#%4$s #record#$n achèvements $m)
 
 #admin_error# $iYou have not finished this map yet..
@@ -110,7 +110,7 @@ Login
 #variable#%1$s #record#sécurise #rank#%2$s. #record#Record Local!#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
 
 #variable#%1$s #record#new #rank#%2$s.#record# Local Record! #time#%3$s
-#variable#%1$s #record#new #rank#%2$s.#record# Record Local! #time#%3$s
+#variable#%1$s #record#nouveau #rank#%2$s.#record# Record Local! #time#%3$s
 
 #record#Oops! #variable#%1$s #record#equals #rank#%2$s#record#. Local Record! #time#%3$s
 #record#Oops! #variable#%1$s #record#égalise #rank#%2$s#record#. Record Local! #time#%3$s
