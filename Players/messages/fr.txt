@@ -65,7 +65,7 @@ Ban List
 Liste des bannis
 
 Black List
-Black noir
+Liste noir
 
 Ignore player %1$s 
 #translate# Ignore player %1$s 

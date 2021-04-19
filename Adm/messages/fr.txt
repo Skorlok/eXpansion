@@ -347,7 +347,7 @@ Settings not changed.
 Paramètres inchangé
 
 Server Control
-Panneau de configuration
+Contrôle du serveur
 
 Custom Round Points
 point personnalisé de rounds

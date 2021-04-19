@@ -6,3 +6,9 @@ MXKarma erreur %1$s: %2$s
 
 MXKarma connection Success!
 MXKarma connection Success!
+
+Vote registered for MXKarma
+Vote registered for MXKarma
+
+MXKarma saved successfully!
+MXKarma saved successfully!
