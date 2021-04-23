@@ -38,6 +38,7 @@ class Gui extends ExpPlugin
     public function eXpOnLoad()
     {
         HudPanel::$mainPlugin = $this;
+
         $config = Config::getInstance();
     }
 
@@ -203,14 +204,19 @@ class Gui extends ExpPlugin
 
     public function showConfigWindow($login, $entries)
     {
-        if (Config::getInstance()->disablePersonalHud) {
+        // This window does eXpansion crash
+        // This window does not work
+
+        $this->eXpChatSendServerMessage("Sorry but this window is disabled", $login);
+
+        /*if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
             $window = Configuration::Create($login, true);
             $window->setSize(120, 90);
             $window->setData($entries);
             $window->show();
-        }
+        }*/
     }
 
     public function resetHud($login)
@@ -357,9 +363,9 @@ class Gui extends ExpPlugin
      */
     public static function createConfirm($finalAction)
     {
-        $outAction = call_user_func_array(
-            array(ActionHandler::getInstance(), 'createAction'),
-            array(array(__NAMESPACE__ . '\Gui', 'showConfirmDialog'), $finalAction)
+        $outAction = ActionHandler::getInstance()->createAction(
+            array('\\ManiaLivePlugins\\eXpansion\\Gui\\Gui', 'showConfirmDialog'),
+            $finalAction
         );
 
         return $outAction;

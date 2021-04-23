@@ -147,6 +147,9 @@ class Widgets extends \ManiaLib\Utils\Singleton
 	public $MapSuggestionButton_posX = array(self::config_default => 116.8);
     public $MapSuggestionButton_posY = array(self::config_default => -53);
 
+    public $CheckpointprogressWidget_posX = array(self::config_default => -80);
+    public $CheckpointprogressWidget_posY = array(self::config_default => -56);
+
     public $ManiaExchangePanel_posX = array(self::config_default => -160);
     public $ManiaExchangePanel_posY = array(self::config_default => 80);
     public $ManiaExchangePanel_autoCloseTimeout = array(self::config_default => 0);
