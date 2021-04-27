@@ -8,5 +8,6 @@ class Config extends \ManiaLib\Utils\Singleton
     public $min_timelimit = '2:00';
     public $max_timelimit = '15:00';
     public $timelimit = '5:00';
+    public $medal = 'author';
     public $message = true;
 }

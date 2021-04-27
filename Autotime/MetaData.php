@@ -29,23 +29,25 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->setGroups(array('Tools'));
 
         $config = Config::getInstance();
+
         $var = new TypeInt("timelimit_multiplier", "Timelimit multiplier", $config, false, false);
         $var->setDefaultValue(6);
         $this->registerVariable($var);
 
-        $config = Config::getInstance();
         $var = new TypeString("min_timelimit", "Minimum timelimit to set", $config, false, false);
         $var->setDefaultValue('2:00');
         $this->registerVariable($var);
 
-        $config = Config::getInstance();
         $var = new TypeString("max_timelimit", "Maximum timelimit to set", $config, false, false);
         $var->setDefaultValue('15:00');
         $this->registerVariable($var);
 
-        $config = Config::getInstance();
         $var = new TypeString("timelimit", "Default timelimit to set", $config, false, false);
         $var->setDefaultValue('5:00');
+        $this->registerVariable($var);
+
+        $var = new TypeString("medal", "Medal multiplicator", $config, false, false);
+        $var->setDefaultValue('author');
         $this->registerVariable($var);
 
         $var = new Boolean("message", "display message at mapstart ?", $config, false, false);
