@@ -58,7 +58,7 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->btnAddAll->setText(__("Add all", $this->getRecipient()));
         $this->btnAddAll->setAction($this->actionAddAll);
         $this->mainFrame->addComponent($this->btnAddAll);
-        $this->allMapsPath = Helper::getPaths()->getDownloadMapsPath();
+        $this->allMapsPath = Helper::getPaths()->getMapPath();
     }
 
     public function addMap($login, $filename)
@@ -104,7 +104,7 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             return;
         }
 
-        $mapPath = Helper::getPaths()->getDownloadMapsPath() . $folder;
+        $mapPath = Helper::getPaths()->getMapPath() . $folder;
         if ($folder) {
             $mapPath = $folder;
             $this->allMapsPath = $folder;
@@ -116,7 +116,7 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($dir->isDir()) {
                 $file = $dir->getPathname();
                 $label = str_replace(DIRECTORY_SEPARATOR, "", str_replace($mapPath, "", $dir->getPathname()));
-                if ((\realpath(Helper::getPaths()->getDownloadMapsPath()) == $dir->getPath())) {
+                if ((\realpath(Helper::getPaths()->getMapPath()) == $dir->getPath())) {
                     if ($dir->isDot()) {
                         continue;
                     }
