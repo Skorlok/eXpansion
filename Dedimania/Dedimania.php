@@ -21,7 +21,6 @@ class Dedimania extends DedimaniaAbstract
         if (!$this->running) {
             return;
         }
-        $this->records = array();
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";
@@ -71,7 +70,7 @@ class Dedimania extends DedimaniaAbstract
     {
         $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
-        if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
+        if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
             return;
         }
 
@@ -205,7 +204,6 @@ class Dedimania extends DedimaniaAbstract
         try {
             $currank = $this->rankings;
             usort($currank, array($this, "compare_BestTime"));
-
             $this->vReplay = $this->connection->getValidationReplay($currank[0]['Login']);
         } catch (Exception $e) {
             $this->console("Unable to get validation replay, server said: " . $e->getMessage());
@@ -283,9 +281,11 @@ class Dedimania extends DedimaniaAbstract
             $this->console($e->getMessage());
             $this->vReplay = "";
             $this->gReplay = "";
+            $this->checkpoints = array();
+            $this->laps_AllCps = array();
+            $this->rankings = array();
         }
         // ignore exception and other, always reset;
-        $this->records = array();
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";

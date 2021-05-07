@@ -33,6 +33,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(GameInfos::GAMEMODE_TEAM);
         $this->addGameModeCompability(GameInfos::GAMEMODE_LAPS);
         $this->addGameModeCompability(GameInfos::GAMEMODE_CUP);
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,"Doppler.Script.txt");
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
         $this->setEnviAsTitle(true);

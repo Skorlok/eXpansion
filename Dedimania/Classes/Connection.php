@@ -615,6 +615,15 @@ class Connection extends Singleton implements AppListener, TickListener
             case "laps.script.txt":
                 return "TA";
                 break;
+            case "doppler.script.txt":
+                return "TA";
+                break;
+            case "endurocup.script.txt":
+                return "TA";
+                break;
+            case "endurance.script.txt":
+                return "TA";
+                break;
             case "rounds.script.txt":
                 return "Rounds";
                 break;
