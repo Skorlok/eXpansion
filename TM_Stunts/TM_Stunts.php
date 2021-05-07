@@ -46,7 +46,7 @@ class TM_Stunts extends ExpPlugin
     {
         switch ($callback) {
             case "Trackmania.Event.Stunt":
-                call_user_func_array(array($this, "LibXmlRpc_OnStunt"),
+                call_user_func_array(array($this, "onPlayerStunt"),
                     json_decode($array[0], true)
                 );
                 break;
@@ -63,7 +63,7 @@ class TM_Stunts extends ExpPlugin
         $this->counter++;
     }
 
-    public function LibXmlRpc_OnStunt($points,$login,$combo,$stuntsscore,$factor,$figure,$angle,$isstraight,$isreversed,$ismasterjump) {
+    public function onPlayerStunt($time,$login,$racetime,$laptime,$stuntsscore,$figure,$angle,$points,$combo,$isstraight,$isreverse,$ismasterjump,$factor) {
         $figure = str_replace("::EStuntFigure::", "", $figure);
 
         if ($angle || ($figure != "StraightJump" && $figure != "RespawnPenalty")) {
@@ -76,6 +76,23 @@ class TM_Stunts extends ExpPlugin
             $split = preg_split('/(?=\p{Lu})/u', $figure);
             $figure = implode(" ", $split) . " " . $angle;
             $this->stuntWindow->setLabels($figure, $points);
+            $this->stuntWindow->show($login);
+        }
+    }
+
+    public function LibXmlRpc_OnStunt($login,$points,$combo,$totalScore,$factor,$stuntname,$angle,$isStraight,$isReversed,$isMasterJump) {
+        $stuntname = str_replace("::EStuntFigure::", "", $stuntname);
+
+        if ($angle || ($stuntname != "StraightJump" && $stuntname != "RespawnPenalty")) {
+            if ($isReversed) {
+                $stuntname = "Reversed" . $stuntname;
+            }
+            if ($angle == 0) {
+                $angle = "";
+            }
+            $split = preg_split('/(?=\p{Lu})/u', $stuntname);
+            $stuntname = implode(" ", $split) . " " . $angle;
+            $this->stuntWindow->setLabels($stuntname, $points);
             $this->stuntWindow->show($login);
         }
     }
