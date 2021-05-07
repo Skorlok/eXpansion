@@ -567,7 +567,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     protected function debugMaxRanks($debugMsg)
     {
         if (($this->debug & self::DEBUG_MAX_RANKS) == self::DEBUG_MAX_RANKS) {
-            $this->console('[Max Ranks]' . $debugMsg);
+            $this->debug('[Max Ranks]' . $debugMsg);
         }
     }
 }

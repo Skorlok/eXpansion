@@ -263,7 +263,6 @@ class Dedimania extends DedimaniaAbstract
             if (sizeof($rankings) == 0) {
                 $this->vReplay = "";
                 $this->gReplay = "";
-                $this->console("No new times driven. Skipping dedimania sent.");
                 return;
             }
 
@@ -275,7 +274,6 @@ class Dedimania extends DedimaniaAbstract
                 $this->console("Couldn't get validation replay of the first player. Dedimania times not sent.");
                 return;
             }
-            $this->console("Attempting to send times");
             $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $this->vReplay, $this->gReplay, $this->laps_AllCps);
         } catch (Exception $e) {
             $this->console($e->getMessage());
