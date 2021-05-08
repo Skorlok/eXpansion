@@ -1,8 +1,11 @@
 %1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s
 %1$s #dedirecord#nouveau #rank#%2$s.#dedirecord# Record Dedimania! #time#%3$s
 
-%1$s #dedirecord#claims #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)
+%1$s #dedirecord#improves #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)
 %1$s #dedirecord#améliore #rank#%2$s.#dedirecord# Record Dedimania! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)
+
+%1$s #dedirecord#secures #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)
+%1$s #dedirecord#sécurise #rank#%2$s.#dedirecord# Record Dedimania! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)
 
 #dedirecord#Dedimania global ranking limited to top #rank#15#dedirecord# for basic accounts.  $l[http://dedimania.net/tm2stats/?do=donation]Click here$l for more info..
 #dedirecord#Rang global Dedimania limité aux top #rank#15#dedirecord# pour comptes de base.  $l[http://dedimania.net/tm2stats/?do=donation]Cliquer ici $l plus d'informations...

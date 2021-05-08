@@ -50,13 +50,13 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     /* @var bool $warmup */
     protected $wasWarmup = false;
-    protected $msg_newRecord;
     protected $msg_norecord;
-    protected $msg_record;
     protected $msg_welcome;
     protected $msg_premium;
     protected $msg_regular;
-    protected $msg_BeginMap;
+    protected $msg_new;
+    protected $msg_secure;
+    protected $msg_improved;
 
     public static $actionOpenRecs = -1;
     public static $actionOpenCps = -1;
@@ -84,13 +84,13 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         Dispatcher::register(DediEvent::getClass(), $this);
         $this->dedimania = DediConnection::getInstance();
-        $this->msg_record = eXpGetMessage('%1$s #dedirecord#claims #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
         $this->msg_welcome = eXpGetMessage('#variable#Dedimania $0f0Connected! #variable#Top #rank#%1$s #variable#records enabled for you (%2$s #variable#account)');
         $this->msg_premium = eXpGetMessage('$FC3p$FD2r$FE1e$FF0m$FF0i$FE2u$FC3m');
         $this->msg_regular = eXpGetMessage('regular');
-        $this->msg_newRecord = eXpGetMessage('%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s');
         $this->msg_norecord = eXpGetMessage('#dedirecord#No dedimania records found for the map!');
-        $this->msg_BeginMap = eXpGetMessage('#dedirecord#Current dedimania record on #variable#%1$s  #dedirecord#is #time#%2$s #dedirecord#by #variable#%3$s');
+        $this->msg_new = eXpGetMessage('%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s');
+        $this->msg_improved = eXpGetMessage('%1$s #dedirecord#improves #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
+        $this->msg_secure = eXpGetMessage('%1$s #dedirecord#secures #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
     }
 
     public function eXpOnReady()
@@ -424,12 +424,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             if ($record->place <= Config::getInstance()->noRedirectTreshold) {
                 $noRedirect = true;
             }
-            $this->eXpChatSendServerMessage(
-                $this->msg_newRecord,
-                $recepient,
-                array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"), $record->place, $time),
-                $noRedirect
-            );
+            $this->eXpChatSendServerMessage($this->msg_new,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"), $record->place, $time),$noRedirect);
         } catch (\Exception $e) {
             $this->console("Error: couldn't show dedimania message" . $e->getMessage());
         }
@@ -474,17 +469,12 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             if ($record->place <= Config::getInstance()->noRedirectTreshold) {
                 $noRedirect = true;
             }
-            $this->eXpChatSendServerMessage(
-                $this->msg_record,
-                $recepient,
-                array(
-                    \ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),
-                    $record->place,
-                    $time,
-                    $oldRecord->place, $diff
-                ),
-                $noRedirect
-            );
+
+            if ($oldRecord->place != $record->place) {
+                $this->eXpChatSendServerMessage($this->msg_improved,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+            } else {
+                $this->eXpChatSendServerMessage($this->msg_secure,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+            }
             $this->debug("message sent.");
         } catch (\Exception $e) {
             $this->console("Error: couldn't show dedimania message");
