@@ -211,7 +211,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->dedimania->playerDisconnect($login);
     }
 
-    public function onStatusChanged($statusCode, $statusName)
+    /*public function onStatusChanged($statusCode, $statusName)
     {
         if ($statusCode !== 4) {
             return;
@@ -221,16 +221,16 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         $this->records = array();
         $this->dedimania->getChallengeRecords();
-    }
+    }*/
 
-    /*public function onBeginMatch()
+    public function onBeginMatch()
     {
         if (!$this->running) {
             return;
         }
         $this->records = array();
         $this->dedimania->getChallengeRecords();
-    }*/
+    }
 
     public function onBeginRound()
     {
