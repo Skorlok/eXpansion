@@ -441,6 +441,36 @@ EOT;
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
         }
+
+        $dataDir = $this->connection->GameDataDirectory();
+
+        if (!file_exists($dataDir . '/Config/blacklist.txt')) {
+	        $filename = $dataDir . '/Config/blacklist.txt';
+		    $file = '<?xml version="1.0" encoding="utf-8" ?>'."\n"
+			    . "<blacklist>\n"
+			    . "<!-- format:\n"
+			    . "	<player>\n"
+			    . "		<login></login>\n"
+			    . "	</player>\n"
+			    . "-->\n"
+			    . "</blacklist>\n";
+
+		    file_put_contents($filename, $file);
+        }
+
+        if (!file_exists($dataDir . '/Config/guestlist.txt')) {
+	        $filename = $dataDir . '/Config/guestlist.txt';
+		    $file = '<?xml version="1.0" encoding="utf-8" ?>'."\n"
+			    . "<guestlist>\n"
+			    . "<!-- format\n"
+			    . "	<player>\n"
+			    . "		<login></login>\n"
+			    . "	</player>\n"
+			    . "-->\n"
+			    . "</guestlist>\n";
+
+		    file_put_contents($filename, $file);
+        }
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -765,6 +795,7 @@ EOT;
                 $this->lastServerSettings = clone $serverSettings;
             }
         }
+
         $this->teamScores = array();
 
         $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);

@@ -142,12 +142,6 @@ class Connection extends Singleton implements AppListener, TickListener
             throw new Exception("Server code is not configured! \n");
         }
 
-        if (strtolower($serverInfo->login) != strtolower($config->login)) {
-            throw new Exception(
-                "Your dedicated server login differs from configured server login, please check your configuration."
-            );
-        }
-
         if ($packmask == "") {
             $packmask = $version->titleId;
         }
