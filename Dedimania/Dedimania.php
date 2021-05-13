@@ -24,8 +24,6 @@ class Dedimania extends DedimaniaAbstract
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";
-        $this->checkpoints = array();
-        $this->laps_AllCps = array();
     }
 
     public function onPlayerFinish($playerUid, $login, $time)
@@ -216,9 +214,10 @@ class Dedimania extends DedimaniaAbstract
             $currank = $this->rankings;
             usort($currank, array($this, "compare_BestTime"));
 
-            $grfile = sprintf('Dedimania/%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$currank[0]['BestTime'],$currank[0]['Login']);
+            $grfile = sprintf('%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$currank[0]['BestTime'],$currank[0]['Login']);
             $this->connection->saveBestGhostsReplay($currank[0]['Login'], $grfile);
             $this->gReplay = file_get_contents($this->connection->gameDataDirectory().'Replays/'.$grfile);
+            unlink($this->connection->gameDataDirectory().'Replays/'.$grfile);
         } catch (Exception $e) {
             $this->console("Unable to save ghost replay, server said: " . $e->getMessage());
         }
@@ -267,27 +266,23 @@ class Dedimania extends DedimaniaAbstract
             }
 
             $playerinfo = Core::$playerInfo;
-            $this->laps_AllCps = implode(",", $playerinfo[$rankings[0]['Login']]->checkpoints);
+            $AllChecks = implode(",", $playerinfo[$rankings[0]['Login']]->checkpoints);
 
             // Dedimania doesn't allow times sent without validation replay. So, let's just stop here if there is none.
             if (empty($this->vReplay)) {
                 $this->console("Couldn't get validation replay of the first player. Dedimania times not sent.");
                 return;
             }
-            $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $this->vReplay, $this->gReplay, $this->laps_AllCps);
+            $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $this->vReplay, $this->gReplay, $AllChecks);
         } catch (Exception $e) {
             $this->console($e->getMessage());
             $this->vReplay = "";
             $this->gReplay = "";
-            $this->checkpoints = array();
-            $this->laps_AllCps = array();
             $this->rankings = array();
         }
         // ignore exception and other, always reset;
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";
-        $this->checkpoints = array();
-        $this->laps_AllCps = array();
     }
 }
