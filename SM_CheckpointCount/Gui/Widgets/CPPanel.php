@@ -16,7 +16,7 @@ class CPPanel extends Widget
 
     protected function eXpOnBeginConstruct()
     {
-        $this->setName("Checkpoint counter (storm)");
+        $this->setName("Checkpoint counter");
     }
 
     protected function eXpOnEndConstruct()
@@ -39,7 +39,7 @@ class CPPanel extends Widget
         $this->addComponent($this->label);
     }
 
-    protected function onResize($oldX, $oldY)
+    public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
         //$this->cplabel->setPosition(($this->sizeX / 2), -1);

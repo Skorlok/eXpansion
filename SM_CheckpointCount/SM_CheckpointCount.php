@@ -8,10 +8,10 @@ use ManiaLivePlugins\eXpansion\SM_CheckpointCount\Gui\Widgets\CPPanel;
 class SM_CheckpointCount extends ExpPlugin
 {
 
-    public function eXpOnLoad()
+    /*public function eXpOnLoad()
     {
         $this->enableScriptEvents("LibXmlRpc_OnWayPoint");
-    }
+    }*/
 
     public function eXpOnReady()
     {
@@ -43,18 +43,31 @@ class SM_CheckpointCount extends ExpPlugin
         $info = CPPanel::Create($login);
         $info->setSize(35, 6);
         $text = $cpIndex . " / " . ($this->storage->currentMap->nbCheckpoints - 1);
+        if ($cpIndex == ($this->storage->currentMap->nbCheckpoints - 1)) {
+            $text = '$f00Finish now';
+        }
         $info->setText('$fff' . $text);
-        $info->setPosition(-17.5, -60);
+        $info->setPosition(-17.5, -63);
         $info->show();
     }
 
-    public function LibXmlRpc_OnWayPoint($login, $blockId, $time, $cpIndex, $isEndBlock, $lapTime, $lapNb, $isLapEnd)
+    /*public function LibXmlRpc_OnWayPoint($login, $blockId, $time, $cpIndex, $isEndBlock, $lapTime, $lapNb, $isLapEnd)
     {
         $cp = $cpIndex;
         if ($isEndBlock) {
             $cp = "-";
         }
         $this->displayWidget($login, $cp);
+    }*/
+
+    public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
+    {
+        $this->displayWidget($login, $checkpointIndex + 1);
+    }
+
+    public function onPlayerFinish($playerUid, $login, $timeOrScore)
+    {
+        $this->displayWidget($login, "-");
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
