@@ -36,7 +36,7 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaL
         $this->addComponent($this->bg);
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
-        $this->frame->setSize(100, 6);
+        $this->frame->setSize(140, 6);
         $this->frame->setPosY(0);
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
         $this->addComponent($this->frame);
@@ -66,9 +66,14 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaL
         $this->label_nbFinish->setId('column_' . $indexNumber . '_4');
         $this->frame->addComponent($this->label_nbFinish);
 
+        $this->label_date = new \ManiaLib\Gui\Elements\Label(10, 6);
+        $this->label_date->setAlign('left', 'center');
+        $this->label_date->setId('column_' . $indexNumber . '_5');
+        $this->frame->addComponent($this->label_date);
+
         if (AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
             $this->button_delete = new Label(15, 6);
-            $this->button_delete->setId('column_' . $indexNumber . '_5');
+            $this->button_delete->setId('column_' . $indexNumber . '_6');
             $this->button_delete->setAlign('left', 'center');
             $this->button_delete->setAttribute('class', "eXpOptimizedPagerAction");
             $this->button_delete->setAction($action);
@@ -78,7 +83,7 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaL
             $this->frame->addComponent($this->button_delete);
         }
 
-        $this->setSizeX(120);
+        $this->setSizeX(140);
     }
 
     public function onResize($oldX, $oldY)
@@ -90,8 +95,9 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaL
         $this->label_score->setSizeX($scaledSizes[2]);
         $this->label_avgScore->setSizeX($scaledSizes[3]);
         $this->label_nbFinish->setSizeX($scaledSizes[4]);
+        $this->label_date->setSizeX($scaledSizes[5]);
         if ($this->button_delete != null) {
-            $this->button_delete->setSizeX($scaledSizes[5]);
+            $this->button_delete->setSizeX($scaledSizes[6]);
         }
     }
 
@@ -112,6 +118,6 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaL
 
     public function getNbTextColumns()
     {
-        return 6;
+        return 7;
     }
 }

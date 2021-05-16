@@ -1518,7 +1518,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         /** @var Records $window */
         $window->setTitle(__('Records on a Map', $login));
         $window->centerOnScreen();
-        $window->setSize(120, 100);
+        $window->setSize(140, 100);
         $window->populateList($records, $this->config->recordsCount, $currentMap, $this);
         $window->show();
     }

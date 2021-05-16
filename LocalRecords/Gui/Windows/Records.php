@@ -22,7 +22,8 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $label_score;
     protected $label_avgScore;
     protected $label_nbFinish;
-    protected $widths = array(1, 5, 3, 3, 2, 4);
+    protected $label_date;
+    protected $widths = array(1, 5, 3, 3, 2, 4, 5);
 
     /**
      * @var \ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager
@@ -81,6 +82,11 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_nbFinish->setScale(0.8);
         $this->frame->addComponent($this->label_nbFinish);
 
+        $this->label_date = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 4);
+        $this->label_date->setAlign('left', 'center');
+        $this->label_date->setScale(0.8);
+        $this->frame->addComponent($this->label_date);
+
         $this->button_sectors = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
         $this->button_sectors->setText("Sector Times");
         $this->button_sectors->setAction(LocalRecords::$openSectorsAction);
@@ -103,6 +109,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_score->setSizeX($scaledSizes[2]);
         $this->label_avgScore->setSizeX($scaledSizes[3]);
         $this->label_nbFinish->setSizeX($scaledSizes[4]);
+        $this->label_date->setSizeX($scaledSizes[5]);
         $this->pager->setSize($this->getSizeX() - 1, $this->getSizeY() - 12);
         $this->pager->setPosY(-7);
         foreach ($this->items as $item) {
@@ -120,6 +127,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_score->setText(__(LocalRecords::$txt_score, $this->getRecipient()));
         $this->label_avgScore->setText(__(LocalRecords::$txt_avgScore, $this->getRecipient()));
         $this->label_nbFinish->setText(__(LocalRecords::$txt_nbFinish, $this->getRecipient()));
+        $this->label_date->setText(__('Date'));
     }
 
     public function destroy()
@@ -159,6 +167,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $localBase->formatScore($record->time) . " " => -1,
                 $localBase->formatScore($record->avgScore) . "" => -1,
                 "#" . $record->nbFinish => -1,
+                date('d/m/Y', $record->date) . "" => -1,
                 ($record->isDelete ? 'Undo' : 'Delete') => $this->createAction(
                     array($this, 'toogleDelete'),
                     $record
