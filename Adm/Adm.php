@@ -166,10 +166,13 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
     /**
      * Function to validated score change
      */
-    public function forceScoresOk()
+    public function forceScoresOk($login)
     {
         // @TODO Replace this by a proper event.
-        $this->eXpChatSendServerMessage('Notice: Admin has altered the scores of current match!');
+        $nick = $this->storage->getPlayerObject($login)->nickName;
+        $msg = eXpGetMessage('#admin_action#%s %s $z$s#admin_action#has altered the scores of current match!');
+        $this->eXpChatSendServerMessage($msg, null, array(AdminGroups::getGroupName($login),$nick));
+
         if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\ESLcup\\ESLcup")) {
             $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\ESLcup\\ESLcup", "syncScores");
         }
@@ -347,7 +350,7 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
 
             $this->connection->restartMap($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_CUP);
             $admin = $this->storage->getPlayerObject($login);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#%s#variable# %s #admin_action#restarts the challenge!', null, array(AdminGroups::getGroupName($login),$admin->nickName));
         }
     }
 
@@ -430,9 +433,8 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
                 }
             }
 
-            $msg = eXpGetMessage('#admin_action#Admin %s $z$s#admin_action#sets custom ' .
-			"round points to #variable#%s" );
-            $this->eXpChatSendServerMessage($msg, null, array($nick, implode(",", $intPoints)));
+            $msg = eXpGetMessage('#admin_action#%s %s $z$s#admin_action#sets custom ' .	"round points to #variable#%s" );
+            $this->eXpChatSendServerMessage($msg, null, array(AdminGroups::getGroupName($login),$nick, implode(",", $intPoints)));
         } catch (Exception $e) {
             $this->connection->chatSendServerMessage(__('#admin_error#Error: %s', $login, $e->getMessage()), $login);
         }

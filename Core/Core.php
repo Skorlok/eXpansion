@@ -444,8 +444,8 @@ EOT;
 
         $dataDir = $this->connection->GameDataDirectory();
 
-        if (!file_exists($dataDir . '/Config/blacklist.txt')) {
-	        $filename = $dataDir . '/Config/blacklist.txt';
+        if (!file_exists($dataDir . "/Config/" . $this->config->guestListSettingsFile)) {
+	        $filename = $dataDir . "/Config/" . $this->config->guestListSettingsFile;
 		    $file = '<?xml version="1.0" encoding="utf-8" ?>'."\n"
 			    . "<blacklist>\n"
 			    . "<!-- format:\n"
@@ -458,8 +458,8 @@ EOT;
 		    file_put_contents($filename, $file);
         }
 
-        if (!file_exists($dataDir . '/Config/guestlist.txt')) {
-	        $filename = $dataDir . '/Config/guestlist.txt';
+        if (!file_exists($dataDir . "/Config/" . $this->config->blackListSettingsFile)) {
+	        $filename = $dataDir . "/Config/" . $this->config->blackListSettingsFile;
 		    $file = '<?xml version="1.0" encoding="utf-8" ?>'."\n"
 			    . "<guestlist>\n"
 			    . "<!-- format\n"
