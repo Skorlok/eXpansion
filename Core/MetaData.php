@@ -182,12 +182,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('dedicated_cfg.txt');
         $this->registerVariable($var);
 
-        $var = new ConfigFile('blackListSettingsFile', 'The file to save/load servers black list', $config, false);
+        $var = new TypeString('blackListSettingsFile', 'The file to save/load servers black list', $config, false);
         $var->setGroup("Config Files");
         $var->setDefaultValue('blacklist.txt');
         $this->registerVariable($var);
 
-        $var = new ConfigFile('guestListSettingsFile', 'The file to save/load servers guest list', $config, false);
+        $var = new TypeString('guestListSettingsFile', 'The file to save/load servers guest list', $config, false);
         $var->setGroup("Config Files");
         $var->setDefaultValue('guestlist.txt');
         $this->registerVariable($var);
