@@ -1,5 +1,2 @@
 $ff0$iNew time limit: $fff%s $ff0seconds.
 $ff0$iNew time limit: $fff%s $ff0seconds.
-
-$ff0$iTimeLimit reset to: $fff%s $ff0seconds.
-$ff0$iTimeLimit reset to: $fff%s $ff0seconds.

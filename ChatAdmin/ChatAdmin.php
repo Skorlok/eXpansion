@@ -1650,6 +1650,7 @@ Other server might use the same blacklist file!!'
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
+            $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
 
             $this->eXpChatSendServerMessage(
                 '#admin_action#Admin#variable# %s #admin_action#forces the round to end.',

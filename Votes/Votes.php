@@ -413,6 +413,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
             if ($cmdName == "EndRound") {
                 $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
+                $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
             }
             $this->voter = null;
         }

@@ -418,6 +418,8 @@ EOT;
         $this->connection->dedicatedEcho("ManiaLive\\eXpansion", (string)getmypid());
         $this->connection->setForcedMusic(false, "");
         $this->connection->setRoundCustomPoints($this->config->roundsPoints);
+        $this->connection->triggerModeScriptEventArray('Trackmania.SetPointsRepartition', $this->config->scriptRoundsPoints);
+        $this->connection->triggerModeScriptEventArray('Rounds_SetPointsRepartition', $this->config->scriptRoundsPoints);
         $this->connection->resetServerTags();
         $this->connection->setServerTag("nl.controller", "ManiaLive / eXpansion");
         $this->connection->setServerTag(
@@ -440,6 +442,15 @@ EOT;
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
+        }
+
+        //enable custom points in team mode
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
+            try {
+                $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
+            } catch (Exception $e) {
+                $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
+            }
         }
 
         $dataDir = $this->connection->GameDataDirectory();
@@ -989,6 +1000,14 @@ EOT;
     {
         $this->saveMatchSettings();
         $this->showNotice("GameMode Changed");
+        //enable custom points in team mode
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
+            try {
+                $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
+            } catch (Exception $e) {
+                $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
+            }
+        }
     }
 
     /**

@@ -61,10 +61,4 @@ class Autotime extends ExpPlugin
         }
         $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($tatime)]);
     }
-
-    public function eXpOnUnload()
-    {
-        $this->connection->setModeScriptSettings(["S_TimeLimit" => intval(TimeConversion::MStoTM(Config::getInstance()->timelimit) / 1000)]);
-        $this->eXpChatSendServerMessage('$ff0$iTimeLimit reset to: $fff%s $ff0seconds.',null,array($this->config->timelimit));
-    }
 }

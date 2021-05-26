@@ -48,6 +48,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $disableGameMode = array();
     public $netLostTime = 4000;   // time in milliseconds for lastresponse time, used to determine netlost
     public $roundsPoints = array(10, 8, 6, 5, 4, 3, 2, 1);
+    public $scriptRoundsPoints = array('10', '8', '7', '6', '5', '4', '3', '2', '1');
     public $quitDialogManialink = "";
     public $useWhitelist = false;
 }

@@ -214,6 +214,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(array(10, 8, 7, 6, 5, 4, 3, 2, 1));
         $this->registerVariable($var);
 
+        $var = new SortedList('scriptRoundsPoints', 'Script Round points', $config, false);
+        $var->setVisible(false);
+        $var->setGroup("Misc");
+        $var->setType(new TypeString(""));
+        $var->setOrder("desc");
+        $var->setDefaultValue(array('10', '8', '7', '6', '5', '4', '3', '2', '1'));
+        $this->registerVariable($var);
+
         $var = new TypeString(
             'quitDialogManialink',
             'Quit dialog customization, use url with custom manialink.xml',

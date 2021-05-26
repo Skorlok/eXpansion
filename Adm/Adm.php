@@ -422,7 +422,15 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
             }
             unset($num);
             $this->connection->triggerModeScriptEventArray('Trackmania.SetPointsRepartition', $points);
+            $this->connection->triggerModeScriptEventArray('Rounds_SetPointsRepartition', $points);
             $this->connection->setRoundCustomPoints($intPoints);
+
+            $config->scriptRoundsPoints = $points;
+
+            $var = \ManiaLivePlugins\eXpansion\Core\MetaData::getInstance()->getVariable('scriptRoundsPoints');
+            $var->setRawValue($points);
+
+            \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
             //enable custom points in team mode
             if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
