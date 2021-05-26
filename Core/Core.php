@@ -1008,6 +1008,16 @@ EOT;
                 $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
             }
         }
+
+        //resend the points repartition
+        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP) {
+            try {
+                $this->connection->triggerModeScriptEventArray('Trackmania.SetPointsRepartition', $this->config->scriptRoundsPoints);
+                $this->connection->triggerModeScriptEventArray('Rounds_SetPointsRepartition', $this->config->scriptRoundsPoints);
+            } catch (Exception $e) {
+                $this->console('[CustomPoints] Unable to re-send the custom pointrepartition, server said: ' . $e->getMessage());
+            }
+        }
     }
 
     /**
