@@ -79,7 +79,7 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
-    public function ok($login, $settings)
+    public function ok($login, $settings = null)
     {
 
         foreach ($this->items as $item) {

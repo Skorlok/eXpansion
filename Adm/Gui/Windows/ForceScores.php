@@ -121,7 +121,7 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
-    public function ok($login, $scores)
+    public function ok($login, $scores = null)
     {
         $outScores = array();
 
