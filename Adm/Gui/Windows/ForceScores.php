@@ -135,7 +135,7 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
         }
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
-        self::$mainPlugin->forceScoresOk($login);
+        self::$mainPlugin->forceScoresOk();
         $this->erase($login);
     }
 

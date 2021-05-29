@@ -166,13 +166,10 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
     /**
      * Function to validated score change
      */
-    public function forceScoresOk($login)
+    public function forceScoresOk()
     {
         // @TODO Replace this by a proper event.
-        $nick = $this->storage->getPlayerObject($login)->nickName;
-        $msg = eXpGetMessage('#admin_action#%s %s $z$s#admin_action#has altered the scores of current match!');
-        $this->eXpChatSendServerMessage($msg, null, array(AdminGroups::getGroupName($login),$nick));
-
+        $this->eXpChatSendServerMessage('Notice: Admin has altered the scores of current match!');
         if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\ESLcup\\ESLcup")) {
             $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\ESLcup\\ESLcup", "syncScores");
         }
@@ -441,8 +438,8 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
                 }
             }
 
-            $msg = eXpGetMessage('#admin_action#%s %s $z$s#admin_action#sets custom ' .	"round points to #variable#%s" );
-            $this->eXpChatSendServerMessage($msg, null, array(AdminGroups::getGroupName($login),$nick, implode(",", $intPoints)));
+            $msg = eXpGetMessage('#admin_action#Admin %s $z$s#admin_action#sets custom ' . "round points to #variable#%s");
+            $this->eXpChatSendServerMessage($msg, null, array($nick, implode(",", $intPoints)));
         } catch (Exception $e) {
             $this->connection->chatSendServerMessage(__('#admin_error#Error: %s', $login, $e->getMessage()), $login);
         }
