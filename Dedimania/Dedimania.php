@@ -83,6 +83,10 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
+        if (Core::$warmUpActive) {
+            return;
+        }
+
         if (!array_key_exists('BestTime', $this->rankings[$login])) {
             $this->rankings[$login] = array('Login' => $login, 'BestTime' => $time, 'BestCheckpoints' => $checkpoints);
         } else {

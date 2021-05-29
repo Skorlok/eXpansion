@@ -51,6 +51,8 @@ class Core extends types\ExpPlugin
 
     public static $rankings = null;
 
+    public static $warmUpActive = false;
+
     /**
      * public variable to export player infos
      *
@@ -535,6 +537,16 @@ EOT;
                 Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_EndRound, $params));
                 $this->onEndRound(0);
                 break;
+
+			case 'Maniaplanet.WarmUp.Start':
+			case 'Trackmania.WarmUp.Start':
+                self::$warmUpActive = true;
+		    	break;
+
+			case 'Maniaplanet.WarmUp.End':
+			case 'Trackmania.WarmUp.End':
+                self::$warmUpActive = false;
+		    	break;
 
             case 'Trackmania.Scores':
 				if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
