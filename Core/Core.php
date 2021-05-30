@@ -540,11 +540,13 @@ EOT;
 
 			case 'Maniaplanet.WarmUp.Start':
 			case 'Trackmania.WarmUp.Start':
+            case 'LibXmlRpc_BeginWarmUp':
                 self::$warmUpActive = true;
 		    	break;
 
 			case 'Maniaplanet.WarmUp.End':
 			case 'Trackmania.WarmUp.End':
+            case 'LibXmlRpc_EndWarmUp':
                 self::$warmUpActive = false;
 		    	break;
 

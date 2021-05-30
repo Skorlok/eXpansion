@@ -48,6 +48,17 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
         $this->updateDediPanel();
         self::$me = $this;
+
+        $this->enableScriptEvents(array("LibXmlRpc_EndWarmUp", "Trackmania.WarmUp.End"));
+    }
+
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Trackmania.WarmUp.End":
+                $this->LibXmlRpc_EndWarmUp(0);
+                break;
+        }
     }
 
     public function onTick()
@@ -229,6 +240,11 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
         if ($data->maxRank > Connection::$serverMaxRank) {
             $this->needUpdate = self::DEDIMANIA_FORCE;
         }
+    }
+
+    public function LibXmlRpc_EndWarmUp()
+    {
+        $this->needUpdate = self::DEDIMANIA_FORCE;
     }
 
     public function onDedimaniaPlayerDisconnect()
