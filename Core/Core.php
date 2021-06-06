@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Core;
 
+use Exception;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
@@ -282,12 +283,15 @@ EOT;
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
             $this->enableScriptEvents("LibXmlRpc_Callbacks");
+            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_OnWayPoint", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
         }
 
         //Started paralel download utility, thanks to xymph and other devs to have coded it. it rocks
         DataAccess::getInstance()->start();
 
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
 
@@ -494,49 +498,60 @@ EOT;
 		}
 
         switch ($callback) {
+
+
+
             case 'Trackmania.Event.Respawn':
 				$response = array(
-					'time'			=> $params['time'],					// Server time when the event occured
-					'login'			=> $params['login'],					// PlayerLogin
-					'nb_respawns'		=> $params['nbrespawns'],				// Number of respawns since the beginning of the race
-					'race_time'		=> $params['racetime'],					// Total race time in milliseconds
-					'lap_time'		=> $params['laptime'],					// Lap time in milliseconds
-					'stunts_score'		=> $params['stuntsscore'],				// Stunts score
-					'checkpoint_in_race'	=> ($params['checkpointinrace'] + 1),			// Number of checkpoints crossed since the beginning of the race
-					'checkpoint_in_lap'	=> ($params['checkpointinlap'] + 1),			// Number of checkpoints crossed since the beginning of the lap
-					'speed'			=> $params['speed'],					// Speed of the player in km/h
-					'distance'		=> $params['distance'],					// Distance traveled by the player since the beginning of the race
+					'time'			=> $params['time'],
+					'login'			=> $params['login'],
+					'nb_respawns'		=> $params['nbrespawns'],
+					'race_time'		=> $params['racetime'],
+					'lap_time'		=> $params['laptime'],
+					'stunts_score'		=> $params['stuntsscore'],
+					'checkpoint_in_race'	=> ($params['checkpointinrace'] + 1),
+					'checkpoint_in_lap'	=> ($params['checkpointinlap'] + 1),
+					'speed'			=> $params['speed'],
+					'distance'		=> $params['distance'],
 				);
 		    	break;
 
+
+
             case 'Trackmania.Event.Stunt':
 				$response = array(
-					'time'			=> $params['time'],					// Server time when the event occured
-					'login'			=> $params['login'],					// PlayerLogin
-					'race_time'		=> $params['racetime'],					// Total race time in milliseconds
-					'lap_time'		=> $params['laptime'],					// Lap time in milliseconds
-					'stunts_score'		=> $params['stuntsscore'],				// Stunts score
-					'figure'		=> $params['figure'],					// Name of the figure
-					'angle'			=> $params['angle'],					// Angle of the car
-					'points'		=> $params['points'],					// Point awarded by the figure
-					'combo'			=> $params['combo'],					// Combo counter
-					'is_straight'		=> $params['isstraight'],				// Is the car straight
-					'is_reverse'		=> $params['isreverse'],				// Is the car reversed
+					'time'			=> $params['time'],
+					'login'			=> $params['login'],
+					'race_time'		=> $params['racetime'],
+					'lap_time'		=> $params['laptime'],
+					'stunts_score'		=> $params['stuntsscore'],
+					'figure'		=> $params['figure'],
+					'angle'			=> $params['angle'],
+					'points'		=> $params['points'],
+					'combo'			=> $params['combo'],
+					'is_straight'		=> $params['isstraight'],
+					'is_reverse'		=> $params['isreverse'],
 					'is_masterjump'		=> $params['ismasterjump'],
-					'factor'		=> $params['factor'],					// Points multiplier
+					'factor'		=> $params['factor'],
 				);
                 //Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_OnStunt, $response));
 		    	break;
+
+
 
             case "Maniaplanet.StartRound_Start":
                 Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_BeginRound, $params));
                 $this->onBeginRound(0);
                 break;
 
+
+
             case "Maniaplanet.EndRound_Start":
                 Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_EndRound, $params));
                 $this->onEndRound(0);
                 break;
+
+
 
 			case 'Maniaplanet.WarmUp.Start':
 			case 'Trackmania.WarmUp.Start':
@@ -544,11 +559,15 @@ EOT;
                 self::$warmUpActive = true;
 		    	break;
 
+
+
 			case 'Maniaplanet.WarmUp.End':
 			case 'Trackmania.WarmUp.End':
             case 'LibXmlRpc_EndWarmUp':
                 self::$warmUpActive = false;
 		    	break;
+
+
 
             case 'Trackmania.Scores':
 				if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
@@ -562,12 +581,12 @@ EOT;
 								'round_points'			=> $item['roundpoints'],
 								'map_points'			=> $item['mappoints'],
 								'match_points'			=> $item['matchpoints'],
-								'best_race_time'		=> $item['bestracetime'],		// Best race time in milliseconds
-								'best_race_respawns'		=> $item['bestracerespawns'],		// Number of respawn during best race
-								'best_race_checkpoints'		=> $item['bestracecheckpoints'],	// Checkpoints times during best race
-								'bestTime'			=> $item['bestlaptime'],		// Best lap time in milliseconds
-								'best_lap_respawns'		=> $item['bestlaprespawns'],		// Number of respawn during best lap
-								'best_lap_checkpoints'		=> $item['bestlapcheckpoints'],		// Checkpoints times during best lap
+								'best_race_time'		=> $item['bestracetime'],
+								'best_race_respawns'		=> $item['bestracerespawns'],
+								'best_race_checkpoints'		=> $item['bestracecheckpoints'],
+								'bestTime'			=> $item['bestlaptime'],
+								'best_lap_respawns'		=> $item['bestlaprespawns'],
+								'best_lap_checkpoints'		=> $item['bestlapcheckpoints'],
 								'prev_race_time'		=> $item['prevracetime'],
 								'prev_race_respawns'		=> $item['prevracerespawns'],
 								'prev_race_checkpoints'		=> $item['prevracecheckpoints'],
@@ -582,21 +601,17 @@ EOT;
 						$rank_blue = PHP_INT_MAX;
 						$rank_red = PHP_INT_MAX;
 
-						// Check which team has a higher score
 						if ($params['teams'][0]['mappoints'] > $params['teams'][1]['mappoints']) {
-							// Set "Team Blue" to Rank 1 and "Team Red" to 2
 							$rank_blue = 1;
 							$rank_red = 2;
 						}
 						else {
-							// Set "Team Blue" to Rank 2 and "Team Red" to 1
 							$rank_blue = 2;
 							$rank_red = 1;
 						}
 
 						$scores = array();
 
-						// Team Blue
 						$scores[] = array(
 							'rank'				=> $rank_blue,
 							'login'				=> '0',
@@ -606,7 +621,6 @@ EOT;
 							'score'			=> $params['teams'][0]['matchpoints'],
 						);
 
-						// Team Red
 						$scores[] = array(
 							'rank'				=> $rank_red,
 							'login'				=> '1',
@@ -620,6 +634,132 @@ EOT;
                 $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
                 self::$rankings = $scores;
                 break;
+
+
+
+            case 'LibXmlRpc_ScoresReady':
+                $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+                $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+				break;
+
+
+
+            // [0]=TeamBlueRoundScore, [1]=TeamRedRoundScore, [2]=TeamBlueTotalScore, [3]=TeamRedTotalScore
+			case 'LibXmlRpc_TeamsScores':
+				if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM && isset($array)) {
+					$rank_blue = PHP_INT_MAX;
+					$rank_red = PHP_INT_MAX;
+
+					if (intval($array[2]) > intval($array[3])) {
+						$rank_blue = 1;
+						$rank_red = 2;
+					}
+					else {
+						$rank_blue = 2;
+						$rank_red = 1;
+					}
+
+                    $scores = array();
+
+					$scores[] = array(
+						'rank'		=> $rank_blue,
+						'login'		=> '0',
+						'nickName'	=> '$00FTeam Blue',
+						'score'		=> intval($array[0]),
+					);
+
+					$scores[] = array(
+						'rank'		=> $rank_red,
+						'login'		=> '1',
+						'nickName'	=> '$F00Team Red',
+						'score'		=> intval($array[1]),
+					);
+
+
+                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
+                    self::$rankings = $scores;
+				}
+		    	break;
+
+
+
+            // [0]=Login, [1]=Rank, [2]=BestCheckpoints, [3]=TeamId, [4]=IsSpectator, [5]=IsAway, [6]=BestTime, [7]=Zone, [8]=RoundScore, [9]=TotalScore
+			case 'LibXmlRpc_PlayersRanking':
+				if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM && isset($array)) {
+                    $scores = array();
+					foreach ($array as $item) {
+						$rank = explode(':', $item);
+
+						$cps = array_map('intval', explode(',', $rank[2]));
+						if (count($cps) == 1 && $cps[0] === -1) {
+							$cps = array();
+						}
+
+                        $nick = $this->storage->getPlayerObject($rank[0])->nickName;
+
+						$scores[] = array(
+							'rank'		=> intval($rank[1]),
+							'login'		=> $rank[0],
+							'nickName'	=> $nick,
+							'bestTime'		=> intval($rank[6]),
+							'score'		=> intval($rank[9]),
+							'bestCheckpoints'		=> $cps,
+		 					'team'		=> intval($rank[3]),
+							'spectator'	=> $rank[4],
+							'away'		=> $rank[5],
+						);
+					}
+
+                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
+                    self::$rankings = $scores;
+				}
+		    	break;
+
+
+
+            // We don't need this for instant
+
+            /*case 'LibXmlRpc_PlayersTimes':
+                if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
+                    $scores = array();
+					foreach ($array as $item) {
+						$rank = explode(':', $item);
+
+						$scores[] = array(
+							//'rank'		=> $rank[0],
+							'login'		=> $rank[0],
+							'nickName'	=> $this->storage->getPlayerObject($rank[0])->nickName,
+							'bestTime'  => $rank[1],
+						);
+					}
+
+                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
+                    self::$rankings = $scores;
+				}
+                break;*/
+
+
+
+            // We don't need this for instant
+
+            /*case 'LibXmlRpc_PlayersScores':
+                if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
+                    $scores = array();
+					foreach ($array as $item) {
+						$rank = explode(':', $item);
+
+						$scores[] = array(
+							//'rank'		=> $rank[0],
+							'login'		=> $rank[0],
+							'nickName'	=> $this->storage->getPlayerObject($rank[0])->nickName,
+							'bestTime'  => $rank[1],
+						);
+					}
+
+                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
+                    self::$rankings = $scores;
+				}
+                break;*/
         }
     }
     
@@ -825,12 +965,16 @@ EOT;
 
         $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
 
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**
@@ -1340,13 +1484,17 @@ EOT;
     {
         $this->update = true;
         $this->resetExpPlayers();
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     public function onEndRound()
     {
         $this->update = true;
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**
@@ -1356,7 +1504,9 @@ EOT;
      */
     public function onPlayerInfoChanged($playerInfo)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         if ($this->enableCalculation == false || $this->expStorage->isRelay) {
             return;
         }
@@ -1455,7 +1605,9 @@ EOT;
 
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         if ($this->enableCalculation == false || $this->expStorage->isRelay) {
             return;
         }
