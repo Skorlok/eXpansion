@@ -9,6 +9,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Events\GameSettingsEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\ServerSettingsEvent;
+use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
@@ -283,7 +284,7 @@ EOT;
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
             $this->enableScriptEvents("LibXmlRpc_Callbacks");
-            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_OnWayPoint", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
+            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
         }
 
         //Started paralel download utility, thanks to xymph and other devs to have coded it. it rocks
@@ -499,46 +500,6 @@ EOT;
 
         switch ($callback) {
 
-
-
-            case 'Trackmania.Event.Respawn':
-				$response = array(
-					'time'			=> $params['time'],
-					'login'			=> $params['login'],
-					'nb_respawns'		=> $params['nbrespawns'],
-					'race_time'		=> $params['racetime'],
-					'lap_time'		=> $params['laptime'],
-					'stunts_score'		=> $params['stuntsscore'],
-					'checkpoint_in_race'	=> ($params['checkpointinrace'] + 1),
-					'checkpoint_in_lap'	=> ($params['checkpointinlap'] + 1),
-					'speed'			=> $params['speed'],
-					'distance'		=> $params['distance'],
-				);
-		    	break;
-
-
-
-            case 'Trackmania.Event.Stunt':
-				$response = array(
-					'time'			=> $params['time'],
-					'login'			=> $params['login'],
-					'race_time'		=> $params['racetime'],
-					'lap_time'		=> $params['laptime'],
-					'stunts_score'		=> $params['stuntsscore'],
-					'figure'		=> $params['figure'],
-					'angle'			=> $params['angle'],
-					'points'		=> $params['points'],
-					'combo'			=> $params['combo'],
-					'is_straight'		=> $params['isstraight'],
-					'is_reverse'		=> $params['isreverse'],
-					'is_masterjump'		=> $params['ismasterjump'],
-					'factor'		=> $params['factor'],
-				);
-                //Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_OnStunt, $response));
-		    	break;
-
-
-
             case "Maniaplanet.StartRound_Start":
                 Dispatcher::dispatch(new Events\ScriptmodeEvent(Events\ScriptmodeEvent::LibXmlRpc_BeginRound, $params));
                 $this->onBeginRound(0);
@@ -570,7 +531,7 @@ EOT;
 
 
             case 'Trackmania.Scores':
-				if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
+				if ($this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM) {
                     $scores = array();
 					if (isset($params['players']) && is_array($params['players'])) {
 						foreach ($params['players'] as $item) {
@@ -646,7 +607,7 @@ EOT;
 
             // [0]=TeamBlueRoundScore, [1]=TeamRedRoundScore, [2]=TeamBlueTotalScore, [3]=TeamRedTotalScore
 			case 'LibXmlRpc_TeamsScores':
-				if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM && isset($array)) {
+				if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM && isset($array)) {
 					$rank_blue = PHP_INT_MAX;
 					$rank_red = PHP_INT_MAX;
 
@@ -685,7 +646,7 @@ EOT;
 
             // [0]=Login, [1]=Rank, [2]=BestCheckpoints, [3]=TeamId, [4]=IsSpectator, [5]=IsAway, [6]=BestTime, [7]=Zone, [8]=RoundScore, [9]=TotalScore
 			case 'LibXmlRpc_PlayersRanking':
-				if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM && isset($array)) {
+				if ($this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM && isset($array)) {
                     $scores = array();
 					foreach ($array as $item) {
 						$rank = explode(':', $item);
@@ -720,7 +681,7 @@ EOT;
             // We don't need this for instant
 
             /*case 'LibXmlRpc_PlayersTimes':
-                if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
+                if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
                     $scores = array();
 					foreach ($array as $item) {
 						$rank = explode(':', $item);
@@ -743,7 +704,7 @@ EOT;
             // We don't need this for instant
 
             /*case 'LibXmlRpc_PlayersScores':
-                if ($this->eXpGetCurrentCompatibilityGameMode()!= \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
+                if ($this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_ROUNDS && count($array) > 0) {
                     $scores = array();
 					foreach ($array as $item) {
 						$rank = explode(':', $item);
@@ -1159,7 +1120,7 @@ EOT;
         $this->saveMatchSettings();
         $this->showNotice("GameMode Changed");
         //enable custom points in team mode
-        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
+        if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
             try {
                 $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
             } catch (Exception $e) {
@@ -1168,7 +1129,7 @@ EOT;
         }
 
         //resend the points repartition
-        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP) {
+        if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_CUP) {
             try {
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetPointsRepartition', $this->config->scriptRoundsPoints);
                 $this->connection->triggerModeScriptEventArray('Rounds_SetPointsRepartition', $this->config->scriptRoundsPoints);

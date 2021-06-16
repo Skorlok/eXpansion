@@ -52,13 +52,17 @@ class Dedimania_Script extends DedimaniaAbstract
             return;
         }
 
-        if ($time == 0) {
+        if ($lapTime == 0) {
             return;
         }
 
         $playerinfo = Core::$playerInfo;
 
-        if (!$isendrace) {
+        if (!$isendlap) {
+            return;
+        }
+
+        if (Core::$warmUpActive) {
             return;
         }
 
@@ -91,35 +95,30 @@ class Dedimania_Script extends DedimaniaAbstract
             $this->rankings[$login] = array();
         }
 
-        $this->AllCps[$login] = array(
-            'Login' => $login,
-            'AllCheckpoints' => implode(",", $curracecheckpoints),
-        );
-
         if (!array_key_exists('BestTime', $this->rankings[$login])) {
             $this->rankings[$login] = array(
                 'Login' => $login,
-                'BestTime' => $time,
-                'BestCheckpoints' => implode(",", $curracecheckpoints),
+                'BestTime' => $lapTime,
+                'BestCheckpoints' => implode(",", $curlapcheckpoints),
             );
         } else {
-            if ($time < $this->rankings[$login]['BestTime']) {
+            if ($lapTime < $this->rankings[$login]['BestTime']) {
                 $this->rankings[$login] = array(
                     'Login' => $login,
-                    'BestTime' => $time,
-                    'BestCheckpoints' => implode(",", $curracecheckpoints),
+                    'BestTime' => $lapTime,
+                    'BestCheckpoints' => implode(",", $curlapcheckpoints),
                 );
             }
         }
 
-        $this->getVReplay();
-        $this->getGReplay();
+        $this->getVReplay($login, $curracecheckpoints);
+        $this->getGReplay($login);
 
         // if current map doesn't have records, create one.
         if (count($this->records) == 0) {
             $player = $this->storage->getPlayerObject($login);
             $playerinfo = Core::$playerInfo;
-            if ($this->storage->currentMap->nbCheckpoints !== count($curracecheckpoints)) {
+            if ($this->storage->currentMap->nbCheckpoints !== count($curlapcheckpoints)) {
                 $this->console("Player CP mismatch");
             }
 
@@ -127,9 +126,9 @@ class Dedimania_Script extends DedimaniaAbstract
                 $login,
                 $player->nickName,
                 DediConnection::$players[$login]->maxRank,
-                $time,
+                $lapTime,
                 -1,
-                $curracecheckpoints
+                $curlapcheckpoints
             );
             $this->reArrage($login);
             Dispatcher::dispatch(new DediEvent(DediEvent::ON_NEW_DEDI_RECORD, $this->records[$login]));
@@ -149,7 +148,7 @@ class Dedimania_Script extends DedimaniaAbstract
             $maxrank = DediConnection::$players[$login]->maxRank;
         }
 
-        if ($time <= $this->lastRecord->time || count($this->records) <= $maxrank) {
+        if ($lapTime <= $this->lastRecord->time || count($this->records) <= $maxrank) {
 
             // print "times matches!";
             // if player exists on the list... see if he got better time
@@ -163,16 +162,16 @@ class Dedimania_Script extends DedimaniaAbstract
             if (array_key_exists($login, $this->records)) {
 
 
-                if ($this->records[$login]->time > $time) {
+                if ($this->records[$login]->time > $lapTime) {
                     $oldRecord = $this->records[$login];
 
                     $this->records[$login] = new DediRecord(
                         $login,
                         $player->nickName,
                         DediConnection::$players[$login]->maxRank,
-                        $time,
+                        $lapTime,
                         -1,
-                        $curracecheckpoints
+                        $curlapcheckpoints
                     );
 
                     // if new records count is greater than old count, and doesn't exceed the maxrank of the server
@@ -202,9 +201,9 @@ class Dedimania_Script extends DedimaniaAbstract
                     $login,
                     $player->nickName,
                     DediConnection::$players[$login]->maxRank,
-                    $time,
+                    $lapTime,
                     -1,
-                    $curracecheckpoints
+                    $curlapcheckpoints
                 );
                 // if new records count is greater than old count, increase the map records limit
 
@@ -226,22 +225,40 @@ class Dedimania_Script extends DedimaniaAbstract
         }
     }
 
-    public function getVReplay()
+    public function getVReplay($login, $checkpoints)
     {
-        $currank = $this->rankings;
-        usort($currank, array($this, "compare_BestTime"));
+        try {
+            $currank = $this->rankings;
+            usort($currank, array($this, "compare_BestTime"));
 
-        $this->vReplay = $this->connection->getValidationReplay($currank[0]['Login']);
+            if ($currank[0]['Login'] !== $login) {
+                return;
+            }
+
+            $this->vReplay = $this->connection->getValidationReplay($currank[0]['Login']);
+            $this->AllCps = implode(",", $checkpoints);
+        } catch (Exception $e) {
+            $this->console("Unable to get validation replay, server said: " . $e->getMessage());
+        }
     }
 
-    public function getGReplay()
+    public function getGReplay($login)
     {
-        $currank = $this->rankings;
-        usort($currank, array($this, "compare_BestTime"));
+        try {
+            $currank = $this->rankings;
+            usort($currank, array($this, "compare_BestTime"));
 
-        $grfile = sprintf('Dedimania/%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$rankings[0]['BestTime'],$rankings[0]['Login']);
-        $this->connection->saveBestGhostsReplay($rankings[0]['Login'], $grfile);
-        $this->gReplay = file_get_contents($this->connection->gameDataDirectory().'Replays/'.$grfile);
+            if ($currank[0]['Login'] !== $login) {
+                return;
+            }
+
+            $grfile = sprintf('%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$currank[0]['BestTime'],$currank[0]['Login']);
+            $this->connection->saveBestGhostsReplay($currank[0]['Login'], $grfile);
+            $this->gReplay = file_get_contents($this->connection->gameDataDirectory().'Replays/'.$grfile);
+            unlink($this->connection->gameDataDirectory().'Replays/'.$grfile);
+        } catch (Exception $e) {
+            $this->console("Unable to save ghost replay, server said: " . $e->getMessage());
+        }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -260,7 +277,6 @@ class Dedimania_Script extends DedimaniaAbstract
         }
 
         usort($this->rankings, array($this, "compare_BestTime"));
-        usort($this->AllCps, array($this, "compare_BestTime"));
 
         $rankings = array();
         $error = false;
@@ -287,16 +303,6 @@ class Dedimania_Script extends DedimaniaAbstract
                 $this->console("No new times driven. Skipping dedimania sent.");
                 return;
             }
-
-            //$this->vReplay = $this->connection->getValidationReplay($rankings[0]['Login']);
-            $vrfile = sprintf('Dedimania/VReplay/%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$rankings[0]['BestTime'],$rankings[0]['Login']);
-
-            $gameData = $this->connection->gameDataDirectory();
-            file_put_contents($gameData .'Replays/'. $vrfile, $this->vReplay);
-
-            //$grfile = sprintf('Dedimania/%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$rankings[0]['BestTime'],$rankings[0]['Login']);
-            //$this->connection->saveBestGhostsReplay($rankings[0]['Login'], $grfile);
-            //$this->gReplay = file_get_contents($this->connection->gameDataDirectory().'Replays/'.$grfile);
 
             // Dedimania doesn't allow times sent without validation relay. So, let's just stop here if there is none.
             if (empty($this->vReplay)) {
