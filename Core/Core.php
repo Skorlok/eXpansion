@@ -656,7 +656,14 @@ EOT;
 							$cps = array();
 						}
 
-                        $nick = $this->storage->getPlayerObject($rank[0])->nickName;
+                        //$nick = $this->storage->getPlayerObject($rank[0])->nickName;
+
+
+
+                        // alors oui c'est TRÈS peu optimisé donc svp ne venez pas me décrypter le fion je suis debutant en PHP et je sais pas comment corriger cette merde
+
+                        // oh passage WHAT A DEVILISH LINE (oui je suis attardé c'est quoi le problème ?)
+                        $nick = $this->connection->getCurrentRankingForLogin($rank[0])[0]->nickName;
 
 						$scores[] = array(
 							'rank'		=> intval($rank[1]),
