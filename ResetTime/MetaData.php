@@ -1,15 +1,14 @@
 <?php
 
-namespace ManiaLivePlugins\eXpansion\ExtendTime;
+namespace ManiaLivePlugins\eXpansion\ResetTime;
 
-use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
  * Description of MetaData
  *
- * @author Petri
+ * @author Skorlok
  */
 class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 {
@@ -17,21 +16,18 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Extend Time");
+        $this->setName("ResetTime");
 
         $this->addGameModeCompability(GameInfos::GAMEMODE_TIMEATTACK);
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
 
-        $this->setDescription("Provides Votes to Extend timelimit on  a map");
+        $this->setDescription("Reset the timelimit after each map");
         $this->setGroups(array('Tools'));
 
         $config = Config::getInstance();
-        $var = new BoundedTypeFloat("ratio", "voteRatio", $config, false, false);
-        $var->setMax(1.0);
-        $var->setMax(0.0);
-        $var->setDefaultValue(0.49);
+        $var = new TypeInt("timelimit", "Default timelimit to set", $config, false, false);
+        $var->setDefaultValue(300);
         $this->registerVariable($var);
-
     }
 }

@@ -29,7 +29,6 @@ class ExtendTime extends ExpPlugin
         $this->votes = ["yes" => 0, "no" => 0];
         $this->voters = [];
         $this->voteCount = 1;
-        $this->connection->setModeScriptSettings(["S_TimeLimit" => $this->config->timelimit]);
         $this->showWidget();
     }
 
@@ -45,8 +44,7 @@ class ExtendTime extends ExpPlugin
             if ( ($this->votes['yes'] / $total) > $this->config->ratio) {
                 $this->eXpChatSendServerMessage("#vote#Vote to extend time: #vote_success# Success.");
                 $this->voteCount++;
-                $ScriptSettings = $this->connection->GetModeScriptSettings();
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"])*2]);
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
             } else {
                 $this->eXpChatSendServerMessage("#vote#Vote to extend time: #vote_failure# Fail.");
             }

@@ -157,16 +157,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$f00');
         $this->registerVariable($var);
 
-        $var = new TypeString('time_dynamic_max', 'Max time for dynamic TA limit, use format mm:ss', $config, false);
-        $var->setGroup("Misc");
-        $var->setDefaultValue('7:00');
-        $this->registerVariable($var);
-
-        $var = new TypeString('time_dynamic_min', 'Min time for dynamic TA limit, use format mm:ss', $config, false);
-        $var->setGroup("Misc");
-        $var->setDefaultValue('4:00');
-        $this->registerVariable($var);
-
         $var = new Boolean('enableRanksCalc', 'Enable player position calculation', $config, false, true);
         $var->setGroup("Misc");
         $var->setDefaultValue(true);

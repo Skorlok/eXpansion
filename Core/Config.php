@@ -34,8 +34,6 @@ class Config extends \ManiaLib\Utils\Singleton
     public $Colors_info = '$bbb'; // votes
     public $Colors_vote_success = '$0f0'; // vote success
     public $Colors_vote_failure = '$f00'; // vote failure
-    public $time_dynamic_max = '7:00'; // dynamic timelimit max time for /ta dynamic <x>
-    public $time_dynamic_min = '4:00'; // dynamic timelimit min time for /ta dynamic <x>
     public $API_Version = '2013-04-16'; //ApiVersion can be 2011-10-06 for TM and 2013-04-16 for SM Add in config
     public $enableRanksCalc = true; // enable calculation of player ranks on checkpoints
     public $mapBase = "";

@@ -51,9 +51,22 @@ class Core extends types\ExpPlugin
     /** @var array() */
     private $teamScores = array();
 
-    public static $rankings = null;
+    public static $rankings = array();
 
     public static $warmUpActive = false;
+
+
+    // variables for extend time
+
+    public static $isTimeExtendable = false;
+
+    public static $isPointExtendable = false;
+
+    public static $initialTimelimit = 300;
+
+    public static $initialPoint = 50;
+
+    public static $isExtended = false;
 
     /**
      * public variable to export player infos
@@ -405,6 +418,7 @@ EOT;
         $this->updateQuitDialog();
         //trigger a begin map
         $this->onBeginMap(null, null, null);
+        $this->onBeginMatch();
 
         //Reset extra data for players
         $this->resetExpPlayers(true);
@@ -450,6 +464,9 @@ EOT;
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
         }
+
+        //extend time or point compatibility
+        $this->setPublicMethod("extendTime");
 
         //enable custom points in team mode
         if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
@@ -938,11 +955,79 @@ EOT;
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
+    public function onBeginMatch()
+    {
+        $ScriptSettings = $this->connection->GetModeScriptSettings();
+
+        if (array_key_exists('S_TimeLimit', $ScriptSettings)) {
+            self::$isTimeExtendable = true;
+            self::$isPointExtendable = false;
+            self::$initialPoint = 50;
+            self::$initialTimelimit = intval($ScriptSettings["S_TimeLimit"]);
+            self::$isExtended = false;
+        }
+
+        if (array_key_exists('S_PointsLimit', $ScriptSettings)) {
+            self::$isTimeExtendable = false;
+            self::$isPointExtendable = true;
+            self::$initialPoint = intval($ScriptSettings["S_PointsLimit"]);
+            self::$initialTimelimit = 300;
+            self::$isExtended = false;
+        }
+    }
+
     public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+
+        if (self::$isExtended) {
+            
+            if (self::$isTimeExtendable) {
+                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval(self::$initialTimelimit)]);
+            }
+
+            if (self::$isPointExtendable) {
+                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval(self::$initialPoint)]);
+            }
+        }
+        self::$isTimeExtendable = false;
+        self::$isPointExtendable = false;
+        self::$initialPoint = 50;
+        self::$initialTimelimit = 300;
+        self::$isExtended = false;
+    }
+
+    public function extendTime($timeOrPoint = null)
+    {
+        $ScriptSettings = $this->connection->GetModeScriptSettings();
+
+        if ($timeOrPoint == null) {
+
+            if (self::$isTimeExtendable) {
+                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + self::$initialTimelimit]);
+                self::$isExtended = true;
+            }
+
+            if (self::$isPointExtendable) {
+                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + self::$initialPoint]);
+                self::$isExtended = true;
+            }
+
+        } else {
+
+            if (self::$isTimeExtendable) {
+                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + $timeOrPoint]);
+                self::$isExtended = true;
+            }
+
+            if (self::$isPointExtendable) {
+                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + $timeOrPoint]);
+                self::$isExtended = true;
+            }
+
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\ChatAdmin;
 
 use Exception;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLib\Utils\Formatting;
 use ManiaLib\Utils\Path;
 use ManiaLive\Application\Application;
@@ -42,9 +43,6 @@ use Phine\Exception\Exception as Exception2;
  */
 class ChatAdmin extends ExpPlugin
 {
-    /** @var integer $dynamicTime */
-    private $dynamicTime = 0;
-
     /** @var integer $teamGap */
     private $teamGap = 0;
 
@@ -500,15 +498,6 @@ Other server might use the same blacklist file!!'
         $cmd->addchecker(1, Time_ms::getInstance());
         AdminGroups::addAlias($cmd, 'setTAlimit');
 
-        $cmd = AdminGroups::addAdminCommand('set game ta dynamic', $this, 'setTAdynamic', Permission::GAME_SETTINGS);
-        $cmd->setHelp('Enables the dynamic timelimit for Time Attack Mode.')
-            ->addLineHelpMore(
-                '$w/admin set game ta timelimit #num$z will change the multiplier used for map authortime.'
-            )
-            ->setMinParam(1);
-        $cmd->addchecker(1, Integer::getInstance());
-        AdminGroups::addAlias($cmd, 'setTAdynamic');
-
         $cmd = AdminGroups::addAdminCommand(
             'set game ta WarmUpDuration',
             $this,
@@ -548,6 +537,11 @@ Other server might use the same blacklist file!!'
         $cmd->setHelp('Force the current scores of one team');
         AdminGroups::addAlias($cmd, 'forceteampoints');
         AdminGroups::addAlias($cmd, 'ftpts');
+
+        //extend time or points
+        $cmd = AdminGroups::addAdminCommand('extend', $this, 'extendTimeOrPoints', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Extend current timelimit or pointslimit');
+        AdminGroups::addAlias($cmd, 'ext');
 
         $cmd = AdminGroups::addAdminCommand(
             'set game rounds PointsLimit',
@@ -888,9 +882,9 @@ Other server might use the same blacklist file!!'
                 case "timelimit":
                     $this->setTAlimit($fromLogin, $params);
                     break;
-                case "dyn":
-                case "dynamic":
-                    $this->setTAdynamic($fromLogin, $params);
+                case "ext":
+                case "extend":
+                    $this->extendTimeOrPoints($fromLogin, $params);
                     break;
                 case "wud":
                 case "wu":
@@ -902,7 +896,7 @@ Other server might use the same blacklist file!!'
                     $this->setNbWarmUp($fromLogin, $params);
                     break;
                 default:
-                    $msg = eXpGetMessage("possible parameters: limit, dynamic, wu");
+                    $msg = eXpGetMessage("possible parameters: limit, extend, wu, wunb");
                     $this->eXpChatSendServerMessage($msg, $fromLogin);
                     break;
             }
@@ -1751,6 +1745,59 @@ Other server might use the same blacklist file!!'
         }
     }
 
+    public function extendTimeOrPoints($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+
+        if (Core::$isTimeExtendable) {
+            if ($params[0] == null){
+
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit.', null, array($admin->nickName));
+                return;
+
+            } else {
+
+                if (!is_numeric($params[0])) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $fromLogin);
+                    return;
+                }
+
+                $timeToAdd = intval($params[0]*60);
+
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $timeToAdd);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit with #variable#%s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+                return;
+            }
+        }
+
+        if (Core::$isPointExtendable) {
+            if ($params[0] == null){
+
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit.', null, array($admin->nickName));
+                return;
+
+            } else {
+
+                if (!is_numeric($params[0])) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $fromLogin);
+                    return;
+                }
+
+                $pointsToAdd = intval($params[0]);
+
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $pointsToAdd);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit with #variable#%s #admin_action#points.', null, array($admin->nickName, $pointsToAdd));
+                return;
+            }
+        }
+
+        if (!Core::$isTimeExtendable || !Core::$isPointExtendable) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#Incompatible mode'), $fromLogin);
+        }
+    }
+
     /**
      * @param $fromLogin
      * @param $params
@@ -2502,40 +2549,6 @@ Other server might use the same blacklist file!!'
      * @param $fromLogin
      * @param $params
      */
-    public function setTAdynamic($fromLogin, $params)
-    {
-        try {
-            $this->dynamicTime = $params[0];
-            $admin = $this->storage->getPlayerObject($fromLogin);
-            if ($params[0] == 0) {
-                $this->eXpChatSendServerMessage(
-                    '#admin_action#Admin#variable# %s #admin_action# disables the dynamic time limit!',
-                    null,
-                    array($admin->nickName)
-                );
-                $this->eXpChatSendServerMessage(
-                    '#admin_action#Static timelimit is set to #variable#5:00 #admin_action#minutes.'
-                );
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => 300]);
-
-                return;
-            }
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets dynamic '
-                . 'time limit multiplier to #variable# %s #admin_action#!',
-                null,
-                array($admin->nickName, $params[0])
-            );
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
-            return;
-        }
-    }
-
-    /**
-     * @param $fromLogin
-     * @param $params
-     */
     public function setTAlimit($fromLogin, $params)
     {
 
@@ -3101,46 +3114,6 @@ Other server might use the same blacklist file!!'
             $window->show();
         } catch (Exception $e) {
             $this->sendErrorChat($login, $e->getMessage());
-        }
-    }
-
-    /**
-     * @param $statusCode
-     * @param $statusName
-     */
-    public function onBeginMap($map, $warmUp, $matchContinuation)
-    {
-        try {
-            if ($this->expStorage->simpleEnviTitle == Storage::TITLE_SIMPLE_TM && $this->dynamicTime > 0) {
-                if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TIMEATTACK) {
-                    $map = $this->connection->getCurrentMapInfo();
-                    $laps = $map->nbLaps;
-                    if ($map->nbLaps <= 1) {
-                        $laps = 1;
-                    }
-
-                    $newLimit = floor((intval($map->authorTime) / intval($laps)) * floatval($this->dynamicTime));
-
-                    $max = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_max);
-                    $min = TimeConversion::MStoTM(Config::getInstance()->time_dynamic_min);
-
-                    if ($newLimit > $max) {
-                        $newLimit = $max;
-                    }
-                    if ($newLimit < $min) {
-                        $newLimit = $min;
-                    }
-                    $scriptLimit = $newLimit / 1000;
-                    $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($scriptLimit)]);
-
-                    $this->eXpChatSendServerMessage(
-                        '#admin_action#Dynamic time limit set to: #variable#' . Time::fromTM($newLimit),
-                        null
-                    );
-                }
-            }
-        } catch (Exception $e) {
-            $this->console($e->getMessage());
         }
     }
 

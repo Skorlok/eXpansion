@@ -13,8 +13,8 @@ Supprimer
 unIgnore
 Ne plus ignorer
 
-possible parameters: limit, dynamic, wu
-Paramètre possible : limit, dynamic, wu
+possible parameters: limit, extend, wu, wunb
+Paramètre possible : limit, extend, wu, wunb
 
 possible parameters: laps, limit, wu, fto, ftimeout
 Paramètre possible : laps, limit, wu, fto, ftimeout

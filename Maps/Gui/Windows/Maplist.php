@@ -214,7 +214,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->pager->setSize($this->getSizeX() - 6, $this->getSizeY() - 20);
 
-        $this->pager->setPosition(3, -17);
+        $this->pager->setPosition(3, -17, 5);
 
         $this->titlebg->setPosition(3, -9.5);
         $this->titlebg->setSize($this->getSizeX() - 6, 6.5);

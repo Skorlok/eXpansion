@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Votes;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
@@ -250,7 +251,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function vote_Extend($login)
     {
-        if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
+        if (Core::$isTimeExtendable || Core::$isPointExtendable) {
             try {
                 $managedVotes = $this->getVotes();
                 //if vote is not managed...
@@ -408,8 +409,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $this->connection->nextMap();
             }
             if ($cmdName == "Extend") {
-                $ScriptSettings = $this->connection->GetModeScriptSettings();
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"])*2]);
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
             }
             if ($cmdName == "EndRound") {
                 $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));

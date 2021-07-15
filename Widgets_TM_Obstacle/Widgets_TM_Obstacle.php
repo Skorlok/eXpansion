@@ -42,7 +42,7 @@ class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
         $info->show();
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $this->displayWidget();
     }

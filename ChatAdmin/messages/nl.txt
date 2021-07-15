@@ -13,8 +13,8 @@ Verwijder
 unIgnore
 unIgnore
 
-possible parameters: limit, dynamic, wu
-#translate# possible parameters: limit, dynamic, wu
+possible parameters: limit, extend, wu, wunb
+#translate# possible parameters: limit, extend, wu, wunb
 
 possible parameters: laps, limit, wu, fto, ftimeout
 #translate# possible parameters: laps, limit, wu, fto, ftimeout
