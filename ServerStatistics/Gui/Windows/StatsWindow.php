@@ -41,6 +41,7 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->btn1->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverPlayerAction);
         $this->btn1->colorize("f00");
         $this->btn1->setScale(0.8);
+        $this->btn1->setPosZ(4);
         $this->btn1->setIcon("Icons128x128_1", 'Rankings');
         $this->frame->addComponent($this->btn1);
 
@@ -49,6 +50,7 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->btn2->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverMemAction);
         $this->btn2->colorize("f00");
         $this->btn2->setScale(0.8);
+        $this->btn2->setPosZ(4);
         $this->btn2->setIcon("http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/ramStat.png", null);
         $this->frame->addComponent($this->btn2);
 
@@ -58,6 +60,7 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->btn3->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverCpuAction);
         $this->btn3->colorize("f00");
         $this->btn3->setScale(0.8);
+        $this->btn3->setPosZ(4);
         $this->btn3->setIcon("http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/cpuStat.png", null);
         $this->frame->addComponent($this->btn3);
 
