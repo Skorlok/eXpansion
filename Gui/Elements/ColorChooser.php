@@ -61,6 +61,7 @@ class ColorChooser extends Control implements \ManiaLivePlugins\eXpansion\Gui\St
         $this->openButton->setBgcolor("000");
         $this->openButton->setId("preview_" . $this->buttonId);
         $this->openButton->setAttribute("class", "colorchooser");
+        $this->openButton->setPosZ(5);
         $this->openButton->setScriptEvents();
         $this->addComponent($this->openButton);
 

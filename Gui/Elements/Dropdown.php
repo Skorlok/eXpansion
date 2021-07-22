@@ -49,6 +49,7 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $this->label->setBgcolorFocus("3af");
         $this->label->setAlign('left', 'center');
         $this->label->setScriptEvents(true);
+        $this->label->setPosZ(4);
         $this->addComponent($this->label);
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame(0, 0);

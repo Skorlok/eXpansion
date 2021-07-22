@@ -85,7 +85,7 @@ class Inputbox extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->button->setAlign('left', 'center');
         $this->button->setTextColor('fff');
-        $this->button->setPosition(2, -7, 20);
+        $this->button->setPosition(2, -7, 5);
         $this->button->setSize($this->getSizeX() - 3, 4);
         $this->addComponent($this->button);
     }

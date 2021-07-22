@@ -75,7 +75,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             array(
                 "NextMap", "RestartMap",
                 "Kick", "Ban", "SetModeScriptSettingsAndCommands",
-                "JumpToMapIndex", "SetNextMapIdent",
+                "JumpToMapIdent", "SetNextMapIdent",
                 "AutoTeamBalance")
         );
         $this->registerVariable($var);

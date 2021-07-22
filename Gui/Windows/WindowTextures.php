@@ -113,16 +113,13 @@ abstract class WindowTextures extends \ManiaLive\Gui\Window
         $this->_titlebar->setModulateColor($config->windowTitleBackgroundColor);
         $this->_windowFrame->addComponent($this->_titlebar);
 
-        $this->_closebutton = new \ManiaLib\Gui\Elements\Label(9.6, 4);
+        $this->_closebutton = new \ManiaLib\Gui\Elements\Quad(4, 4);
         $this->_closebutton->setId("Close");
         $this->_closebutton->setAlign('right', 'bottom');
+        $this->_closebutton->setPosZ(5);
+        $this->_closebutton->setImage('file://Media/Manialinks/Common/Chat/buddy-buddy-deny-focus.dds', true);
+        $this->_closebutton->setImageFocus('file://Media/Manialinks/Common/Chat/buddy-buddy-deny.dds', true);
         $this->_closebutton->setScriptEvents(true);
-        $this->_closebutton->setTextcolor("fff");
-        $this->_closebutton->setFocusareacolor1($config->windowTitleBackgroundColor);
-        $this->_closebutton->setFocusareacolor2("D30707");
-        $this->_closebutton->setAttribute("textfont", "OswaldMono");
-        $this->_closebutton->setTextSize(2);
-        $this->_closebutton->setText("✖");
         $this->_windowFrame->addComponent($this->_closebutton);
 
         $this->mainFrame = new \ManiaLive\Gui\Controls\Frame();
