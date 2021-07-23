@@ -90,13 +90,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->setPublicMethod("vote_endround");
         $this->setPublicMethod("showVotesConfig");
 
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-            $this->setPublicMethod("showTimeOptions");
-            $this->setPublicMethod("vote_time");
-
-        }
-
-        $cmd = AdminGroups::addAdminCommand('votes', $this, 'showVotesConfig', 'server_votes'); //
+        $cmd = AdminGroups::addAdminCommand('votes', $this, 'showVotesConfig', 'server_votes');
         $cmd->setHelp('shows config window for managing votes');
         $cmd->setMinParam(0);
 
@@ -255,20 +249,20 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             try {
                 $managedVotes = $this->getVotes();
                 //if vote is not managed...
-                if (!array_key_exists('SetModeScriptSettingsAndCommands', $managedVotes)) {
+                if (!array_key_exists('ExtendTime', $managedVotes)) {
                     return;
                 }
                 // if vote is not managed...
-                if ($managedVotes['SetModeScriptSettingsAndCommands']->managed == false) {
+                if ($managedVotes['ExtendTime']->managed == false) {
                     return;
                 }
-                if ($managedVotes['SetModeScriptSettingsAndCommands']->ratio == -1.) {
+                if ($managedVotes['ExtendTime']->ratio == -1.) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#Extend vote is disabled!"), $login);
                     return;
                 }
 
                 $this->voter = $login;
-                $vote = $managedVotes['SetModeScriptSettingsAndCommands'];
+                $vote = $managedVotes['ExtendTime'];
                 $this->debug("[exp\Votes] Calling extend vote..");
                 $vote->callerLogin = $this->voter;
                 $vote->cmdName = "Extend";
@@ -296,20 +290,20 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             try {
                 $managedVotes = $this->getVotes();
                 // if vote is not managed...
-                if (!array_key_exists('RestartMap', $managedVotes)) {
+                if (!array_key_exists('EndRound', $managedVotes)) {
                     return;
                 }
                 // if vote is not managed...
-                if ($managedVotes['RestartMap']->managed == false) {
+                if ($managedVotes['EndRound']->managed == false) {
                     return;
                 }
-                if ($managedVotes['RestartMap']->ratio == -1.) {
+                if ($managedVotes['EndRound']->ratio == -1.) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#End round vote is disabled!"), $login);
                     return;
                 }
 
                 $this->voter = $login;
-                $vote = $managedVotes['RestartMap'];
+                $vote = $managedVotes['EndRound'];
                 $this->debug("[exp\Votes] Calling EndRound vote..");
                 $vote->callerLogin = $this->voter;
                 $vote->cmdName = "EndRound";

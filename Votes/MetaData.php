@@ -56,7 +56,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new HashList("managedVote_enable", "Use eXp managed votes ?", $config, false, false);
         $type = new Boolean("", "", null);
         $var->setType($type);
-        $var->setVisible(false);
+        $var->setVisible(true);
         $var->setDefaultValue(array("NextMap" => true,
             "RestartMap" => true,
             "Kick" => true,
@@ -64,18 +64,21 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetModeScriptSettingsAndCommands" => true,
             "JumpToMapIdent" => true,
             "SetNextMapIdent" => true,
+            "ExtendTime" => true,
+            "EndRound" => true,
+            "Question" => true,
             "AutoTeamBalance" => true));
         $this->registerVariable($var);
 
         $var = new BasicList("managedVote_commands", "Managed vote commands", $config, false, false);
         $type = new TypeString("", "", null);
         $var->setType($type);
-        $var->setVisible(false);
+        $var->setVisible(true);
         $var->setDefaultValue(
             array(
                 "NextMap", "RestartMap",
                 "Kick", "Ban", "SetModeScriptSettingsAndCommands",
-                "JumpToMapIdent", "SetNextMapIdent",
+                "JumpToMapIdent", "SetNextMapIdent", "ExtendTime", "EndRound", "Question",
                 "AutoTeamBalance")
         );
         $this->registerVariable($var);
@@ -85,7 +88,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $type = new BoundedTypeFloat("", "", null);
         $type->setMin(-1.0);
         $type->setMax(1.0);
-        $var->setVisible(false);
+        $var->setVisible(true);
         $var->setType($type);
         $var->setDefaultValue(array("NextMap" => 0.5,
             "RestartMap" => 0.5,
@@ -94,6 +97,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetModeScriptSettingsAndCommands" => -1.,
             "JumpToMapIdent" => -1.,
             "SetNextMapIdent" => -1.,
+            "ExtendTime" => 0.6,
+            "EndRound" => 0.6,
+            "Question" => 0.6,
             "AutoTeamBalance" => 0.5));
         $this->registerVariable($var);
 
@@ -101,7 +107,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDescription("time in seconds");
         $type = new TypeInt("", "", null);
         $var->setType($type);
-        $var->setVisible(false);
+        $var->setVisible(true);
         $var->setDefaultValue(array("NextMap" => 30,
             "RestartMap" => 30,
             "Kick" => 30,
@@ -109,6 +115,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetModeScriptSettingsAndCommands" => 60,
             "JumpToMapIdent" => 60,
             "SetNextMapIdent" => 30,
+            "ExtendTime" => 30,
+            "EndRound" => 30,
+            "Question" => 30,
             "AutoTeamBalance" => 30));
         $this->registerVariable($var);
 
@@ -116,7 +125,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $type = new BoundedTypeInt("", "", null);
         $type->setMin(0);
         $type->setMax(2);
-        $var->setVisible(false);
+        $var->setVisible(true);
         $var->setType($type);
         $var->setDefaultValue(array("NextMap" => 1,
             "RestartMap" => 1,
@@ -125,6 +134,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetModeScriptSettingsAndCommands" => 1,
             "JumpToMapIdent" => 1,
             "SetNextMapIdent" => 1,
+            "ExtendTime" => 1,
+            "EndRound" => 1,
+            "Question" => 1,
             "AutoTeamBalance" => 1));
         $this->registerVariable($var);
     }
