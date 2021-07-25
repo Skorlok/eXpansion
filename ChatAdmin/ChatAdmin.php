@@ -72,6 +72,8 @@ class ChatAdmin extends ExpPlugin
         $this->setPublicMethod("forcePointsRounds");
         $this->setPublicMethod("forcePointsTeam");
         $this->setPublicMethod("shuffleMaps");
+        $this->setPublicMethod("setPause");
+        $this->setPublicMethod("setUnPause");
     }
 
     /**
@@ -537,6 +539,16 @@ Other server might use the same blacklist file!!'
         $cmd->setHelp('Force the current scores of one team');
         AdminGroups::addAlias($cmd, 'forceteampoints');
         AdminGroups::addAlias($cmd, 'ftpts');
+
+        //set pause in game
+        $cmd = AdminGroups::addAdminCommand('pause', $this, 'setPause', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Set the game to pause');
+        AdminGroups::addAlias($cmd, 'p');
+
+        //remove pause in game
+        $cmd = AdminGroups::addAdminCommand('unpause', $this, 'setUnPause', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Continue the game after pause');
+        AdminGroups::addAlias($cmd, 'up');
 
         //extend time or points
         $cmd = AdminGroups::addAdminCommand('extend', $this, 'extendTimeOrPoints', Permission::GAME_SETTINGS);
@@ -1740,6 +1752,32 @@ Other server might use the same blacklist file!!'
                 null,
                 array($admin->nickName, $params[0], $params[1])
             );
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    public function setPause($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("true"));
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
+
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to pause.', null, array($admin->nickName));
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    public function setUnPause($fromLogin, $params)
+    {
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("false"));
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
+
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to play.', null, array($admin->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }

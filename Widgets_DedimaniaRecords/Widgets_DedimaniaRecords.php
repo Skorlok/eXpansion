@@ -58,6 +58,10 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
             case "Trackmania.WarmUp.End":
                 $this->LibXmlRpc_EndWarmUp(0);
                 break;
+
+            case "Maniaplanet.Pause.Status":
+                $this->LibXmlRpc_EndWarmUp(0);
+                break;
         }
     }
 
