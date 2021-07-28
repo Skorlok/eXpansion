@@ -32,5 +32,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new Boolean("isHorizontal", "Use horizontal (old) widget style", $config, false, false);
         $var->setDefaultValue(false);
         $this->registerVariable($var);
+
+        $var = new Boolean("defaultPositionLeft", "Autoplace panel title on left in special gamemode", $config, false, false);
+        $var->setDefaultValue(true);
+        $this->registerVariable($var);
     }
 }

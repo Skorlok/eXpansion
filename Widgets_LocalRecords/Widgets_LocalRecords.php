@@ -7,6 +7,7 @@ use ManiaLive\PluginHandler\Dependency;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel2;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -59,10 +60,18 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $panelMain->setSizeX($this->panelSizeX);
                 $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
                 if (!$this->config->isHorizontal) {
-                    if ($this->eXpGetCurrentCompatibilityGameMode() == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode() == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP || $this->eXpGetCurrentCompatibilityGameMode() == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode() == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
-                        $panelMain->setDirection("right");
+                    if ($this->config->defaultPositionLeft) {
+                        if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+                            $panelMain->setDirection("right");
+                        } else {
+                            $panelMain->setDirection("left");
+                        }
                     } else {
-                        $panelMain->setDirection("left");
+                        if ($this->eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TIMEATTACK) {
+                            $panelMain->setDirection("right");
+                        } else {
+                            $panelMain->setDirection("left");
+                        }
                     }
                 }
                 $this->widgetIds["LocalPanel"] = $panelMain;
