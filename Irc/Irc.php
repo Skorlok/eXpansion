@@ -97,7 +97,13 @@ class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Cl
     public function irc_onPublicChat($connection, $channel, $nick, $message)
     {
         if (substr($message, 0, 1) != "!") {
-            $this->connection->chatSendServerMessage('$fff($f00Irc$fff) $fff' . $connection->getIrcNick($nick) . ': $ff0' . $message);
+            
+            if ($this->config->showIRCNick) {
+                $this->connection->chatSendServerMessage('$fff($f00Irc$fff) $fff' . $connection->getIrcNick($nick) . ': $ff0' . $message);
+            } else {
+                $this->connection->chatSendServerMessage('$ff0' . $message);
+            }
+
         }
     }
 
@@ -128,11 +134,17 @@ class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Cl
 
     public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
     {
-        if ($playerUid != 0 && substr($text, 0, 1) != "/") {
-            $nick = $this->storage->getPlayerObject($login);
-            $nick = $nick->nickName;
-            $message = \ManiaLib\Utils\Formatting::stripStyles($nick) . ": " . \ManiaLib\Utils\Formatting::stripStyles($text);
-            $this->irc->sendChat($message);
+        if ($playerUid == 0) {
+            return;
         }
+
+        if (substr($text, 0, 1) == "/" && !$this->config->includeChatCommand) {
+            return;
+        }
+        
+        $nick = $this->storage->getPlayerObject($login);
+        $nick = $nick->nickName;
+        $message = \ManiaLib\Utils\Formatting::stripStyles($nick) . ": " . \ManiaLib\Utils\Formatting::stripStyles($text);
+        $this->irc->sendChat($message);
     }
 }

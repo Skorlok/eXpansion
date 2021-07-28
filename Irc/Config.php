@@ -38,5 +38,8 @@ class Config extends \ManiaLib\Utils\Singleton
     public $channelKey = "";
     public $allowedIrcLogins = array();
 
+    public $includeChatCommand = false;
+    public $showIRCNick = true;
+
     public $plugins = array("AdminPrivateTriggers");
 }

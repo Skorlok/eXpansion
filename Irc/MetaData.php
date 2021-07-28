@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Irc;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 
 /**
  * Description of MetaData
@@ -57,6 +58,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new TypeString("channelKey", "irc channel key", $config, false, false);
         $var->setDefaultValue("");
+        $this->registerVariable($var);
+
+        $var = new Boolean("includeChatCommand", "Include the chat commands from TM to the IRC ?", $config, true, false);
+        $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
+        $var = new Boolean("showIRCNick", "show the author nickname of irc message", $config, true, false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
 
         $var = new BasicList("allowedIrcLogins", "Allowed Irc nicknames to use admin commands", $config, false, false);
