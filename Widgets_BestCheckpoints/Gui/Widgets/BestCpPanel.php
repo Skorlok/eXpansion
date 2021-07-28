@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Gui\Controls\CheckpointElem;
+use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Config;
 
 class BestCpPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
@@ -16,6 +17,8 @@ class BestCpPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnBeginConstruct()
     {
+        $this->maxCpIndex = Config::getInstance()->CPNumber;
+
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Flow(220, 20));
         $this->frame->setSize(220, 20);

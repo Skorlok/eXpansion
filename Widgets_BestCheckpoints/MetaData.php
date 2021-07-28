@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints;
 
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
+
 /**
  * Description of MetaData
  *
@@ -29,5 +31,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
             'TeamAttack.Script.txt'
         );
+
+        $config = Config::getInstance();
+
+        $var = new TypeInt("CPNumber", "Number of checkpoints to show", $config, false, false);
+        $var->setDefaultValue(12);
+        $this->registerVariable($var);
     }
 }
