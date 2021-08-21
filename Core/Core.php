@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.0.1.3";
+    const EXP_VERSION = "1.0.1.4";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -698,11 +698,6 @@ EOT;
 
                         //$nick = $this->storage->getPlayerObject($rank[0])->nickName;
 
-
-
-                        // alors oui c'est TRÈS peu optimisé donc svp ne venez pas me décrypter le fion je suis debutant en PHP et je sais pas comment corriger cette merde
-
-                        // oh passage WHAT A DEVILISH LINE (oui je suis attardé c'est quoi le problème ?)
                         $nick = $this->connection->getCurrentRankingForLogin($rank[0])[0]->nickName;
 
 						$scores[] = array(
@@ -973,6 +968,7 @@ EOT;
 
         $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
 
+        self::$rankings = array();
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
@@ -1251,6 +1247,23 @@ EOT;
             } catch (Exception $e) {
                 $this->console('[CustomPoints] Unable to re-send the custom pointrepartition, server said: ' . $e->getMessage());
             }
+        }
+
+        //prevent bugs when switching from MP3 gamemode to MP4
+        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
+            $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
+            $this->enableScriptEvents("LibXmlRpc_Callbacks");
+            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
+
+            $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+            $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+            $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
+            $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
+
+            $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
+            $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
+            self::optimizeScriptCallbacks();
         }
     }
 

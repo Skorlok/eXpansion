@@ -1,5 +1,0 @@
-declare oldGear = 1;
-declare oldState = CTmMlPlayer::ERaceState::Eliminated;
-
-declare label_indicator <=> (Page.GetFirstChild("indicator") as CMlLabel);
-declare label_gear <=> (Page.GetFirstChild("gear") as CMlLabel);

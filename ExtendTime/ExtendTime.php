@@ -13,7 +13,7 @@ class ExtendTime extends ExpPlugin
     protected $votes = ["yes" => 0, "no" => 0];
     protected $voters = [];
     protected $config;
-    protected $voteCount = 1;
+    protected $voteCount = 0;
 
     public function eXpOnReady()
     {
@@ -28,7 +28,7 @@ class ExtendTime extends ExpPlugin
     {
         $this->votes = ["yes" => 0, "no" => 0];
         $this->voters = [];
-        $this->voteCount = 1;
+        $this->voteCount = 0;
         $this->showWidget();
     }
 
@@ -43,7 +43,6 @@ class ExtendTime extends ExpPlugin
         if ($total > 0) {
             if ( ($this->votes['yes'] / $total) > $this->config->ratio) {
                 $this->eXpChatSendServerMessage("#vote#Vote to extend time: #vote_success# Success.");
-                $this->voteCount++;
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
             } else {
                 $this->eXpChatSendServerMessage("#vote#Vote to extend time: #vote_failure# Fail.");
@@ -52,6 +51,11 @@ class ExtendTime extends ExpPlugin
 
         $this->votes = ["yes" => 0, "no" => 0];
         $this->voters = [];
+
+        $this->voteCount++;
+        if($this->voteCount >= Config::getInstance()->limit_votes && Config::getInstance()->limit_votes != -1) {
+            TimeExtendVote::EraseAll();
+        }
     }
 
     public function vote($login, $vote)

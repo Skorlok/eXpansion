@@ -81,8 +81,8 @@ class Config extends \ManiaLib\Utils\Singleton
     public $multilap_info_y = 61.0;
     public $multilap_info_z = 5.0;
 
-    public $spectator_info_x = 74.0;
-    public $spectator_info_y = -85.0;
+    public $spectator_info_x = 0.0;
+    public $spectator_info_y = -68.0;
     public $spectator_info_z = 5.0;
 
     public $viewers_count_x = 140.0;

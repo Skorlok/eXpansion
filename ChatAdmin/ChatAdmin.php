@@ -69,8 +69,6 @@ class ChatAdmin extends ExpPlugin
         $this->setPublicMethod("forceEndRound");
         $this->setPublicMethod("forceEndWu");
         $this->setPublicMethod("forceEndWuR");
-        $this->setPublicMethod("forcePointsRounds");
-        $this->setPublicMethod("forcePointsTeam");
         $this->setPublicMethod("shuffleMaps");
         $this->setPublicMethod("setPause");
         $this->setPublicMethod("setUnPause");
@@ -528,17 +526,11 @@ Other server might use the same blacklist file!!'
         AdminGroups::addAlias($cmd, 'endwuround');
         AdminGroups::addAlias($cmd, 'ewur');
 
-        //forcescores in rounds
+        //forcescores
         $cmd = AdminGroups::addAdminCommand('forceroundpoints', $this, 'forcePointsRounds', Permission::GAME_SETTINGS);
         $cmd->setHelp('Force the current scores of one player');
-        AdminGroups::addAlias($cmd, 'forceroundpoints');
-        AdminGroups::addAlias($cmd, 'frpts');
-
-        //forcescores in team
-        $cmd = AdminGroups::addAdminCommand('forceteampoints', $this, 'forcePointsTeam', Permission::GAME_SETTINGS);
-        $cmd->setHelp('Force the current scores of one team');
-        AdminGroups::addAlias($cmd, 'forceteampoints');
-        AdminGroups::addAlias($cmd, 'ftpts');
+        AdminGroups::addAlias($cmd, 'forcepoints');
+        AdminGroups::addAlias($cmd, 'fpts');
 
         //set pause in game
         $cmd = AdminGroups::addAdminCommand('pause', $this, 'setPause', Permission::GAME_SETTINGS);
@@ -1702,58 +1694,53 @@ Other server might use the same blacklist file!!'
 
     public function forcePointsRounds($fromLogin, $params)
     {
-        $admin = $this->storage->getPlayerObject($fromLogin);
-        $player = $this->storage->getPlayerObject($params[0]);
-        if ($params[0] == null){
-            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the login of the player'), $fromLogin);
-            return;
-        }
-        if ($params[1] == null){
-            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the player'), $fromLogin);
-            return;
-        }
-        try {
-            $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
+        if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
 
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.',
-                null,
-                array($admin->nickName, $player->nickName, $params[1])
-            );
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
-        }
-    }
+            $admin = $this->storage->getPlayerObject($fromLogin);
+            if ($params[0] != "blue" && $params[0] != "red"){
+                $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the id of the team (red or blue) !'), $fromLogin);
+                return;
+            }
+            if ($params[1] == null){
+                $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the team'), $fromLogin);
+                return;
+            }
 
-    public function forcePointsTeam($fromLogin, $params)
-    {
-        $admin = $this->storage->getPlayerObject($fromLogin);
-        if ($params[0] == null){
-            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the id of the team (red or blue) !'), $fromLogin);
-            return;
-        }
-        if ($params[1] == null){
-            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the team'), $fromLogin);
-            return;
-        }
+            if ($params[0] == "blue"){
+                $teampts = 0;
+            }
+            if ($params[0] == "red"){
+                $teampts = 1;
+            }
 
-        if ($params[0] == blue){
-            $teampts = 0;
-        }
-        if ($params[0] == red){
-            $teampts = 1;
-        }
+            try {
+                $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
 
-        try {
-            $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $params[0], $params[1]));
+            } catch (Exception $e) {
+                $this->sendErrorChat($fromLogin, $e->getMessage());
+            }
 
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.',
-                null,
-                array($admin->nickName, $params[0], $params[1])
-            );
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
+        } else {
+
+            $admin = $this->storage->getPlayerObject($fromLogin);
+            $player = $this->storage->getPlayerObject($params[0]);
+            if ($params[0] == null){
+                $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the login of the player'), $fromLogin);
+                return;
+            }
+            if ($params[1] == null){
+                $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide the points of the player'), $fromLogin);
+                return;
+            }
+            try {
+                $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
+
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $player->nickName, $params[1]));
+            } catch (Exception $e) {
+                $this->sendErrorChat($fromLogin, $e->getMessage());
+            }
+
         }
     }
 

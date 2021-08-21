@@ -21,6 +21,6 @@ class Run extends AbstractStructure
         $this->player = $player;
         $this->totalTime = $player->bestTime;
         $this->nickname = $player->nickName;
-        $this->checkpoints = $player->best_lap_checkpoints;
+        $this->checkpoints = $player->bestCheckpoints;
     }
 }

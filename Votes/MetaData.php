@@ -66,7 +66,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetNextMapIdent" => true,
             "ExtendTime" => true,
             "EndRound" => true,
-            "Question" => true,
             "AutoTeamBalance" => true));
         $this->registerVariable($var);
 
@@ -78,7 +77,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             array(
                 "NextMap", "RestartMap",
                 "Kick", "Ban", "SetModeScriptSettingsAndCommands",
-                "JumpToMapIdent", "SetNextMapIdent", "ExtendTime", "EndRound", "Question",
+                "JumpToMapIdent", "SetNextMapIdent", "ExtendTime", "EndRound",
                 "AutoTeamBalance")
         );
         $this->registerVariable($var);
@@ -99,7 +98,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetNextMapIdent" => -1.,
             "ExtendTime" => 0.6,
             "EndRound" => 0.6,
-            "Question" => 0.6,
             "AutoTeamBalance" => 0.5));
         $this->registerVariable($var);
 
@@ -117,7 +115,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetNextMapIdent" => 30,
             "ExtendTime" => 30,
             "EndRound" => 30,
-            "Question" => 30,
             "AutoTeamBalance" => 30));
         $this->registerVariable($var);
 
@@ -136,7 +133,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "SetNextMapIdent" => 1,
             "ExtendTime" => 1,
             "EndRound" => 1,
-            "Question" => 1,
             "AutoTeamBalance" => 1));
         $this->registerVariable($var);
     }

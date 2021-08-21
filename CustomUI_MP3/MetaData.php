@@ -68,7 +68,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 		
 		$var = new Boolean("personal_best_and_rank", "personal_best_and_rank", $config, false, false);
-        $var->setDefaultValue(false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
 
 		$var = new Boolean("position", "position", $config, false, false);
@@ -137,11 +137,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
 
         $var = new TypeFloat("countdown_x", "countdown_x", $config, false, false);
-        $var->setDefaultValue(154.0);
+        $var->setDefaultValue(128.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("countdown_y", "countdown_y", $config, false, false);
-        $var->setDefaultValue(-57.0);
+        $var->setDefaultValue(-68.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("countdown_z", "countdown_z", $config, false, false);
@@ -167,7 +167,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("personal_best_and_rank_y", "personal_best_and_rank_y", $config, false, false);
-        $var->setDefaultValue(-61.0);
+        $var->setDefaultValue(-65.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("personal_best_and_rank_z", "personal_best_and_rank_z", $config, false, false);

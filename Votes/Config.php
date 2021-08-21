@@ -24,7 +24,6 @@ class Config extends \ManiaLib\Utils\Singleton
         "SetNextMapIdent" => true,
         "ExtendTime" => true,
         "EndRound" => true,
-        "Question" => true,
         "AutoTeamBalance" => true);
 
     public $managedVote_commands = array(
@@ -37,7 +36,6 @@ class Config extends \ManiaLib\Utils\Singleton
         "SetNextMapIdent",
         "ExtendTime",
         "EndRound",
-        "Question",
         "AutoTeamBalance"
     );
 
@@ -50,7 +48,6 @@ class Config extends \ManiaLib\Utils\Singleton
         "SetNextMapIdent" => -1.,
         "ExtendTime" => 0.6,
         "EndRound" => 0.6,
-        "Question" => 0.6,
         "AutoTeamBalance" => 0.5);
 
     public $managedVote_timeouts = array("NextMap" => 30,
@@ -62,7 +59,6 @@ class Config extends \ManiaLib\Utils\Singleton
         "SetNextMapIdent" => 30,
         "ExtendTime" => 30,
         "EndRound" => 30,
-        "Question" => 30,
         "AutoTeamBalance" => 30);
 
     public $managedVote_voters = array("NextMap" => 1,
@@ -74,6 +70,5 @@ class Config extends \ManiaLib\Utils\Singleton
         "SetNextMapIdent" => 1,
         "ExtendTime" => 1,
         "EndRound" => 1,
-        "Question" => 1,
         "AutoTeamBalance" => 1);
 }

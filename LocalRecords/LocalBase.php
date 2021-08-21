@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\LocalRecords;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEventListener;
@@ -13,6 +14,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Cps;
+use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\CpDiff;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Ranks;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Records;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Sector;
@@ -290,6 +292,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $cmd = $this->registerChatCommand("cps", "showCpWindow", 0, true);
         $cmd->help = 'Show Checkpoint times';
+
+        $cmd = $this->registerChatCommand("cps", "showCPDiffWindow", 1, true);
+        $cmd->help = 'Show Checkpoint difference';
 
         $cmd = $this->registerChatCommand("sectors", "showSectorWindow", 0, true);
         $cmd->help = 'Show Players Best Sector times';
@@ -1548,6 +1553,44 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         /** @var Cps $window */
         $window->setTitle(__('CheckPoints on Map', $login));
         $window->populateList($this->currentChallengeRecords, 100, $this);
+        $window->setSize(200, 100);
+        $window->centerOnScreen();
+        $window->show();
+    }
+
+    public function showCpDiffWindow($login, $params)
+    {
+        CpDiff::Erase($login);
+        $params-=1;
+
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
+            $dedirecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania", "getRecords");
+        }
+        if ($dedirecs[$login]) {
+            if ($this->getCurrentChallangePlayerRecord($login)) {
+                if ($this->getCurrentChallangePlayerRecord($login)->time <= $dedirecs[$login]->time) {
+                    $player = $this->getCurrentChallangePlayerRecord($login);
+                } else {
+                    $player = new Record();
+                    $player->place = $dedirecs[$login]->place;
+                    $player->nickName = $dedirecs[$login]->nickname;
+                    $player->ScoreCheckpoints = explode(",", $dedirecs[$login]->checkpoints);
+                }
+            } else {
+                $player = new Record();
+                $player->place = $dedirecs[$login]->place;
+                $player->nickName = $dedirecs[$login]->nickname;
+                $player->ScoreCheckpoints = explode(",", $dedirecs[$login]->checkpoints);
+            }
+        } else {
+            $player = $this->getCurrentChallangePlayerRecord($login);
+        }
+
+        $target = $this->currentChallengeRecords[$params];
+
+        $window = CpDiff::Create($login);
+        $window->setTitle(__('Local CheckPoints Difference', $login));
+        $window->populateList(array($player, $target));
         $window->setSize(200, 100);
         $window->centerOnScreen();
         $window->show();

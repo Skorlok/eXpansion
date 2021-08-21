@@ -291,11 +291,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
 
         $var = new TypeFloat("spectator_info_x", "spectator_info_x", $config, false, false);
-        $var->setDefaultValue(74.0);
+        $var->setDefaultValue(0.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("spectator_info_y", "spectator_info_y", $config, false, false);
-        $var->setDefaultValue(-85.0);
+        $var->setDefaultValue(-68.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("spectator_info_z", "spectator_info_z", $config, false, false);

@@ -1,22 +1,5 @@
 <?php
 
-/*
- * Copyright (C) 2014 Reaby
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 namespace ManiaLivePlugins\eXpansion\MXKarma;
 
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
@@ -30,33 +13,25 @@ use ManiaLivePlugins\eXpansion\MXKarma\Gui\Widgets\MXRatingsWidget;
 use ManiaLivePlugins\eXpansion\MXKarma\Structures\MXRating;
 use ManiaLivePlugins\eXpansion\MXKarma\Structures\MXVote;
 
-/**
- * Description of MXKarma
- *
- * @author Reaby
- */
 class MXKarma extends ExpPlugin implements MXKarmaEventListener
 {
 
     /** @var Connection */
     private $mxConnection;
 
-    private $mapTime = 0;
-
-    private $mapStart = -1;
+    private $mxMapStart = -1;
 
     /** @var MXRating */
     private $mxRatings = null;
 
     /** @var String[][] */
-    private $votes = array();
+    private $mx_votes = array();
 
     /** @var MXVote[] */
-    private $votesTemp = array();
+    private $mx_votesTemp = array();
 
-
-    private $msg_error;
-    private $msg_connected;
+    private $mx_msg_error;
+    private $mx_msg_connected;
 
     /** @var Config */
     private $config;
@@ -68,8 +43,8 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
         parent::eXpOnLoad();
         $this->config = Config::getInstance();
         $this->mxConnection = new mxConnection();
-        $this->msg_error = eXpGetMessage('MXKarma error %1$s: %2$s');
-        $this->msg_connected = eXpGetMessage('MXKarma connection Success!');
+        $this->mx_msg_error = eXpGetMessage('MXKarma error %1$s: %2$s');
+        $this->mx_msg_connected = eXpGetMessage('MXKarma connection Success!');
     }
 
     public function eXpOnReady()
@@ -77,8 +52,7 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
         $this->enableDedicatedEvents();
         \ManiaLive\Event\Dispatcher::register(MXKarmaEvent::getClass(), $this);
 
-
-        $this->mapStart = time();
+        $this->mxMapStart = time();
         $this->tryConnect();
     }
 
@@ -88,20 +62,13 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
         $this->config = Config::getInstance();
         if (!$this->mxConnection->isConnected()) {
             if (empty($this->config->mxKarmaServerLogin) || empty($this->config->mxKarmaApiKey)) {
-                $admins->announceToPermission(
-                    Permission::EXPANSION_PLUGIN_SETTINGS,
-                    "#admin_error#Server login or/and Server code is empty in MXKarma Configuration"
-                );
+                $admins->announceToPermission(Permission::EXPANSION_PLUGIN_SETTINGS, "#admin_error#Server login or/and Server code is empty in MXKarma Configuration");
                 $this->console("Server code or/and login is not configured for MXKarma plugin!");
-
                 return;
             }
             $this->mxConnection->connect($this->config->mxKarmaServerLogin, $this->config->mxKarmaApiKey);
         } else {
-            $admins->announceToPermission(
-                Permission::EXPANSION_PLUGIN_SETTINGS,
-                "#admin_error#Tried to connect to MXKarma, but connection is already made."
-            );
+            $admins->announceToPermission(Permission::EXPANSION_PLUGIN_SETTINGS, "#admin_error#Tried to connect to MXKarma, but connection is already made.");
             $this->console("Tried to connect to MXKarma, but connection is already made.");
         }
     }
@@ -109,9 +76,7 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $this->settingsChanged[$var->getName()] = true;
-        if (array_key_exists("mxKarmaApiKey", $this->settingsChanged)
-            && array_key_exists("mxKarmaServerLogin", $this->settingsChanged)
-        ) {
+        if (array_key_exists("mxKarmaApiKey", $this->settingsChanged) && array_key_exists("mxKarmaServerLogin", $this->settingsChanged)) {
             $this->tryConnect();
             $this->settingsChanged = array();
         }
@@ -154,20 +119,44 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
 
     public function vote($player, $vote)
     {
-        $this->votesTemp[$player->login] = new MXVote($player, $vote);
+        $oldVote = ArrayOfObj::getObjbyPropValue($this->mxRatings->votes, "login", $player->login);
+
+        if ($oldVote) {
+            if ($oldVote->vote == $vote) {
+                $this->eXpChatSendServerMessage("Vote registered for MXKarma", $player->login);
+                return;
+            } else {
+                if ($this->mxRatings->votecount != 1) {
+
+                    $reAverage = ($this->mxRatings->voteaverage) - (($oldVote->vote - $this->mxRatings->voteaverage) / ($this->mxRatings->votecount-1));
+                    $this->mxRatings->votecount -= 1;
+                    $this->mxRatings->voteaverage = $reAverage;
+                    unset($this->mxRatings->votes[array_search($player->login, $this->mxRatings->votes)]);
+
+                } else {
+
+                    $this->mxRatings->votecount = 0;
+                    $this->mxRatings->voteaverage = 50;
+                    unset($this->mxRatings->votes[array_search($player->login, $this->mxRatings->votes)]);
+
+                }
+            }
+        }
+        
+        $this->mx_votesTemp[$player->login] = new MXVote($player, $vote);
         $this->eXpChatSendServerMessage("Vote registered for MXKarma", $player->login);
 
         $widget = MXRatingsWidget::Create();
         $x = 0;
         $avgTempVotes = 0;
-        foreach ($this->votesTemp as $vote) {
+        foreach ($this->mx_votesTemp as $vote) {
             $avgTempVotes += $vote->vote;
             $x++;
         }
         if ($x > 0) {
             $avgTempVotes = $avgTempVotes / $x;
         }
-        $newAverage = ($this->mxRatings->voteaverage + $avgTempVotes) / 2;
+        $newAverage = (($this->mxRatings->voteaverage * $this->mxRatings->votecount) + ($avgTempVotes*$x)) / ($this->mxRatings->votecount+$x);
         $widget->setRating($newAverage, ($this->mxRatings->votecount+$x));
         $widget->show();
     }
@@ -176,9 +165,9 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
     {
         parent::onBeginMatch();
         $this->mxRatings = null;
-        $this->votes = array();
-        $this->votesTemp = array();
-        $this->mapStart = time();
+        $this->mx_votes = array();
+        $this->mx_votesTemp = array();
+        $this->mxMapStart = time();
         if ($this->mxConnection->isConnected()) {
             $this->mxConnection->getRatings($this->getPlayers(), false);
         }
@@ -186,20 +175,10 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-
         $newVotes = array();
 
-        foreach ($this->votesTemp as $login => $vote) {
-            $oldVote = ArrayOfObj::getObjbyPropValue($this->votes, "login", $login);
-            // if oldvote was found
-            if ($oldVote) {
-                // compare if the new vote and the old vote differs
-                if ($oldVote->vote != $vote->vote) {
-                    $newVotes[] = $vote;
-                }
-            } else { // othervice cast it as new vote
-                $newVotes[] = $vote;
-            }
+        foreach ($this->mx_votesTemp as $login => $vote) {
+            $newVotes[] = $vote;
         }
 
         if (count($newVotes) > 0) {
@@ -208,7 +187,7 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
                 $outArray[] = $vote;
             }
 
-            $this->mxConnection->saveVotes($this->storage->currentMap, time() - $this->mapStart, $outArray);
+            $this->mxConnection->saveVotes($this->storage->currentMap, time() - $this->mxMapStart, $outArray);
         }
 
         MXRatingsWidget::EraseAll();
@@ -217,10 +196,31 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
     public function getPlayers()
     {
         $players = array();
+
         $players = array_keys($this->storage->players);
         array_merge($players, array_keys($this->storage->players));
 
-        return $players;
+        $spectators = array_keys($this->storage->spectators);
+        array_merge($spectators, array_keys($this->storage->spectators));
+
+        $total = array_merge($spectators, $players);
+        return $total;
+    }
+
+    public function onPlayerConnect($login, $isSpectator)
+    {
+        if ($this->mxConnection->isConnected()) {
+            $playerVote = ArrayOfObj::getObjbyPropValue($this->mxRatings->votes, "login", $login);
+            if ($playerVote) {
+                return;
+            } else {
+                if (array_key_exists($login, $this->mx_votesTemp)) {
+                    return;
+                } else {
+                    $this->mxConnection->getRatings(array($login), true);
+                }
+            }
+        }
     }
 
     public function MXKarma_onConnected()
@@ -235,7 +235,7 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
 
     public function MXKarma_onError($state, $number, $reason)
     {
-        $this->eXpChatSendServerMessage($this->msg_error, null, array($state, $reason));
+        $this->eXpChatSendServerMessage($this->mx_msg_error, null, array($state, $reason));
         $this->console("MXKarma error  " . $state . ": " . $reason);
     }
 
@@ -243,26 +243,29 @@ class MXKarma extends ExpPlugin implements MXKarmaEventListener
     {
         if ($this->mxRatings === null) {
             $this->mxRatings = $votes;
-            $this->votes = array();
+            $this->mx_votes = array();
             foreach ($votes->votes as $vote) {
-                $this->votes[] = $vote;
+                $this->mx_votes[] = $vote;
             }
+
+            $widget = MXRatingsWidget::Create();
+            $widget->setRating($this->mxRatings->voteaverage, $this->mxRatings->votecount);
+            $widget->show();
+
         } else {
-            $this->mxRatings->append($votes);
             foreach ($votes->votes as $vote) {
-                $this->votes[] = $vote;
+                $this->mx_votes[] = $vote;
+                $this->mxRatings->votes[] = $vote;
             }
         }
-
-        $widget = MXRatingsWidget::Create();
-        $widget->setRating($this->mxRatings->voteaverage, $this->mxRatings->votecount);
-        $widget->show();
     }
 
     public function MXKarma_onVotesSave($isSuccess)
     {
         if ($isSuccess) {
-            $this->eXpChatSendServerMessage("MXKarma saved successfully!", null);
+            $this->console("MXKarma saved successfully!");
+        } else {
+            $this->console("Failed to save MXKarma!");
         }
     }
 

@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Dedimania;
 use ManiaLive\Application\ErrorHandling;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Time;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
@@ -162,8 +163,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                     $this->dedimania->openSession($this->expStorage->version->titleId, $this->config);
                     $this->registerChatCommand("dedirecs", "showRecs", 0, true);
                     $this->registerChatCommand("dedicps", "showCps", 0, true);
+                    $this->registerChatCommand("dedicps", "showCpDiff", 1, true);
                     $this->setPublicMethod("showRecs");
                     $this->setPublicMethod("showCps");
+                    $this->setPublicMethod("getRecords");
 
                     $this->running = true;
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
@@ -502,6 +505,11 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     }
 
+    public function getRecords()
+    {
+        return $this->records;
+    }
+
     public function showRecs($login)
     {
         \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::Erase($login);
@@ -533,7 +541,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
         if (sizeof($this->records) == 0) {
             $this->eXpChatSendServerMessage($this->msg_norecord, $login);
-
             return;
         }
         try {
@@ -541,12 +548,57 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             $window->setTitle(__('Dedimania cps for ', $login), $this->storage->currentMap->name);
             $window->centerOnScreen();
             $window->populateList($this->records);
-
             $window->setSize(170, 110);
             $window->show();
         } catch (\Exception $e) {
             ErrorHandling::displayAndLogError($e);
         }
+    }
+
+    public function showCpDiff($login, $params)
+    {
+        if (sizeof($this->records) == 0) {
+            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
+            return;
+        }
+        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\CpDiff::Erase($login);
+
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+            $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+        }
+        $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
+        if ($player_localrec) {
+            if ($this->records[$login]) {
+                if ($this->records[$login]->time > $player_localrec->time) {
+                    $player = $player_localrec;
+                } else {
+                    $player = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+                    $player->place = $this->records[$login]->place;
+                    $player->nickName = $this->records[$login]->nickname;
+                    $player->ScoreCheckpoints = explode(",", $this->records[$login]->checkpoints);
+                }
+            } else {
+                $player = $player_localrec;
+            }
+        } else {
+            $player = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+            $player->place = $this->records[$login]->place;
+            $player->nickName = $this->records[$login]->nickname;
+            $player->ScoreCheckpoints = explode(",", $this->records[$login]->checkpoints);
+        }
+
+        $target_data = ArrayOfObj::getObjbyPropValue($this->records, "place", $params);
+        $target = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+        $target->place = $target_data->place;
+        $target->nickName = $target_data->nickname;
+        $target->ScoreCheckpoints = explode(",", $target_data->checkpoints);
+
+        $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\CpDiff::Create($login);
+        $window->setTitle(__('Dedimania CheckPoints Difference', $login));
+        $window->populateList(array($player, $target));
+        $window->setSize(200, 100);
+        $window->centerOnScreen();
+        $window->show();
     }
 
     public function isRunning()

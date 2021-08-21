@@ -219,6 +219,10 @@ class Menu extends ExpPlugin implements Listener
                 $admGroup->addItem("Skip", "!admskip", $this);
             }
 
+            if ($group->hasPermission(Permission::GAME_SETTINGS)) {
+                $admGroup->addItem("Extend", "!admext", $this);
+            }
+
             if ($group->hasPermission(Permission::MAP_END_ROUND)) {
                 $admGroup->addItem("End Round", "!admer", $this);
             }
@@ -229,6 +233,14 @@ class Menu extends ExpPlugin implements Listener
 			
 			if ($group->hasPermission(Permission::MAP_END_ROUND)) {
                 $admGroup->addItem("End Round WarmUp", "!admewur", $this);
+            }
+
+            if ($group->hasPermission(Permission::GAME_SETTINGS)) {
+                $admGroup->addItem("Start pause", "!admpause", $this);
+            }
+
+            if ($group->hasPermission(Permission::GAME_SETTINGS)) {
+                $admGroup->addItem("End pause", "!admunpause", $this);
             }
 
             if ($group->hasPermission(Permission::TEAM_BALANCE)) {
@@ -282,6 +294,15 @@ class Menu extends ExpPlugin implements Listener
                     break;
                 case "!admskip":
                     $adminGrp->adminCmd($login, "skip");
+                    break;
+                case "!admext":
+                    $adminGrp->adminCmd($login, "extend");
+                    break;
+                case "!admpause":
+                    $adminGrp->adminCmd($login, "pause");
+                    break;
+                case "!admunpause":
+                    $adminGrp->adminCmd($login, "unpause");
                     break;
                 case "!admer":
                     $adminGrp->adminCmd($login, "er");
@@ -367,17 +388,9 @@ class Menu extends ExpPlugin implements Listener
                     if ($this->isPluginLoaded($plugin)) {
                         $this->callPublicMethod($plugin, "showCps", $login);
                     }
-                    $plugin = $this->getPluginClass("Dedimania_Script");
-                    if ($this->isPluginLoaded($plugin)) {
-                        $this->callPublicMethod($plugin, "showCps", $login);
-                    }
                     break;
                 case "!dedirecs":
                     $plugin = $this->getPluginClass("Dedimania");
-                    if ($this->isPluginLoaded($plugin)) {
-                        $this->callPublicMethod($plugin, "showRecs", $login);
-                    }
-                    $plugin = $this->getPluginClass("Dedimania_Script");
                     if ($this->isPluginLoaded($plugin)) {
                         $this->callPublicMethod($plugin, "showRecs", $login);
                     }

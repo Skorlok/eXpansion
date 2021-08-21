@@ -21,9 +21,11 @@ class Dedimania extends DedimaniaAbstract
         if (!$this->running) {
             return;
         }
+        $this->checkpoints = array();
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";
+        $this->AllCps = array();
     }
 
     public function onPlayerFinish($playerUid, $login, $time)
@@ -58,24 +60,60 @@ class Dedimania extends DedimaniaAbstract
         $this->handlePlayerFinish($playerUid, $login, $time, $checkpoints);
     }
 
-    /**
-     * @param \ManiaLive\Data\Player $player
-     * @param                        $time
-     * @param                        $checkpoints
-     * @param int $nbLap
-     */
-    public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
-    {
-        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
-        if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
+    function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
+	{
+        if (!$this->running) {
+            return;
+        }
+        if ($timeOrScore == 0) {
             return;
         }
 
-        $checkpoints = implode(",", $checkpoints);
+        if ($this->storage->currentMap->nbCheckpoints == 1) {
+            return;
+        }
 
-        $this->handlePlayerFinish($player->playerId, $player->login, $time, $checkpoints);
-    }
+        if (!array_key_exists($login, DediConnection::$players)) {
+            return;
+        }
+
+        // if player is banned from dedimania, don't send his time.
+        if (DediConnection::$players[$login]->banned) {
+            return;
+        }
+
+        if (self::eXpGetCurrentCompatibilityGameMode() != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
+            return;
+        }
+
+		if ($checkpointIndex == 0)
+			$this->checkpoints[$login] = array();
+
+		elseif ($checkpointIndex > 0 && (!isset($this->checkpoints[$login]) || !isset($this->checkpoints[$login][$checkpointIndex - 1]) || $timeOrScore < $this->checkpoints[$login][$checkpointIndex - 1]))
+			return;
+
+		$this->checkpoints[$login][$checkpointIndex] = $timeOrScore;
+
+		if ($this->storage->currentMap->nbCheckpoints && ($checkpointIndex + 1) % $this->storage->currentMap->nbCheckpoints == 0) {
+			$player = $this->storage->getPlayerObject($login);
+			if ($player) {
+				$checkpoints = array_slice($this->checkpoints[$login], -$this->storage->currentMap->nbCheckpoints);
+
+				if ($checkpointIndex >= $this->storage->currentMap->nbCheckpoints) {
+					$offset = $this->checkpoints[$login][($checkpointIndex - $this->storage->currentMap->nbCheckpoints)];
+					for ($i = 0; $i < count($checkpoints); ++$i)
+						$checkpoints[$i] -= $offset;
+
+					$timeOrScore -= $offset;
+				}
+
+				if (end($checkpoints) != $timeOrScore)
+					return;
+
+                $this->handlePlayerFinish($playerUid, $login, end($checkpoints), implode(",", $checkpoints));
+			}
+		}
+	}
 
     public function handlePlayerFinish($playerUid, $login, $time, $checkpoints)
     {
@@ -95,8 +133,8 @@ class Dedimania extends DedimaniaAbstract
             }
         }
 
-        $this->getVReplay();
-        $this->getGReplay();
+        $this->getVReplay($login, $this->checkpoints[$login]);
+        $this->getGReplay($login);
 
         // if current map doesn't have records, create one.
         if (count($this->records) == 0) {
@@ -201,22 +239,32 @@ class Dedimania extends DedimaniaAbstract
         }
     }
 
-    public function getVReplay()
+    public function getVReplay($login, $checkpoints)
     {
         try {
             $currank = $this->rankings;
             usort($currank, array($this, "compare_BestTime"));
+
+            if ($currank[0]['Login'] !== $login) {
+                return;
+            }
+
             $this->vReplay = $this->connection->getValidationReplay($currank[0]['Login']);
+            $this->AllCps = implode(",", $checkpoints);
         } catch (Exception $e) {
             $this->console("Unable to get validation replay, server said: " . $e->getMessage());
         }
     }
 
-    public function getGReplay()
+    public function getGReplay($login)
     {
         try {
             $currank = $this->rankings;
             usort($currank, array($this, "compare_BestTime"));
+
+            if ($currank[0]['Login'] !== $login) {
+                return;
+            }
 
             $grfile = sprintf('%s.%d.%07d.%s.Replay.Gbx',$this->storage->currentMap->uId,$this->storage->gameInfos->gameMode,$currank[0]['BestTime'],$currank[0]['Login']);
             $this->connection->saveBestGhostsReplay($currank[0]['Login'], $grfile);
@@ -269,24 +317,25 @@ class Dedimania extends DedimaniaAbstract
                 return;
             }
 
-            $playerinfo = Core::$playerInfo;
-            $AllChecks = implode(",", $playerinfo[$rankings[0]['Login']]->checkpoints);
-
             // Dedimania doesn't allow times sent without validation replay. So, let's just stop here if there is none.
             if (empty($this->vReplay)) {
                 $this->console("Couldn't get validation replay of the first player. Dedimania times not sent.");
                 return;
             }
-            $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $this->vReplay, $this->gReplay, $AllChecks);
+            $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $this->vReplay, $this->gReplay, $this->AllCps);
         } catch (Exception $e) {
             $this->console($e->getMessage());
             $this->vReplay = "";
             $this->gReplay = "";
             $this->rankings = array();
+            $this->checkpoints = array();
+            $this->AllCps = array();
         }
         // ignore exception and other, always reset;
         $this->rankings = array();
         $this->vReplay = "";
         $this->gReplay = "";
+        $this->checkpoints = array();
+        $this->AllCps = array();
     }
 }

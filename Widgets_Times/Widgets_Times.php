@@ -27,20 +27,17 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
             Dispatcher::register(LocalEvent::getClass(), $this);
             try {
-                TimePanel::$localrecords = $this->callPublicMethod(
-                    "\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords",
-                    "getRecords"
-                );
+                TimePanel::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
             } catch (\Exception $e) {
                 TimePanel::$localrecords = array();
             }
         }
 
-        $this->registerChatCommand("cps", "chat_cps", 1, true);
+        $this->registerChatCommand("cpt", "chat_cpt", 1, true);
         $this->showToAll();
     }
 
-    public function chat_cps($login, $value)
+    public function chat_cpt($login, $value)
     {
         if (!is_numeric($value)) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#error#"%s" is not a numeric value!'), $login, array($value));

@@ -17,7 +17,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Extend Time");
+        $this->setName("Tools: Extend Time");
 
         $this->addGameModeCompability(GameInfos::GAMEMODE_TIMEATTACK);
         $this->addTitleSupport("TM");
@@ -27,11 +27,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->setGroups(array('Tools'));
 
         $config = Config::getInstance();
+
         $var = new BoundedTypeFloat("ratio", "voteRatio", $config, false, false);
         $var->setMax(1.0);
         $var->setMax(0.0);
-        $var->setDefaultValue(0.49);
+        $var->setDefaultValue(0.51);
         $this->registerVariable($var);
 
+        $var = new TypeInt("limit_votes", "Limit voting for a player on map", $config, false, false);
+        $var->setDescription("-1 to disable, othervice number of vote start");
+        $var->setDefaultValue(1);
+        $this->registerVariable($var);
     }
 }

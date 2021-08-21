@@ -134,7 +134,7 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 }
             }
         }
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         self::$mainPlugin->forceScoresOk();
         $this->erase($login);
     }
@@ -151,7 +151,7 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$rank->login", "0", "0", "0"));
             }
         }
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         self::$mainPlugin->forceScoresOk();
 
         $this->populateList();

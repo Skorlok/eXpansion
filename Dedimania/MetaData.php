@@ -33,7 +33,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(GameInfos::GAMEMODE_TEAM);
         $this->addGameModeCompability(GameInfos::GAMEMODE_LAPS);
         $this->addGameModeCompability(GameInfos::GAMEMODE_CUP);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,"Doppler.Script.txt");
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
         $this->setEnviAsTitle(true);
@@ -44,13 +43,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue("");
         $this->registerVariable($var);
 
-        $var = new TypeString(
-            "code",
-            'Dedimania server code, $l[http://dedimania.net/tm2stats/?do=register]click this text to register$l',
-            $config,
-            false,
-            false
-        );
+        $var = new TypeString("code", 'Dedimania server code, $l[http://dedimania.net/tm2stats/?do=register]click this text to register$l', $config, false, false);
         $var->setDescription('For server code: click the header or visit http://dedimania.net');
         $var->setDefaultValue("");
         $this->registerVariable($var);

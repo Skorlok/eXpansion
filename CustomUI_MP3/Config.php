@@ -5,28 +5,22 @@ namespace ManiaLivePlugins\eXpansion\CustomUI_MP3;
 class Config extends \ManiaLib\Utils\Singleton
 {
 	public $map_info = false;
-    public $live_info = true;
     public $opponents_info = true;
     public $chat = true;
     public $chatline = 7;
     public $checkpoint_list = true;
-    public $checkpoint_ranking = true;
     public $round_scores = false;
     public $countdown = true;
     public $go = true;
     public $chrono = true;
     public $speed_and_distance = true;
-    public $personal_best_and_rank = false;
+    public $personal_best_and_rank = true;
     public $position = true;
     public $checkpoint_time = true;
     public $chat_avatar = false;
     public $warmup = true;
     public $endmap_ladder_recap = false;
     public $multilap_info = true;
-    public $spectator_info = true;
-    public $scorestablealt = true;
-    public $scorestable = true;
-    public $viewers_count = true;
 
 
     public $chrono_x = 0.0;
@@ -41,8 +35,8 @@ class Config extends \ManiaLib\Utils\Singleton
     public $round_scores_y = 14.0;
     public $round_scores_z = 5.0;
 
-    public $countdown_x = 154.0;
-    public $countdown_y = -57.0;
+    public $countdown_x = 128.0;
+    public $countdown_y = -68.0;
     public $countdown_z = 5.0;
 
     public $speed_and_distance_x = 158.0;
@@ -50,7 +44,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $speed_and_distance_z = 5.0;
 
     public $personal_best_and_rank_x = 158.0;
-    public $personal_best_and_rank_y = -61.0;
+    public $personal_best_and_rank_y = -65.0;
     public $personal_best_and_rank_z = 5.0;
 
     public $checkpoint_time_x = -8.0;

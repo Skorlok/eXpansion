@@ -19,7 +19,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Auto TimeLimit");
+        $this->setName("Tools: Auto TimeLimit");
 
         $this->addGameModeCompability(GameInfos::GAMEMODE_TIMEATTACK);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,"Doppler.Script.txt");

@@ -56,11 +56,14 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $this->bestTime = $time;
             BestRunPanel::$bestRuns = array();
-            $ranking = Core::$rankings;
 
-            foreach ($ranking as $player) {
-                BestRunPanel::$bestRuns[] = new Run($player);
-            }
+            $data = new \Maniaplanet\DedicatedServer\Structures\PlayerRanking();
+            $data->bestTime = $time;
+            $data->nickName = $this->storage->getPlayerObject($login)->nickName;
+            $data->bestCheckpoints = Core::$playerInfo[$login]->checkpoints;
+
+            BestRunPanel::$bestRuns[] = new Run($data);
+
             BestRunPanel::RedrawAll();
         }
     }

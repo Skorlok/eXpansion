@@ -5,6 +5,9 @@ namespace ManiaLivePlugins\eXpansion\Database;
 use ManiaLib\Utils\Formatting as StringFormatting;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
 
 /**
@@ -111,13 +114,13 @@ class Database extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        $firstFound = false;
+        $winner = ArrayOfObj::getObjbyPropValue(Core::$rankings, "rank", "1");
+        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM && $winner) {
+            $this->incrementWins($winner);
+        }
+
         foreach ($this->storage->players as $login => $player) { // get players
             $this->updatePlayTime($player);
-            if ($player->rank == 1 && sizeof($this->storage->players) > 1 && !$firstFound) {
-                $this->incrementWins($player);
-                $firstFound = true;
-            }
         }
 
         foreach ($this->storage->spectators as $login => $player) { // get spectators
