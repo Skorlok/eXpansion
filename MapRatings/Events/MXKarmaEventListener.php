@@ -1,6 +1,6 @@
 <?php
 
-namespace ManiaLivePlugins\eXpansion\MXKarma\Events;
+namespace ManiaLivePlugins\eXpansion\MapRatings\Events;
 
 /**
  * Description of PlayerEventListener
@@ -22,9 +22,9 @@ interface MXKarmaEventListener
 
     /**
      *
-     * @param \ManiaLivePlugins\eXpansion\MXKarma\Structures\MXRating $votes
+     * @param \ManiaLivePlugins\eXpansion\MapRatings\Structures\MXRating $votes
      */
-    public function MXKarma_onVotesRecieved(\ManiaLivePlugins\eXpansion\MXKarma\Structures\MXRating $votes);
+    public function MXKarma_onVotesRecieved(\ManiaLivePlugins\eXpansion\MapRatings\Structures\MXRating $votes);
 
     /**
      *

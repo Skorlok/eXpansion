@@ -41,7 +41,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new BoundedTypeInt("tm_score_lines", "Lines per column", $config, false, false);
         $var->setMax(20);
         $var->setMin(5);
-        $var->setDefaultValue(8);
+        $var->setDefaultValue(7);
         $this->registerVariable($var);
     }
 }

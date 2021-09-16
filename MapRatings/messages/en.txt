@@ -39,3 +39,27 @@ Yes
 
 Did you like the map ?
 Did you like the map ?
+
+MX Map Rating
+MX Map Rating
+
+MXKarma error %1$s: %2$s
+MXKarma error %1$s: %2$s
+
+MXKarma connection Success!
+MXKarma connection Success!
+
+Vote registered for MXKarma
+Vote registered for MXKarma
+
+MXKarma saved successfully!
+MXKarma saved successfully!
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5
+
+#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)
+#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5

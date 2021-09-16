@@ -59,7 +59,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_record', 'Color code for all localrecord messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$0af');
+        $var->setDefaultValue('$3af');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_record_top', 'Color code for top 5 localrecord messages', $config, false, true);
@@ -69,12 +69,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_dedirecord', 'Color code for dedimania record messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$0af');
+        $var->setDefaultValue('$2d0');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_rank', 'Color code for rank in records messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$ff0');
+        $var->setDefaultValue('$dee');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_time', 'Color code for time in records messages', $config, false, true);
@@ -84,17 +84,17 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_rating', 'Color code for map rating messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$fb3');
+        $var->setDefaultValue('$f80');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_queue', 'Color code for map queue messages (jukebox)', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$0af');
+        $var->setDefaultValue('$ff0');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_personalmessage', 'Color code for personal messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$f90');
+        $var->setDefaultValue('$3bd');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_admingroup_chat', 'Color code for admin chat channel', $config, false, true);
@@ -114,12 +114,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_joinmsg', 'Color code for joining  message', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$3f0');
+        $var->setDefaultValue('$0c0$i');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_leavemsg', 'Color code for leaving message', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$3f0');
+        $var->setDefaultValue('$c00$i');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_music', 'Color code for musicbox messages', $config, false, true);
@@ -144,17 +144,17 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_vote', 'Color code for voting', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$0f0');
+        $var->setDefaultValue('$3bd$i');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_vote_success', 'Color code for vote passing', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$0f0');
+        $var->setDefaultValue('$5d3');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_vote_failure', 'Color code for vote failure', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$f00');
+        $var->setDefaultValue('$d10');
         $this->registerVariable($var);
 
         $var = new Boolean('enableRanksCalc', 'Enable player position calculation', $config, false, true);

@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace ManiaLivePlugins\eXpansion\MXKarma\Classes;
+namespace ManiaLivePlugins\eXpansion\MapRatings\Classes;
 
 use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as Storage2;
-use ManiaLivePlugins\eXpansion\MXKarma\Events\MXKarmaEvent;
-use ManiaLivePlugins\eXpansion\MXKarma\Structures\MXRating;
+use ManiaLivePlugins\eXpansion\MapRatings\Events\MXKarmaEvent;
+use ManiaLivePlugins\eXpansion\MapRatings\Structures\MXRating;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**

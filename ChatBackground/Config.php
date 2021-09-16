@@ -11,5 +11,5 @@ class Config extends \ManiaLib\Utils\Singleton
     public $posZ = -20;
     public $color = "000";
     public $colorHighlite = "3af";
-    public $opacity = 0.9;
+    public $opacity = 0.4;
 }

@@ -47,12 +47,11 @@ class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         parent::onResize($oldX, $oldY);
     }
 
-    public function setStars($number, $total)
+    public function setRating($number, $total)
     {
         $this->frame->clearComponents();
-        $login = $this->getRecipient();
 
-        $test = ($number / 6) * 100;
+        $test = $number;
         $color = "fff";
         if ($test < 30) {
             $color = "0ad";
@@ -67,21 +66,17 @@ class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->gauge->setContent(
             '<gauge sizen="32 7" drawblockbg="1" style="ProgressBarSmall" color="'
             . $color . '" drawbg="1" rotation="0" posn="0 -3.5" grading="1" ratio="'
-            . ($number / 5) . '" centered="0" />'
+            . ($number / 100) . '" centered="0" />'
         );
         $this->frame->addComponent($this->gauge);
-
-        $score = ($number / 5) * 100;
-        $score = round($score);
-
 
         $info = new \ManiaLib\Gui\Elements\Label();
         $info->setTextSize(1);
         $info->setTextColor('fff');
         $info->setAlign("center", "center");
         $info->setTextEmboss();
-        $info->setText($score . "% (" . $total . ")");
-        $info->setPosition(17, -7, 10);
+        $info->setText(round($number) . "% (" . $total . ")");
+        $info->setPosition(17, -7, 5);
         $this->frame->addComponent($info);
         $this->redraw();
     }

@@ -50,7 +50,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new ColorCode('publicChatColor', 'Public chat color for server', $config, false, false);
-        $var->setDefaultValue('$ff0');
+        $var->setDefaultValue('$fff');
         $this->registerVariable($var);
 
         $var = new ColorCode('otherServerChatColor', 'Public chat color for relay server', $config, false, false);

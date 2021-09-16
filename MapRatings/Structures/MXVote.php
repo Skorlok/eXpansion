@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace ManiaLivePlugins\eXpansion\MXKarma\Structures;
+namespace ManiaLivePlugins\eXpansion\MapRatings\Structures;
 
 class MXVote extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {

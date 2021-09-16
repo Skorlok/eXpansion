@@ -32,7 +32,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $config = Config::getInstance();
 
         $var = new TypeInt("timelimit_multiplier", "Timelimit multiplier", $config, false, false);
-        $var->setDefaultValue(6);
+        $var->setDefaultValue(8);
         $this->registerVariable($var);
 
         $var = new TypeString("min_timelimit", "Minimum timelimit to set", $config, false, false);
@@ -48,7 +48,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeString("medal", "Medal multiplicator", $config, false, false);
-        $var->setDefaultValue('author');
+        $var->setDefaultValue('silver');
         $this->registerVariable($var);
 
         $var = new Boolean("message", "display message at mapstart ?", $config, false, false);

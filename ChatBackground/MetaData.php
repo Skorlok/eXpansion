@@ -29,7 +29,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $config = Config::getInstance();
 
         $var = new BoundedTypeFloat('opacity', 'Box Opacity', $config, false, false);
-        $var->setDefaultValue(0.9);
+        $var->setDefaultValue(0.4);
         $var->setMax(1.0);
         $var->setMin(0.0);
         $this->registerVariable($var);

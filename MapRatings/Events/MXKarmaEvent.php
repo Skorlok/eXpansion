@@ -1,6 +1,6 @@
 <?php
 
-namespace ManiaLivePlugins\eXpansion\MXKarma\Events;
+namespace ManiaLivePlugins\eXpansion\MapRatings\Events;
 
 class MXKarmaEvent extends \ManiaLive\Event\Event
 {

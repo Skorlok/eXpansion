@@ -56,7 +56,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new HashList("managedVote_enable", "Use eXp managed votes ?", $config, false, false);
         $type = new Boolean("", "", null);
         $var->setType($type);
-        $var->setVisible(true);
+        $var->setVisible(false);
         $var->setDefaultValue(array("NextMap" => true,
             "RestartMap" => true,
             "Kick" => true,
@@ -72,7 +72,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new BasicList("managedVote_commands", "Managed vote commands", $config, false, false);
         $type = new TypeString("", "", null);
         $var->setType($type);
-        $var->setVisible(true);
+        $var->setVisible(false);
         $var->setDefaultValue(
             array(
                 "NextMap", "RestartMap",
@@ -87,11 +87,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $type = new BoundedTypeFloat("", "", null);
         $type->setMin(-1.0);
         $type->setMax(1.0);
-        $var->setVisible(true);
+        $var->setVisible(false);
         $var->setType($type);
         $var->setDefaultValue(array("NextMap" => 0.5,
             "RestartMap" => 0.5,
-            "Kick" => 0.6,
+            "Kick" => 0.8,
             "Ban" => -1.,
             "SetModeScriptSettingsAndCommands" => -1.,
             "JumpToMapIdent" => -1.,
@@ -105,13 +105,13 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDescription("time in seconds");
         $type = new TypeInt("", "", null);
         $var->setType($type);
-        $var->setVisible(true);
+        $var->setVisible(false);
         $var->setDefaultValue(array("NextMap" => 30,
             "RestartMap" => 30,
             "Kick" => 30,
             "Ban" => 30,
-            "SetModeScriptSettingsAndCommands" => 60,
-            "JumpToMapIdent" => 60,
+            "SetModeScriptSettingsAndCommands" => 30,
+            "JumpToMapIdent" => 30,
             "SetNextMapIdent" => 30,
             "ExtendTime" => 30,
             "EndRound" => 30,
@@ -122,7 +122,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $type = new BoundedTypeInt("", "", null);
         $type->setMin(0);
         $type->setMax(2);
-        $var->setVisible(true);
+        $var->setVisible(false);
         $var->setType($type);
         $var->setDefaultValue(array("NextMap" => 1,
             "RestartMap" => 1,

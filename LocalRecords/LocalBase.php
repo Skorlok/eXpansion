@@ -296,6 +296,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $cmd = $this->registerChatCommand("cps", "showCPDiffWindow", 1, true);
         $cmd->help = 'Show Checkpoint difference';
 
+        $cmd = $this->registerChatCommand("localcps", "showCpDiffNoDediWindow", 1, true);
+        $cmd->help = 'Show Checkpoint difference without dedimania';
+
         $cmd = $this->registerChatCommand("sectors", "showSectorWindow", 0, true);
         $cmd->help = 'Show Players Best Sector times';
 
@@ -1591,6 +1594,19 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $window = CpDiff::Create($login);
         $window->setTitle(__('Local CheckPoints Difference', $login));
         $window->populateList(array($player, $target));
+        $window->setSize(200, 100);
+        $window->centerOnScreen();
+        $window->show();
+    }
+
+    public function showCpDiffNoDediWindow($login, $params)
+    {
+        CpDiff::Erase($login);
+        $params-=1;
+
+        $window = CpDiff::Create($login);
+        $window->setTitle(__('Local CheckPoints Difference', $login));
+        $window->populateList(array($this->getCurrentChallangePlayerRecord($login), $this->currentChallengeRecords[$params]));
         $window->setSize(200, 100);
         $window->centerOnScreen();
         $window->show();

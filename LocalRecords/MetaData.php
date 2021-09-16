@@ -61,7 +61,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new BoundedTypeInt("recordsCount", "Localrecords: records count (min: 30)", $config, true, false);
         $var->setMin(30);
         $var->setMax(1000);
-        $var->setDefaultValue(100);
+        $var->setDefaultValue(1000);
         $this->registerVariable($var);
 
         $var = new BoundedTypeInt(
@@ -74,7 +74,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDescription("to show always public messages, set this to same value as recordsCount");
         $var->setMin(1);
         $var->setMax(1000);
-        $var->setDefaultValue(15);
+        $var->setDefaultValue(100);
         $this->registerVariable($var);
 
 
@@ -112,7 +112,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new Boolean("sendBeginMapNotices", "Localrecords: show message at begin map", $config, true, false);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue(false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
 
         $var = new Boolean(
@@ -123,7 +123,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             false
         );
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue(false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
 
         $var = new TypeInt('saveRecFrequency', 'Records save Frequency', $config, true, false);

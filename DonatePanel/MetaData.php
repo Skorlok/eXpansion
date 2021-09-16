@@ -31,7 +31,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             true
         );
         $var->setGroup("Planets");
-        $var->setDefaultValue(500);
+        $var->setDefaultValue(20);
         $this->registerVariable($var);
     }
 }

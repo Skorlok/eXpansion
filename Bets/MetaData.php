@@ -22,7 +22,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new BoundedTypeInt("timeoutSetBet", "Bet Accept timeout (in seconds)", $configInstance, false, false);
         $var->setMin(20);
-        $var->setDefaultValue(60);
+        $var->setDefaultValue(45);
         $this->registerVariable($var);
     }
 }

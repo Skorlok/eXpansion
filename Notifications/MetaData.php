@@ -34,12 +34,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("posX", "Pos X", $config, false, false);
-        $var->setDefaultValue(40);
+        $var->setDefaultValue(-160);
         $var->setDefaultValue(array());
         $this->registerVariable($var);
 
         $var = new TypeFloat("posY", "Pos Y", $config, false, false);
-        $var->setDefaultValue(-40);
+        $var->setDefaultValue(80.5);
         $var->setDefaultValue(array());
         $this->registerVariable($var);
     }
