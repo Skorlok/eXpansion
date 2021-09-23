@@ -35,8 +35,8 @@ class Config extends \ManiaLib\Utils\Singleton
     public $round_scores_y = 14.0;
     public $round_scores_z = 5.0;
 
-    public $countdown_x = 128.0;
-    public $countdown_y = -68.0;
+    public $countdown_x = 154.0;
+    public $countdown_y = -57.0;
     public $countdown_z = 5.0;
 
     public $speed_and_distance_x = 158.0;
@@ -44,7 +44,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $speed_and_distance_z = 5.0;
 
     public $personal_best_and_rank_x = 158.0;
-    public $personal_best_and_rank_y = -65.0;
+    public $personal_best_and_rank_y = -61.0;
     public $personal_best_and_rank_z = 5.0;
 
     public $checkpoint_time_x = -8.0;

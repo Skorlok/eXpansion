@@ -15,4 +15,6 @@ interface GlobalEventListener
     public function onMapSkip();
 
     public function eXpAutoloadComplete();
+
+    public function onScoresCalculated($scores);
 }

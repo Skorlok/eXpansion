@@ -46,7 +46,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
 
-        $var = new Boolean("mxKarmaEnabled", "Use mxKarma ?", $config, true, false);
+        $var = new Boolean("mxKarmaEnabled", "Use mxKarma ?", $config, false, false);
         $var->setGroup("MXKarma");
         $var->setDefaultValue(false);
         $this->registerVariable($var);

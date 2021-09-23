@@ -34,9 +34,7 @@ class PlainLivePanel extends PlainPanel
     protected function getScript()
     {
         $gm = Widgets_LiveRankings::eXpGetCurrentCompatibilityGameMode();
-        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP || $gm == GameInfos::GAMEMODE_TEAM
-            || Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS
-        ) {
+        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP || $gm == GameInfos::GAMEMODE_TEAM || Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
 
             $script = new CpPositions();
             $this->timeScript = $script;
@@ -61,7 +59,11 @@ class PlainLivePanel extends PlainPanel
             if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
                 $ScriptSettings = self::$connection->getModeScriptSettings();
                 if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
-                    $nbLaps = $ScriptSettings['S_ForceLapsNb'] == -1 ? 1 : $ScriptSettings['S_ForceLapsNb'];
+                    if ($ScriptSettings['S_ForceLapsNb'] != -1) {
+                        $nbLaps = $ScriptSettings['S_ForceLapsNb'];
+                    } else {
+                        $nbLaps = $this->storage->currentMap->nbLaps;
+                    }
                 }
                 if (isset($ScriptSettings['S_MaxPointsPerRound'])) {
                     $teamMaxPoint = $ScriptSettings['S_MaxPointsPerRound'];
@@ -80,7 +82,7 @@ class PlainLivePanel extends PlainPanel
                 } else {
                     $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->lapsNbLaps);
                 }
-            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $ScriptSettings["S_ForceLapsNb"] > 0) {
+            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
 
                 if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
@@ -88,7 +90,7 @@ class PlainLivePanel extends PlainPanel
                 } else {
                     $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->roundsForcedLaps);
                 }
-            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM && $ScriptSettings["S_ForceLapsNb"] > 0) {
+            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
 
                 if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
@@ -96,7 +98,7 @@ class PlainLivePanel extends PlainPanel
                 } else {
                     $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->roundsForcedLaps);
                 }
-            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP && $ScriptSettings["S_ForceLapsNb"] > 0) {
+            } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
 
                 if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
@@ -154,9 +156,7 @@ class PlainLivePanel extends PlainPanel
 
         $gm = Widgets_LiveRankings::eXpGetCurrentCompatibilityGameMode();
         $short = false;
-        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP
-            || $gm == GameInfos::GAMEMODE_TEAM || $gm == GameInfos::GAMEMODE_LAPS
-        ) {
+        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP || $gm == GameInfos::GAMEMODE_TEAM || $gm == GameInfos::GAMEMODE_LAPS) {
             $short = true;
         }
 
@@ -170,9 +170,7 @@ class PlainLivePanel extends PlainPanel
             $this->frame->addComponent($this->items[$index - 1]);
         }
 
-        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP
-            || $gm == GameInfos::GAMEMODE_TEAM || $gm == GameInfos::GAMEMODE_LAPS
-        ) {
+        if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP || $gm == GameInfos::GAMEMODE_TEAM || $gm == GameInfos::GAMEMODE_LAPS) {
             $this->cpUpdate();
         } else {
             $this->taUpdate();

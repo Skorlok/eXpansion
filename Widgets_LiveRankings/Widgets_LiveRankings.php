@@ -39,7 +39,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 	
 	public function eXpOnModeScriptCallback($callback, $array)
     {
-
         switch ($callback) {
             case "Maniaplanet.StartRound_Start":
                 $this->onBeginRound(0);
@@ -121,7 +120,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
         self::$raceOn = false;
         $this->hideLivePanel();
     }
@@ -136,6 +134,18 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             self::$raceOn = true;
         } else {
             $this->hideLivePanel();
+        }
+    }
+
+    public function onScoresCalculated($scores)
+    {
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+            return;
+        }
+
+        if (self::$raceOn = true) {
+            $this->updateLivePanel();
         }
     }
 
@@ -195,7 +205,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-
         $this->showLivePanel($login);
     }
 

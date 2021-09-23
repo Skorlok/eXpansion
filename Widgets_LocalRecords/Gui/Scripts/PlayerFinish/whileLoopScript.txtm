@@ -1,36 +1,26 @@
-// if (UI.UISequence == CUIConfig::EUISequence::Playing && triggerBegin == True) {
-//    triggerBegin = False;
-//    isStart = True;
-//    animStart = Now;
-// }
-
 if (isStart) {
-    declare delay = 100;
+    isStart = False;
+    isZoom = True;
+    animStart = Now;
+
     for (i, 1, nbFields ) {
         declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
-	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
-	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-        declare time = (Now - animStart - delay);
-        if (time < 0) {
-            time = 0;
-        }
-        timeLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
-        nickLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
-        rank.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
-        delay += 100;
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        timeLabel.Opacity = 1.;
+        nickLabel.Opacity = 1.;
+        rank.Opacity = 1.;
     }
-
 }
 
 if (isZoom) {
     if (zoomId != -1) {
-    declare rank = (Page.GetFirstChild("RecRank_"^zoomId) as CMlLabel);
-    declare nickLabel = (Page.GetFirstChild("RecNick_"^zoomId) as CMlLabel);
-    declare timeLabel = (Page.GetFirstChild("RecTime_"^zoomId) as CMlLabel);
-    declare time = (Now - animStart);
-    timeLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
-    nickLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
-    rank.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        declare rank = (Page.GetFirstChild("RecRank_"^zoomId) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^zoomId) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^zoomId) as CMlLabel);
+        timeLabel.RelativeScale = 1.;
+        nickLabel.RelativeScale = 1.;
+        rank.RelativeScale = 1.;
     }
 }
 
@@ -39,122 +29,8 @@ if (edge_showDiff != old_showDiff) {
     needUpdate = True;
 }
 
-
-if (isStart && animStart + 3000 <= Now ) {
-    isStart = False;
-
-    // added for debug
-    isZoom = True;
-    animStart = Now;
-
-    // just a failsafe to force visibility, if animation fails for some reason
-    for (i, 1, nbFields ) {
-        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
-	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
-	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-        timeLabel.Opacity = 1.;
-        nickLabel.Opacity = 1.;
-        rank.Opacity = 1.;
-    }
-}
-
 if (isZoom && animStart + 2000 <= Now ) {
     isZoom = False;
-}
-
-
-foreach (Player in Players) {
-
-    declare <?php echo $this->varName ?> for Player = -1;
-
-    if (useMaxPlayerRank) {
-        //log(<?php echo $this->varName ?>^" : "^Player.CurRace.Checkpoints.count);
-    }
-
-    if (<?php echo $this->varName ?> != Player.CurRace.Checkpoints.count) {
-
-        //Update the current checkpoint of this user
-        <?php echo $this->varName ?> = Player.CurRace.Checkpoints.count;
-        curCp = Player.CurRace.Checkpoints.count;
-        playersOnServer[Player.Login] = Player.Name;
-
-        //If finish
-        if (curCp > 0 && curCp % (totalCp) == 0 && totalCp > acceptMinCp) {
-
-            declare Integer cpIndex = totalCp - 1;
-            declare Integer lastCpIndex = curCp - totalCp - 1;
-            declare time = 0;
-
-            if (lastCpIndex > 0) {
-            time = Player.CurRace.Checkpoints[curCp - 1] - Player.CurRace.Checkpoints[lastCpIndex];
-            } else {
-            time = Player.CurRace.Checkpoints[curCp - 1];
-            }
-
-            //This player start's to be interesting.
-            declare playerTime = -1;
-
-            if (!playerTimes.existskey(Player.Login)) {
-                playerTime = -1;
-                playerNickName[Player.Login] = Player.Name;
-            }else{
-                playerTime = playerTimes[Player.Login];
-            }
-
-
-
-            if (playerTime == -1 || playerTime > time) {
-               //  log("Better Time: "^Player.Login);
-
-                //Dedimania situation need to check record fits
-                if (useMaxPlayerRank) {
-                    origPlayerTimes.clear();
-                    origPlayerTimes = playerTimes;
-
-                    //Add new time that might be removed
-                    playerTimes[Player.Login] = time;
-
-                    //sort times
-                    playerTimes = playerTimes.sort();
-
-                    //get max rank
-                    declare maxRank = maxServerRank;
-                    if (maxPlayerRank.existskey(Player.Login) && maxPlayerRank[Player.Login] > maxRank) {
-                        maxRank = maxPlayerRank[Player.Login];
-                    }
-
-                    declare Boolean keepRecord = False;
-                    declare Integer inRank = 1;
-
-                    //Check if player ew rank is nice to go
-                    foreach (Login => Score in playerTimes) {
-                        if (Login == Player.Login) {
-                            //It's our player
-                            if(inRank <= maxRank){
-                  //              log("Dedimania Record not to be ignored");
-                                keepRecord = True;
-                            }
-                        }
-                        inRank += 1;
-                    }
-
-                    if(!keepRecord){
-                        playerTimes.clear();
-                        playerTimes = origPlayerTimes;
-                    }
-                }else{
-                    //Normal situation all times are taken in account
-                    playerTimes[Player.Login] = time;
-                }
-
-                needUpdate = True;
-            }
-        }
-        //Work around for 0 CP tracks
-        if(<?php echo $this->varName ?>  == 1 && totalCp==1){
-            <?php echo $this->varName ?> = -1;
-        }
-    }
 }
 
 
@@ -181,9 +57,9 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
     declare recCount = -1;
 
     if (playerTimes.count > nbShow) {
-	recCount = nbShow;
+	    recCount = nbShow;
     } else {
-	recCount = playerTimes.count;
+	    recCount = playerTimes.count;
     }
 
     i = 1;
@@ -191,8 +67,8 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
     foreach (Login => Score in playerTimes) {
         if (LocalUser != Null) {
             if (Login == LocalUser.Login) {
-            myRank = i;
-            break;
+                myRank = i;
+                break;
             }
         }
         i += 1;
@@ -207,8 +83,8 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
         } else {
             end = start + (nbFields - nbFirstFields);
             if (end > recCount) {
-            end = recCount;
-            start = end - (nbFields - nbFirstFields);
+                end = recCount;
+                start = end - (nbFields - nbFirstFields);
             }
         }
     } else {
@@ -236,18 +112,18 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
             if (nickLabel != Null) {
                 declare outScore = Score;
                 if (edge_showDiff) {
-                    if (i > 1 && Login != InputPlayer.Login) {
+                    if (i > 1) {
                         outScore = Score - scoreFirst;
                     }
                 }
                 putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login);
-               if (highliteQuad != Null) {
-                            if (playersOnServer.existskey(Login) && i != myRank) {
-                                highliteQuad.Show();
-                            } else {
-                                highliteQuad.Hide();
-                            }
-                        }
+                if (highliteQuad != Null) {
+                    if (playersOnServer.existskey(Login) && i != myRank) {
+                        highliteQuad.Show();
+                    } else {
+                        highliteQuad.Hide();
+                    }
+                }
                 if (Login == LocalUser.Login) {
                     showed = True;
                     zoomId = i;
@@ -261,10 +137,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
             i += 1;
         }
         nbRec += 1;
-
-        if (nbRec > nbShow) {
-
-        }
     }
 
 }

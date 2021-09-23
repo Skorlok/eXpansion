@@ -106,22 +106,22 @@ class MapRatings extends ExpPlugin
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_ratings', 2);
         }
 
-        $cmd = $this->registerChatCommand("---", "moinsmoinsmoins", 0, true);
+        $cmd = $this->registerChatCommand("---", "vote_moinsmoinsmoins", 0, true);
         $cmd->help = '/---';
 
-        $cmd = $this->registerChatCommand("--", "moinsmoins", 0, true);
+        $cmd = $this->registerChatCommand("--", "vote_moinsmoins", 0, true);
         $cmd->help = '/--';
 
-        $cmd = $this->registerChatCommand("-", "moins", 0, true);
+        $cmd = $this->registerChatCommand("-", "vote_moins", 0, true);
         $cmd->help = '/-';
 
-        $cmd = $this->registerChatCommand("+", "plus", 0, true);
+        $cmd = $this->registerChatCommand("+", "vote_plus", 0, true);
         $cmd->help = '/+';
 
-        $cmd = $this->registerChatCommand("++", "plusplus", 0, true);
+        $cmd = $this->registerChatCommand("++", "vote_plusplus", 0, true);
         $cmd->help = '/++';
 
-        $cmd = $this->registerChatCommand("+++", "plusplusplus", 0, true);
+        $cmd = $this->registerChatCommand("+++", "vote_plusplusplus", 0, true);
         $cmd->help = '/+++';
 
         $cmd = $this->registerChatCommand("rating", "chatRating", 0, true);
@@ -759,32 +759,32 @@ class MapRatings extends ExpPlugin
         }
     }
 
-    public function moinsmoinsmoins($fromLogin)
+    public function vote_moinsmoinsmoins($fromLogin)
     {
         $this->saveRating($fromLogin, 0);
     }
 
-    public function moinsmoins($fromLogin)
+    public function vote_moinsmoins($fromLogin)
     {
         $this->saveRating($fromLogin, 1);
     }
 
-    public function moins($fromLogin)
+    public function vote_moins($fromLogin)
     {
         $this->saveRating($fromLogin, 2);
     }
 
-    public function plus($fromLogin)
+    public function vote_plus($fromLogin)
     {
         $this->saveRating($fromLogin, 3);
     }
 
-    public function plusplus($fromLogin)
+    public function vote_plusplus($fromLogin)
     {
         $this->saveRating($fromLogin, 4);
     }
 
-    public function plusplusplus($fromLogin)
+    public function vote_plusplusplus($fromLogin)
     {
         $this->saveRating($fromLogin, 5);
     }

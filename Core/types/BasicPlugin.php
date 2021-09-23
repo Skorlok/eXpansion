@@ -885,6 +885,11 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
 
         }
 
+        public function onScoresCalculated($scores)
+        {
+
+        }
+
         public function onMapRestart()
         {
 

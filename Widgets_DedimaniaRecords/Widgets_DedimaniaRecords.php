@@ -48,29 +48,11 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
         $this->updateDediPanel();
         self::$me = $this;
-
-        $this->enableScriptEvents(array("LibXmlRpc_EndWarmUp", "Trackmania.WarmUp.End"));
-    }
-
-    public function eXpOnModeScriptCallback($callback, $array)
-    {
-        switch ($callback) {
-            case "Trackmania.WarmUp.End":
-                $this->LibXmlRpc_EndWarmUp(0);
-                break;
-
-            case "Maniaplanet.Pause.Status":
-                $this->LibXmlRpc_EndWarmUp(0);
-                break;
-        }
     }
 
     public function onTick()
     {
-        if (($this->needUpdate & self::DEDIMANIA) == self::DEDIMANIA
-            || $this->forceUpdate
-            || ($this->needUpdate & self::DEDIMANIA_FORCE) == self::DEDIMANIA_FORCE
-        ) {
+        if (($this->needUpdate & self::DEDIMANIA) == self::DEDIMANIA || $this->forceUpdate || ($this->needUpdate & self::DEDIMANIA_FORCE) == self::DEDIMANIA_FORCE) {
             if ($this->dedi || $this->needUpdate == self::DEDIMANIA_FORCE) {
                 $this->updateDediPanel();
                 $this->dedi = false;
@@ -229,6 +211,7 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     public function onDedimaniaUpdateRecords($data)
     {
         self::$dedirecords = $data['Records'];
+        $this->needUpdate = self::DEDIMANIA_FORCE;
     }
 
     public function onDedimaniaNewRecord($data)
@@ -240,13 +223,6 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
      * @param $data DediPlayer
      */
     public function onDedimaniaPlayerConnect($data)
-    {
-        if ($data->maxRank > Connection::$serverMaxRank) {
-            $this->needUpdate = self::DEDIMANIA_FORCE;
-        }
-    }
-
-    public function LibXmlRpc_EndWarmUp()
     {
         $this->needUpdate = self::DEDIMANIA_FORCE;
     }

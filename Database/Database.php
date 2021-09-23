@@ -115,7 +115,7 @@ class Database extends ExpPlugin
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         $winner = ArrayOfObj::getObjbyPropValue(Core::$rankings, "rank", "1");
-        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM && $winner) {
+        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM && $winner && $winner->bestTime != -1) {
             $this->incrementWins($winner);
         }
 

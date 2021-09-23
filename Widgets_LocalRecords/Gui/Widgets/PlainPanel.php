@@ -103,13 +103,8 @@ class PlainPanel extends Widget
 
         $recCount = Config::getInstance()->recordsCount;
         $this->timeScript = $script;
-        $this->timeScript->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
         $this->timeScript->setParam("playerTimes", "[]");
         $this->timeScript->setParam("nbRecord", $recCount);
-        $this->timeScript->setParam("acceptMaxServerRank", $recCount);
-        $this->timeScript->setParam("acceptMaxPlayerRank", "Integer[Text]");
-        $this->timeScript->setParam("useMaxPlayerRank", "False");
-        $this->timeScript->setParam("acceptMinCp", 0);
         $this->timeScript->setParam("nbFields", 20);
         $this->timeScript->setParam("nbFirstFields", 5);
         $this->timeScript->setParam('varName', 'LocalTime1');
@@ -199,8 +194,6 @@ class PlainPanel extends Widget
             $nickData .= '"' . Gui::fixString($record->login) . '"=>"' . Gui::fixString($record->nickName) . '"';
             $index++;
         }
-
-        $this->timeScript->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
 
         if (empty($recsData)) {
             $recsData = 'Integer[Text]';

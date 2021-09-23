@@ -14,18 +14,12 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
     {
         parent::eXpOnBeginConstruct();
         $this->setName("Dedimania Panel");
-        $this->timeScript->setParam("acceptMinCp", 1);
         $this->timeScript->setParam('varName', 'DediTime1');
-        $this->timeScript->setParam("acceptMaxServerRank", Connection::$serverMaxRank);
         $this->bg->setAction(\ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenRecs);
     }
 
     public function update()
     {
-        $this->timeScript->setParam(
-            "acceptMaxPlayerRank",
-            \ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection::$serverMaxRank
-        );
         $login = $this->getRecipient();
 
         foreach ($this->items as $item) {
@@ -57,7 +51,6 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
             $nickData .= '"' . Gui::fixString($record['Login']) . '"=>"' . Gui::fixString($record['NickName']) . '"';
             $index++;
         }
-        $this->timeScript->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
 
         if (empty($recsData)) {
             $recsData = 'Integer[Text]';
@@ -68,21 +61,8 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
         }
 
         $this->timeScript->setParam("nbRecord", 100);
-        $this->timeScript->setParam("acceptMaxServerRank", Connection::$serverMaxRank);
         $this->timeScript->setParam("playerTimes", $recsData);
         $this->timeScript->setParam("playerNicks", $nickData);
-        $this->timeScript->setParam("acceptMaxPlayerRank", "Integer[Text]");
-        $this->timeScript->setParam("useMaxPlayerRank", "True");
-        if (count(\ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection::$players) > 0) {
-            $out = "[";
-            foreach (\ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection::$players as $dediplayer) {
-                $out .= '"' . Gui::fixString($dediplayer->login) . '" => ' . $dediplayer->maxRank . ',';
-            }
-            $out = trim($out, ",");
-            $out = $out . "]";
-
-            $this->timeScript->setParam("acceptMaxPlayerRank", $out);
-        }
     }
 
     public function fixDashes($string)

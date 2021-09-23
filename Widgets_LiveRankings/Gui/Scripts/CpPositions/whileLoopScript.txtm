@@ -37,8 +37,6 @@ foreach (Player in Players) {
 			}
 			playerTimes[curCp][Player.Login] = Player.CurRace.Checkpoints[curCp];
 			playerNickNames[Player.Login] = TextExt_StripLinks(Player.Name);
-                        log(Player.Name);
-                        log(playerNickNames[Player.Login]);
 
 			updatedPlayers[Player.Login] = True;
 			//Remove from older checkpoint
@@ -72,8 +70,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
     lastUpdateTime = Now;
 
     needUpdate = False;
-
-    log ("update: " ^ id);
 
     declare i = 1;
     declare nbRec = 1;
@@ -172,19 +168,19 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 					if(playersTeam[p] == 1){
 						timeLabel.SetText("$3AF"^TimeToText(Score));
 						rank.SetText("$3AF"^nbRec);
-						declare point = total - nbRec;
-						if(point < 0){
-							point = 0;
+						if((cpIndex+1) == totalCp*nbLaps){
+							if(points.existskey(nbRec-1)){
+								teamBlueScore += points[nbRec-1];
+							}
 						}
-						teamBlueScore +=  point;
 					}else{
 						timeLabel.SetText("$D00"^TimeToText(Score));
 						rank.SetText("$D00"^nbRec);
-						declare point = total - nbRec;
-						if(point < 0){
-							point = 0;
+						if((cpIndex+1) == totalCp*nbLaps){
+							if(points.existskey(nbRec-1)){
+								teamRedScore += points[nbRec-1];
+							}
 						}
-						teamRedScore += point;
 					}
 				}else{
 					timeLabel.SetText(TimeToText(Score));
@@ -225,14 +221,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 				declare labelCp2 = (Page.GetFirstChild("RecCp2_"^i) as CMlLabel);
 
 				if((cpIndex+1) == totalCp*nbLaps && givePoints){
-				if(isTeam){
-				   declare point = total  - nbRec;
-					if(point < 0){
-						point = 0;
-					}
-					labelCp1.SetText("$2A2"^point^" pts");
-					labelCp2.SetText("$2A2"^point^" pts");
-				}else{
 					if(points.existskey(nbRec-1)){
 						labelCp1.SetText("$2A2"^points[nbRec-1]^" pts");
 						labelCp2.SetText("$2A2"^points[nbRec-1]^" pts");
@@ -240,7 +228,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 						labelCp1.SetText("$2A20P");
 						labelCp2.SetText("$2A20P");
 					}
-				}
 				}else{
 					if(nbRec == 1){
 						 declare lap = 0;

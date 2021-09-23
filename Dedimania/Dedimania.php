@@ -6,6 +6,7 @@ use Exception;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Dedimania extends DedimaniaAbstract
 {
@@ -50,7 +51,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if (self::eXpGetCurrentCompatibilityGameMode() == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
             return;
         }
 
@@ -82,7 +83,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if (self::eXpGetCurrentCompatibilityGameMode() != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
+        if (self::eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_LAPS) {
             return;
         }
 
@@ -123,6 +124,20 @@ class Dedimania extends DedimaniaAbstract
 
         if (Core::$warmUpActive) {
             return;
+        }
+
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode(); // special rounds mode with forced laps are ignored by dedimania
+        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
+            if ($this->storage->currentMap->nbLaps > 1) {
+                $ScriptSettings = $this->connection->getModeScriptSettings();
+                if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
+                    if ($ScriptSettings['S_ForceLapsNb'] != -1) {
+                        if ($ScriptSettings['S_ForceLapsNb'] != $this->storage->currentMap->nbLaps) {
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
         if (!array_key_exists('BestTime', $this->rankings[$login])) {

@@ -41,8 +41,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
         $this->lastUpdate = time();
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
-            self::$localrecords = $this
-                ->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+            self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
         }
         $this->updateLocalPanel();
         self::$me = $this;
@@ -175,17 +174,19 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        $this->showLocalPanel($login);
+        $this->updateLocalPanel();
     }
 
     public function onNewRecord($data)
     {
         self::$localrecords = $data;
+        $this->updateLocalPanel();
     }
 
     public function onUpdateRecords($data)
     {
         self::$localrecords = $data;
+        $this->updateLocalPanel();
     }
 
     public function eXpOnUnload()

@@ -183,14 +183,6 @@ class Connection extends Singleton implements AppListener, TickListener
             return;
         }
 
-        // special rounds mode disabled
-		$ScriptSettings = $this->connection->GetModeScriptSettings();
-		
-        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $ScriptSettings["S_ForceLapsNb"]!= -1) {
-            $this->console("[Warning] Special rounds mode with forced laps ignored!");
-            return;
-        }
-
         // only special maps under 8 seconds are allowed
         if ($map->authorTime < 8000 && strtolower($map->author) != 'nadeo') {
             $this->console("[Notice] Author time under 8 seconds, will not send records.");

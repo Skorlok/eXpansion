@@ -230,7 +230,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("personal_best_and_rank_y", "personal_best_and_rank_y", $config, false, false);
-        $var->setDefaultValue(-42.5);
+        $var->setDefaultValue(-49.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("personal_best_and_rank_z", "personal_best_and_rank_z", $config, false, false);
@@ -243,7 +243,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("position_y", "position_y", $config, false, false);
-        $var->setDefaultValue(-42.0);
+        $var->setDefaultValue(-53.0);
         $this->registerVariable($var);
 
         $var = new TypeFloat("position_z", "position_z", $config, false, false);
@@ -308,7 +308,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("viewers_count_y", "viewers_count_y", $config, false, false);
-        $var->setDefaultValue(-47.0);
+        $var->setDefaultValue(-58.5);
         $this->registerVariable($var);
 
         $var = new TypeFloat("viewers_count_z", "viewers_count_z", $config, false, false);

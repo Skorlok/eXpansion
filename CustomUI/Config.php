@@ -62,11 +62,11 @@ class Config extends \ManiaLib\Utils\Singleton
     public $speed_and_distance_z = 10.0;
 
     public $personal_best_and_rank_x = 157.0;
-    public $personal_best_and_rank_y = -42.5;
+    public $personal_best_and_rank_y = -49.0;
     public $personal_best_and_rank_z = 5.0;
 
     public $position_x = 150.5;
-    public $position_y = -42.0;
+    public $position_y = -53.0;
     public $position_z = 10.0;
 
     public $checkpoint_time_x = 0.0;
@@ -86,6 +86,6 @@ class Config extends \ManiaLib\Utils\Singleton
     public $spectator_info_z = 5.0;
 
     public $viewers_count_x = 140.0;
-    public $viewers_count_y = -47.0;
+    public $viewers_count_y = -58.5;
     public $viewers_count_z = 5.0;
 }

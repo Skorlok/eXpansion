@@ -465,6 +465,27 @@ EOT;
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
+
+            // Make sure the callbacks will be receive for MP3 scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
+
+            // Make sure the callbacks will be receive for MP3 scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
+
+            // Make sure the callbacks will be receive for MP4 scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
         }
 
         //extend time or point compatibility
@@ -634,6 +655,7 @@ EOT;
                 }
                 $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
                 self::$rankings = $scores;
+                Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_SCORES_CALCULATED, $scores));
                 break;
 
 
@@ -679,6 +701,7 @@ EOT;
 
                     $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
                     self::$rankings = $scores;
+                    Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_SCORES_CALCULATED, $scores));
 				}
 		    	break;
 
@@ -715,6 +738,7 @@ EOT;
 
                     $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
                     self::$rankings = $scores;
+                    Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_SCORES_CALCULATED, $scores));
 				}
 		    	break;
 
@@ -997,8 +1021,6 @@ EOT;
 
     public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
 
         if (self::$isExtended) {
@@ -1264,6 +1286,28 @@ EOT;
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
             self::optimizeScriptCallbacks();
+
+
+            // Make sure the callbacks will be receive for MP3 scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
+
+            // Make sure the callbacks will be receive for all scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
+
+            // Make sure the callbacks will be receive for MP4 scripts mode
+            try {
+                $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
+            } catch (\Exception $ex) {
+                // Do nothing
+            }
         }
     }
 
@@ -1488,6 +1532,10 @@ EOT;
                 $this->connection->kick($login, "This server is whitelisted, you are not in the list.");
             }
         }
+
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     public function syncAdminStatus($loginDisconnecting = false)
@@ -1536,6 +1584,10 @@ EOT;
             unset($this->expPlayers[$login]);
         }
         $this->updateServerTags = true;
+
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**
@@ -1581,8 +1633,6 @@ EOT;
     public function onEndRound()
     {
         $this->update = true;
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
@@ -1593,8 +1643,6 @@ EOT;
      */
     public function onPlayerInfoChanged($playerInfo)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         if ($this->enableCalculation == false || $this->expStorage->isRelay) {
             return;
@@ -1694,9 +1742,12 @@ EOT;
 
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
-        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+        if ($timeOrScore != 0) {
+            $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+            $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+            $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+        }
+
         if ($this->enableCalculation == false || $this->expStorage->isRelay) {
             return;
         }
