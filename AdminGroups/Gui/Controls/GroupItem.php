@@ -76,11 +76,16 @@ class GroupItem extends Control
         $frame->addComponent($gui_nbPlayers);
 
         if (!($group instanceof GuestGroup)) {
-            $this->plistButton = new MyButton(30, 6);
-            $this->plistButton->setAction($this->action_playerList);
-            $this->plistButton->setText(__(AdminGroups::$txt_playerList, $login));
-            $this->plistButton->setScale($buttonScale);
-            $frame->addComponent($this->plistButton);
+            if (AdminGroups::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS) || (
+                AdminGroups::hasPermission($login, Permission::ADMINGROUPS_ONLY_OWN_GROUP)
+                && AdminGroups::getAdmin($login)->getGroup()->getGroupName() == $group->getGroupName())
+            ) {
+                $this->plistButton = new MyButton(30, 6);
+                $this->plistButton->setAction($this->action_playerList);
+                $this->plistButton->setText(__(AdminGroups::$txt_playerList, $login));
+                $this->plistButton->setScale($buttonScale);
+                $frame->addComponent($this->plistButton);
+            }
         }
 
         if (AdminGroups::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS) || (

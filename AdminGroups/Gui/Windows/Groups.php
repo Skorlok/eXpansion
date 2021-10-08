@@ -7,6 +7,7 @@ use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Group;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\GroupItem;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
@@ -121,23 +122,25 @@ class Groups extends Window
      */
     public function clickAdd($login2, $args)
     {
-        $groupName = $args['group_name'];
-        /** @var AdminGroups $adminGroups */
-        $adminGroups = AdminGroups::getInstance();
-        if ($groupName != "") {
-            $adminGroups->addGroup($login2, $groupName);
-        }
+        if (AdminGroups::hasPermission($login2, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            $groupName = $args['group_name'];
+            /** @var AdminGroups $adminGroups */
+            $adminGroups = AdminGroups::getInstance();
+            if ($groupName != "") {
+                $adminGroups->addGroup($login2, $groupName);
+            }
 
-        $this->group_add->setText("");
-        $this->onShow();
-        $this->redraw($login2);
+            $this->group_add->setText("");
+            $this->onShow();
+            $this->redraw($login2);
 
-        $windows = Groups::GetAll();
+            $windows = Groups::GetAll();
 
-        foreach ($windows as $window) {
-            $login = $window->getRecipient();
-            $window->onShow();
-            $window->redraw($login);
+            foreach ($windows as $window) {
+                $login = $window->getRecipient();
+                $window->onShow();
+                $window->redraw($login);
+            }
         }
     }
 
