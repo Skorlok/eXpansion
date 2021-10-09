@@ -43,6 +43,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(1);
         $this->registerVariable($var);
 
+        $var = new TypeInt("extendTimeLimit", "The maximum time that can be added with /ext ##", $config, false, false);
+        $var->setDescription("-1 to disable, othervice the maximum time that can be added");
+        $var->setDefaultValue(15);
+        $this->registerVariable($var);
+
         $var = new Boolean(
             "restartVote_useQueue",
             "Use track queue instead of intant restart for replay votes ?",

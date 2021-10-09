@@ -313,6 +313,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
                     return;
                 }
+                $config = Config::getInstance();
+                if ($config->extendTimeLimit != -1 && $params > $config->extendTimeLimit) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#You are trying to add too much time, the max time is $config->extendTimeLimit"), $login);
+                    return;
+                }
 
                 if (Core::$isTimeExtendable) {
 

@@ -1491,7 +1491,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showTopSums($login)
     {
-        TopSumsWindow::EraseAll();
+        TopSumsWindow::Erase($login);
 
         $win = TopSumsWindow::Create($login);
         $win->setTitle("TopSums");

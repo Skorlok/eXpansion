@@ -8,6 +8,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $use_votes = true;
     public $global_timeout = 30;
     public $limit_votes = 1;
+    public $extendTimeLimit = 15;
 
     /**
      * @var bool Use track queue instead of instant restart, if 'eXpansion\Maps' plugin is loaded
