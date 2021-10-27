@@ -55,6 +55,8 @@ class Core extends types\ExpPlugin
 
     public static $warmUpActive = false;
 
+    public static $players = array();
+
 
     // variables for extend time
 
@@ -529,6 +531,14 @@ EOT;
 
 		    file_put_contents($filename, $file);
         }
+
+        foreach ($this->storage->players as $player) {
+            self::$players[$player->login] = $player->nickName;
+        }
+
+        foreach ($this->storage->spectators as $player) {
+            self::$players[$player->login] = $player->nickName;
+        }
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -719,14 +729,10 @@ EOT;
 							$cps = array();
 						}
 
-                        //$nick = $this->storage->getPlayerObject($rank[0])->nickName;
-
-                        $nick = $this->connection->getCurrentRankingForLogin($rank[0])[0]->nickName;
-
 						$scores[] = array(
 							'rank'		=> intval($rank[1]),
 							'login'		=> $rank[0],
-							'nickName'	=> $nick,
+							'nickName'	=> self::$players[$rank[0]],
 							'bestTime'		=> intval($rank[6]),
 							'score'		=> intval($rank[9]),
 							'bestCheckpoints'		=> $cps,
@@ -741,52 +747,6 @@ EOT;
                     Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_SCORES_CALCULATED, $scores));
 				}
 		    	break;
-
-
-
-            // We don't need this for instant
-
-            /*case 'LibXmlRpc_PlayersTimes':
-                if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TIMEATTACK && count($array) > 0) {
-                    $scores = array();
-					foreach ($array as $item) {
-						$rank = explode(':', $item);
-
-						$scores[] = array(
-							//'rank'		=> $rank[0],
-							'login'		=> $rank[0],
-							'nickName'	=> $this->storage->getPlayerObject($rank[0])->nickName,
-							'bestTime'  => $rank[1],
-						);
-					}
-
-                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
-                    self::$rankings = $scores;
-				}
-                break;*/
-
-
-
-            // We don't need this for instant
-
-            /*case 'LibXmlRpc_PlayersScores':
-                if ($this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_ROUNDS && count($array) > 0) {
-                    $scores = array();
-					foreach ($array as $item) {
-						$rank = explode(':', $item);
-
-						$scores[] = array(
-							//'rank'		=> $rank[0],
-							'login'		=> $rank[0],
-							'nickName'	=> $this->storage->getPlayerObject($rank[0])->nickName,
-							'bestTime'  => $rank[1],
-						);
-					}
-
-                    $scores = \Maniaplanet\DedicatedServer\Structures\PlayerRanking::fromArrayOfArray($scores, array(-1, 0));
-                    self::$rankings = $scores;
-				}
-                break;*/
         }
     }
     
@@ -992,6 +952,14 @@ EOT;
 
         $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
 
+        foreach ($this->storage->players as $player) {
+            self::$players[$player->login] = $player->nickName;
+        }
+
+        foreach ($this->storage->spectators as $player) {
+            self::$players[$player->login] = $player->nickName;
+        }
+
         self::$rankings = array();
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
@@ -1038,6 +1006,10 @@ EOT;
         self::$initialPoint = 50;
         self::$initialTimelimit = 300;
         self::$isExtended = false;
+
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     public function extendTime($timeOrPoint = null)
@@ -1533,6 +1505,8 @@ EOT;
             }
         }
 
+        self::$players[$login] = $this->storage->getPlayerObject($login)->nickName;
+
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
@@ -1633,6 +1607,8 @@ EOT;
     public function onEndRound()
     {
         $this->update = true;
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
@@ -1696,6 +1672,10 @@ EOT;
             $this->expPlayers[$player->login]->isPlaying = true;
             $this->expPlayers[$player->login]->hasRetired = true;
         }
+
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**

@@ -13,7 +13,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     private $forceUpdate = false;
     private $needUpdate = false;
     private $widgetIds = array();
-    public static $raceOn;
+    public static $raceOn = true;
     public static $roundPoints;
 
     /** @var Config */
@@ -144,7 +144,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             return;
         }
 
-        if (self::$raceOn = true) {
+        if (self::$raceOn == true) {
             $this->updateLivePanel();
         }
     }

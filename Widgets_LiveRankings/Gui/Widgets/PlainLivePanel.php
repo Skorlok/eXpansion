@@ -54,6 +54,32 @@ class PlainLivePanel extends PlainPanel
             $this->timeScript->setParam("isTeam", "False");
             $this->timeScript->setParam("playerTeams", "Integer[Text]");
 
+            $playersOnServer = "";
+            $index = 1;
+            foreach ($this->storage->players as $player) {
+                if ($index > 1) {
+                    $playersOnServer .= ', ';
+                }
+                $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+                $index++;
+            }
+
+            foreach ($this->storage->spectators as $player) {
+                if ($index > 1) {
+                    $playersOnServer .= ', ';
+                }
+                $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+                $index++;
+            }
+
+            if (empty($playersOnServer)) {
+                $playersOnServer = 'Text[Text]';
+            } else {
+                $playersOnServer = '[' . $playersOnServer . ']';
+            }
+
+            $this->timeScript->setParam("playersOnline", $playersOnServer);
+
 
             $teamMaxPoint = 10;
             if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {

@@ -192,15 +192,13 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
         $this->needUpdate = self::DEDIMANIA_FORCE;
     }
 
-    public function onPlayerConnect($login, $isSpectator)
-    {
-        $this->showDediPanel($login);
-    }
-
     public function onPlayerDisconnect($login, $reason = null)
     {
         Gui\Widgets\DediPanel::Erase($login);
         Gui\Widgets\DediPanel2::Erase($login);
+        if (self::$raceOn == true) {
+            $this->needUpdate = self::DEDIMANIA_FORCE;
+        }
     }
 
     public function onDedimaniaOpenSession()
@@ -224,7 +222,9 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
      */
     public function onDedimaniaPlayerConnect($data)
     {
-        $this->needUpdate = self::DEDIMANIA_FORCE;
+        if (self::$raceOn == true) {
+            $this->needUpdate = self::DEDIMANIA_FORCE;
+        }
     }
 
     public function onDedimaniaPlayerDisconnect()

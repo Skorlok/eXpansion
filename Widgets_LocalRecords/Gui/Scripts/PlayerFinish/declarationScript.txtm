@@ -12,7 +12,7 @@ declare playerTimes = <?php echo $this->playerTimes ?>;
 
 //The latest chackpoint the player past
 declare playerNickName = <?php echo $this->playerNicks ?>;
-declare playersOnServer = Text[Text];
+declare playersOnServer = <?php echo $this->playersOnline ?>;
 declare playersCps = Text[Text];
 declare nbCount = 0;
 
@@ -39,15 +39,6 @@ foreach (Login => Score in playerTimes) {
 
 playerTimes.clear();
 playerTimes = origPlayerTimes;
-
-//Updating currently connected players
-foreach (Player in Players) {
-    playersOnServer[Player.Login] = Player.Name;
-
-    if(!playerNickName.existskey(Player.Login)){
-        playerNickName[Player.Login] = Player.Name;
-    }
-}
 
 for (i, 1, nbFields ) {
     declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);

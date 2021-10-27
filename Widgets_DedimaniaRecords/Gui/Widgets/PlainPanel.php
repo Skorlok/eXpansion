@@ -63,6 +63,32 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
         $this->timeScript->setParam("nbRecord", 100);
         $this->timeScript->setParam("playerTimes", $recsData);
         $this->timeScript->setParam("playerNicks", $nickData);
+
+        $playersOnServer = "";
+        $index = 1;
+        foreach ($this->storage->players as $player) {
+            if ($index > 1) {
+                $playersOnServer .= ', ';
+            }
+            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $index++;
+        }
+
+        foreach ($this->storage->spectators as $player) {
+            if ($index > 1) {
+                $playersOnServer .= ', ';
+            }
+            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $index++;
+        }
+
+        if (empty($playersOnServer)) {
+            $playersOnServer = 'Text[Text]';
+        } else {
+            $playersOnServer = '[' . $playersOnServer . ']';
+        }
+
+        $this->timeScript->setParam("playersOnline", $playersOnServer);
     }
 
     public function fixDashes($string)

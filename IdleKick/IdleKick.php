@@ -17,6 +17,7 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
+        $this->enableScriptEvents("Trackmania.Event.Respawn");
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
         }
@@ -24,7 +25,9 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        $this->checkActivity($login);
+        if (!$isSpectator) {
+            $this->checkActivity($login);
+        }
     }
 
     public function onPlayerDisconnect($login, $reason = null)
@@ -70,6 +73,20 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        $params = array();
+		if (isset($array[0]) && !empty($array[0])) {
+			$params = json_decode($array[0], true);
+		}
+
+        switch ($callback) {
+            case 'Trackmania.Event.Respawn':
+                $this->checkActivity($params['login']);
+		    	break;
+        }
+    }
+
     public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
     {
         if ($playerUid != 0) {
@@ -80,7 +97,7 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function onPlayerInfoChanged($playerInfo)
+    public function onPlayerChangeSide($playerInfo, $old)
     {
         $player = \Maniaplanet\DedicatedServer\Structures\PlayerInfo::fromArray($playerInfo);
         $login = $player->login;

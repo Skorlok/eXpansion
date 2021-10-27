@@ -110,6 +110,32 @@ class PlainPanel extends Widget
         $this->timeScript->setParam('varName', 'LocalTime1');
         $this->timeScript->setParam('getCurrentTimes', Widgets_LocalRecords::$secondMap ? "True" : "False");
 
+        $playersOnServer = "";
+        $index = 1;
+        foreach ($this->storage->players as $player) {
+            if ($index > 1) {
+                $playersOnServer .= ', ';
+            }
+            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $index++;
+        }
+
+        foreach ($this->storage->spectators as $player) {
+            if ($index > 1) {
+                $playersOnServer .= ', ';
+            }
+            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $index++;
+        }
+
+        if (empty($playersOnServer)) {
+            $playersOnServer = 'Text[Text]';
+        } else {
+            $playersOnServer = '[' . $playersOnServer . ']';
+        }
+
+        $this->timeScript->setParam("playersOnline", $playersOnServer);
+
         return $script;
     }
 
