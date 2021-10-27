@@ -38,6 +38,16 @@ if(!needUpdate){
     lastUpdateTime = Now;
 }
 
+//Updating currently connected players
+foreach (Player in Players) {
+    playersOnServer[Player.Login] = Player.Name;
+
+    if(!playerNickName.existskey(Player.Login)){
+        playerNickName[Player.Login] = Player.Name;
+    }
+    needUpdate = True;
+}
+
 if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
     lastUpdateTime = Now;
 
@@ -153,5 +163,3 @@ foreach (Event in PendingEvents) {
         }
     }
 }
-
-

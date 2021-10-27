@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Widgets_DedimaniaRecords;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Controls\Recorditem;
 
@@ -64,24 +63,6 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
         $this->timeScript->setParam("nbRecord", 100);
         $this->timeScript->setParam("playerTimes", $recsData);
         $this->timeScript->setParam("playerNicks", $nickData);
-
-        $playersOnServer = "";
-        $index = 1;
-        foreach (Core::$connectedPlayers as $login => $nick) {
-            if ($index > 1) {
-                $playersOnServer .= ', ';
-            }
-            $playersOnServer .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString($nick) . '"';
-            $index++;
-        }
-
-        if (empty($playersOnServer)) {
-            $playersOnServer = 'Text[Text]';
-        } else {
-            $playersOnServer = '[' . $playersOnServer . ']';
-        }
-
-        $this->timeScript->setParam("playersOnline", $playersOnServer);
     }
 
     public function fixDashes($string)

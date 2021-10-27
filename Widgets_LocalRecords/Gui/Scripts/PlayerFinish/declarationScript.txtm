@@ -12,7 +12,7 @@ declare playerTimes = <?php echo $this->playerTimes ?>;
 
 //The latest chackpoint the player past
 declare playerNickName = <?php echo $this->playerNicks ?>;
-declare playersOnServer = <?php echo $this->playersOnline ?>;
+declare playersOnServer = Text[Text];
 declare playersCps = Text[Text];
 declare nbCount = 0;
 
@@ -44,9 +44,9 @@ for (i, 1, nbFields ) {
     declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
 	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
 	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-        rank.Opacity = 0.;
-        timeLabel.Opacity = 0.;
-        nickLabel.Opacity = 0.;
+    rank.Opacity = 0.;
+    timeLabel.Opacity = 0.;
+    nickLabel.Opacity = 0.;
 }
 
 isStart = True;

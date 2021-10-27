@@ -6,7 +6,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Data\Storage;
 use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
@@ -110,24 +109,6 @@ class PlainPanel extends Widget
         $this->timeScript->setParam("nbFirstFields", 5);
         $this->timeScript->setParam('varName', 'LocalTime1');
         $this->timeScript->setParam('getCurrentTimes', Widgets_LocalRecords::$secondMap ? "True" : "False");
-
-        $playersOnServer = "";
-        $index = 1;
-        foreach (Core::$connectedPlayers as $login => $nick) {
-            if ($index > 1) {
-                $playersOnServer .= ', ';
-            }
-            $playersOnServer .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString($nick) . '"';
-            $index++;
-        }
-
-        if (empty($playersOnServer)) {
-            $playersOnServer = 'Text[Text]';
-        } else {
-            $playersOnServer = '[' . $playersOnServer . ']';
-        }
-
-        $this->timeScript->setParam("playersOnline", $playersOnServer);
 
         return $script;
     }
