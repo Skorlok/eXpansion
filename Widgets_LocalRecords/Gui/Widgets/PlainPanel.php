@@ -6,6 +6,7 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Data\Storage;
 use ManiaLive\Gui\Controls\Frame;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
@@ -112,19 +113,11 @@ class PlainPanel extends Widget
 
         $playersOnServer = "";
         $index = 1;
-        foreach ($this->storage->players as $player) {
+        foreach (Core::$connectedPlayers as $login => $nick) {
             if ($index > 1) {
                 $playersOnServer .= ', ';
             }
-            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
-            $index++;
-        }
-
-        foreach ($this->storage->spectators as $player) {
-            if ($index > 1) {
-                $playersOnServer .= ', ';
-            }
-            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $playersOnServer .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString($nick) . '"';
             $index++;
         }
 

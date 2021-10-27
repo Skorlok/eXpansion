@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Widgets_DedimaniaRecords;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Controls\Recorditem;
 
@@ -66,19 +67,11 @@ class PlainPanel extends \ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Wi
 
         $playersOnServer = "";
         $index = 1;
-        foreach ($this->storage->players as $player) {
+        foreach (Core::$connectedPlayers as $login => $nick) {
             if ($index > 1) {
                 $playersOnServer .= ', ';
             }
-            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
-            $index++;
-        }
-
-        foreach ($this->storage->spectators as $player) {
-            if ($index > 1) {
-                $playersOnServer .= ', ';
-            }
-            $playersOnServer .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString($player->nickName) . '"';
+            $playersOnServer .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString($nick) . '"';
             $index++;
         }
 

@@ -57,6 +57,8 @@ class Core extends types\ExpPlugin
 
     public static $players = array();
 
+    public static $connectedPlayers = array();
+
 
     // variables for extend time
 
@@ -534,10 +536,12 @@ EOT;
 
         foreach ($this->storage->players as $player) {
             self::$players[$player->login] = $player->nickName;
+            self::$connectedPlayers[$player->login] = $player->nickName;
         }
 
         foreach ($this->storage->spectators as $player) {
             self::$players[$player->login] = $player->nickName;
+            self::$connectedPlayers[$player->login] = $player->nickName;
         }
     }
 
@@ -1506,6 +1510,7 @@ EOT;
         }
 
         self::$players[$login] = $this->storage->getPlayerObject($login)->nickName;
+        self::$connectedPlayers[$login] = $this->storage->getPlayerObject($login)->nickName;
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
@@ -1558,6 +1563,8 @@ EOT;
             unset($this->expPlayers[$login]);
         }
         $this->updateServerTags = true;
+
+        unset(self::$connectedPlayers[$login]);
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));

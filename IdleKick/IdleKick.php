@@ -17,6 +17,7 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
+        $this->enableStorageEvents();
         $this->enableScriptEvents("Trackmania.Event.Respawn");
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);

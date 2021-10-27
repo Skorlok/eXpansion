@@ -55,6 +55,11 @@ class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
+	public function onGameModeChange($oldGameMode, $newGameMode)
+	{
+		$this->updateData();
+	}
+
     public function eXpOnUnload()
     {
 		$ui  = '<ui_properties>';
