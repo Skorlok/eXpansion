@@ -174,16 +174,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        if (self::$raceOn == true) {
-            $this->updateLocalPanel();
-        }
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        if (self::$raceOn == true) {
-            $this->updateLocalPanel();
-        }
+        $this->showLocalPanel($login);
     }
 
     public function onNewRecord($data)

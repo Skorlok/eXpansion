@@ -51,6 +51,16 @@ foreach (Event in PendingEvents) {
         }
     }
 
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F5") {
+        TriggerPageAction(actionYes);
+        isVoted = True;
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F6") {
+        TriggerPageAction(actionNo);
+        isVoted = True;
+    }
+
     if (Event.Type == CMlEvent::Type::MouseClick) {
         if (Event.ControlId == "button_0") {
             TriggerPageAction(actionNo);

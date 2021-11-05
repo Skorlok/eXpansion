@@ -196,9 +196,6 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     {
         Gui\Widgets\DediPanel::Erase($login);
         Gui\Widgets\DediPanel2::Erase($login);
-        if (self::$raceOn == true) {
-            $this->needUpdate = self::DEDIMANIA_FORCE;
-        }
     }
 
     public function onDedimaniaOpenSession()

@@ -1511,10 +1511,6 @@ EOT;
 
         self::$players[$login] = $this->storage->getPlayerObject($login)->nickName;
         self::$connectedPlayers[$login] = $this->storage->getPlayerObject($login)->nickName;
-
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
-        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     public function syncAdminStatus($loginDisconnecting = false)
@@ -1565,10 +1561,6 @@ EOT;
         $this->updateServerTags = true;
 
         unset(self::$connectedPlayers[$login]);
-
-        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
-        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**

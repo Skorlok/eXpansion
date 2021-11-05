@@ -15,7 +15,17 @@ foreach (Event in PendingEvents) {
             quad.RelativeScale = 1.5;
         }
 
-    } 
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F5") {
+        TriggerPageAction(rate_5);
+	    Window.Hide();
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F6") {
+        TriggerPageAction(rate_0);
+	    Window.Hide();
+    }
     
     if (Event.Type == CMlEvent::Type::MouseOut) {
         if (Event.ControlId == "button_0" || Event.ControlId == "button_5") {	
@@ -33,12 +43,12 @@ foreach (Event in PendingEvents) {
 
     if (Event.Type == CMlEvent::Type::MouseClick) {    
 	if (Event.ControlId == "button_0") {	
-	    TriggerPageAction(rate_0);    
-	    Window.Hide();	
+	    TriggerPageAction(rate_0);
+	    Window.Hide();
 	}    	
 	if (Event.ControlId == "button_5") {	
-	    TriggerPageAction(rate_5);    
-	    Window.Hide();	
+	    TriggerPageAction(rate_5);
+	    Window.Hide();
 	}    
     }
 }

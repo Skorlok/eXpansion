@@ -33,22 +33,23 @@ if (isZoom && animStart + 2000 <= Now ) {
     isZoom = False;
 }
 
-
-if(!needUpdate){
+if (!needUpdate) {
     lastUpdateTime = Now;
 }
 
-//Updating currently connected players
-foreach (Player in Players) {
-    playersOnServer[Player.Login] = Player.Name;
+if  ((Now - lastUpdateTime) >= 500) {
+    //Updating currently connected players
+    foreach (Player in Players) {
+        playersOnServer[Player.Login] = Player.Name;
 
-    if(!playerNickName.existskey(Player.Login)){
-        playerNickName[Player.Login] = Player.Name;
+        if(!playerNickName.existskey(Player.Login)){
+            playerNickName[Player.Login] = Player.Name;
+        }
+        needUpdate = True;
     }
-    needUpdate = True;
 }
 
-if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
     lastUpdateTime = Now;
 
     needUpdate = False;
