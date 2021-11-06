@@ -10,10 +10,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     protected $references = array();
 
-    public function eXpOnInit()
-    {
-    }
-
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
@@ -41,13 +37,11 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         if (!is_numeric($value)) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#error#"%s" is not a numeric value!'), $login, array($value));
-
             return;
         }
 
         if ($value < 1) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#error#"%s" is less than 1!'), $login, array($value));
-
             return;
         }
 
@@ -69,10 +63,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
             if (empty(TimePanel::$localrecords)) {
                 try {
-                    TimePanel::$localrecords = $this->callPublicMethod(
-                        "\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords",
-                        "getRecords"
-                    );
+                    TimePanel::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
                 } catch (\Exception $e) {
                     TimePanel::$localrecords = array();
                 }
@@ -101,7 +92,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showPanel($login, $playerObject)
     {
-
+        TimePanel::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
         $spectatorTarget = $login;
 
         if ($playerObject->currentTargetId) {
@@ -124,7 +115,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $info->setReference($this->references[$login]);
         }
 
-        $info->setMapInfo($this->storage->currentMap);
+        $info->setMapInfo($this->storage->currentMap, $this->eXpGetCurrentCompatibilityGameMode(), $this->connection->getModeScriptSettings());
         $info->show();
     }
 
@@ -144,10 +135,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->showToAll();
     }
 
-    /**
-     *
-     * @param \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record $record
-     */
     public function onUpdateRecords($data)
     {
         TimePanel::$localrecords = $data;
@@ -194,11 +181,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     }
 
-    /**
-     *
-     * @param \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord $record
-     * @param \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecorr $oldrecord
-     */
     public function onDedimaniaRecord($record, $oldrecord)
     {
         foreach (TimePanel::$dedirecords as $index => $data) {
@@ -215,10 +197,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->showPanel($record->login, false);
     }
 
-    /**
-     *
-     * @param \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord $data
-     */
     public function onDedimaniaNewRecord($record)
     {
         foreach (TimePanel::$dedirecords as $index => $data) {

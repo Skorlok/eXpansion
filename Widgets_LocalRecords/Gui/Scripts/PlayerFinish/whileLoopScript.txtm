@@ -33,10 +33,6 @@ if (isZoom && animStart + 2000 <= Now ) {
     isZoom = False;
 }
 
-if (!needUpdate) {
-    lastUpdateTime = Now;
-}
-
 if  ((Now - lastUpdateTime) >= 500) {
     //Updating currently connected players
     foreach (Player in Players) {

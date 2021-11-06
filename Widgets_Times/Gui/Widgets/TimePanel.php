@@ -3,6 +3,8 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_Times\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Core\Core;
 
 class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
@@ -18,9 +20,11 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected $target = "";
     protected $reference = 1;
 
-    /** @var \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record[] */
+
     public static $localrecords = array();
     public static $dedirecords = array();
+
+    protected $checkValidCps = true;
 
     protected function eXpOnBeginConstruct()
     {
@@ -88,48 +92,104 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->reference = $val;
     }
 
-    public function setMapInfo(\Maniaplanet\DedicatedServer\Structures\Map $map)
+    public function setMapInfo($map, $gamemode, $ScriptSettings)
     {
-        $this->totalCp = $map->nbCheckpoints;
-        $this->lapRace = $map->lapRace;
+        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
+
+            if ($map->lapRace) {
+
+                $this->checkValidCps = false;
+                $this->lapRace = 2;
+
+                if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
+                    if ($ScriptSettings['S_ForceLapsNb'] > 0) {
+                        $this->totalCp = $map->nbCheckpoints * $ScriptSettings['S_ForceLapsNb'];
+                    } else {
+                        $this->totalCp = $map->nbCheckpoints * $map->nbLaps;
+                    }
+                } else {
+                    $this->totalCp = $map->nbCheckpoints * $map->nbLaps;
+                }
+
+            } else {
+                $this->checkValidCps = true;
+                $this->totalCp = $map->nbCheckpoints;
+                $this->lapRace = 0;
+            }
+
+        } else {
+            if ($map->lapRace) {
+                $this->lapRace = 1;
+            } else {
+                $this->lapRace = 0;
+            }
+            $this->totalCp = $map->nbCheckpoints;
+            $this->checkValidCps = true;
+        }
     }
 
     protected function onDraw()
     {
-        $record = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue(
-            self::$localrecords,
-            "login",
-            $this->target
-        );
+        $record = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue(self::$localrecords, "login", $this->target);
 
-        $checkpoints = "[ -1 ]";
-        $noRecs = true;
+        if ($this->checkValidCps) {
 
-        // Add record information for MS usage.
-        if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
-            // Normally all CP even last one should be in the object,
-            // but not in databases imported from XAseco where last CP is missing.
-            if (sizeof($record->ScoreCheckpoints) == $this->totalCp) {
-                // Normal DB entry with all CP's.
-                $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
-                $noRecs = false;
-                // XAseco entry missing last CP. Add the record time as it is the the same value.
-            } elseif (sizeof($record->ScoreCheckpoints) == $this->totalCp - 1) {
-                $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
-                $noRecs = false;
-            }
-        }
+            $checkpoints = "[ -1 ]";
+            $noRecs = true;
 
-        // If CP in database don't match Map or no records send empty CP information.
-        if ($noRecs) {
-            $checkpoints = '[';
-            for ($i = 0; $i < $this->totalCp; $i++) {
-                if ($i > 0) {
-                    $checkpoints .= ', ';
+            // Add record information for MS usage.
+            if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
+                // Normally all CP even last one should be in the object,
+                // but not in databases imported from XAseco where last CP is missing.
+                if (sizeof($record->ScoreCheckpoints) == $this->totalCp) {
+                    // Normal DB entry with all CP's.
+                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
+                    $noRecs = false;
+                    // XAseco entry missing last CP. Add the record time as it is the the same value.
+                } elseif (sizeof($record->ScoreCheckpoints) == $this->totalCp - 1) {
+                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
+                    $noRecs = false;
                 }
-                $checkpoints .= -1;
             }
-            $checkpoints .= ']';
+
+            // If CP in database don't match Map or no records send empty CP information.
+            if ($noRecs) {
+                $checkpoints = '[';
+                for ($i = 0; $i < $this->totalCp; $i++) {
+                    if ($i > 0) {
+                        $checkpoints .= ', ';
+                    }
+                    $checkpoints .= -1;
+                }
+                $checkpoints .= ']';
+            }
+
+        } else {
+
+            $checkpoints = "[ -1 ]";
+            $noRecs = true;
+
+            if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
+                if ($record->ScoreCheckpoints[count($record->ScoreCheckpoints) - 1] != $record->time) {
+                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
+                    $noRecs = false;
+                } else {
+                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
+                    $noRecs = false;
+                }
+            }
+
+            if ($noRecs) {
+                $checkpoints = '[';
+                for ($i = 0; $i < $this->totalCp; $i++) {
+                    if ($i > 0) {
+                        $checkpoints .= ', ';
+                    }
+                    $checkpoints .= -1;
+                }
+                $checkpoints .= ']';
+            }
+
         }
 
         // Send data for the dedimania records.
@@ -154,16 +214,11 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
             $dediTime .= ']';
         }
 
-        $bool = "False";
-        if ($this->lapRace) {
-            $bool = "True";
-        }
-
         $this->nScript->setParam('checkpoints', $checkpoints);
         $this->nScript->setParam('deditimes', $dediTime);
         $this->nScript->setParam('totalCp', $this->totalCp);
         $this->nScript->setParam('target', Gui::fixString($this->target));
-        $this->nScript->setParam('lapRace', $bool);
+        $this->nScript->setParam('lapRace', $this->lapRace);
         $this->nScript->setParam("playSound", 'True');
         $this->nScript->setParam("reference", $reference);
 
