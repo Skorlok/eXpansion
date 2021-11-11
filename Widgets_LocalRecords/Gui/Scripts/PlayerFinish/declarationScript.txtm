@@ -78,7 +78,7 @@ declare nbRec = 1;
 declare showed = False;
 
 declare myRank = -1;
-declare start = -1;
+declare start2 = -1;
 declare end = -1;
 declare recCount = -1;
 
@@ -101,21 +101,21 @@ foreach (Login => Score in playerTimes) {
 }
 
 if (myRank != -1) {
-    start = myRank - ((nbFields - nbFirstFields) / 2);
+    start2 = myRank - ((nbFields - nbFirstFields) / 2);
 
-    if (start <= nbFirstFields) {
-        start = nbFirstFields;
-        end = start + (nbFields - nbFirstFields);
+    if (start2 <= nbFirstFields) {
+        start2 = nbFirstFields;
+        end = start2 + (nbFields - nbFirstFields);
     } else {
-        end = start + (nbFields - nbFirstFields);
+        end = start2 + (nbFields - nbFirstFields);
         if (end > recCount) {
             end = recCount;
-            start = end - (nbFields - nbFirstFields);
+            start2 = end - (nbFields - nbFirstFields);
         }
     }
 } else {
-    start = recCount  - (nbFields - nbFirstFields);
-    end = start + (nbFields - nbFirstFields);
+    start2 = recCount  - (nbFields - nbFirstFields);
+    end = start2 + (nbFields - nbFirstFields);
 }
 
 i = 1;
@@ -129,7 +129,7 @@ foreach (Login => Score in playerTimes) {
         scoreFirst = Score;
     }
 
-    if ((nbRec <= nbFirstFields || (nbRec > start && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
+    if ((nbRec <= nbFirstFields || (nbRec > start2 && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
 
         declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
         declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
