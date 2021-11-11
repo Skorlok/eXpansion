@@ -22,9 +22,7 @@ declare Boolean needUpdate = True;
 declare lastUpdateTime = 0;
 
 declare Integer animStart = Now;
-declare Boolean isStart = False;
 declare Boolean isZoom = True;
-declare Boolean triggerBegin = True;
 declare Integer zoomId = -1;
 declare Integer lastZoomId = -2;
 
@@ -42,12 +40,127 @@ playerTimes = origPlayerTimes;
 
 for (i, 1, nbFields ) {
     declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
-	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
-	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-    rank.Opacity = 0.;
-    timeLabel.Opacity = 0.;
-    nickLabel.Opacity = 0.;
+    declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+    declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+    timeLabel.Opacity = 1.;
+    nickLabel.Opacity = 1.;
+    rank.Opacity = 1.;
+
+    isZoom = True;
+    animStart = Now;
 }
 
-isStart = True;
-animStart = Now;
+
+
+
+
+// This part is a debug to fix the time between the end of the declaration (this file) and the start of the widget loop (whileLoop file), so please don't remove
+
+foreach (Player in Players) {
+    playersOnServer[Player.Login] = Player.Name;
+
+    if(!playerNickName.existskey(Player.Login)){
+        playerNickName[Player.Login] = Player.Name;
+    }
+    needUpdate = True;
+}
+
+lastUpdateTime = Now;
+
+needUpdate = False;
+declare Integer inRank = 1;
+declare Boolean isNewRecord = False;
+
+playerTimes = playerTimes.sort();
+
+declare i = 1;
+declare nbRec = 1;
+declare showed = False;
+
+declare myRank = -1;
+declare start = -1;
+declare end = -1;
+declare recCount = -1;
+
+if (playerTimes.count > nbShow) {
+    recCount = nbShow;
+} else {
+    recCount = playerTimes.count;
+}
+
+i = 1;
+
+foreach (Login => Score in playerTimes) {
+    if (LocalUser != Null) {
+        if (Login == LocalUser.Login) {
+            myRank = i;
+            break;
+        }
+    }
+    i += 1;
+}
+
+if (myRank != -1) {
+    start = myRank - ((nbFields - nbFirstFields) / 2);
+
+    if (start <= nbFirstFields) {
+        start = nbFirstFields;
+        end = start + (nbFields - nbFirstFields);
+    } else {
+        end = start + (nbFields - nbFirstFields);
+        if (end > recCount) {
+            end = recCount;
+            start = end - (nbFields - nbFirstFields);
+        }
+    }
+} else {
+    start = recCount  - (nbFields - nbFirstFields);
+    end = start + (nbFields - nbFirstFields);
+}
+
+i = 1;
+nbRec = 1;
+zoomId = -1;
+declare scoreFirst = -1;
+
+foreach (Login => Score in playerTimes) {
+
+    if (scoreFirst == -1) {
+        scoreFirst = Score;
+    }
+
+    if ((nbRec <= nbFirstFields || (nbRec > start && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
+
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        declare highliteQuad = (Page.GetFirstChild("RecBg_"^i) as CMlQuad);
+
+        if (nickLabel != Null) {
+            declare outScore = Score;
+            if (edge_showDiff) {
+                if (i > 1) {
+                    outScore = Score - scoreFirst;
+                }
+            }
+            putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login);
+            if (highliteQuad != Null) {
+                if (playersOnServer.existskey(Login) && i != myRank) {
+                    highliteQuad.Show();
+                } else {
+                    highliteQuad.Hide();
+                }
+            }
+            if (Login == LocalUser.Login) {
+                showed = True;
+                zoomId = i;
+                if (lastZoomId != zoomId) {
+                    isZoom = True;
+                    animStart = Now;
+                    lastZoomId = zoomId;
+                }
+            }
+        }
+        i += 1;
+    }
+    nbRec += 1;
+}

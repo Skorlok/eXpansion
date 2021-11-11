@@ -1,18 +1,3 @@
-if (isStart) {
-    isStart = False;
-    isZoom = True;
-    animStart = Now;
-
-    for (i, 1, nbFields ) {
-        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
-        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
-        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-        timeLabel.Opacity = 1.;
-        nickLabel.Opacity = 1.;
-        rank.Opacity = 1.;
-    }
-}
-
 if (isZoom) {
     if (zoomId != -1) {
         declare rank = (Page.GetFirstChild("RecRank_"^zoomId) as CMlLabel);
@@ -35,6 +20,7 @@ if (isZoom && animStart + 2000 <= Now ) {
 
 if  ((Now - lastUpdateTime) >= 500) {
     //Updating currently connected players
+    playersOnServer.clear();
     foreach (Player in Players) {
         playersOnServer[Player.Login] = Player.Name;
 
