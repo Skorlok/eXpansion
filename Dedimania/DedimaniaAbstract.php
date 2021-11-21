@@ -24,6 +24,8 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public $debug = self::DEBUG_MAX_RANKS;
 
+    protected $endMapTriggered = false;
+
     /** @var DediConnection */
     protected $dedimania;
     protected $running = false;
@@ -214,25 +216,29 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->dedimania->playerDisconnect($login);
     }
 
-    /*public function onStatusChanged($statusCode, $statusName)
+    public function BeginMap()
     {
-        if ($statusCode !== 4) {
-            return;
-        }
-        if (!$this->running) {
-            return;
-        }
+        $this->endMapTriggered = true;
         $this->records = array();
         $this->dedimania->getChallengeRecords();
-    }*/
+    }
 
     public function onBeginMatch()
     {
-        if (!$this->running) {
-            return;
+        if (!$this->endMapTriggered) {
+            $this->records = array();
+            $this->dedimania->getChallengeRecords();
         }
-        $this->records = array();
-        $this->dedimania->getChallengeRecords();
+    }
+
+    public function EndMatch()
+    {
+        $this->endMapTriggered = false;
+    }
+
+    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
+    {
+        $this->endMapTriggered = true;
     }
 
     public function onBeginRound()

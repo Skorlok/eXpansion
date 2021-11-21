@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_Times\Gui\Widgets;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 
 class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
@@ -130,7 +131,31 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function onDraw()
     {
-        $record = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue(self::$localrecords, "login", $this->target);
+        $playerRecord = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue(self::$localrecords, "login", $this->target);
+        $drecord = array_search($this->target, array_column(self::$dedirecords, 'Login'));
+
+        $record = false;
+
+        // Now check for the PB in dedi and local records
+        if ($drecord) {
+            if ($playerRecord) {
+                if ($playerRecord->time <= self::$dedirecords[$drecord]['Best']) {
+                    $record = $playerRecord;
+                } else {
+                    $record = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+                    $record->place = self::$dedirecords[$drecord]['Rank'];
+                    $record->nickName = self::$dedirecords[$drecord]['NickName'];
+                    $record->ScoreCheckpoints = explode(",", self::$dedirecords[$drecord]['Checks']);
+                }
+            } else {
+                $record = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+                $record->place = self::$dedirecords[$drecord]['Rank'];
+                $record->nickName = self::$dedirecords[$drecord]['NickName'];
+                $record->ScoreCheckpoints = explode(",", self::$dedirecords[$drecord]['Checks']);
+            }
+        } else {
+            $record = $playerRecord;
+        }
 
         if ($this->checkValidCps) {
 

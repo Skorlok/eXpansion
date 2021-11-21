@@ -27,6 +27,8 @@ class Dedimania extends DedimaniaAbstract
         $this->vReplay = "";
         $this->gReplay = "";
         $this->AllCps = array();
+
+        $this->BeginMap();
     }
 
     public function onPlayerFinish($playerUid, $login, $time)
@@ -293,6 +295,7 @@ class Dedimania extends DedimaniaAbstract
     public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
         $this->sendScores();
+        $this->EndMatch();
     }
 
     public function sendScores()
