@@ -8,11 +8,6 @@ use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
 use ManiaLivePlugins\eXpansion\Widgets_PersonalBest\Gui\Widgets\PBPanel;
 
-/**
- * Description of Widgets_PersonalBest
- *
- * @author oliverde8
- */
 class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
@@ -37,31 +32,13 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        if (!$isSpectator) {
-            $this->displayRecordWidget($login);
-        }
-    }
-
-    public function onPlayerInfoChanged($playerInfo)
-    {
-        if ($this->storage->serverStatus->code != 4) {
-            return;
-        }
-
-        $player = \Maniaplanet\DedicatedServer\Structures\PlayerInfo::fromArray($playerInfo);
-
-        if ($player->spectator) {
-            PBPanel::Erase($player->login);
-        } else {
-            $this->displayRecordWidget($player->login);
-        }
+        $this->displayRecordWidget($login);
     }
 
     public function onBeginMatch()
     {
         $this->redrawWidget();
     }
-
 
     public function onRecordsLoaded($record)
     {
@@ -73,7 +50,7 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
     }
 
-    public function onEndMatch($rankings, $winnerTeamOrMap)
+    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
         PBPanel::EraseAll();
     }
@@ -83,8 +60,11 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
         }
-    }
 
+        foreach ($this->storage->spectators as $spectator) {
+            $this->onPlayerConnect($spectator->login, false);
+        }
+    }
 
     public function onPersonalBestRecord(Record $record)
     {
@@ -110,17 +90,8 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->displayRecordWidget($login, $record);
     }
 
-    /**
-     *
-     * @param string $login
-     * @param Record $record
-     *
-     * @return
-     */
     public function displayRecordWidget($login, $record = null)
     {
-        //PBPanel::Erase($login);
-
         if ($login == null) {
             return;
         }

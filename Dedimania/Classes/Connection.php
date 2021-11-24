@@ -517,7 +517,7 @@ class Connection extends Singleton implements AppListener, TickListener
                 $gamemode = "Rounds";
                 break;
             default:
-                $gamemode = "";
+                $gamemode = "TA";
                 break;
         }
         return $gamemode;

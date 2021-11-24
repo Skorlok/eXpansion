@@ -19,6 +19,11 @@ class Autotime extends ExpPlugin
     public function onStatusChanged($statusCode, $statusName)
     {
         if ($statusCode == 4) {
+
+            if (!isset($this->connection->getModeScriptSettings()['S_TimeLimit'])) {
+                return;
+            }
+
             $this->config = Config::getInstance();
 
             $map = $this->connection->getCurrentMapInfo();
