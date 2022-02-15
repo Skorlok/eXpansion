@@ -6,8 +6,6 @@ use ManiaLive\PluginHandler\Dependency;
 
 class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    private $wasWarmup = false;
-
     public function eXpOnInit()
     {
         $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords'));
@@ -89,14 +87,9 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
         $this->hide();
     }
 
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
-    }
-
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         $this->displayWidget();

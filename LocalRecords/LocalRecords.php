@@ -73,7 +73,7 @@ class LocalRecords extends LocalBase
             $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
             //Laps mode has it own on Player finish event
-            if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
+            if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro != true) {
                 return;
             }
 

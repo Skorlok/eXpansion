@@ -4,8 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Snow;
 
 class Snow extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    private $wasWarmup = false;
-
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
@@ -21,14 +19,9 @@ class Snow extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Gui\Windows\SnowParticle::EraseAll();
     }
 
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
-    }
-
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         $window = Gui\Windows\SnowParticle::Create(null);

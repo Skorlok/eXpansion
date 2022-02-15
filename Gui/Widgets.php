@@ -121,6 +121,11 @@ class Widgets extends \ManiaLib\Utils\Singleton
         GameInfos::GAMEMODE_LAPS => 10,
         GameInfos::GAMEMODE_CUP => 10);
 
+    public $EnduroPanel_posX = array(self::config_default => -160);
+    public $EnduroPanel_posY = array(self::config_default => 66);
+    public $EnduroPanel_nbFields = array(self::config_default => 13);
+    public $EnduroPanel_nbFirstFields = array(self::config_default => 3);
+
     public $SkipandResButtons_posX = array(self::config_default => 96.5,
         self::config_shootmania => -70);
     public $SkipandResButtons_posY = array(self::config_default => 75,

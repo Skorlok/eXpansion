@@ -461,29 +461,31 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $exploded = explode('\\', $className);
         array_pop($exploded);
         $size = sizeof($exploded);
-        $pluginId = implode('\\', $exploded) . '\\' . $exploded[$size - 1];
+		if ($size != 0) {
+			$pluginId = implode('\\', $exploded) . '\\' . $exploded[$size - 1];
 
-        if ($pluginId[0] != '\\') {
-            $pluginId = '\\' . $pluginId;
-        }
+			if ($pluginId[0] != '\\') {
+				$pluginId = '\\' . $pluginId;
+			}
 
-        if (class_exists($pluginId)) {
-            /**
-             * @var MetaDataType $metaData
-             */
-            $metaData = $className::getInstance($pluginId);
-            if ($metaData->getPlugin() == null) {
-                $metaData->setPlugin($pluginId);
-            } else {
-                $pluginId = $metaData->getPlugin();
-            }
+			if (class_exists($pluginId)) {
+				/**
+				 * @var MetaDataType $metaData
+				 */
+				$metaData = $className::getInstance($pluginId);
+				if ($metaData->getPlugin() == null) {
+					$metaData->setPlugin($pluginId);
+				} else {
+					$pluginId = $metaData->getPlugin();
+				}
 
-            $this->availablePlugins[$pluginId] = $metaData;
-            self::$allAvailablePlugins[$pluginId] = $metaData;
+				$this->availablePlugins[$pluginId] = $metaData;
+				self::$allAvailablePlugins[$pluginId] = $metaData;
 
-            uasort($this->availablePlugins, array($this, 'pluginNameCmp'));
-            uasort(self::$allAvailablePlugins, array($this, 'pluginNameCmp'));
-        }
+				uasort($this->availablePlugins, array($this, 'pluginNameCmp'));
+				uasort(self::$allAvailablePlugins, array($this, 'pluginNameCmp'));
+			}
+		}
     }
 
     /**

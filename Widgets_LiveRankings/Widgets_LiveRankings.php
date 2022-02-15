@@ -22,7 +22,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function eXpOnLoad()
     {
-
         $this->config = Config::getInstance();
     }
 
@@ -56,6 +55,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function updateLivePanel($login = null)
     {
+        if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
+            return;
+        }
         Gui\Widgets\LivePanel::$connection = $this->connection;
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
         $localRecs = LivePanel::GetAll();

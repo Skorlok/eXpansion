@@ -204,11 +204,7 @@ class Gui extends ExpPlugin
 
     public function showConfigWindow($login, $entries)
     {
-        // This window does eXpansion crash
-        // This window does not work
-
-        $this->eXpChatSendServerMessage("Sorry but this window is disabled", $login);
-
+		return;
         /*if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {

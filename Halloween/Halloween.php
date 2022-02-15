@@ -5,8 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Halloween;
 class Halloween extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    public $wasWarmup = false;
-
     public function eXpOnReady()
     {
         parent::eXpOnReady();
@@ -26,14 +24,9 @@ class Halloween extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Gui\Widget\SpiderWidget::EraseAll();
     }
 
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
-    }
-
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         $window = Gui\Widget\SpiderWidget::Create(null);

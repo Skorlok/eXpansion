@@ -7,7 +7,7 @@ declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntr
 declare Text outText = "";
 
 declare Boolean toggleSubmenu = False;
-declare Boolean[Text][Text][Text] eXp_widgetVisible for LocalUser = Boolean[Text][Text][Text];
+declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
 
 declare Text version = "<?php echo $this->version ?>";
 declare Text id = "<?php echo $this->name ?>";

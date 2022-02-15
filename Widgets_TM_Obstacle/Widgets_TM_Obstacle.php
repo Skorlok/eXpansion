@@ -49,6 +49,9 @@ class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+            return;
+        }
         Gui\Widgets\CpProgress::EraseAll();
     }
 

@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.0.1.5";
+    const EXP_VERSION = "1.0.1.6";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -1420,7 +1420,7 @@ EOT;
                     $outPlayers[$player->login] = $player;
                 }
             }
-            if (sizeof($outPlayers < 0)) {
+            if ($outPlayers !== array() && sizeof($outPlayers < 0)) {
                 Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_NETLOST, $outPlayers));
             }
         }

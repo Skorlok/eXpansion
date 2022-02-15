@@ -42,6 +42,9 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
     public function updateDediPanel($login = null)
     {
+        if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
+            return;
+        }
 
         $dedi = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();

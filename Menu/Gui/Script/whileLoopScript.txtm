@@ -132,7 +132,7 @@ if (needUpdate) {
                             outText = outText ^ idd ^ ":" ^ gameMode ^ ":" ^ bool ^ "|";
                     }
                     // log(outText);
-                   // widgetStatus.Value = outText;
+                    //widgetStatus.Value = outText;
                     needHidden = True;
 } else {
     if (needHidden) {

@@ -27,7 +27,6 @@ class Dedimania extends DedimaniaAbstract
         $this->vReplay = "";
         $this->gReplay = "";
         $this->AllCps = array();
-
         $this->BeginMap();
     }
 
@@ -125,6 +124,10 @@ class Dedimania extends DedimaniaAbstract
         }
 
         if (Core::$warmUpActive) {
+            return;
+        }
+
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
             return;
         }
 
@@ -267,7 +270,9 @@ class Dedimania extends DedimaniaAbstract
             }
 
             $this->vReplay = $this->connection->getValidationReplay($currank[0]['Login']);
-            $this->AllCps = implode(",", $checkpoints);
+			if ($this->checkpoints !== array()) {
+				$this->AllCps = implode(",", $checkpoints);
+			}
         } catch (Exception $e) {
             $this->console("Unable to get validation replay, server said: " . $e->getMessage());
         }

@@ -661,7 +661,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-
+        $this->onEndMatch(array(), array());
         if ($this->ranks_reset) {
             $this->resetRanks();
         }

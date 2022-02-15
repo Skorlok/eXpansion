@@ -81,7 +81,6 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
         self::$raceOn = false;
         $this->hideAroundMe();
     }

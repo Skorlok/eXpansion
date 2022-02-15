@@ -45,6 +45,9 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->enableTickerEvent();
         $this->reset();
         $this->lastSend = time() - 3;
+        if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
+            return;
+        }
         $this->displayWidget();
     }
 
@@ -65,6 +68,9 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     private function displayWidget()
     {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+            return;
+        }
         $this->update = true;
     }
 
@@ -122,11 +128,17 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         $this->reset();
+        if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
+            return;
+        }
         $this->displayWidget();
     }
 
     public function onBeginMatch()
     {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+            return;
+        }
         $this->reset();
         $this->displayWidget();
     }

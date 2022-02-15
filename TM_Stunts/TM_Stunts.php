@@ -67,7 +67,7 @@ class TM_Stunts extends ExpPlugin
         $figure = str_replace("::EStuntFigure::", "", $figure);
 
         if ($angle || ($figure != "StraightJump" && $figure != "RespawnPenalty")) {
-            if ($isreversed) {
+            if ($isreverse) {
                 $figure = "Reversed" . $figure;
             }
             if ($angle == 0) {

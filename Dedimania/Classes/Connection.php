@@ -520,6 +520,9 @@ class Connection extends Singleton implements AppListener, TickListener
                 $gamemode = "TA";
                 break;
         }
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+            return "TA";
+        }
         return $gamemode;
     }
 

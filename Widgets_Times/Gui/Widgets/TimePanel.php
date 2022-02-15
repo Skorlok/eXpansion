@@ -95,6 +95,9 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     public function setMapInfo($map, $gamemode, $ScriptSettings)
     {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+            $gamemode = GameInfos::GAMEMODE_LAPS;
+        }
         if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
 
             if ($map->lapRace) {
@@ -144,12 +147,14 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
                 } else {
                     $record = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
                     $record->place = self::$dedirecords[$drecord]['Rank'];
+                    $record->time = self::$dedirecords[$drecord]['Best'];
                     $record->nickName = self::$dedirecords[$drecord]['NickName'];
                     $record->ScoreCheckpoints = explode(",", self::$dedirecords[$drecord]['Checks']);
                 }
             } else {
                 $record = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
                 $record->place = self::$dedirecords[$drecord]['Rank'];
+                $record->time = self::$dedirecords[$drecord]['Best'];
                 $record->nickName = self::$dedirecords[$drecord]['NickName'];
                 $record->ScoreCheckpoints = explode(",", self::$dedirecords[$drecord]['Checks']);
             }

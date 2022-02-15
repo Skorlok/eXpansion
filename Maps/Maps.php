@@ -363,8 +363,11 @@ class Maps extends ExpPlugin
         }
     }
 
-    public function onEndMatch($rankings, $winnerTeamOrMap)
+    public function onEndMatch($rankings, $winnerTeamOrMap, $enduroSkipMap = false)
     {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false && $enduroSkipMap != true) {
+            return;
+        }
         $this->is_onBeginMatch = false;
         if ($this->is_onEndMatch) {
             return;
@@ -1415,6 +1418,13 @@ class Maps extends ExpPlugin
     public function onMapRestart()
     {
         $this->wasWarmup = true;
+    }
+
+    public function onMapSkip()
+    {
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+            $this->onEndMatch(array(),array(), true);
+        }
     }
 
     public function eXpOnUnload()

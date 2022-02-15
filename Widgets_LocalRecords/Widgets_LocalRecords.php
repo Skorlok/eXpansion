@@ -114,7 +114,9 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
+        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+            return;
+        }
         self::$raceOn = false;
         $this->widgetIds = array();
         Gui\Widgets\LocalPanel::EraseAll();
