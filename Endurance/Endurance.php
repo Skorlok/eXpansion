@@ -320,6 +320,9 @@ class Endurance extends ExpPlugin
 
 	public function updateEnduroPanel($login = null)
     {
+		if (!self::$enduro) {
+			return;
+		}
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
         $localRecs = self::$enduro_total_points;
