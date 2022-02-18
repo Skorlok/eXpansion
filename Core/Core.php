@@ -1420,7 +1420,7 @@ EOT;
                     $outPlayers[$player->login] = $player;
                 }
             }
-            if ($outPlayers !== array() && sizeof($outPlayers < 0)) {
+            if (sizeof($outPlayers) < 0) {
                 Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_NETLOST, $outPlayers));
             }
         }

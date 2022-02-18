@@ -1277,7 +1277,7 @@ class AdminGroups extends ExpPlugin
      *
      * @return Group[]
      */
-    public function getGroupList()
+    public static function getGroupList()
     {
         return self::$groupList;
     }

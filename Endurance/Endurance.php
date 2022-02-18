@@ -590,4 +590,12 @@ class Endurance extends ExpPlugin
 		}
 		$data[] = $best_points;
 	}
+
+	public function eXpOnUnload()
+    {
+		self::$enduro = false;
+        EnduroPanel::EraseAll();
+		EnduroPanel2::EraseAll();
+		EnduroScores::EraseAll();
+    }
 }

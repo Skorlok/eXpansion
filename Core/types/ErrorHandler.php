@@ -17,7 +17,7 @@ class ErrorHandler extends \ManiaLive\Application\ErrorHandling
         parent::createExceptionFromError($errno, $errstr, $errfile, $errline);
     }
 
-    public static function displayAndLogError(\Exception $e)
+    public static function displayAndLogError(\Exception $e, $type = '')
     {
         $log = "";
         foreach (self::computeMessage($e) as $line) {
