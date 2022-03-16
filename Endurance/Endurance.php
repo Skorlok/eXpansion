@@ -145,7 +145,8 @@ class Endurance extends ExpPlugin
 						$this->lastcptime[$player_login] = 0;
 					} else {
 						$this->console('[plugin.records_eyepiece_enduro.php] Ignoring player login '.$player_login.' for invalid CPs! (no CP time registered)');
-						$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iIgnoring player $z'. $this->storage->getPlayerObject($player_login)->nickName .'$z$i$f00$i for invalid CPs! (no CP time registered)', null);
+						$nick = $this->db->execute('SELECT player_nickname FROM exp_players WHERE player_login = "' . $player_login . '";')->fetchArrayOfObject();
+						$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iIgnoring player $z'. $nick[0]->player_nickname .'$z$i$f00$i for invalid CPs! (no CP time registered)', null);
 						continue;
 					}
 				}
@@ -213,7 +214,8 @@ class Endurance extends ExpPlugin
 
         foreach ($this->lastcptime as $player_login => &$value) {
 		    if (!isset(self::$enduro_total_points[$player_login])) {
-			    self::$enduro_total_points[$player_login]['name'] = $this->storage->getPlayerObject($player_login)->nickName;
+                $nick = $this->db->execute('SELECT player_nickname FROM exp_players WHERE player_login = "' . $player_login . '";')->fetchArrayOfObject();
+                self::$enduro_total_points[$player_login]['name'] = $nick[0]->player_nickname;
 			    self::$enduro_total_points[$player_login]['points'] = 0;
 		    }
 	    }

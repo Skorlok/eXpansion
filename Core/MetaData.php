@@ -46,13 +46,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$fff');
         $this->registerVariable($var);
 
-        $var = new ColorCode(
-            'Colors_variable',
-            'Color code for all variables used in chatmessages',
-            $config,
-            false,
-            true
-        );
+        $var = new ColorCode('Colors_variable','Color code for all variables used in chatmessages', $config, false, true);
         $var->setGroup("Chat Messages");
         $var->setDefaultValue('$fff');
         $this->registerVariable($var);
@@ -187,12 +181,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('casualRace');
         $this->registerVariable($var);
 
-        $var = new TypeString(
-            'contact',
-            'Server administrators contact info (displayed at serverinfo window)',
-            $config,
-            false
-        );
+        $var = new TypeString('contact', 'Server administrators contact info (displayed at serverinfo window)', $config, false);
         $var->setDefaultValue('YOUR@EMAIL.COM');
         $this->registerVariable($var);
 
@@ -212,12 +201,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(array('10', '8', '7', '6', '5', '4', '3', '2', '1'));
         $this->registerVariable($var);
 
-        $var = new TypeString(
-            'quitDialogManialink',
-            'Quit dialog customization, use url with custom manialink.xml',
-            $config,
-            false
-        );
+        $var = new TypeString('quitDialogManialink', 'Quit dialog customization, use url with custom manialink.xml', $config, false);
         $var->setDescription('Customize quit dialog with your own manialink!');
         $var->setGroup('GUI');
         $var->setDefaultValue('');
@@ -230,12 +214,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new Boolean('debug', 'Enable Debug-mode', $config, false, true);
         $var->setDefaultValue(false);
-        $this->registerVariable($var);
-
-        $var = new Boolean('analytics', 'Send analytic data to eXpansion server', $config, false);
-        $var->setDescription("All data are anonymous.");
-        $var->setGroup("General");
-        $var->setDefaultValue(true);
         $this->registerVariable($var);
     }
 }

@@ -47,6 +47,12 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         if ($this->tickCounter % 10 == 0) {
             $this->tickCounter = 0;
+
+            if (sizeof($this->storage->players) == 1) {
+                $this->tickCounter++;
+                return;
+            }
+
             $this->config = Config::getInstance();
             foreach ($this->timeStamps as $playerLogin => $time) {
                 if ((time() - $time) > ($this->config->idleMinutes * 60)) {

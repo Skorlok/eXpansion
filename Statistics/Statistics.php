@@ -8,9 +8,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnInit()
     {
         //The Database plugin is needed.
-        $this->addDependency(
-            new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database")
-        );
+        $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database"));
     }
 
     public function eXpOnReady()
@@ -49,6 +47,9 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->setPublicMethod("showTopWinners");
         $this->registerChatCommand("stats", "showTopWinners", 0, true);
+        $this->registerChatCommand("wins", "chat_wins", 0, true);
+        $this->registerChatCommand("laston", "chat_laston", 0, true);
+        $this->registerChatCommand("laston", "chat_laston", 1, true);
     }
 
     public function closeAllWindows($login)
@@ -68,6 +69,40 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryWinner::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Country::Erase($login);
+    }
+
+    public function chat_wins($login)
+    {
+        $this->storage->serverLogin;
+        $sql = 'SELECT player_wins FROM exp_players WHERE player_login LIKE "' . $login . '"';
+        $wins = $this->db->execute($sql)->fetchArrayOfObject();
+
+        $message = '#player#You have #variable#%1$s#player# wins!';
+        $this->eXpChatSendServerMessage($message, $login, array($wins[0]->player_wins));
+    }
+
+    public function chat_laston($login, $params = null)
+    {
+        $this->storage->serverLogin;
+
+        if ($params == null) {
+            $params = $login;
+        }
+
+        $sql = 'SELECT player_updated FROM exp_players WHERE player_login LIKE "' . $params . '"';
+        $last_update = $this->db->execute($sql)->fetchArrayOfObject();
+
+        if (!isset($last_update[0]->player_updated)) {
+            $message = '#admin_error#There are no player with login #variable#%1$s#admin_error# on this server!';
+            $this->eXpChatSendServerMessage($message, $login, array($params));
+            return;
+        }
+
+        $time = date('d/m/Y H:i:s', $last_update[0]->player_updated);
+        $nick = $this->db->execute('SELECT player_nickname FROM exp_players WHERE player_login = "' . $params . '";')->fetchArrayOfObject();
+
+        $message = '#player#Player #variable#%s$s#player# was last online on: #variable#%s';
+        $this->eXpChatSendServerMessage($message, $login, array($nick[0]->player_nickname, $time));
     }
 
     public function showTopIncome($login)

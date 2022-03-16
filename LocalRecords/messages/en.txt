@@ -16,6 +16,12 @@
 #admin_error#$iNot enough local records to obtain ranking yet..
 #admin_error#$iNot enough local records to obtain ranking yet..
 
+#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]
+#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]
+
+#record#You are already the best ranked player
+#record#You are already the best ranked player
+
 #
 #
 
@@ -117,3 +123,6 @@ $z$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$F90!$z$s$o$fff %2$s.$f9
 
 #record#Server rank: #rank#%1$s#record#/#rank#%2$s
 #record#Server rank: #rank#%1$s#record#/#rank#%2$s
+
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s

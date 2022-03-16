@@ -9,11 +9,12 @@ use ManiaLivePlugins\eXpansion\LocalRecords\LocalRecords;
 class CpDiff extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
     protected $frame;
-    protected $label_rank;
+    protected $label_CP;
     protected $label_player;
-    protected $label_nick;
-    protected $label_login;
-    protected $widths = array(1, 4, 4, 4);
+    protected $label_target;
+    protected $label_diff;
+    protected $label_diff_cp;
+    protected $widths = array(1, 4, 4, 4, 4);
     protected $pager;
     protected $items = array();
     protected $label_visit;
@@ -50,6 +51,10 @@ class CpDiff extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_diff = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 6);
         $this->label_diff->setAlign('left', 'center');
         $this->frame->addComponent($this->label_diff);
+
+        $this->label_diff_cp = new \ManiaLib\Gui\Elements\Label($scaledSizes[4], 6);
+        $this->label_diff_cp->setAlign('left', 'center');
+        $this->frame->addComponent($this->label_diff_cp);
     }
 
     public function onResize($oldX, $oldY)
@@ -61,6 +66,7 @@ class CpDiff extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_player->setSizeX($scaledSizes[1]);
         $this->label_target->setSizeX($scaledSizes[2]);
         $this->label_diff->setSizeX($scaledSizes[3]);
+        $this->label_diff_cp->setSizeX($scaledSizes[4]);
 
         $this->pager->setSize($this->getSizeX(), $this->getSizeY() - 12);
         foreach ($this->items as $item) {
@@ -72,6 +78,7 @@ class CpDiff extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         $this->label_CP->setText(__("CP"));
         $this->label_diff->setText(__("Difference"));
+        $this->label_diff_cp->setText(__("Difference / CP"));
     }
 
     public function destroy()

@@ -7,7 +7,7 @@ if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500 ) {
                 edge_isMinimized = False;
                 lastValue = False;
                 edge_animatedId[id] = True;
-             }
+            }
         }
 
 

@@ -153,7 +153,11 @@ class Dedimania extends DedimaniaAbstract
             }
         }
 
-        $this->getVReplay($login, $this->checkpoints[$login]);
+        if (isset($this->checkpoints[$login])) {
+            $this->getVReplay($login, $this->checkpoints[$login]);
+        } else {
+            $this->getVReplay($login, array());
+        }
         $this->getGReplay($login);
 
         // if current map doesn't have records, create one.

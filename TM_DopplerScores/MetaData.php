@@ -32,9 +32,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\LocalRecords\MetaData
     public function initName()
     {
         $this->setName('Records: Doppler@Nerpson');
-        $this->setDescription(
-            'Works like LocalRecords but instead of ordering times it orders scores. Higher scores are better.'
-        );
+        $this->setDescription('Works like LocalRecords but instead of ordering times it orders scores. Higher scores are better.');
         $this->setGroups(array('Records'));
     }
 
@@ -43,10 +41,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\LocalRecords\MetaData
         $this->addTitleSupport("TM");
 
         $this->setRelaySupport(false);
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            'Doppler.Script.txt'
-        );
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'Doppler.Script.txt');
         $this->setScriptCompatibilityMode(false);
     }
 }

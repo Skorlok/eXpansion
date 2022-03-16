@@ -8,16 +8,15 @@ use ManiaLivePlugins\eXpansion\Gui\Gui;
 /**
  * Description of RecItem
  *
- * @author oliverde8
+ * @author Skorlok
  */
 class CpDiffItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
-    protected $label_rank;
-    protected $label_nick;
-    protected $label_score;
-    protected $label_avgScore;
-    protected $label_nbFinish;
-    protected $label_login;
+    protected $label_CP;
+    protected $label_player;
+    protected $label_target;
+    protected $label_diff;
+    protected $label_diff_cp;
     protected $bg;
     protected $button_report;
     protected $widths;
@@ -55,16 +54,34 @@ class CpDiffItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label_diff = new \ManiaLib\Gui\Elements\Label(10, 6);
         $this->label_diff->setAlign('left', 'center');
         $this->label_diff->setScale(1);
-        $cp_Diff = $record[0]->ScoreCheckpoints[$indexNumber] - $record[1]->ScoreCheckpoints[$indexNumber];
-        if ($cp_Diff <= 0) {
-            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Diff);
+        $cp_Different = $record[0]->ScoreCheckpoints[$indexNumber] - $record[1]->ScoreCheckpoints[$indexNumber];
+        if ($cp_Different <= 0) {
+            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Different);
             $cp_Diff = '$0f0- ' . $cp_Diff;
         } else {
-            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Diff);
+            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Different);
             $cp_Diff = '$f00+ ' . $cp_Diff;
         }
         $this->label_diff->setText($cp_Diff);
         $this->frame->addComponent($this->label_diff);
+
+        $this->label_diff_cp = new \ManiaLib\Gui\Elements\Label(10, 6);
+        $this->label_diff_cp->setAlign('left', 'center');
+        $this->label_diff_cp->setScale(1);
+        if ($indexNumber > 0) {
+            $cp_Different_Last = $cp_Different - ($record[0]->ScoreCheckpoints[$indexNumber - 1] - $record[1]->ScoreCheckpoints[$indexNumber - 1]);
+        } else {
+            $cp_Different_Last = $cp_Different;
+        }
+        if ($cp_Different_Last <= 0) {
+            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Different_Last);
+            $cp_Diff = '$0f0- ' . $cp_Diff;
+        } else {
+            $cp_Diff = \ManiaLive\Utilities\Time::fromTM($cp_Different_Last);
+            $cp_Diff = '$f00+ ' . $cp_Diff;
+        }
+        $this->label_diff_cp->setText($cp_Diff);
+        $this->frame->addComponent($this->label_diff_cp);
     }
 
     public function onResize($oldX, $oldY)
@@ -75,6 +92,7 @@ class CpDiffItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label_player->setSizeX($scaledSizes[1]);
         $this->label_target->setSizeX($scaledSizes[2]);
         $this->label_diff->setSizeX($scaledSizes[3]);
+        $this->label_diff_cp->setSizeX($scaledSizes[4]);
     }
 
     // manialive 3.1 override to do nothing.

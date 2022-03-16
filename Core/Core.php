@@ -122,9 +122,6 @@ class Core extends types\ExpPlugin
 
     private $quitDialogXml = "";
 
-    /** @var  Analytics */
-    private $analytics;
-
     private static $availableCallbacks = array();
 
     private static $enabledCallbacks = array();
@@ -459,13 +456,6 @@ EOT;
         // which is not needed anymore as of 09/2014
         // $this->connection->keepPlayerSlots(true);
 
-        $this->analytics = new Analytics();
-        if ($this->config->analytics) {
-            $this->analytics->enable();
-        } else {
-            $this->analytics->disable();
-        }
-
         if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
             $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
@@ -772,12 +762,6 @@ EOT;
                     $this->doWhitelist();
                 }
                 break;
-            case "analytics":
-                if ($var->getRawValue()) {
-                    $this->analytics->enable();
-                } else {
-                    $this->analytics->disable();
-                }
         }
     }
 

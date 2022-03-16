@@ -36,7 +36,6 @@ class ManiaExchange extends ExpPlugin
 
     public function eXpOnLoad()
     {
-
         $this->msg_add = eXpGetMessage('Map %s $z$s$fff added from MX Succesfully');
     }
 
@@ -54,17 +53,9 @@ class ManiaExchange extends ExpPlugin
         $cmd->setMinParam(1);
         $this->cmd_add = $cmd;
 
-
         if ($this->isPluginLoaded('eXpansion\Menu')) {
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('ManiaExchange'), false);
-            $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Menu',
-                'addItem',
-                __('Search Maps'),
-                null,
-                array($this, 'mxSearch'),
-                false
-            );
+            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addItem', __('Search Maps'), null, array($this, 'mxSearch'), false);
         }
 
         $version = $this->connection->getVersion();
@@ -99,10 +90,7 @@ class ManiaExchange extends ExpPlugin
                 break;
             case "help":
             default:
-                $msg = eXpGetMessage(
-                    "usage /mx add [id], /mx queue [id],"
-                    . " /mx search \"terms here\"  \"authorname\" ,/mx author \"name\" "
-                );
+                $msg = eXpGetMessage("usage /mx add [id], /mx queue [id], /mx search \"terms here\"  \"authorname\" ,/mx author \"name\" ");
                 $this->eXpChatSendServerMessage($msg, $login);
                 break;
         }
@@ -122,9 +110,7 @@ class ManiaExchange extends ExpPlugin
     public function addMap($login, $mxId)
     {
         if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance()->hasPermission($login, 'map_add')) {
-            $this->connection
-                ->chatSendServerMessage(__('$iYou don\'t have permission to do that!', $login, $mxId), $login);
-
+            $this->connection->chatSendServerMessage(__('$iYou don\'t have permission to do that!', $login, $mxId), $login);
             return;
         }
 
@@ -139,7 +125,6 @@ class ManiaExchange extends ExpPlugin
             } catch (\Exception $e) {
                 $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
             }
-
             return;
         }
         $this->download($mxId, $login, "xAddMapAdmin");
@@ -157,7 +142,6 @@ class ManiaExchange extends ExpPlugin
     {
         if (!is_numeric($mxId)) {
             $this->connection->chatSendServerMessage(__('"%s" is not a numeric value.', $login, $mxId), $login);
-
             return false;
         }
 
@@ -173,8 +157,7 @@ class ManiaExchange extends ExpPlugin
 
         $this->eXpChatSendServerMessage("Download starting for: $mxId", $login);
         $options = array(CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
-        $this->dataAccess
-            ->httpCurl($query, array($this, $redirect), array("login" => $login, "mxId" => $mxId), $options);
+        $this->dataAccess->httpCurl($query, array($this, $redirect), array("login" => $login, "mxId" => $mxId), $options);
     }
 
     /**
@@ -196,18 +179,16 @@ class ManiaExchange extends ExpPlugin
         if ($code !== 200) {
             if ($code == 302) {
                 $this->eXpChatSendServerMessage("Map author has declined the permission to download this map!", $login);
-
                 return;
             }
             $this->eXpChatSendServerMessage("MX returned error code $code", $login);
-
             return;
         }
         /** @var \Maniaplanet\DedicatedServer\Structures\Version */
         $game = $this->connection->getVersion();
-        $dir = Helper::getPaths()->getDownloadMapsPath() . $game->titleId;
+        $dir = Helper::getPaths()->getDownloadMapsPath() . $this->storage->serverLogin;
         if ($this->expStorage->isRemoteControlled) {
-            $dir = "Downloaded/" . $game->titleId;
+            $dir = "Downloaded/" . $this->storage->serverLogin;
         }
 
 
@@ -237,7 +218,6 @@ class ManiaExchange extends ExpPlugin
                     if (!$this->connection->checkMapForCurrentServerParams($file)) {
                         $msg = eXpGetMessage("The Map is not compatible with current server settings, map not added.");
                         $this->eXpChatSendServerMessage($msg, $login);
-
                         return;
                     }
 
@@ -246,13 +226,7 @@ class ManiaExchange extends ExpPlugin
                     $map = $this->connection->getMapInfo($file);
                     $this->eXpChatSendServerMessage($this->msg_add, null, array($map->name));
                     if ($this->config->juke_newmaps) {
-                        $this->callPublicMethod(
-                            '\ManiaLivePlugins\eXpansion\Maps\Maps',
-                            "queueMap",
-                            $login,
-                            $map,
-                            false
-                        );
+                        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
@@ -261,8 +235,7 @@ class ManiaExchange extends ExpPlugin
                 $this->eXpChatSendServerMessage("Error while saving a map file at remote host: " . $file, $login);
             }
         } catch (Exception $ex) {
-            $this
-                ->eXpChatSendServerMessage("Error while saving a map file at remote host :" . $e->getMessage(), $login);
+            $this->eXpChatSendServerMessage("Error while saving a map file at remote host :" . $e->getMessage(), $login);
         }
     }
 
@@ -279,7 +252,6 @@ class ManiaExchange extends ExpPlugin
                     if (!$this->connection->checkMapForCurrentServerParams($file)) {
                         $msg = eXpGetMessage("Map is not compatible with current server settings, map not added.");
                         $this->eXpChatSendServerMessage($msg, $login);
-
                         return;
                     }
 
@@ -288,13 +260,7 @@ class ManiaExchange extends ExpPlugin
                     $map = $this->connection->getMapInfo($file);
                     $this->eXpChatSendServerMessage($this->msg_add, null, array($map->name));
                     if ($this->config->juke_newmaps) {
-                        $this->callPublicMethod(
-                            '\ManiaLivePlugins\eXpansion\Maps\Maps',
-                            "queueMap",
-                            $login,
-                            $map,
-                            false
-                        );
+                        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
@@ -326,25 +292,22 @@ class ManiaExchange extends ExpPlugin
         if ($code !== 200) {
             if ($code == 302) {
                 $this->eXpChatSendServerMessage("Map author has declined the permission to download this map!", $login);
-
                 return;
             }
             $this->eXpChatSendServerMessage("MX returned error code $code", $login);
-
             return;
         }
 
-        $file = Helper::getPaths()->getDownloadMapsPath() . $mxId . ".Map.Gbx";
+        $file = Helper::getPaths()->getDownloadMapsPath() . $this->storage->serverLogin . "/" . $mxId . ".Map.Gbx";
 
-        if (!is_dir(Helper::getPaths()->getDownloadMapsPath())) {
-            mkdir(Helper::getPaths()->getDownloadMapsPath(), 0775);
+        if (!is_dir(Helper::getPaths()->getDownloadMapsPath() . $this->storage->serverLogin)) {
+            mkdir(Helper::getPaths()->getDownloadMapsPath() . $this->storage->serverLogin, 0775);
         }
 
         if ($this->dataAccess->save($file, $data)) {
             if (!$this->connection->checkMapForCurrentServerParams($file)) {
                 $msg = eXpGetMessage("Map is not compatible with current server settings, map not added.");
                 $this->eXpChatSendServerMessage($msg, $login);
-
                 return;
             }
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\\Maps\\Maps', 'queueMxMap', $login, $file);
@@ -357,13 +320,11 @@ class ManiaExchange extends ExpPlugin
 
         if (!is_numeric($mxId)) {
             $this->connection->chatSendServerMessage(__('"%s" is not a numeric value.', $login, $mxId), $login);
-
             return;
         }
 
         if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_ADD_MX)) {
             $this->mxQueue($login, $mxId);
-
             return;
         }
 
@@ -372,7 +333,6 @@ class ManiaExchange extends ExpPlugin
             if ($q->player->login == $login) {
                 $msg = eXpGetMessage('#admin_error# $iYou already have a map in the queue...');
                 $this->eXpChatSendServerMessage($msg, $login);
-
                 return;
             }
         }
@@ -408,21 +368,15 @@ class ManiaExchange extends ExpPlugin
         if ($code !== 200) {
             if ($code == 302) {
                 $this->eXpChatSendServerMessage("Map author has declined the permission to download this map!", $login);
-
                 return;
             }
             $this->eXpChatSendServerMessage("Mx error: $code", $login);
-
             return;
         }
         $map = json_decode($data, true);
 
         if (!$map) {
-            $this->connection->chatSendServerMessage(
-                __('Unable to retrieve track info from MX..  wrong ID..?'),
-                $login
-            );
-
+            $this->connection->chatSendServerMessage(__('Unable to retrieve track info from MX..  wrong ID..?'), $login);
             return;
         }
 
@@ -430,7 +384,6 @@ class ManiaExchange extends ExpPlugin
 
         if (strtolower(substr($version->titleId, 2)) != strtolower($map['EnvironmentName'])) {
             $this->connection->chatSendServerMessage(__('Wrong environment!'), $login);
-
             return;
         }
 
@@ -442,13 +395,7 @@ class ManiaExchange extends ExpPlugin
         $vote->callerLogin = $login;
         $vote->cmdName = '$0f0add $fff$o' . $map['Name'] . '$o$0f0 by $eee' . $map['Username'] . ' $0f0';
         $vote->cmdParam = array('to the queue from MX?$3f3');
-        $this->connection
-            ->callVote(
-                $vote,
-                $this->config->mxVote_ratios,
-                ($this->config->mxVote_timeouts * 1000),
-                $this->config->mxVote_voters
-            );
+        $this->connection->callVote( $vote, $this->config->mxVote_ratios, ($this->config->mxVote_timeouts * 1000), $this->config->mxVote_voters);
     }
 
     public function mxQueue($login, $mxId)

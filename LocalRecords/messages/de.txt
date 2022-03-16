@@ -40,8 +40,17 @@ $FF0G$FE0lü$FD0ck$FC0wü$FB0ns$FA0ch$F90e! #variable#%1$s  #record_top#hat den 
 #record#Server rank: #rank#%1$s#record#/#rank#%2$s
 #record#Server-Rang: #rank#%1$s#record#/#rank#%2$s
 
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s
+#record#Server-Rang: #rank#%1$s#record#/#rank#%2$s #record#Schnitt: $s#time#%3$s
+
 #admin_error#$iNot enough local records to obtain ranking yet..
 #admin_error#$iNoch nicht genügend lokale Rekorde für einen Ranglistenplatz erreicht..
+
+#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]
+#record#Der nächst besser platzierte Spieler ist #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Schnitt: $s#time#%4$s [$s#time#%5$s]
+
+#record#You are already the best ranked player
+#record#Sie sind bereits der bestplatzierte Spieler
 
 #
 #

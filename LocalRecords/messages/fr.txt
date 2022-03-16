@@ -40,8 +40,17 @@ $FF0Fé$FE0li$FD0ci$FC0ta$FB0ti$FA0on$F90s! #variable#%1$s  #record_top#a améli
 #record#Server rank: #rank#%1$s#record#/#rank#%2$s
 #record#Rang serveur: #rank#%1$s#record#/#rank#%2$s
 
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s
+#record#Rang serveur: #rank#%1$s#record#/#rank#%2$s #record#Moyenne: $s#time#%3$s
+
 #admin_error#$iNot enough local records to obtain ranking yet..
 #admin_error#$iNombre de records locaux insuffisant pour obtenir un rang..
+
+#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]
+#record#Le prochain joueur le mieux classé est #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Moyenne: $s#time#%4$s [$s#time#%5$s]
+
+#record#You are already the best ranked player
+#record#Vous êtes déjà le meilleur joueur classé
 
 #
 #
@@ -107,7 +116,7 @@ Login
 Login
 
 #variable#%1$s #record#secures #rank#%2$s. #record#Local Record!#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
-#variable#%1$s #record#sécurise #rank#%2$s. #record#Record Local!#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+#variable#%1$s #record#sécurise #rank#%2$s. #record#Record Local! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
 
 #variable#%1$s #record#new #rank#%2$s.#record# Local Record! #time#%3$s
 #variable#%1$s #record#nouveau #rank#%2$s.#record# Record Local! #time#%3$s
