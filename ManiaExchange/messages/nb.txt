@@ -1,68 +1,95 @@
+#mx#Map $fff%s $z$s#mx# added from MX Succesfully
+#mx#Map $fff%s $z$s#mx# added from MX Succesfully
+
+#mx#MX World Record: #time#%s#mx# by #variable#%s
+#mx#MX World Record: #time#%s#mx# by #variable#%s
+
+#error#Map not found on ManiaExchange
+#error#Map not found on ManiaExchange
+
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
+
+ManiaExchange Map Infos
+ManiaExchange Map Infos
+
+#error#You don't have permission to run this command.
+#error#You don't have permission to run this command.
+
+Update Maps
+Update Maps
+
+ManiaExchange
+ManiaExchange
+
+"%s" is not a numeric value.
+"%s" is not a numeric value.
+
+#mx#Download starting for: %s
+#mx#Download starting for: %s
+
+#admin_error#Map author has declined the permission to download this map!
+#admin_error#Map author has declined the permission to download this map!
+
+#admin_error#The Map is not compatible with current server settings, map not added.
+#admin_error#The Map is not compatible with current server settings, map not added.
+
+Top 25 MX Records
+Top 25 MX Records
+
+Visit the map page
+Visit the map page
+
+Award this map
+Award this map
+
+Maps from all titles pack
+Maps from all titles pack
+
 Map name
-Banenavn
+Map name
 
-Creators name
-Banebygger
+Author name
+Author name
 
-Length
-Lengde
+Search
+Search
 
-Queue
-Kø
+Click Search with empty terms to get the most recent maps
+Click Search with empty terms to get the most recent maps
 
-Install
-Installere
-
-ManiaExchange
-ManiaExchange
-
-Search Maps
-Søk i baner
-
-Usage.. /mx queue [id] or /mx search "your search terms here"
-Bruk.. /mx queue [id] eller /mx search "dine søkekriterier her"
-
-Error: %s
-Feil: %s
-
-MX is down
-MX er nede
-
-Couldn't create mapfile in maps folder, check folder permissions!
-Kunne ikke opprette banefil i banemappen, sjekk mapperettighetene!
+Searching, please wait
+Searching, please wait
 
 #admin_error# $iYou already have a map in the queue...
-#admin_error# $iDu har allerede en bane i køen...
-
-Unable to retrieve track info from MX..  wrong ID..?
-Kunne ikke hente bane fra MX.. Feil ID?
-
-Wrong environment!
-Feil miljø!
+#admin_error# $iYou already have a map in the queue...
 
 #record# $iVote passed!
-#record# $iAvstemming vellykket!
+#record# $iVote passed!
 
 #admin_error# $iVote failed!
-#admin_error# $iAvstemming mislykket!
+#admin_error# $iVote failed!
 
-Error receving data from ManiaExchange!
-#translate# Error receving data from ManiaExchange!
+Recieving maps info, please wait...
+Recieving maps info, please wait...
 
-Map %s $z$s$fff added from MX Succesfully
-#translate# Map %s $z$s$fff added from MX Succesfully
+Error, not enough maps.
+Error, not enough maps.
 
-Author
-#translate# Author
+All maps up-to-date!
+All maps up-to-date!
 
-Map is not compatible with current server settings, map not added.
-#translate# Map is not compatible with current server settings, map not added.
+Update
+Update
 
-The Map is not compatible with current server settings, map not added.
-#translate# The Map is not compatible with current server settings, map not added.
+length
+length
 
-$iYou don't have permission to do that!
-#translate# $iYou don't have permission to do that!
+style
+style
 
- is not a numeric value.
-#translate#  is not a numeric value.
+Install
+Install
+
+Queue
+Queue

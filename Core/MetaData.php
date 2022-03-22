@@ -151,6 +151,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$d10');
         $this->registerVariable($var);
 
+        $var = new ColorCode('Colors_mx', 'Color code for the mx plugin', $config, false, true);
+        $var->setGroup("Chat Messages");
+        $var->setDefaultValue('$3bd');
+        $this->registerVariable($var);
+
         $var = new Boolean('enableRanksCalc', 'Enable player position calculation', $config, false, true);
         $var->setGroup("Misc");
         $var->setDefaultValue(true);

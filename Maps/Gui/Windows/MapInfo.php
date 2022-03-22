@@ -85,7 +85,7 @@ class MapInfo extends Window
             if ($gbxInfo) {
                 $model = $gbxInfo->playerModel;
                 $map->mood = $gbxInfo->mood;
-                $map->nbLaps = $gbxInfo->nbLaps;
+                $map->nbLap = $gbxInfo->nbLaps;
                 $map->authorTime = $gbxInfo->authorTime;
                 $map->silverTime = $gbxInfo->silverTime;
                 $map->bronzeTime = $gbxInfo->bronzeTime;

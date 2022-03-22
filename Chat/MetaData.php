@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Chat;
 
+use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\ColorCode;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
@@ -28,20 +29,21 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(false);
         $this->registerVariable($var);
 
+        $var = new Boolean('useChannels', 'Use chat channels', $config, false, false);
+        $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
+        $var = new BasicList('channels', 'Chat channels', $config, false, false);
+        $var->setType(new TypeString(''));
+        $var->setDefaultValue(array("English", "French", "German"));
+        $this->registerVariable($var);
+
         $var = new Boolean('publicChatActive', 'Enable public chat for players', $config, false, false);
-        $var->setDescription(
-            'Admins with required permissions can continue to chat. A personal message is sent to other players'
-        );
+        $var->setDescription('Admins with required permissions can continue to chat. A personal message is sent to other players');
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 
-        $var = new Boolean(
-            'enableSpectatorChat',
-            'Enable chat for spectators when othervice disabled',
-            $config,
-            false,
-            false
-        );
+        $var = new Boolean('enableSpectatorChat', 'Enable chat for spectators when othervice disabled', $config, false, false);
         $var->setDefaultValue(false);
         $this->registerVariable($var);
 
@@ -50,7 +52,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new ColorCode('publicChatColor', 'Public chat color for server', $config, false, false);
-        $var->setDefaultValue('$fff');
+        $var->setDefaultValue('$ff0');
         $this->registerVariable($var);
 
         $var = new ColorCode('otherServerChatColor', 'Public chat color for relay server', $config, false, false);
@@ -68,5 +70,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new TypeString('chatSeparator', 'Separator for between nickname and message', $config, false, false);
         $var->setDefaultValue('$0af»$z$s ');
         $this->registerVariable($var);
+
     }
 }

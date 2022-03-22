@@ -1,68 +1,95 @@
+#mx#Map $fff%s $z$s#mx# added from MX Succesfully
+#mx#Map $fff%s $z$s#mx# added from MX Succesfully
+
+#mx#MX World Record: #time#%s#mx# by #variable#%s
+#mx#MX World Record: #time#%s#mx# by #variable#%s
+
+#error#Map not found on ManiaExchange
+#error#Map not found on ManiaExchange
+
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
+
+ManiaExchange Map Infos
+ManiaExchange Map Infos
+
+#error#You don't have permission to run this command.
+#error#You don't have permission to run this command.
+
+Update Maps
+Update Maps
+
+ManiaExchange
+ManiaExchange
+
+"%s" is not a numeric value.
+"%s" is not a numeric value.
+
+#mx#Download starting for: %s
+#mx#Download starting for: %s
+
+#admin_error#Map author has declined the permission to download this map!
+#admin_error#Map author has declined the permission to download this map!
+
+#admin_error#The Map is not compatible with current server settings, map not added.
+#admin_error#The Map is not compatible with current server settings, map not added.
+
+Top 25 MX Records
+Top 25 MX Records
+
+Visit the map page
+Visit the map page
+
+Award this map
+Award this map
+
+Maps from all titles pack
+Maps from all titles pack
+
 Map name
-Kartan nimi
+Map name
 
-Creators name
-Tekijän nimi
+Author name
+Author name
 
-Length
-Pituus
+Search
+Search
 
-Queue
-Jonoon
+Click Search with empty terms to get the most recent maps
+Click Search with empty terms to get the most recent maps
 
-Install
-Asenna
-
-ManiaExchange
-ManiaExchange
-
-Search Maps
-Etsi karttoja
-
-Usage.. /mx queue [id] or /mx search "your search terms here"
-Käyttö.. /mx queue [id] tai /mx search "hakutermit tähän"
-
-Error: %s
-Virhe: %s
-
-MX is down
-Yhteyttä MX:n ei voitu muodostaa 
-
-Couldn't create mapfile in maps folder, check folder permissions!
-Karttatiedostoa ei voitu tallentaa karttahakemistoon, tarkista hakemiston oikeudet!
+Searching, please wait
+Searching, please wait
 
 #admin_error# $iYou already have a map in the queue...
-#admin_error# $iSinulla on jo kartta jonossa...
-
-Unable to retrieve track info from MX..  wrong ID..?
-Karttaa ei löytynyt MX:stä..  kenties väärä ID..?
-
-Wrong environment!
-Väärä peli!
+#admin_error# $iYou already have a map in the queue...
 
 #record# $iVote passed!
-#record# $iÄänestys onnistui!
+#record# $iVote passed!
 
 #admin_error# $iVote failed!
-#admin_error# $iÄänestys epäonnistui!
+#admin_error# $iVote failed!
 
-Error receving data from ManiaExchange!
-Virhe vastaanotettaessa tietoja Mania-Exchangesta!
+Recieving maps info, please wait...
+Recieving maps info, please wait...
 
-Map %s $z$s$fff added from MX Succesfully
-Onnistui! Kartta %s $z$s$fff lisätty MX:stä 
+Error, not enough maps.
+Error, not enough maps.
 
-Author
-Tekijä
+All maps up-to-date!
+All maps up-to-date!
 
-Map is not compatible with current server settings, map not added.
-Karttaa ei lisätty, sillä se ei ole yhteensopiva nykyisten palvelimen asetusten kanssa. 
+Update
+Update
 
-The Map is not compatible with current server settings, map not added.
-Kartta ei ole yhteensopiva palvelinasetusten kanssa, joten sitä ei lisätty.
+length
+length
 
-$iYou don't have permission to do that!
-$iSinulla ei ole oikeutta tehdä tätä!
+style
+style
 
- is not a numeric value.
- ei ole numeerinen arvo.
+Install
+Install
+
+Queue
+Queue

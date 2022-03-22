@@ -1,44 +1,68 @@
+#mx#Map $fff%s $z$s#mx# added from MX Succesfully
+#mx#Le circuit %s $z$s$fff#mx# a été ajoute a partir de MX avec succès
+
+#mx#MX World Record: #time#%s#mx# by #variable#%s
+#mx#Record mondial MX: #time#%s#mx# par #variable#%s
+
+#error#Map not found on ManiaExchange
+#error#Carte non trouvée sur ManiaExchange
+
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
+utilisation /mx add [id], /mx queue [id], /mx search "termes ici"  "de de l'auteur", /mx author "nom", /mx infos, /mx random, /mx update
+
+ManiaExchange Map Infos
+Informations de Map ManiaExchange
+
+#error#You don't have permission to run this command.
+#error#Vous n'avez pas la permission d'exécuter cette commande.
+
+Update Maps
+Update Maps
+
+ManiaExchange
+ManiaExchange
+
+"%s" is not a numeric value.
+"%s" n'est pas une valeur numérique.
+
+#mx#Download starting for: %s
+#mx#Téléchargement démarré pour: %s
+
+#admin_error#Map author has declined the permission to download this map!
+#admin_error#L'auteur de la carte a refusé l'autorisation de télécharger cette carte !
+
+#admin_error#The Map is not compatible with current server settings, map not added.
+Le circuit n'est pas compatible avec les paramètres du serveur actuels, pas ajouté.
+
+Top 25 MX Records
+Top 25 Records MX
+
+Visit the map page
+Vister la page de la map
+
+Award this map
+Award this map
+
+Maps from all titles pack
+Maps de tous les pack de titre
+
 Map name
 Nom de Map
 
-Creators name
+Author name
 Nom de l'auteur
 
-Length
-Duration
+Search
+Rechercher
 
-Queue
-Queue
+Click Search with empty terms to get the most recent maps
+Cliquez sur Rechercher avec des termes vides pour obtenir les cartes les plus récentes.
 
-Install
-Installer
-
-ManiaExchange
-ManiaExchange
-
-Search Maps
-Chercher Maps
-
-Usage.. /mx queue [id] or /mx search "your search terms here"
-Utilisation.. /mx queue [id] ou /mx search "vos termes à chercher"
-
-Error: %s
-Erreur: %s
-
-MX is down
-MX indisponible
-
-Couldn't create mapfile in maps folder, check folder permissions!
-Impossible de créer le fichier dans le répertoire de maps, vérifier les permissions du répertoire!
+Searching, please wait
+Recherche, veuillez patienter
 
 #admin_error# $iYou already have a map in the queue...
 #admin_error# $iTu as déjà une map dans la queue...
-
-Unable to retrieve track info from MX..  wrong ID..?
-Impossible d'interroger les infos de map de MX..  mauvaise ID..?
-
-Wrong environment!
-Titre / environment invalide!
 
 #record# $iVote passed!
 #record# $iLe vote à succédé!
@@ -46,26 +70,26 @@ Titre / environment invalide!
 #admin_error# $iVote failed!
 #admin_error# $iLe vote a échoué!
 
-Error receving data from ManiaExchange!
-Erreur en recevant les donees de ManiaExchange!
+Recieving maps info, please wait...
+Réception des informations de maps, veuillez patienter...
 
-Map %s $z$s$fff added from MX Succesfully
-Le circuit %s $z$s$fff a été ajoute a partir de MX avec succès
+Error, not enough maps.
+Erreur, pas assez de maps
 
-Author
-Auteur
+All maps up-to-date!
+Toutes les maps sont à jour!
 
-Map is not compatible with current server settings, map not added.
-Le circuit n'est pas compatible avec les paramètres du serveur actuels, pas ajouté.
+Update
+Mise à jour
 
-The Map is not compatible with current server settings, map not added.
-Le circuit n'est pas compatible avec les paramètres du serveur actuels, pas ajouté.
+length
+Durée
 
-$iYou don\'t have permission to do that!
-$iVous n'êtes pas autorisé faire cela!
+style
+style
 
- is not a numeric value.
- n'est pas une valeur numérique.
+Install
+Installer
 
-Map author has declined the permission to download this map!
-L'auteur de la carte a refusé l'autorisation de télécharger cette carte !
+Queue
+Queue

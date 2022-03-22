@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows;
 use ManiaLivePlugins\eXpansion\Dedimania\Gui\Controls\RecItem;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\LocalRecords\LocalRecords;
+use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 
 class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -17,10 +18,13 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $pager;
     protected $items = array();
     protected $label_visit;
+    protected $connection;
+    protected $url;
 
     protected function onConstruct()
     {
         parent::onConstruct();
+        $this->connection = Singletons::getInstance()->getDediConnection();
         $login = $this->getRecipient();
         $sizeX = 100;
         $scaledSizes = Gui::getScaledSize($this->widths, $sizeX);
@@ -57,8 +61,15 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->mainFrame->addComponent($this->button_cps);
 
         $this->label_visit = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(50);
+        $action = $this->createAction(array($this, 'handleVisitButton'));
+        $this->label_visit->setAction($action);
         $this->label_visit->setText(__("Visit Dedimania at Web", $login));
         $this->mainFrame->addComponent($this->label_visit);
+    }
+
+    public function handleVisitButton($login)
+    {
+        $this->connection->sendOpenLink($login, $this->url, 0);
     }
 
     public function onResize($oldX, $oldY)
@@ -113,7 +124,6 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function setDediUrl($url)
     {
-        $this->label_visit->setUrl($url);
-        $this->label_visit->setScriptEvents();
+        $this->url = $url;
     }
 }
