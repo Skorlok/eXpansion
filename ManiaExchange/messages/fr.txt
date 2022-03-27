@@ -7,8 +7,8 @@
 #error#Map not found on ManiaExchange
 #error#Carte non trouvée sur ManiaExchange
 
-usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update
-utilisation /mx add [id], /mx queue [id], /mx search "termes ici"  "de de l'auteur", /mx author "nom", /mx infos, /mx random, /mx update
+usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update, /mx pack [id]
+utilisation /mx add [id], /mx queue [id], /mx search "termes ici"  "nom de l'auteur", /mx author "nom", /mx infos, /mx random, /mx update, /mx pack [id]
 
 ManiaExchange Map Infos
 Informations de Map ManiaExchange
@@ -93,3 +93,9 @@ Installer
 
 Queue
 Queue
+
+#error#No maps found in mappack !
+#error#Aucune carte trouvée dans le mappack !
+
+#mx#Map already in playlist! Update? remove it first or use /mx update
+#mx#Carte déjà dans la playlist ! Mise à jour ? supprimez-la d'abord ou utilisez /mx update

@@ -9,9 +9,11 @@ use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\Console;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Widgets\MxWidget;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxInfos;
+use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 use oliverde8\AsynchronousJobs\Job\Curl;
 use ManiaLive\Utilities\Time;
@@ -90,7 +92,13 @@ class ManiaExchange extends ExpPlugin
     {
         self::$mxInfo = array();
         self::$mxReplays = array();
-        $query = "http://api.mania-exchange.com/tm/tracks/" . $this->storage->currentMap->uId;
+
+        $title = "tm";
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $title = "sm";
+        }
+
+        $query = "http://api.mania-exchange.com/" . $title . "/tracks/" . $this->storage->currentMap->uId;
 
         $ch = curl_init($query);
         curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -174,9 +182,12 @@ class ManiaExchange extends ExpPlugin
             case "random":
                 $this->mxRandom($login);
                 break;
+            case "pack":
+                $this->mxPack($login, $param);
+                break;
             case "help":
             default:
-                $msg = eXpGetMessage('usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update');
+                $msg = eXpGetMessage('usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update, /mx pack [id]');
                 $this->eXpChatSendServerMessage($msg, $login);
                 break;
         }
@@ -193,6 +204,58 @@ class ManiaExchange extends ExpPlugin
         $window->setSize(220, 100);
         $window->centerOnScreen();
         $window->show();
+    }
+
+    public function mxPack($login, $packId)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_MX)) {
+            $this->eXpChatSendServerMessage("#error#You don't have permission to run this command.", $login);
+            return;
+        }
+
+        if (is_array($packId)) {
+            $packId = $packId[0];
+        }
+
+        if (!is_numeric($packId)) {
+            $this->connection->chatSendServerMessage(__('"%s" is not a numeric value.', $login, $packId), $login);
+            return false;
+        }
+
+        $title = "tm";
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $title = "sm";
+        }
+
+        $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($packId));
+
+        $query = 'https://' . $title . '.mania-exchange.com/api/mappack/get_mappack_tracks/' . $packId;
+        
+        $ch = curl_init($query);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = curl_exec($ch);
+        $status = curl_getinfo($ch);
+        curl_close($ch);
+
+        if ($data === false || $status["http_code"] !== 200) {
+            $this->eXpChatSendServerMessage("#error#MX returned error code $code", $login);
+            return;
+        }
+
+        $json = json_decode($data);
+        if ($json === false || sizeof($json) == 0) {
+            $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+            return;
+        }
+        if (isset($json->Message) && $json->Message == "Specified mappack does not exist.") {
+            $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+            return;
+        }
+
+        foreach($json as $map) {
+            $this->addMap($login, $map->TrackID);
+        }
     }
 
     public function mxRandom($login)
@@ -223,7 +286,12 @@ class ManiaExchange extends ExpPlugin
                 break;
         }
 
-        $query = 'https://tm.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
+        $title = "tm";
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $title = "sm";
+        }
+
+        $query = 'https://' . $title . '.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
 
         $ch = curl_init($query);
         curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -261,7 +329,6 @@ class ManiaExchange extends ExpPlugin
     public function mxSearch($login, $search = "", $author = "")
     {
         $window = Gui\Windows\MxSearch::Create($login);
-        $window->setTitle('ManiaExchange');
         $window->setPlugin($this);
         $window->search($login, $search, $author);
         $window->setSize(210, 100);
@@ -356,6 +423,34 @@ class ManiaExchange extends ExpPlugin
             $gbxReader = new GBXChallMapFetcher(true, false, false);
             $gbxReader->processData($data);
 
+
+            $title = "tm";
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $title = "sm";
+            }
+
+            $query = "https://" . $title . ".mania-exchange.com/api/maps/get_map_info/id/" . $mxId;
+
+            $ch = curl_init($query);
+            curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $mapData = curl_exec($ch);
+            $status = curl_getinfo($ch);
+            curl_close($ch);
+
+            if ($mapData === false || $status["http_code"] !== 200) {
+                $this->eXpChatSendServerMessage("#admin_error#MX returned error code $code", $login);
+                return;
+            }
+
+            $json = json_decode($mapData);
+
+            $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $json->TrackUID);
+            if ($mapFileName){
+                $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use /mx update", $login);
+                return;
+            }
+
             $file = $dir . '/' . $this->getDownloadedMapFilePath($gbxReader, $mxId);
             $dir = dirname($file);
 
@@ -430,6 +525,7 @@ class ManiaExchange extends ExpPlugin
                     if ($this->config->juke_newmaps) {
                         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
+                    $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                 }
@@ -464,6 +560,7 @@ class ManiaExchange extends ExpPlugin
                     if ($this->config->juke_newmaps) {
                         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
+                    $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                 }
@@ -529,7 +626,6 @@ class ManiaExchange extends ExpPlugin
 
         $options = array(CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
         $this->dataAccess->httpCurl($query, array($this, "xUpdateInfo"), null, $options);
-
     }
 
     public function xUpdateInfo($job, $jobData)
@@ -692,7 +788,7 @@ class ManiaExchange extends ExpPlugin
 
         $version = $this->connection->getVersion();
 
-        if (strtolower(substr($version->titleId, 2)) != strtolower($map['EnvironmentName'])) {
+        if (strtolower(substr($version->titleId, 2)) != strtolower($map['TitlePack'])) {
             $this->connection->chatSendServerMessage(__('Wrong environment!'), $login);
             return;
         }

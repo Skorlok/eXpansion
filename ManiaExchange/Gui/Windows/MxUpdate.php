@@ -9,6 +9,8 @@ use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Config;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxInfo;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxMap as MxMapItem;
@@ -21,6 +23,7 @@ class MxUpdate extends Window
 {
     const chunkSize = 50;
 
+    protected $connection;
     protected $frame;
     protected $pager;
     protected $items = array();
@@ -41,6 +44,7 @@ class MxUpdate extends Window
     protected function onConstruct()
     {
         parent::onConstruct();
+        $this->connection = Singletons::getInstance()->getDediConnection();
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->frame->addComponent($this->pager);
@@ -208,6 +212,13 @@ class MxUpdate extends Window
 
     public function updateMap($login, $mapId)
     {
+        $mapUid = ArrayOfObj::getObjbyPropValue($this->maps, "trackID", $mapId);
+
+        $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $mapUid->trackUID);
+        if ($mapFileName){
+            $this->connection->removeMap($mapFileName->fileName);
+        }
+
         $this->mxPlugin->addMap($login, $mapId);
     }
 

@@ -43,6 +43,10 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     /** @var  CheckboxScripted */
     protected $filter;
 
+    protected $prevButton;
+    protected $nextButton;
+    protected $currentPage;
+
     public $mxPlugin;
 
     protected function onConstruct()
@@ -52,6 +56,9 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $config = \ManiaLive\DedicatedApi\Config::getInstance();
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
         $this->storage = \ManiaLive\Data\Storage::getInstance();
+
+        $this->currentPage = 1;
+        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
 
         $this->searchframe = new \ManiaLive\Gui\Controls\Frame();
         $this->searchframe->setLayout(new \ManiaLib\Gui\Layouts\Line());
@@ -70,10 +77,16 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(3, 4);
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
+        $this->searchframe->addComponent($spacer);
 
         $items = array("All", "Race", "Fullspeed", "Tech", "RPG", 'LOL', 'PressForward', 'SpeedTech', 'Multilap', 'Offroad');
         $this->style = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("style", $items);
         $this->searchframe->addComponent($this->style);
+
+        $spacer = new \ManiaLib\Gui\Elements\Quad();
+        $spacer->setSize(3, 4);
+        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
+        $this->searchframe->addComponent($spacer);
 
         $items = array("All", "15sec", "30sec", "45sec", "1min");
         $this->lenght = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("length", $items);
@@ -87,6 +100,16 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $spacer->setSize(8, 4);
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->searchframe->addComponent($spacer);
+
+        $this->prevButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
+        $this->prevButton->setIcon("Icons64x64_1", "ArrowPrev");
+        $this->prevButton->setAction($this->createAction(array($this, "prevPage")));
+        $this->searchframe->addComponent($this->prevButton);
+
+        $this->nextButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
+        $this->nextButton->setIcon("Icons64x64_1", "ArrowNext");
+        $this->nextButton->setAction($this->createAction(array($this, "nextPage")));
+        $this->searchframe->addComponent($this->nextButton);
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
@@ -109,12 +132,29 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->mainFrame->addComponent($this->frame);
     }
 
+    public function nextPage($login, $args)
+    {
+        $this->currentPage++;
+        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
+        $this->actionOk($login, $args);
+    }
+
+    public function prevPage($login, $args)
+    {
+        $this->currentPage--;
+        if ($this->currentPage < 1) {
+            $this->currentPage = 1;
+        }
+        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
+        $this->actionOk($login, $args);
+    }
+
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
         $this->frame->setSizeX($this->sizeX);
         $this->pager->setSize($this->sizeX - 3, $this->sizeY - 12);
-        $this->searchframe->setPosition(8, -3);
+        $this->searchframe->setPosition(0, -3);
         $this->frame->setPosition(0, -6);
     }
 
@@ -148,9 +188,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $mapType = $storage->baseMapType;
             $parts = explode('@', $titlePack);
 
-            $query = 'https://sm.mania-exchange.com/tracksearch2/search?mode=0&vm=0&trackname='
-                . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=All&mtype='
-                . rawurlencode($mapType) . '&priord=2&limit=100&environments=1&tracksearch&api=on&format=json'.$filter;
+            $query = 'https://sm.mania-exchange.com/tracksearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=All&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
         } else {
             $query = 'https://tm.mania-exchange.com/tracksearch2/search?api=on&format=json';
             
@@ -179,8 +217,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                         break;
                 }
             }
-
-            $query .= '&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . $out . '&mtype=All&priord=2&limit=100';
+            $query .= '&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . $out . '&mtype=All&priord=2&limit=100&page=' . rawurlencode($this->currentPage);
         }
 
         $access = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
@@ -320,7 +357,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function actionOk($login, $args)
     {
-
         $style = null;
         $length = null;
         if ($args['style']) {

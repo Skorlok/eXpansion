@@ -16,6 +16,7 @@ use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\GbxReader\Map;
+use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use Maniaplanet\DedicatedServer\Connection;
 
@@ -81,15 +82,18 @@ class MapInfo extends Window
         try {
             $connection = Singletons::getInstance()->getDediConnection();
             $mapPath = $connection->getMapsDirectory();
-            $gbxInfo = Map::read($mapPath . DIRECTORY_SEPARATOR . $map->fileName);
+
+            $gbxInfo = new GBXChallMapFetcher(true, false, false);
+            $gbxInfo->processFile($mapPath . DIRECTORY_SEPARATOR . $map->fileName);
+
             if ($gbxInfo) {
-                $model = $gbxInfo->playerModel;
                 $map->mood = $gbxInfo->mood;
                 $map->nbLap = $gbxInfo->nbLaps;
+                $map->nbCheckpoint = $gbxInfo->nbChecks;
                 $map->authorTime = $gbxInfo->authorTime;
                 $map->silverTime = $gbxInfo->silverTime;
                 $map->bronzeTime = $gbxInfo->bronzeTime;
-                $map->{"nick"} = $gbxInfo->author->nickname;
+                $map->{"nick"} = $gbxInfo->authorNick;
             }
         } catch (Exception $ex) {
             \ManiaLive\Utilities\Console::println("Info: Map not found or error while reading gbx info for map.");
@@ -119,7 +123,7 @@ class MapInfo extends Window
         $this->frame->addComponent($lbl);
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
-        $lbl->setText($gbxInfo->playerModel);
+        $lbl->setText($gbxInfo->vehicle);
         $this->frame->addComponent($lbl);
 
         // frame 2
@@ -132,7 +136,7 @@ class MapInfo extends Window
         $this->frame2->addComponent($lbl);
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
-        $date = new \DateTime(now);
+        $date = new \DateTime(time());
         $date->setTimestamp((int)$map->addTime);
 
         $lbl->setText($date->format("d.m.Y"));

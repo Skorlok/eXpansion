@@ -248,7 +248,7 @@ class Database extends ExpPlugin
             $this->createMapTable();
         }
 
-        if ($this->getDatabaseVersion('exp_maps') != 2) {
+        if ($this->getDatabaseVersion('exp_maps') < 2) {
             $this->db->execute('ALTER TABLE exp_maps ADD KEY(challenge_uid);');
             $this->setDatabaseVersion('exp_maps', 2);
         }

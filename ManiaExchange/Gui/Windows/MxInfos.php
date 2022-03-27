@@ -20,6 +20,13 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $login = $this->getRecipient();
         $this->connection = Singletons::getInstance()->getDediConnection();
 
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+
+        $title = "tm";
+        if ($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) {
+            $title = "sm";
+        }
+
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setSize(25, 6);
         $this->frame->setPosY(-5);
@@ -32,9 +39,9 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->quadImage = new \ManiaLib\Gui\Elements\Quad(80, 50);
         $this->quadImage->setAlign("left", "top");
         if (ManiaExchange::$mxInfo->HasScreenshot) {
-            $this->quadImage->setImage("https://tm.mania-exchange.com/maps/" . ManiaExchange::$mxInfo->TrackID . "/image/1?.png", true);
+            $this->quadImage->setImage("https://" . $title . ".mania-exchange.com/maps/" . ManiaExchange::$mxInfo->TrackID . "/image/1?.png", true);
         } else {
-            $this->quadImage->setImage("https://tm.mania-exchange.com/tracks/screenshot/normal/" . ManiaExchange::$mxInfo->TrackID . "/?.jpg", true);
+            $this->quadImage->setImage("https://" . $title . ".mania-exchange.com/tracks/screenshot/normal/" . ManiaExchange::$mxInfo->TrackID . "/?.jpg", true);
         }
         $this->frameImage->addComponent($this->quadImage);
         $this->mainFrame->addComponent($this->frameImage);
@@ -102,9 +109,12 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_map_comment = new \ManiaLib\Gui\Elements\Label(65, 10);
         $this->label_map_comment->setAlign('left', 'center');
         $this->label_map_comment->setPosition(85, -27);
-        $text = substr(wordwrap(ManiaExchange::$mxInfo->Comments, 80, "\n"), 0, 800);
-        if (strlen($text) < strlen(ManiaExchange::$mxInfo->Comments)) {
-            $text .= "   ....";
+        $text = wordwrap(ManiaExchange::$mxInfo->Comments, 60, "\n");
+        $textSplit = explode("\n", $text);
+        if (count($textSplit) > 18) {
+            $text = array_slice($textSplit, 0, 18);
+            $text = implode("\n", $text);
+            $text .= "\n   ....";
         }
         $this->label_map_comment->setText(__($text));
         $this->label_map_comment->setScale(1.2);
@@ -132,13 +142,27 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function handleButtonVisit($login)
     {
-        $link = "http://tm.mania-exchange.com/tracks/view/" . ManiaExchange::$mxInfo->TrackID;
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+
+        $title = "tm";
+        if ($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) {
+            $title = "sm";
+        }
+
+        $link = "http://" . $title . ".mania-exchange.com/tracks/view/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 
     public function handleButtonAward($login)
     {
-        $link = "http://tm.mania-exchange.com/awards/add/" . ManiaExchange::$mxInfo->TrackID;
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+
+        $title = "tm";
+        if ($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) {
+            $title = "sm";
+        }
+
+        $link = "http://" . $title . ".mania-exchange.com/awards/add/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 
