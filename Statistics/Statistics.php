@@ -36,6 +36,8 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $menu->addItem('Top Play Time', $aHandler->createAction(array($this, 'showTopPlayTime')));
         $menu->addItem('Top nb Finish', $aHandler->createAction(array($this, 'showTopFinish')));
         $menu->addItem('Top nb Map Played', $aHandler->createAction(array($this, 'showTopTrackPlay')));
+        $menu->addItem('Top Karma Voter', $aHandler->createAction(array($this, 'showTopVoter')));
+        $menu->addItem('Top Active Players', $aHandler->createAction(array($this, 'showTopActive')));
 
         $menu->addItem('Country Related', -1, '2B2');
         $menu->addItem('Top Country by Finish', $aHandler->createAction(array($this, 'showTopFinishCountry')));
@@ -64,6 +66,8 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TrackPlay::Erase($login);
+        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::Erase($login);
+        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Finish::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryFinish::Erase($login);
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::Erase($login);
@@ -129,7 +133,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Planet Incomes', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -153,7 +157,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Donators(Amount)', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -178,7 +182,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Server Donators(Amount)', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -201,7 +205,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Donators(Amount)', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -225,7 +229,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Server Donators(Amount)', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -246,7 +250,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Server Winners', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -266,12 +270,15 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Online Time', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
     public function showTopPlayTime($login)
     {
+        if (!$this->db->tableExists("exp_records")) {
+            return;
+        }
 
         $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, '
@@ -290,12 +297,15 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Play Time', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
     public function showTopTrackPlay($login)
     {
+        if (!$this->db->tableExists("exp_records")) {
+            return;
+        }
 
         $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, count(*) as nb'
@@ -313,12 +323,61 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Number tracks played', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
+        $window->show();
+    }
+
+    public function showTopVoter($login)
+    {
+        if (!$this->db->tableExists("exp_ratings")) {
+            return;
+        }
+
+        $this->storage->serverLogin;
+        $sql = 'SELECT player_login as login, player_nickname as nickname, count(*) as nb'
+            . ' FROM exp_ratings, exp_players'
+            . ' WHERE login = player_login'
+            . ' GROUP BY player_login, player_nickname'
+            . ' HAVING count(*) > 0'
+            . ' ORDER BY nb DESC'
+            . ' LIMIT 0, 100';
+
+        $datas = $this->getData($sql);
+
+        $this->closeAllWindows($login);
+        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::Create($login);
+        $window->setTitle(__('Top Karma Voter', $login));
+        $window->centerOnScreen();
+        $window->populateList($datas);
+        $window->setSize(140, 110);
+        $window->show();
+    }
+
+    public function showTopActive($login)
+    {
+
+        $this->storage->serverLogin;
+        $sql = "SELECT player_login as login, player_nickname as nickname, DATEDIFF('". date('Y-m-d H:i:s', time() - date('Z')) ."', FROM_UNIXTIME(`player_updated`)) AS `days`"
+            . ' FROM exp_players'
+            . ' ORDER BY days ASC'
+            . ' LIMIT 0, 100';
+
+        $datas = $this->getData($sql);
+
+        $this->closeAllWindows($login);
+        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::Create($login);
+        $window->setTitle(__('Top Active Players', $login));
+        $window->centerOnScreen();
+        $window->populateList($datas);
+        $window->setSize(140, 110);
         $window->show();
     }
 
     public function showTopFinish($login)
     {
+        if (!$this->db->tableExists("exp_records")) {
+            return;
+        }
 
         $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, SUM(record_nbFinish) as nb'
@@ -336,12 +395,15 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Top Finish', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
     public function showTopFinishCountry($login)
     {
+        if (!$this->db->tableExists("exp_records")) {
+            return;
+        }
 
         $this->storage->serverLogin;
         $sql = 'SELECT player_nation as nation, SUM(record_nbFinish) as nb'
@@ -359,7 +421,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Country with top Finish', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -380,7 +442,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Country with top Online Time', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -402,7 +464,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Most winning country', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -423,7 +485,7 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->setTitle(__('Country with most players', $login));
         $window->centerOnScreen();
         $window->populateList($datas);
-        $window->setSize(140, 100);
+        $window->setSize(140, 110);
         $window->show();
     }
 
@@ -459,6 +521,8 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::EraseAll();
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::EraseAll();
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TrackPlay::EraseAll();
+        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::EraseAll();
+        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::EraseAll();
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Finish::EraseAll();
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryFinish::EraseAll();
         \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::EraseAll();
