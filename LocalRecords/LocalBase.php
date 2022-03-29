@@ -13,6 +13,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Cps;
+use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\SecCps;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\CpDiff;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Ranks;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Records;
@@ -158,6 +159,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public static $openCpsAction = -1;
 
+    public static $openSecCpsAction = -1;
+
     private $deleteTempLogin = null;
 
     abstract protected function getScoreType();
@@ -180,6 +183,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         LocalBase::$openSectorsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showSectorWindow'));
         LocalBase::$openRecordsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showRecsWindowExternal'));
         LocalBase::$openCpsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showCpWindow'));
+        LocalBase::$openSecCpsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showSecCpWindow'));
 
         $this->config = Config::getInstance();
 
@@ -192,6 +196,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->setPublicMethod("showRecsWindow");
         $this->setPublicMethod("showRanksWindow");
         $this->setPublicMethod("showCpWindow");
+        $this->setPublicMethod("showSecCpWindow");
         $this->setPublicMethod("showTopSums");
 
         //The Database plugin is needed.
@@ -292,6 +297,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $cmd = $this->registerChatCommand("cps", "showCpWindow", 0, true);
         $cmd->help = 'Show Checkpoint times';
+
+        $cmd = $this->registerChatCommand("seccps", "showSecCpWindow", 0, true);
+        $cmd->help = 'Show Sectors times';
 
         $cmd = $this->registerChatCommand("cps", "showCPDiffWindow", 1, true);
         $cmd->help = 'Show Checkpoint difference';
@@ -1296,6 +1304,19 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $window->show();
     }
 
+    public function showSecCpWindow($login)
+    {
+        SecCps::Erase($login);
+
+        $window = SecCps::Create($login);
+        /** @var SecCps $window */
+        $window->setTitle(__('Sectors on Map', $login));
+        $window->populateList($this->currentChallengeRecords, 100, $this);
+        $window->setSize(200, 100);
+        $window->centerOnScreen();
+        $window->show();
+    }
+
     public function showCpDiffWindow($login, $params)
     {
         CpDiff::Erase($login);
@@ -1845,6 +1866,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->onEndMatch(array(), array());
         Sector::EraseAll();
         Cps::EraseAll();
+        CpDiff::EraseAll();
+        SecCps::EraseAll();
         Ranks::EraseAll();
         Records::EraseAll();
     }

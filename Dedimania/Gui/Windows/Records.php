@@ -60,6 +60,11 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->button_cps->setAction(\ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenCps);
         $this->mainFrame->addComponent($this->button_cps);
 
+        $this->button_seccps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
+        $this->button_seccps->setText(__("Sectors", $login));
+        $this->button_seccps->setAction(\ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenSecCps);
+        $this->mainFrame->addComponent($this->button_seccps);
+
         $this->label_visit = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(50);
         $action = $this->createAction(array($this, 'handleVisitButton'));
         $this->label_visit->setAction($action);
@@ -83,7 +88,8 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_login->setSizeX($scaledSizes[3]);
 
         $this->button_cps->setPosition($this->getSizeX() - 30, -$this->getSizeY() + 6);
-        $this->label_visit->setPosition($this->getSizeX() - 72, -$this->getSizeY() + 6);
+        $this->button_seccps->setPosition($this->getSizeX() - 56, -$this->getSizeY() + 6);
+        $this->label_visit->setPosition($this->getSizeX() - 97, -$this->getSizeY() + 6);
 
         $this->pager->setSize($this->getSizeX(), $this->getSizeY() - 12);
         foreach ($this->items as $item) {

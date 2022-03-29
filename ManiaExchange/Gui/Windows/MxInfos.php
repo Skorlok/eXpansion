@@ -109,7 +109,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_map_comment = new \ManiaLib\Gui\Elements\Label(65, 10);
         $this->label_map_comment->setAlign('left', 'center');
         $this->label_map_comment->setPosition(85, -27);
-        $text = wordwrap(ManiaExchange::$mxInfo->Comments, 60, "\n");
+        $text = wordwrap(ManiaExchange::$mxInfo->Comments, 70, "\n");
         $textSplit = explode("\n", $text);
         if (count($textSplit) > 18) {
             $text = array_slice($textSplit, 0, 18);

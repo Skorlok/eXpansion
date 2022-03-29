@@ -975,7 +975,7 @@ class GBXChallMapFetcher extends GBXBaseFetcher
             // extract optional song & mod filenames
             if (!empty($this->xmlParsed['DEPS'])) {
                 for ($i = 0; $i < count($this->xmlParsed['DEPS']); $i++) {
-                    if (preg_match('/ChallengeMusics\\\\(.+)/', $this->xmlParsed['DEPS'][$i]['FILE'], $path)) {
+                    if (preg_match('/Musics\\\\(.+)/', $this->xmlParsed['DEPS'][$i]['FILE'], $path)) {
                         $this->songFile = $path[1];
                         if (isset($this->xmlParsed['DEPS'][$i]['URL'])) {
                             $this->songUrl = $this->xmlParsed['DEPS'][$i]['URL'];

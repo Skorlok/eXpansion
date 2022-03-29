@@ -63,6 +63,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public static $actionOpenRecs = -1;
     public static $actionOpenCps = -1;
+    public static $actionOpenSecCps = -1;
 
     public function eXpOnInit()
     {
@@ -103,10 +104,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->enableApplicationEvents();
         $this->enableStorageEvents();
 
-        \ManiaLive\Event\Dispatcher::register(
-            \ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent::getClass(),
-            $this
-        );
+        \ManiaLive\Event\Dispatcher::register(\ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent::getClass(), $this);
 
         $this->tryConnection();
         // $this->previewDediMessages();
@@ -114,30 +112,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public function previewDediMessages()
     {
+        $this->eXpChatSendServerMessage($this->msg_record, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
 
-        $this->eXpChatSendServerMessage(
-            $this->msg_record,
-            null,
-            array(
-                \ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'),
-                rand(1, 100),
-                Time::fromTM(rand(10000, 100000)),
-                rand(1, 100), Time::fromTM(rand(10000, 100000))
-            )
-        );
-
-        $this->eXpChatSendServerMessage(
-            $this->msg_newRecord,
-            null,
-            array(
-                \ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'),
-                rand(1, 100),
-                Time::fromTM(rand(10000, 100000))
-            )
-        );
-
+        $this->eXpChatSendServerMessage($this->msg_newRecord, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
     }
-
 
     private $settingsChanged = array();
 
@@ -155,38 +133,30 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         if (!$this->running) {
             if (empty($this->config->login) || empty($this->config->code)) {
                 $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                $admins->announceToPermission(
-                    Permission::EXPANSION_PLUGIN_SETTINGS,
-                    "#admin_error#Server login or/and Server code is empty in Dedimania Configuration"
-                );
+                $admins->announceToPermission(Permission::EXPANSION_PLUGIN_SETTINGS, "#admin_error#Server login or/and Server code is empty in Dedimania Configuration");
                 $this->console("\$f00Server code or/and login is not configured for dedimania plugin!");
             } else {
                 try {
                     $this->dedimania->openSession($this->expStorage->version->titleId, $this->config);
                     $this->registerChatCommand("dedirecs", "showRecs", 0, true);
                     $this->registerChatCommand("dedicps", "showCps", 0, true);
+                    $this->registerChatCommand("dediseccps", "showSecCps", 0, true);
                     $this->registerChatCommand("dedicps", "showCpDiff", 1, true);
                     $this->setPublicMethod("showRecs");
                     $this->setPublicMethod("showCps");
+                    $this->setPublicMethod("showSecCps");
                     $this->setPublicMethod("getRecords");
 
                     $this->running = true;
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                    $admins->announceToPermission(
-                        'expansion_settings',
-                        "#admin_action#Dedimania connection successfull."
-                    );
+                    $admins->announceToPermission('expansion_settings', "#admin_action#Dedimania connection successfull.");
 
-                    self::$actionOpenRecs = \ManiaLive\Gui\ActionHandler::getInstance()
-                        ->createAction(array($this, "showRecs"));
-                    self::$actionOpenCps = \ManiaLive\Gui\ActionHandler::getInstance()
-                        ->createAction(array($this, "showCps"));
+                    self::$actionOpenRecs = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showRecs"));
+                    self::$actionOpenCps = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showCps"));
+                    self::$actionOpenSecCps = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showSecCps"));
                 } catch (\Exception $ex) {
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                    $admins->announceToPermission(
-                        'expansion_settings',
-                        "#admin_error#Server login or/and Server code is wrong in Dedimania Configuration"
-                    );
+                    $admins->announceToPermission('expansion_settings', "#admin_error#Server login or/and Server code is wrong in Dedimania Configuration");
                     $admins->announceToPermission('expansion_settings', "#admin_error#" . $ex->getMessage());
                     $this->console("\$f00Server code or/and login is wrong for the dedimania plugin!");
                 }
@@ -386,9 +356,11 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->disableDedicatedEvents();
         \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::EraseAll();
         \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenCps);
+        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenSecCps);
         \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenRecs);
         self::$actionOpenRecs = -1;
         self::$actionOpenCps = -1;
+        self::$actionOpenSecCps = -1;
 
 
         Dispatcher::unregister(DediEvent::getClass(), $this);
@@ -522,7 +494,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
         if (sizeof($this->records) == 0) {
             $this->eXpChatSendServerMessage($this->msg_norecord, $login);
-
             return;
         }
         try {
@@ -530,8 +501,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             $window->setTitle(__('Dedimania -records for', $login), $this->storage->currentMap->name);
             $window->centerOnScreen();
             $window->populateList($this->records);
-            $url = "http://dedimania.net/tm2stats/?do=stat&Envir=" . $this->storage->currentMap->environnement
-                . "&RecOrder3=REC-ASC&UId=" . $this->storage->currentMap->uId . "&Show=RECORDS";
+            $url = "http://dedimania.net/tm2stats/?do=stat&Envir=" . $this->storage->currentMap->environnement . "&RecOrder3=REC-ASC&UId=" . $this->storage->currentMap->uId . "&Show=RECORDS";
             $window->setDediUrl($url);
 
             $window->setSize(120, 100);
@@ -552,6 +522,26 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         try {
             $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\RecordCps::Create($login);
             $window->setTitle(__('Dedimania cps for ', $login), $this->storage->currentMap->name);
+            $window->centerOnScreen();
+            $window->populateList($this->records);
+            $window->setSize(170, 110);
+            $window->show();
+        } catch (\Exception $e) {
+            ErrorHandling::displayAndLogError($e);
+        }
+    }
+
+    public function showSecCps($login)
+    {
+        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\RecordSecCps::Erase($login);
+
+        if (sizeof($this->records) == 0) {
+            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
+            return;
+        }
+        try {
+            $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\RecordSecCps::Create($login);
+            $window->setTitle(__('Dedimania sectors for ', $login), $this->storage->currentMap->name);
             $window->centerOnScreen();
             $window->populateList($this->records);
             $window->setSize(170, 110);

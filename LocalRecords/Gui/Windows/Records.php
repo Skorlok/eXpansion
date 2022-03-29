@@ -32,6 +32,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $items = array();
     protected $button_sectors;
     protected $button_cps;
+    protected $button_seccps;
 
     protected $recList;
     protected $limit;
@@ -88,7 +89,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->frame->addComponent($this->label_date);
 
         $this->button_sectors = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_sectors->setText("Sector Times");
+        $this->button_sectors->setText("Top Sector Times");
         $this->button_sectors->setAction(LocalRecords::$openSectorsAction);
         $this->mainFrame->addComponent($this->button_sectors);
 
@@ -97,6 +98,10 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->button_cps->setAction(LocalRecords::$openCpsAction);
         $this->mainFrame->addComponent($this->button_cps);
 
+        $this->button_seccps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
+        $this->button_seccps->setText("Sectors Times");
+        $this->button_seccps->setAction(LocalRecords::$openSecCpsAction);
+        $this->mainFrame->addComponent($this->button_seccps);
     }
 
     public function onResize($oldX, $oldY)
@@ -116,8 +121,9 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->setSizeX($this->getSizeX());
         }
 
-        $this->button_sectors->setPosition($this->getSizeX() - 27, -$this->getSizeY() + 6);
-        $this->button_cps->setPosition($this->getSizeX() - 53, -$this->getSizeY() + 6);
+        $this->button_sectors->setPosition($this->getSizeX() - 31, -$this->getSizeY() + 6);
+        $this->button_cps->setPosition($this->getSizeX() - 57, -$this->getSizeY() + 6);
+        $this->button_seccps->setPosition($this->getSizeX() - 83, -$this->getSizeY() + 6);
     }
 
     public function onShow()
@@ -150,6 +156,8 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->pager->clearItems();
         $this->button_sectors->setVisibility($currentMap);
+        $this->button_cps->setVisibility($currentMap);
+        $this->button_seccps->setVisibility($currentMap);
         $login = $this->getRecipient();
         $x = 0;
 

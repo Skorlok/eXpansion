@@ -33,6 +33,8 @@ class MapInfo extends Window
     /** @var Connection */
     protected $connection;
 
+    protected $gbxInfo;
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -49,7 +51,6 @@ class MapInfo extends Window
 
     public function setMap($uid = null)
     {
-
         $storage = Storage::getInstance();
         if ($uid == null) {
             $uid = $storage->currentMap->uId;
@@ -80,19 +81,22 @@ class MapInfo extends Window
 
         $model = "commonCar";
         try {
-            $connection = Singletons::getInstance()->getDediConnection();
-            $mapPath = $connection->getMapsDirectory();
+            $this->connection = Singletons::getInstance()->getDediConnection();
+            $mapPath = $this->connection->getMapsDirectory();
 
             $gbxInfo = new GBXChallMapFetcher(true, false, false);
             $gbxInfo->processFile($mapPath . DIRECTORY_SEPARATOR . $map->fileName);
 
             if ($gbxInfo) {
+                $this->gbxInfo = $gbxInfo;
                 $map->mood = $gbxInfo->mood;
                 $map->nbLap = $gbxInfo->nbLaps;
                 $map->nbCheckpoint = $gbxInfo->nbChecks;
                 $map->authorTime = $gbxInfo->authorTime;
                 $map->silverTime = $gbxInfo->silverTime;
                 $map->bronzeTime = $gbxInfo->bronzeTime;
+                $map->songFile = $gbxInfo->songFile;
+                $map->modName = $gbxInfo->modName;
                 $map->{"nick"} = $gbxInfo->authorNick;
             }
         } catch (Exception $ex) {
@@ -124,6 +128,30 @@ class MapInfo extends Window
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
         $lbl->setText($gbxInfo->vehicle);
+        $this->frame->addComponent($lbl);
+
+        // Mod file
+        if ($gbxInfo->modUrl) {
+            $this->button_mod = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
+            $this->button_mod->setText(__("Download Mod"));
+            $this->button_mod->setPosition(80, -85);
+            $action = $this->createAction(array($this, 'handleButtonMod'));
+            $this->button_mod->setAction($action);
+            $this->frame->addComponent($this->button_mod);
+        }
+
+        // Song file
+        if ($gbxInfo->songUrl) {
+            $this->button_song = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
+            $this->button_song->setText(__("Download Song"));
+            $this->button_song->setPosition(110, -85);
+            $action = $this->createAction(array($this, 'handleButtonSong'));
+            $this->button_song->setAction($action);
+            $this->frame->addComponent($this->button_song);
+        }
+
+        $lbl = new Label($x, 6);
+        $lbl->setPosition($x, $y);
         $this->frame->addComponent($lbl);
 
         // frame 2
@@ -161,7 +189,7 @@ class MapInfo extends Window
         }
 
         // integer values
-        $mapData = array("nbCheckpoint" => "Checkpoints", "nbLap" => "Laps", "copperPrice" => "Display Cost");
+        $mapData = array("nbCheckpoint" => "Checkpoints", "nbLap" => "Laps", "copperPrice" => "Display Cost", "songFile" => "Song Name", "modName"=> "Mod Name");
         foreach ($mapData as $field => $descr) {
             $lbl = new Label($x, 6);
             $lbl->setPosition($x, $y);
@@ -175,6 +203,16 @@ class MapInfo extends Window
         }
 
         return true;
+    }
+
+    public function handleButtonMod($login)
+    {
+        $this->connection->sendOpenLink($login, $this->gbxInfo->modUrl, 0);
+    }
+
+    public function handleButtonSong($login)
+    {
+        $this->connection->sendOpenLink($login, $this->gbxInfo->songUrl, 0);
     }
 
     protected function onHide()
