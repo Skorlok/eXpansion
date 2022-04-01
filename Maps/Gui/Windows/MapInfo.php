@@ -164,7 +164,7 @@ class MapInfo extends Window
         $this->frame2->addComponent($lbl);
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
-        $date = new \DateTime(time());
+        $date = new \DateTime();
         $date->setTimestamp((int)$map->addTime);
 
         $lbl->setText($date->format("d.m.Y"));

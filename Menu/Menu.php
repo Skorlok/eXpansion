@@ -275,7 +275,7 @@ class Menu extends ExpPlugin implements Listener
         try {
             switch ($action) {
                 case "!maplist":
-                    $this->callPublicMethod($this->getPluginClass("Maps"), "showMapList", $login);
+                    $this->callPublicMethod($this->getPluginClass("Maps"), "showMapList_menu", $login);
                     break;
                 case "!jukebox":
                     $this->callPublicMethod($this->getPluginClass("Maps"), "showJukeList", $login);
@@ -317,10 +317,10 @@ class Menu extends ExpPlugin implements Listener
                     $adminGrp->adminCmd($login, "cancel");
                     break;
                 case "!admremovemap":
-                    $adminGrp->adminCmd($login, "remove this");
+                    $adminGrp->adminCmd($login, "removethis");
                     break;
                 case "!admtrashmap":
-                    $adminGrp->adminCmd($login, "trash this");
+                    $adminGrp->adminCmd($login, "trashthis");
                     break;
                 case "!admmx":
                     $this->callPublicMethod($this->getPluginClass("ManiaExchange"), "mxSearch", $login, "", "");

@@ -86,14 +86,14 @@ class NextMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->bg->setAction($action);
     }
 
-    public function setMap(\Maniaplanet\DedicatedServer\Structures\Map $map)
+    public function setMap($map)
     {
         $this->map = $map;
         $this->labelName->setText($this->map->name);
-        $this->labelAuthor->setText($this->map->author);
-        $this->environment->setText($map->environnement);
+        $this->labelAuthor->setText($this->map->author->nickname);
+        $this->environment->setText($map->environment);
 
-        if ($map->author == "Nadeo") {
+        if ($map->author->login == "Nadeo") {
             $this->country->setImage("http://reaby.kapsi.fi/ml/flags/France.dds", true);
         }
     }

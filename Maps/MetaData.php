@@ -54,5 +54,10 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("Chat Messages");
         $var->setDefaultValue(true);
         $this->registerVariable($var);
+
+        $var = new Boolean("showEndMatchNoticesJukebox", "Show end map notices if someone jukeboxed a map", $config, false, false);
+        $var->setGroup("Chat Messages");
+        $var->setDefaultValue(true);
+        $this->registerVariable($var);
     }
 }

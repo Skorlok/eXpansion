@@ -18,6 +18,8 @@ class Mapitem extends Control implements OptimizedPagerElement
     protected $goButton;
     protected $showRecsButton;
     protected $removeButton;
+    protected $trashButton;
+    protected $jumpButton;
     public $label_map;
     public $label_envi;
     public $label_author;
@@ -30,7 +32,7 @@ class Mapitem extends Control implements OptimizedPagerElement
     public function __construct($indexNumber, $login, $action)
     {
         $sizeY = 6.5;
-        $sizeX = 170;
+        $sizeX = 190;
 
         $scaledSizes = Gui::getScaledSize(self::$ColumnWidths, ($sizeX) - 7);
 
@@ -106,15 +108,35 @@ class Mapitem extends Control implements OptimizedPagerElement
             $this->actionsFrame->addComponent($this->showRecsButton);
         }
 
+        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN)) {
+            $this->jumpButton = new MyButton(5, 5);
+            $this->jumpButton->setDescription(__('Skip to this map', $login), 70);
+            $this->jumpButton->setAction($action);
+            $this->jumpButton->colorize('a22');
+            $this->jumpButton->setIcon('Icons64x64_1', 'ClipPlay');
+            $this->jumpButton->setId('column_' . $indexNumber . '_8');
+            $this->jumpButton->setClass("eXpOptimizedPagerAction");
+            $this->actionsFrame->addComponent($this->jumpButton);
+        }
+
         if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
             $this->removeButton = new MyButton(5, 5);
             $this->removeButton->setDescription(__('$F22Remove this map from server', $login), 70);
             $this->removeButton->setAction($action);
             $this->removeButton->colorize('a22');
-            $this->removeButton->setIcon('Icons64x64_1', 'Close');
-            $this->removeButton->setId('column_' . $indexNumber . '_8');
+            $this->removeButton->setIcon('Icons128x32_1', 'Close');
+            $this->removeButton->setId('column_' . $indexNumber . '_9');
             $this->removeButton->setClass("eXpOptimizedPagerAction");
             $this->actionsFrame->addComponent($this->removeButton);
+
+            $this->trashButton = new MyButton(5, 5);
+            $this->trashButton->setDescription(__('$F22Erase this map and the file from server', $login), 70);
+            $this->trashButton->setAction($action);
+            $this->trashButton->colorize('a22');
+            $this->trashButton->setIcon('Icons64x64_1', 'Close');
+            $this->trashButton->setId('column_' . $indexNumber . '_10');
+            $this->trashButton->setClass("eXpOptimizedPagerAction");
+            $this->actionsFrame->addComponent($this->trashButton);
         }
 
         $this->addComponent($this->frame);
@@ -132,7 +154,7 @@ class Mapitem extends Control implements OptimizedPagerElement
         $this->label_localrec->setSizeX($scaledSizes[4]);
         $this->label_rating->setSizeX($scaledSizes[5]);
         $this->actionsFrame->setSizeX($scaledSizes[6]);
-        $this->frame->setSize($this->getSizeX() - 5, $this->getSizeY());
+        $this->frame->setSize($this->getSizeX(), $this->getSizeY());
     }
 
     public function destroy()
@@ -145,6 +167,12 @@ class Mapitem extends Control implements OptimizedPagerElement
         }
         if (is_object($this->removeButton)) {
             $this->removeButton->destroy();
+        }
+        if (is_object($this->trashButton)) {
+            $this->trashButton->destroy();
+        }
+        if (is_object($this->jumpButton)) {
+            $this->jumpButton->destroy();
         }
         if (is_object($this->showRecsButton)) {
             $this->showRecsButton->destroy();

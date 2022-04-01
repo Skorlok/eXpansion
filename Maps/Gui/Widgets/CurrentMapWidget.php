@@ -97,7 +97,7 @@ class CurrentMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->setSize(90, 15);
     }
 
-    public function setMap(\Maniaplanet\DedicatedServer\Structures\Map $map)
+    public function setMap($map)
     {
         $playerModel = "";
         if (isset($map->playerModel)) {

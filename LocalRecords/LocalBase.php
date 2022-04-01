@@ -567,7 +567,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
         $currentMap->localRecords = array();
         foreach ($this->currentChallengeRecords as $i => $record) {
-            $currentMap->localRecords[$record->login] = $record->place;
+            $currentMap->localRecords[$record->login] = $record->place - 1;
             $newUpdate = $this->updateRecordInDatabase($record, $nbLaps);
             $updated = $updated || $newUpdate;
         }
@@ -582,7 +582,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         } else {
             $q = "SELECT rank_playerlogin FROM `exp_ranks` WHERE rank_challengeuid = " . $this->db->quote($this->storage->currentMap->uId) . $cons;
             $data = $this->db->execute($q);
-            if (sizeof($data->fetchArray()) == 0) {
+            $arr = $data->fetchArray();
+            if ($arr == false || sizeof($arr) == 0) {
                 $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
             }
         }

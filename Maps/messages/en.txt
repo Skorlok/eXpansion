@@ -211,6 +211,12 @@ Show Records
 $F22Remove this map from server
 $F22Remove this map from server
 
+$F22Erase this map and the file from server
+$F22Erase this map and the file from server
+
+Skip to this map
+Skip to this map
+
 Map %s $z$s$fffadded to playlist.
 Map %s $z$s$fffadded to playlist.
 

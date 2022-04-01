@@ -42,16 +42,18 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     /** @var  \ManiaLive\Data\Storage */
     protected $storage;
-    protected $widths = array(5, 15, 4, 4, 3, 3, 3, .7);
+    protected $widths = array(5, 15, 4, 4, 3, 3, 3, 1, 1, 1);
 
     /** @var \ManiaLivePlugins\eXpansion\Maps\Structures\SortableMap[] */
     protected $maps = array();
+    
+    public $mapForLogin = array();
 
     protected function onConstruct()
     {
         parent::onConstruct();
         $login = $this->getRecipient();
-        $sizeX = 100;
+        $sizeX = 120;
         $scaledSizes = Gui::getScaledSize($this->widths, $sizeX);
 
         $config = \ManiaLive\DedicatedApi\Config::getInstance();
@@ -196,6 +198,18 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->RedrawAll();
     }
 
+    public function trashMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
+    {
+        self::$mapsPlugin->eraseMap($login, $map);
+        $this->RedrawAll();
+    }
+
+    public function jumpMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
+    {
+        self::$mapsPlugin->gotoMap($login, $map);
+        $this->RedrawAll();
+    }
+
     public function queueMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
     {
         self::$mapsPlugin->playerQueueMap($login, $map, false);
@@ -239,36 +253,34 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         $mapsAtServer = array();
         $maps = $this->connection->getMapList(-1, 0);
+        $currentMap = $this->connection->getCurrentMapInfo();
 
         foreach ($maps as $map) {
-            $mapsAtServer[] = $map->fileName;
+            if ($map->fileName != $currentMap->fileName) {
+                $mapsAtServer[] = $map->fileName;
+            }
         }
-
-        array_shift($mapsAtServer);
 
         try {
             $this->connection->RemoveMapList($mapsAtServer);
             $this->connection->chatSendServerMessage("Maplist cleared with:" . count($mapsAtServer) . " maps!", $login);
         } catch (\Exception $e) {
-            $this->connection->chatSendServerMessage(
-                "Oops, couldn't clear the map list. server said:" . $e->getMessage()
-            );
+            $this->connection->chatSendServerMessage("Oops, couldn't clear the map list. server said:" . $e->getMessage());
         }
     }
 
     public function updateList($login, $column = null, $sortType = null, $maps = null)
     {
-
         $this->pager->clearItems();
 
         if ($maps == null) {
-            $maps = $this->storage->maps;
+            if (isset($this->mapForLogin[$login])) {
+                $maps = $this->mapForLogin[$login];
+            } else {
+                $maps = $this->storage->maps;
+            }
         } else {
-            $this->title_mapName->setAction(null);
-            $this->title_authorName->setAction(null);
-            $this->title_rating->setAction(null);
-            $this->title_rank->setAction(null);
-            $this->title_goldTime->setAction(null);
+            $this->mapForLogin[$login] = $maps;
         }
 
         foreach ($this->items as $item) {
@@ -278,10 +290,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items = array();
 
 
-        $isAdmin = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission(
-            $login,
-            Permission::MAP_REMOVE_MAP
-        );
+        $isAdmin = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP);
 
         $this->maps = array();
 
@@ -293,19 +302,37 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
 
             if (!empty(Maps::$searchTerm[$login])) {
-                $field = Maps::$searchField[$login];
 
-                if ($field == "name") {
-                    $field = "strippedName";
+                if (isset(Maps::$searchField[$login])) {
+                    $field = Maps::$searchField[$login];
+                } else {
+                    $field = null;
                 }
 
-                $substring = $this->shortest_edit_substring(
-                    Maps::$searchTerm[$login],
-                    \ManiaLib\Utils\Formatting::stripStyles($map->{$field})
-                );
-                $dist = $this->edit_distance(Maps::$searchTerm[$login], $substring);
-                if (!empty($substring) && $dist < 2) {
-                    $this->maps[] = $map;
+                if ($field == "name" || $field == "author") {
+                    
+                    if ($field == "name") {
+                        $field = "strippedName";
+                    }
+
+                    $substring = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->{$field})));
+                    $dist = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring);
+                    if (!empty($substring) && $dist < 2) {
+                        $this->maps[] = $map;
+                    }
+                    
+                } else {
+
+                    $substring_name = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->strippedName)));
+                    $dist_name = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring_name);
+
+                    $substring_author = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->author)));
+                    $dist_author = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring_author);
+
+                    if ((!empty($substring_name) && $dist_name < 2) || (!empty($substring_author) && $dist_author < 2)) {
+                        $this->maps[] = $map;
+                    }
+
                 }
             } else {
                 $this->maps[] = $map;
@@ -351,16 +378,10 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 break;
             default:
                 if (Maps::$playerSortModes[$login]->sortMode == 1) {
-                    \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc(
-                        $this->maps,
-                        Maps::$playerSortModes[$login]->column
-                    );
+                    \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($this->maps, Maps::$playerSortModes[$login]->column);
                 }
                 if (Maps::$playerSortModes[$login]->sortMode == 2) {
-                    \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc(
-                        $this->maps,
-                        Maps::$playerSortModes[$login]->column
-                    );
+                    \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($this->maps, Maps::$playerSortModes[$login]->column);
                 }
         }
 
@@ -377,6 +398,8 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
             $queueMapAction = $this->createAction(array($this, 'queueMap'), $sortableMap);
             $removeMapAction = $this->createAction(array($this, 'removeMap'), $sortableMap);
+            $trashMapAction = $this->createAction(array($this, 'trashMap'), $sortableMap);
+            $jumpMapAction = $this->createAction(array($this, 'jumpMap'), $sortableMap);
             $showRecsAction = $this->createAction(array($this, 'showRec'), $sortableMap);
             $showInfoAction = $this->createAction(array($this, 'showInfo'), $sortableMap->uId);
 
@@ -403,7 +426,9 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $rate => -1,
                 "Info" => $showInfoAction,
                 "Recs" => $showRecsAction,
+                "Jump" => $jumpMapAction,
                 "x" => $removeMapAction,
+                "Trash" => $trashMapAction
             ));
             $x++;
         }
@@ -446,6 +471,10 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function destroy()
     {
+        $login = $this->getRecipient();
+        if (isset($this->mapForLogin[$login])) {
+            unset($this->mapForLogin[$login]);
+        }
         foreach ($this->items as $item) {
             $item->erase();
         }

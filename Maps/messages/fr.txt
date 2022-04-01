@@ -206,7 +206,13 @@ Show Records
 Voir les Records
 
 $F22Remove this map from server
-Retirez cette carte du serveur
+$F22Retirez cette carte du serveur
+
+$F22Erase this map and the file from server
+$F22Retirez cette carte et le fichier du serveur
+
+Skip to this map
+Sauter vers cette map
 
 Map %s $z$s$fffadded to playlist.
 Carte %s $z$s$fffrajoute a la playlist
