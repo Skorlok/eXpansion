@@ -17,7 +17,6 @@ declare Boolean exp_needToCheckPersistentVars for UI = False;
 declare Integer exp_multipleCheckCount = 0;
 
 declare Boolean exp_enableHudMove for UI = False;
-exp_enableHudMove = False;
 
 declare persistent Vec3[Text][Text][Text] eXp_widgetLastPos = Vec3[Text][Text][Text];
 declare persistent Vec3[Text][Text][Text] eXp_widgetLastPosRel =  Vec3[Text][Text][Text];	
