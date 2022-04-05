@@ -18,6 +18,7 @@ class Widgets_Clock extends ExpPlugin
     public function show()
     {
         $widget = Clock::Create(null);
+        $widget->setDisableAxis("x");
         $widget->show();
     }
 

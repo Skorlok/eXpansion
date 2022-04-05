@@ -18,8 +18,8 @@ class Clock extends Widget
         $frame = new Frame();
         $frame->setId("Frame");
         $this->setName("Local time");
-        $bg = new WidgetBackGround(28, 6);
-        $bg->setPosX(-6);
+        $bg = new WidgetBackGround(22, 6);
+        $bg->setPosX(0);
         $frame->addComponent($bg);
 
         $label = new Label(20, 6);
@@ -44,12 +44,11 @@ class Clock extends Widget
         $quad->setScriptEvents();
         $frame->addComponent($quad);
         $this->addComponent($frame);
-
     }
 
     public function eXpOnEndConstruct()
     {
-        $this->setSize(36, 6);
+        $this->setSize(22, 6);
         $this->setPosition(-160, 74);
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\TrayWidget");
         $script->setParam('isMinimized', 'False');

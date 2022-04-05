@@ -45,6 +45,6 @@ class MxWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnEndConstruct()
     {
-        $this->setSize(35, 7);
+        $this->setSize(7, 7);
     }
 }
