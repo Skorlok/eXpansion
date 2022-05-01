@@ -119,7 +119,7 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $x = 0;
         $dbconfig = \ManiaLive\Database\Config::getInstance();
         $dbName = $dbconfig->database;
-        $tables = $this->db->execute("SHOW TABLES in " . $dbName . ";")->fetchArrayOfRow();
+        $tables = $this->db->execute("SHOW TABLES in `" . $dbName . "`;")->fetchArrayOfRow();
 
         foreach ($tables as $table) {
             $this->items[$x] = new \ManiaLivePlugins\eXpansion\Database\Gui\Controls\DbTable(
