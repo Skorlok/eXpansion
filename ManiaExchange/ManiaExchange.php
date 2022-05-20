@@ -686,8 +686,8 @@ class ManiaExchange extends ExpPlugin
                      `mx_difficultyName`=" . $db->quote($map->difficultyName) . ",
                      `mx_replayTypeName`=" . $db->quote($map->replayTypeName) . ",
                      `mx_replayWRID`=" . $db->quote($map->replayWRID) . ",
-                     `mx_replayWRTime`=" . $db->quote($map->replayWRTime) . ",
-                     `mx_replayWRUserID`=" . $db->quote($map->replayWRUserID) . ",
+                     `mx_replayWRTime`=" . $db->quote(intval($map->replayWRTime)) . ",
+                     `mx_replayWRUserID`=" . $db->quote(intval($map->replayWRUserID)) . ",
                      `mx_replayWRUsername`=" . $db->quote($map->replayWRUsername) . ",
                      `mx_ratingVoteCount`=" . $db->quote($map->ratingVoteCount) . ",
                      `mx_ratingVoteAverage`=" . $db->quote($map->ratingVoteAverage) . ",
@@ -696,7 +696,7 @@ class ManiaExchange extends ExpPlugin
                      `mx_comments`=" . $db->quote($map->comments) . ",
                      `mx_commentsCount`=" . $db->quote($map->commentCount) . ",
                      `mx_awardCount`=" . $db->quote($map->awardCount) . ",
-                     `mx_hasScreenshot`=" . $db->quote($map->hasScreenshot) . ",
+                     `mx_hasScreenshot`=" . $db->quote(intval($map->hasScreenshot)) . ",
                      `mx_hasThumbnail`=" . $db->quote($map->hasThumbnail) . "                   
                     WHERE `challenge_uid`=" . $db->quote($map->trackUID) . ";";
             $db->execute($sql);
