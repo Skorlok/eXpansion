@@ -145,7 +145,7 @@ class Dedimania extends DedimaniaAbstract
             }
         }
 
-        if (!array_key_exists('BestTime', $this->rankings[$login])) {
+        if (!isset($this->rankings[$login]['BestTime'])) {
             $this->rankings[$login] = array('Login' => $login, 'BestTime' => $time, 'BestCheckpoints' => $checkpoints);
         } else {
             if ($time < $this->rankings[$login]['BestTime']) {

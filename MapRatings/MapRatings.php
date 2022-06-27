@@ -521,8 +521,13 @@ class MapRatings extends ExpPlugin
                 if ($x > 0) {
                     $avgTempVotes = $avgTempVotes / $x;
                 }
-                $mxAverage = (($this->mxRatings->voteaverage * $this->mxRatings->votecount) + ($avgTempVotes*$x)) / ($this->mxRatings->votecount+$x);
-                $mxAverage = round($mxAverage) . "%";
+
+                if ($this->mxRatings->votecount + $x == 0) {
+                    $mxAverage = 0;
+                } else {
+                    $mxAverage = (($this->mxRatings->voteaverage * $this->mxRatings->votecount) + ($avgTempVotes*$x)) / ($this->mxRatings->votecount+$x);
+                    $mxAverage = round($mxAverage) . "%";
+                }
 
                 if ($this->ratingTotal == 0) {
                     $this->eXpChatSendServerMessage($this->msg_rating_only_mx, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $mxAverage, $this->mxRatings->votecount+$x, $playerRating));

@@ -208,27 +208,11 @@ EOT;
         $dedicatedVersion = $d->year . "." . $d->month . "." . $d->day;
         if (version_compare($dedicatedVersion, self::EXP_REQUIRE_DEDIATED, "lt")) {
             $this->console('Dedicated Server: ' . $d->year . "-" . $d->month . "-" . $d->day);
-            $this->console(
-                'Minimum Dedicated version ' . self::EXP_REQUIRE_DEDIATED . ': Fail (' . $dedicatedVersion . ')'
-            );
-            $this->connection->chatSendServerMessage(
-                "Couldn't start eXpansion - Your dedicated server is too old, required version is: "
-                . self::EXP_REQUIRE_DEDIATED
-            );
+            $this->console('Minimum Dedicated version ' . self::EXP_REQUIRE_DEDIATED . ': Fail (' . $dedicatedVersion . ')');
+            $this->connection->chatSendServerMessage("Couldn't start eXpansion - Your dedicated server is too old, required version is: " . self::EXP_REQUIRE_DEDIATED);
             $bExitApp = true;
         } else {
-            $this->console(
-                'Minimum Dedicated version ' . self::EXP_REQUIRE_DEDIATED . ': Pass (' . $dedicatedVersion . ')'
-            );
-        }
-
-
-        //Checking php version
-        if (version_compare(PHP_VERSION, '5.4.3') >= 0) {
-            $this->console('Minimum PHP version 5.4.3: Pass (' . PHP_VERSION . ')');
-        } else {
-            $this->console('Minimum PHP version 5.4.3: Fail (' . PHP_VERSION . ')');
-            $bExitApp = true;
+            $this->console('Minimum Dedicated version ' . self::EXP_REQUIRE_DEDIATED . ': Pass (' . $dedicatedVersion . ')');
         }
 
         //Without GC we are already out of memory we stop
@@ -247,16 +231,11 @@ EOT;
             $bExitApp = true;
         }
 
-        $this->console(
-            'Version ' . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . ' build ' .
-            date("Y-m-d h:i:s A", Helper::getBuildDate()) . ''
-        );
+        $this->console('Version ' . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . ' build ' . date("Y-m-d h:i:s A", Helper::getBuildDate()) . '');
 
         //List of supported languages found
         $this->console('');
-        $this->console(
-            'Language support detected for: ' . implode(",", I18n::getInstance()->getSupportedLocales()) . '!'
-        );
+        $this->console('Language support detected for: ' . implode(",", I18n::getInstance()->getSupportedLocales()) . '!');
         $this->console('Enabling default locale: ' . $config->defaultLanguage . '');
         I18n::getInstance()->setDefaultLanguage($config->defaultLanguage);
 
@@ -287,19 +266,14 @@ EOT;
         //let know the players they are on a great server running eXpansion
         $this->connection->chatSendServerMessage('$fff$w$oe$3afΧ$fffpansion');
         $this->connection->chatSendServerMessage('$000P L U G I N   P A C K  ');
-        $this->connection->chatSendServerMessage(
-            'Version ' . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . '  $n build '
-            . date("Y-m-d", Helper::getBuildDate()) . ''
-        );
+        $this->connection->chatSendServerMessage('Version ' . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . '  $n build ' . date("Y-m-d", Helper::getBuildDate()));
         if (DEBUG) {
             $this->connection->chatSendServerMessage('$f00$w DEBUG MODE enabled');
         }
 
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-            $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
-            $this->enableScriptEvents("LibXmlRpc_Callbacks");
-            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
-        }
+        $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
+        $this->enableScriptEvents("LibXmlRpc_Callbacks");
+        $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
 
         //Started paralel download utility, thanks to xymph and other devs to have coded it. it rocks
         DataAccess::getInstance()->start();

@@ -123,7 +123,7 @@ class DataAccess extends \ManiaLib\Utils\Singleton implements \ManiaLive\Applica
     final public function httpPost(
         $url,
         $data = null,
-        $callback,
+        $callback = null,
         $callparams = array(),
         $userAgent = "ManiaLive - eXpansionPluginPack",
         $mimeType = "application/json"

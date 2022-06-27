@@ -645,7 +645,7 @@ class Connection extends Singleton implements AppListener, TickListener
         self::$serverMaxRank = intval($data[0]['ServerMaxRank']);
         $maplimit = intval($data[0]['ServerMaxRank']);
 
-        if (count($data[0]['Records']) > 0) {
+        if ($data[0]['Records'] && count($data[0]['Records']) > 0) {
             $maplimit = count($data[0]['Records']);
         }
 

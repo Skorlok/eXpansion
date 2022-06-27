@@ -421,11 +421,9 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function addPoint($login = null, $target)
+    public function addPoint($login, $target)
     {
-        if ($login == null
-            || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)
-        ) {
+        if ($login == null || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             if (!isset($this->players[$target])) {
                 $this->players[$target] = new Structures\QuizPlayer(
                     $target,
