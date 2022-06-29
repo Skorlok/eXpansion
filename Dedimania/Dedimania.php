@@ -15,6 +15,7 @@ class Dedimania extends DedimaniaAbstract
     public function eXpOnInit()
     {
         parent::eXpOnInit();
+        $this->AllCps = array();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)

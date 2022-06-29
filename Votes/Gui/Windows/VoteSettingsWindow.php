@@ -113,14 +113,15 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function addLimits()
     {
         /** @var  Config $config */
+        $configmx = MXconfig::getInstance();
         $config = Config::getInstance();
 
         $vote = new ManagedVote("mxVote", array());
         $vote->command = "mxVote";
-        $vote->managed = $config->mxVote_enable;
-        $vote->ratio = $config->mxVote_ratios;
-        $vote->timeout = $config->mxVote_timeouts;
-        $vote->voters = $config->mxVote_voters;
+        $vote->managed = $configmx->mxVote_enable;
+        $vote->ratio = $configmx->mxVote_ratios;
+        $vote->timeout = $configmx->mxVote_timeouts;
+        $vote->voters = $configmx->mxVote_voters;
 
         $x = count($this->items);
         $this->items[$x] = new \ManiaLivePlugins\eXpansion\Votes\Gui\Controls\ManagedVoteLimit(

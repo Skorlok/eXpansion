@@ -98,10 +98,12 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         TimePanel::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
         $spectatorTarget = $login;
 
-        if ($playerObject->currentTargetId) {
-            $spec = $this->getPlayerObjectById($playerObject->currentTargetId);
-            if ($spec->login) {
-                $spectatorTarget = $spec->login;
+        if (isset($playerObject->currentTargetId)) {
+            if ($playerObject->currentTargetId) {
+                $spec = $this->getPlayerObjectById($playerObject->currentTargetId);
+                if ($spec->login) {
+                    $spectatorTarget = $spec->login;
+                }
             }
         }
 

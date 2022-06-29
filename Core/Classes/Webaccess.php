@@ -485,7 +485,7 @@ class WebaccessUrl
         $query['Datas'] = '';
         $query['DatasSize'] = 0;
         $query['DatasSent'] = 0;
-        $query['Response'] = '';
+        $query['Response'] = array();
         $query['ResponseSize'] = 0;
         $query['Headers'] = array();
         $query['Close'] = false;
@@ -658,7 +658,7 @@ class WebaccessUrl
             for ($i = 0; $i < count($this->_spool); $i++) {
                 $this->_spool[$i]['State'] = 'OPEN';
                 $this->_spool[$i]['DatasSent'] = 0;
-                $this->_spool[$i]['Response'] = '';
+                $this->_spool[$i]['Response'] = array();
                 $this->_spool[$i]['Headers'] = array();
             }
             $this->_response = '';
@@ -763,7 +763,7 @@ class WebaccessUrl
             $this->_spool[0]['State'] = 'SEND';
             $time = microtime(true);
             $this->_spool[0]['Times']['send'][0] = $time;
-            $this->_spool[0]['Response'] = '';
+            $this->_spool[0]['Response'] = array();
             $this->_spool[0]['Headers'] = array();
 
             // finish to prepare header and data to send

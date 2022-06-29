@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Dedimania\Classes;
 
-//require_once('Webaccess.php');
-
 use Exception;
 use ManiaLib\Utils\Singleton;
 use ManiaLive\Application\Listener as AppListener;
@@ -12,7 +10,7 @@ use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Tick\Event as TickEvent;
 use ManiaLive\Features\Tick\Listener as TickListener;
-use ManiaLivePlugins\eXpansion\Core\Classes\Webaccess;
+use ManiaLivePlugins\eXpansion\Dedimania\Classes\Webaccess; // Thanks Undef for this class stolen from Uaseco
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Request as dediRequest;
 use ManiaLivePlugins\eXpansion\Dedimania\Config;

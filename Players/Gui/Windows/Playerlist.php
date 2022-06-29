@@ -92,14 +92,10 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
             if ($ignore) {
                 $this->connection->ignore($target);
-                $this->connection->chatSendServerMessage(
-                    __('%s$z$s$fff was ignored by admin %s', $login, $player->nickName, $admin->nickName)
-                );
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was ignored by admin %s', $login, $player->nickName, $admin->nickName));
             } else {
                 $this->connection->unignore($target);
-                $this->connection->chatSendServerMessage(
-                    __('%s$z$s$fff was unignored by admin %s', $login, $player->nickName, $admin->nickName)
-                );
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was unignored by admin %s', $login, $player->nickName, $admin->nickName));
             }
 
             $this->show($login);
@@ -112,6 +108,7 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         try {
             AdminGroups::getInstance()->adminCmd($login, "kick " . $target);
+            $this->show($login);
         } catch (\Exception $e) {
             Helper::logError("Error:" . $e->getMessage());
         }
@@ -121,6 +118,7 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         try {
             AdminGroups::getInstance()->adminCmd($login, "ban " . $target);
+            $this->show($login);
         } catch (\Exception $e) {
             Helper::logError("Error:" . $e->getMessage());
         }
@@ -130,6 +128,7 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         try {
             AdminGroups::getInstance()->adminCmd($login, "black " . $target);
+            $this->show($login);
         } catch (\Exception $e) {
             Helper::logError("Error:" . $e->getMessage());
         }
@@ -139,6 +138,7 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         try {
             AdminGroups::getInstance()->adminCmd($login, "guest " . $target);
+            $this->show($login);
         } catch (\Exception $e) {
             Helper::logError("Error:" . $e->getMessage());
         }
@@ -156,17 +156,14 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($player->spectatorStatus == 0) {
                 $this->connection->forceSpectator($target, 1);
                 $this->connection->chatSendServerMessage(__('Admin has forced you to specate!', $target), $target);
-
+                $this->show($login);
                 return;
             }
             if ($player->spectator == 1) {
                 $this->connection->forceSpectator($target, 2);
                 $this->connection->forceSpectator($target, 0);
-                $this->connection->chatSendServerMessage(
-                    __("Admin has released you from specate to play.", $target),
-                    $target
-                );
-
+                $this->connection->chatSendServerMessage(__("Admin has released you from specate to play.", $target), $target);
+                $this->show($login);
                 return;
             }
         } catch (\Exception $e) {
@@ -197,6 +194,7 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($player->teamId === 1) {
                 $this->connection->forcePlayerTeam($target, 0);
             }
+            $this->show($login);
         }
     }
 
@@ -208,12 +206,6 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->storage = \ManiaLive\Data\Storage::getInstance();
         $login = $this->getRecipient();
         $isadmin = AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC);
-
-        $list = $this->connection->getIgnoreList(-1, 0);
-        $ignoreList = array();
-        foreach ($list as $player) {
-            $ignoreList[$player->login] = true;
-        }
 
         foreach ($this->storage->players as $player) {
             $ignoreAction = $this->createAction(array($this, 'ignorePlayer'), $player->login);

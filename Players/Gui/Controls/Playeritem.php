@@ -7,6 +7,7 @@ use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Data\Player;
+use ManiaLive\Data\Storage;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
@@ -14,6 +15,7 @@ use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Structures\OptimizedPagerElement;
+use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 
 class Playeritem extends Control implements OptimizedPagerElement
 {
@@ -42,8 +44,14 @@ class Playeritem extends Control implements OptimizedPagerElement
     protected $player;
     protected $columnCount = 1;
 
+    /** @var Connection */
+    protected $connection;
+
     public function __construct($indexNumber, $login, $action)
     {
+        $this->storage = Storage::getInstance();
+        $this->connection = Singletons::getInstance()->getDediConnection();
+
         $this->recipient = $login;
         $sizeY = 6;
         $sizeX = 120;
@@ -75,12 +83,23 @@ class Playeritem extends Control implements OptimizedPagerElement
         // admin additions
         if (AdminGroups::isInList($login)) {
             if (AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
+
+                $ignored = $this->connection->getIgnoreList(-1, 0);
+
+                $ignore = false;
+                foreach ($ignored as $p) {
+                    if ($p->login == $login) {
+                        $ignore = true;
+                        break;
+                    }
+                }
+
                 $this->ignoreButton = new MyButton(7, 5);
                 $this->ignoreButton->setDescription(__('Ignore player', $login), 50);
                 $this->ignoreButton->setTextColor("fff");
                 $this->ignoreButton->colorize("a22");
                 $this->ignoreButton->setAction($action);
-                if ($ignored) {
+                if ($ignore) {
                     $this->ignoreButton->setDescription(__('UnIgnore player', $login), 50);
                     $this->ignoreButton->setIcon('Icons128x128_1', 'Beginner');
                 } else {
@@ -139,7 +158,7 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->forceButton = new MyButton(6, 5);
                 $this->forceButton->setAction($action);
                 $this->forceButton->colorize("2f2");
-                if ($this->player->spectator == 1) {
+                if (isset($this->storage->spectators[$login])) {
                     $this->forceButton->setIcon('Icons64x64_1', 'Opponents');
                     $this->forceButton->setDescription(__('Force to play', $login), 50);
                 } else {
