@@ -1,17 +1,8 @@
 Queue
 Rij
 
-#variable# %1$s - %2$s $z$s#music# is been played next requested by %3$s #variable#
-#variable# %1$s - %2$s $z$s#music# is vraagd door %3$s #variable#
-
-#music#Next song: $z$s#variable# %1$s - %2$s
-#music#Volgende liedje: $z$s#variable# %1$s - %2$s
-
-#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s 
-#translate# #variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s 
-
-#music#Next song: $z$s#variable# %1$s #music#by#variable# %2$s
-#translate# #music#Next song: $z$s#variable# %1$s #music#by#variable# %2$s
+#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s
+#translate# #variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s
 
 MusicBox error http-code: %s
 #translate# MusicBox error http-code: %s

@@ -56,8 +56,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess = null;
 
-    public static $GDsupport = false;
-
     /**
      * onInit()
      * Function called on initialisation of ManiaLive.
@@ -77,24 +75,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     public function eXpOnLoad()
     {
-        if (!extension_loaded("gd")) {
-            if (!(bool)ini_get("enable_dl") || (bool)ini_get("safe_mode")) {
-                $phpPath = get_cfg_var('cfg_file_path');
-                $this->dumpException(
-                    "Autoloading extensions is not enabled in php.ini.\n\n`php_gd2` extension needs to be enabled for systems running this plugin.\n\nEdit following file $phpPath and set:\n\nenable_dl = On\n\nor add this line:\n\nextension=php_gd2.dll",
-                    new \Maniaplanet\WebServices\Exception("Loading extensions is not permitted.")
-                );
-                $this->eXpChatSendServerMessage(
-                    "#quiz#Quiz started, php GD2-extension was not not loaded, see console log for more details."
-                );
-            } else {
-                dl("php_gd2");
-                self::$GDsupport = true;
-            }
-        } else {
-            self::$GDsupport = true;
-        }
-
         $this->enableDedicatedEvents();
         $this->enableDatabase();
 
@@ -154,9 +134,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->msg_format = eXpGetMessage("#error#Question needs to be at the right format!");
         $this->msg_reset = eXpGetMessage("#quiz#Quiz has been reset!");
         $this->msg_correct = eXpGetMessage("Correct from");
-        $this->msg_correctAnswer = eXpGetMessage(
-            "#quiz#Correct! #question# %s$1 #quiz# Well Done,#variable# %s$2 #quiz#!"
-        );
+        $this->msg_correctAnswer = eXpGetMessage("#quiz#Correct! #question# %s$1 #quiz# Well Done,#variable# %s$2 #quiz#!");
         $this->msg_rightAnswer = eXpGetMessage('#quiz#Right answers: $o#question#%s');
         $this->msg_answerMissing = eXpGetMessage("#error#Aswer is missing from the question!");
         $this->msg_questionMissing = eXpGetMessage("#error#Question is missing from the question!");
@@ -164,26 +142,11 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->msg_points = eXpGetMessage("#quiz#Current point holders:");
         $this->msg_pointAdd = eXpGetMessage('#quiz#$oPoint added for #variable#%s');
         $this->msg_pointRemove = eXpGetMessage('#quiz#$oPoint removed from #variable#%s');
-        $this->msg_errorImageType = eXpGetMessage(
-            '#quiz#$Displaying image not possible, due unsupported media type was detected.'
-        );
+        $this->msg_errorImageType = eXpGetMessage('#quiz#$Displaying image not possible, due unsupported media type was detected.');
     }
 
     public function eXpOnReady()
     {
-        if (!extension_loaded("mbstring")) {
-            $this->dumpException(
-                "Plugin init failed!\nQuiz plugin needs 'mbstring' extension to be loaded!\n Please add the extension to to php for loading this plugin!",
-                new \Exception("php_mbstring extension not loaded")
-            );
-            $adm = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-            $adm->announceToPermission(
-                Permission::EXPANSION_PLUGIN_START_STOP,
-                "\$d00Quiz plugin needs 'mbstring' extension to be added in php extensions! Plugin not loaded."
-            );
-            $this->eXpUnload();
-        }
-
         Gui\Windows\QuestionWindow::$mainPlugin = $this;
         Gui\Windows\Playerlist::$mainPlugin = $this;
         Gui\Windows\AddPoint::$mainPlugin = $this;
@@ -506,19 +469,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function setHiddenQuestionBoxes(Question $question)
     {
-        if (self::$GDsupport) {
-            $this->dataAccess->httpCurl(
-                $question->getImage(),
-                array($this, "xGetHiddenImage"),
-                array("question" => $question)
-            );
-        } else {
-            $this->eXpChatSendServerMessage(
-                "#quiz#Hidden Questions can be only asked with GD Support",
-                $question->asker->login
-            );
-        }
-
+        $this->dataAccess->httpCurl($question->getImage(), array($this, "xGetHiddenImage"), array("question" => $question));
     }
 
 
@@ -533,16 +484,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $nickName = $this->currentQuestion->asker->nickName;
             $question = $this->currentQuestion->question;
             if ($this->currentQuestion->hasImage() && $redraw) {
-                if (self::$GDsupport) {
-
-                    $this->dataAccess->httpCurl($this->currentQuestion->getImage(), array($this, "xGetImage"));
-                } else {
-                    $widget = Gui\Widget\QuizImageWidget::Create(null);
-                    $widget->setImage($this->currentQuestion->getImage());
-                    $widget->setHiddenQuestion($this->currentQuestion->isHidden, $this->currentQuestion->boxOrder);
-                    $widget->setImageSize(20, 11.25);
-                    $widget->show();
-                }
+                $this->dataAccess->httpCurl($this->currentQuestion->getImage(), array($this, "xGetImage"));
             }
             $this->eXpChatSendServerMessage($this->msg_questionPre, null, array($this->questionCounter, $nickName));
             $this->eXpChatSendServerMessage($this->msg_question, null, array($question));
@@ -552,7 +494,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function xGetImage($job, $jobData)
     {
-
         $info = $job->getCurlInfo();
         $httpCode = $info['http_code'];
 

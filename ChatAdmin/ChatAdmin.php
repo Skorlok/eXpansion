@@ -2382,6 +2382,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->sendHideManialinkPage();
             $this->connection->stopServer();
+            Application::getInstance()->kill();
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }

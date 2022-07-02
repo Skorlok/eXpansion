@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\CustomUI;
 
+use Exception;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 
 class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -86,6 +87,10 @@ class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 		$ui .= '<viewers_count visible="true" pos="157. -40. 5." />';
 		$ui .= '</ui_properties>';
 
-        $this->connection->triggerModeScriptEvent("Trackmania.UI.SetProperties", array($ui));
+		try {
+			$this->connection->triggerModeScriptEvent("Trackmania.UI.SetProperties", array($ui));
+		} catch (Exception $e) {
+			return;
+		}
 	}
 }

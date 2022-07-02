@@ -29,8 +29,8 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
 
     public function onBeginMatch()
     {
-        $this->displayWidget();
         $this->BestCps = array();
+        $this->displayWidget();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)

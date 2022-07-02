@@ -57,8 +57,6 @@ class Core extends types\ExpPlugin
 
     public static $players = array();
 
-    public static $connectedPlayers = array();
-
 
     // variables for extend time
 
@@ -329,38 +327,13 @@ EOT;
 
     public function checkPhpExtensions()
     {
-        $extensions = array(
-            'mysqli' => 'extension=php_mysqli.dll',
-            'openssl' => 'extension=php_openssl.dll',
-            'curl' => 'extension=curl.dll',
-        );
-
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $extensions['com_dotnet'] = 'extension=php_com_dotnet.dll';
-        }
-        $recomend = array(
-            'xmlrpc' => "It will have better performances !",
-            'gd' => 'gd2 needs to be enabled for better performances reading maps',
-        );
-
-        $status = true;
-
-        foreach ($extensions as $extension => $description) {
-            if (!extension_loaded($extension)) {
-                $this->console(
-                    "eXpansion needs PHP extension $extension to run. Enable it to run eXpansion => " . $description
-                );
-                $status = false;
+            if (!extension_loaded('com_dotnet')) {
+                $this->console("eXpansion needs PHP extension com_dotnet to run. Enable it to run eXpansion => extension=php_com_dotnet.dll");
+                return false;
             }
         }
-
-        foreach ($recomend as $extension => $reason) {
-            if (!extension_loaded($extension)) {
-                $this->console("eXpansion works better with PHP extension $extension : " . $reason);
-            }
-        }
-
-        return $status;
+        return true;
     }
 
     /**
@@ -500,12 +473,10 @@ EOT;
 
         foreach ($this->storage->players as $player) {
             self::$players[$player->login] = $player->nickName;
-            self::$connectedPlayers[$player->login] = $player->nickName;
         }
 
         foreach ($this->storage->spectators as $player) {
             self::$players[$player->login] = $player->nickName;
-            self::$connectedPlayers[$player->login] = $player->nickName;
         }
     }
 
@@ -912,7 +883,9 @@ EOT;
 
         $this->teamScores = array();
 
-        $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
+        if ($this->quitDialogXml) {
+            $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
+        }
 
         foreach ($this->storage->players as $player) {
             self::$players[$player->login] = $player->nickName;
@@ -1468,7 +1441,6 @@ EOT;
         }
 
         self::$players[$login] = $this->storage->getPlayerObject($login)->nickName;
-        self::$connectedPlayers[$login] = $this->storage->getPlayerObject($login)->nickName;
     }
 
     public function syncAdminStatus($loginDisconnecting = false)
@@ -1517,8 +1489,6 @@ EOT;
             unset($this->expPlayers[$login]);
         }
         $this->updateServerTags = true;
-
-        unset(self::$connectedPlayers[$login]);
     }
 
     /**

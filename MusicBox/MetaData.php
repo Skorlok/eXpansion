@@ -22,13 +22,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $config = Config::getInstance();
 
-        $var = new Boolean(
-            "override",
-            "Override all music on server, even if map has defined custom one ?",
-            $config,
-            false,
-            false
-        );
+        $var = new Boolean("override", "Override all music on server, even if map has defined custom one ?", $config, false, false);
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 
@@ -38,6 +32,10 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new Boolean("disableJukebox", "Disable jukeboxing of music?", $config, false, false);
         $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
+        $var = new Boolean("shuffle", "Shuffle song list ?", $config, false, false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
     }
 }

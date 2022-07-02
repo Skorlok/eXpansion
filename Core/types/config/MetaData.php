@@ -505,7 +505,7 @@ abstract class MetaData
         }
 
         if (isset($this->gameModeSupport[0]) && !empty($this->gameModeSupport[0])) {
-            foreach ($this->gameModeSupport[0] as $supportedScript) {
+            foreach ($this->gameModeSupport[0] as $supportedScript => $active) {
                 if ($this->softScriptCompatibility && strpos($scriptName, $supportedScript) !== false) {
                     return true;
                 } else {

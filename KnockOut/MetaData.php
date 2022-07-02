@@ -20,13 +20,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
-        $this->setScriptCompatibilityMode(false);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS);
-		$this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            'TeamAttack.Script.txt'
-        );
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP);
 
         $configInstance = Config::getInstance();
 

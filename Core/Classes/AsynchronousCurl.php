@@ -96,6 +96,7 @@ class AsynchronousCurl extends \ManiaLib\Utils\Singleton implements \ManiaLive\A
 
     public function onTerminate()
     {
-        curl_multi_close($this->handle);
+        if ($this->handle != null)
+            curl_multi_close($this->handle);
     }
 }

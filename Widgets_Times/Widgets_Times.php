@@ -224,6 +224,5 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Dispatcher::unregister(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         Dispatcher::unregister(LocalEvent::getClass(), $this);
         TimePanel::EraseAll();
-        parent::eXpUnload();
     }
 }

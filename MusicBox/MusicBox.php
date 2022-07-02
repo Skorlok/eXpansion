@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\MusicBox;
 
+use Exception;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
@@ -11,14 +12,13 @@ use ManiaLivePlugins\eXpansion\MusicBox\Structures\Song;
 
 class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
     private $config;
     private $songs = array();
     private $enabled = true;
     private $wishes = array();
     private $nextSong = null;
     private $music = null;
-    private $wasWarmup = false;
+    private $ignore = false;
     private $counter = 0;
 
     /**
@@ -40,14 +40,60 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $command = $this->registerChatCommand("mlist", "mbox", 1, true); // xaseco
     }
 
+    /*
+     * onReady()
+     * Function called when ManiaLive is ready loading.
+     *
+     * @return void
+     */
+    public function eXpOnReady()
+    {
+        try {
+            foreach ($this->getMusicCsv() as $music) {
+                $this->songs[] = Structures\Song::fromArray($music);
+            }
+            if ($this->config->shuffle) {
+                shuffle($this->songs);
+            }
+        } catch (\Exception $e) {
+            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . utf8_encode($e->getMessage()));
+            $this->enabled = false;
+        }
+
+        $this->music = $this->connection->getForcedMusic();
+        $this->showWidget();
+    }
+
+    public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
+    {
+        $this->config = Config::getInstance();
+
+        $this->songs = array();
+        try {
+            foreach ($this->getMusicCsv() as $music) {
+                $this->songs[] = Structures\Song::fromArray($music);
+            }
+            if ($this->config->shuffle) {
+                shuffle($this->songs);
+            }
+        } catch (\Exception $e) {
+            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . utf8_encode($e->getMessage()));
+            $this->enabled = false;
+        }
+    }
+
     public function eXpOnUnload()
     {
-        CurrentTrackWidget::EraseAll();
-        MusicListWindow::EraseAll();
+        try {
+            CurrentTrackWidget::EraseAll();
+            MusicListWindow::EraseAll();
 
-        CurrentTrackWidget::$musicBoxPlugin = null;
-        Gui\Windows\MusicListWindow::$musicPlugin = null;
-        $this->connection->setForcedMusic(false, "");
+            CurrentTrackWidget::$musicBoxPlugin = null;
+            Gui\Windows\MusicListWindow::$musicPlugin = null;
+			$this->connection->setForcedMusic(false, "");
+		} catch (Exception $e) {
+			return;
+		}
     }
 
     public function download($url)
@@ -88,8 +134,6 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function getMusicCsv()
     {
-
-
         $data = $this->download(rtrim($this->config->url, "/") . "/index.csv");
         if (!$data) {
             $this->enabled = false;
@@ -122,34 +166,10 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         return $array;
     }
 
-    /*
-     * onReady()
-     * Function called when ManiaLive is ready loading.
-     *
-     * @return void
-     */
-
-    public function eXpOnReady()
-    {
-
-        try {
-            foreach ($this->getMusicCsv() as $music) {
-                $this->songs[] = Structures\Song::fromArray($music);
-            }
-        } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . utf8_encode($e->getMessage()));
-            $this->enabled = false;
-        }
-
-        $this->music = $this->connection->getForcedMusic();
-        $this->showWidget();
-    }
-
-    public function onBeginMatch()
+    public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         $this->music = $this->connection->getForcedMusic();
         $this->showWidget();
-        $this->wasWarmup = $this->connection->getWarmUp();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -157,11 +177,11 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        if (!$this->enabled || $this->wasWarmup) {
+        if (!$this->enabled || $this->ignore) {
             return;
         }
+        $this->ignore = false;
         try {
-
             $wish = false;
 
             if (sizeof($this->wishes) != 0) {
@@ -179,38 +199,20 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $url = trim($this->config->url, "/") . $folder . rawurlencode($song->filename);
 
-            $this->connection->setForcedMusic(true, $url);
+            $this->connection->setForcedMusic($this->config->override, $url);
             if ($wish) {
-                $text = eXpGetMessage(
-                    '#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s '
-                );
-                $this->eXpChatSendServerMessage(
-                    $text,
-                    null,
-                    array(
-                        $song->title,
-                        $song->artist,
-                        \ManiaLib\Utils\Formatting::stripCodes($wish->player->nickName, "wos")
-                    )
-                );
-            } else {
-                $text = eXpGetMessage('#music#Next song: $z$s#variable# %1$s #music#by#variable# %2$s');
-                $this->eXpChatSendServerMessage($text, null, array($song->title, $song->artist));
+                $text = eXpGetMessage('#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s');
+                $this->eXpChatSendServerMessage($text, null, array($song->title, $song->artist, \ManiaLib\Utils\Formatting::stripCodes($wish->player->nickName, "wos")));
             }
         } catch (\Exception $e) {
             $this->console("On EndMatch Error : " . $e->getMessage());
         }
     }
 
-    public function onMapSkip()
-    {
-        $this->wasWarmup = false;
-    }
-
     public function onMapRestart()
     {
         // set warmup, so musicbox doesn't announce next song at podium
-        $this->wasWarmup = true;
+        $this->ignore = true;
     }
 
     /**
@@ -274,10 +276,14 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
+        if (Config::getInstance()->disableJukebox) {
+            $this->eXpChatSendServerMessage("#music# Jukeboxing music is disabled.", $login);
+            return;
+        }
+
         $player = $this->storage->getPlayerObject($login);
         if ($number == 'list' || $number == null) { // parametres redirect
             $this->musicList($login);
-
             return;
         }
         if (!is_numeric($number)) { // check for numeric value
@@ -333,12 +339,6 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function musicList($login)
     {
-
-        if (Config::getInstance()->disableJukebox) {
-            $this->eXpChatSendServerMessage("#music# Jukeboxing music is disabled.", $login);
-            return;
-        }
-
         try {
             $info = Gui\Windows\MusicListWindow::Create($login);
             $info->setSize(180, 90);

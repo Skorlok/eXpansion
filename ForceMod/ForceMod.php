@@ -51,7 +51,7 @@ class ForceMod extends ExpPlugin
             Helper::logDebug(print_r($rnd_mod, true), array('eXpansion', 'ForceMod'));
             Helper::logDebug("=========================\n", array('eXpansion', 'ForceMod'));
 
-            $this->connection->setForcedMods(true, $rnd_mod);
+            $this->connection->setForcedMods($this->config->override, $rnd_mod);
         } catch (Exception $e) {
             $this->console(
                 "[eXp\\ForceMod] error while enabling the mod:" . $e->getMessage() . " line:" . $e->getLine()
@@ -106,8 +106,6 @@ class ForceMod extends ExpPlugin
             $this->console("Disabling forced mods");
             $this->connection->setForcedMods(true, array());
         } catch (Exception $e) {
-            $this->console("[eXp\\ForceMod] error while disabling the mods:" . $e->getMessage());
-
             return;
         }
     }

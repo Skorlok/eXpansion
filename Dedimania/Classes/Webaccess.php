@@ -139,7 +139,7 @@ class Webaccess {
 		list($host, $port, $path) = getHostPortPath($url);
 
 		if ($host === false)
-			print_r('Webaccess request(): Bad URL: ' . $url);
+			print_r('Webaccess request(): Bad URL: ' . $url . PHP_EOL);
 		else {
 			$server = $host . ':' . $port;
 			// create object if needed
@@ -177,7 +177,7 @@ class Webaccess {
 
 		list($host, $port, $path) = getHostPortPath($url);
 		if ($host === false) {
-			print_r('Webaccess retry(): Bad URL: ' . $url);
+			print_r('Webaccess retry(): Bad URL: ' . $url . PHP_EOL);
 		} else {
 			$server = $host . ':' . $port;
 			if (isset($this->_WebaccessList[$server]))
@@ -200,10 +200,10 @@ class Webaccess {
 		$write = $this->_getWebaccessWriteSockets($write);
 		//$except = $this->_getWebaccessReadSockets($except);
 
-		//print_r($this->_WebaccessList);
-		//print_r($read);
-		//print_r($write);
-		//print_r($except);
+		//print_r($this->_WebaccessList . PHP_EOL);
+		//print_r($read . PHP_EOL);
+		//print_r($write . PHP_EOL);
+		//print_r($except . PHP_EOL);
 
 		// if no socket to select then return
 		if (count($read) + count($write) + count($except) == 0) {
@@ -413,7 +413,7 @@ class WebaccessUrl {
 	function _bad($errstr, $isbad = true) {
 		global $_web_access_retry_timeout;
 
-		print_r($this->_webaccess_str . $errstr);
+		print_r($this->_webaccess_str . $errstr . PHP_EOL);
 		$this->infos();
 
 		if ($this->_socket)
@@ -476,7 +476,7 @@ class WebaccessUrl {
 		// if asynch, in error, and maximal timeout, then forget the request and return false
 		if (($query['Callback'] != null) && ($this->_state == 'BAD')) {
 			if ($this->_bad_timeout > $_web_access_retry_timeout_max) {
-				print_r($this->_webaccess_str . 'Request refused for consecutive errors (' . $this->_bad_timeout . ' / ' . $_web_access_retry_timeout_max . ')');
+				print_r($this->_webaccess_str . 'Request refused for consecutive errors (' . $this->_bad_timeout . ' / ' . $_web_access_retry_timeout_max . ')' . PHP_EOL);
 				return false;
 
 			} else {
@@ -547,7 +547,7 @@ class WebaccessUrl {
 				$query['State'] = 'OPEN';
 				$query['Retries'] = 0;
 
-				//print_r($msg);
+				//print_r($msg . PHP_EOL);
 
 				// add the query in spool
 				$this->_spool[] = &$query;
@@ -562,12 +562,12 @@ class WebaccessUrl {
 					$this->_open();
 
 			} else {
-				print_r($this->_webaccess_str . 'Bad data');
+				print_r($this->_webaccess_str . 'Bad data' . PHP_EOL);
 				return false;
 			}
 
 		} else {
-			print_r($this->_webaccess_str . 'Bad callback function: ' . $query['Callback']);
+			print_r($this->_webaccess_str . 'Bad callback function: ' . $query['Callback'] . PHP_EOL);
 			return false;
 		}
 		return true;
@@ -595,7 +595,7 @@ class WebaccessUrl {
 				}
 			}
 			$this->_state = 'OPENED';
-			//print_r($this->_webaccess_str . 'connection opened!');
+			//print_r($this->_webaccess_str . 'connection opened!' . PHP_EOL);
 
 			// new socket connection: reset all pending request original values
 			for ($i = 0; $i < count($this->_spool); $i++) {
@@ -625,14 +625,14 @@ class WebaccessUrl {
 		if (!$this->_wait && $this->_state == 'BAD' &&
 		    (($this->_bad_timeout > $_web_access_retry_timeout_max) ||
 		    (($time - $this->_bad_time) < $this->_bad_timeout))) {
-			//print_r($this->_webaccess_str . 'wait to retry (' . ($time - $this->_bad_time) . ' / ' . $this->_bad_timeout . ')');
+			//print_r($this->_webaccess_str . 'wait to retry (' . ($time - $this->_bad_time) . ' / ' . $this->_bad_timeout . ')' . PHP_EOL);
 			return false;
 		}
 
 		// if the socket is probably in timeout, close it
 		if ($this->_socket && $this->_state == 'OPENED' &&
 		    ($this->_serv_keepalive_timeout <= ($time - $this->_query_time))) {
-			//print_r($this->_webaccess_str . 'timeout, close it!');
+			//print_r($this->_webaccess_str . 'timeout, close it!' . PHP_EOL);
 			$this->_state = 'CLOSED';
 			@fclose($this->_socket);
 			$this->_socket = null;
@@ -737,7 +737,7 @@ class WebaccessUrl {
 			$this->_spool[0]['DatasSize'] = strlen($msg);
 			$this->_spool[0]['DatasSent'] = 0;
 
-			//print_r($msg);
+			//print_r($msg . PHP_EOL);
 		}
 
 		// if not SEND then stop
@@ -853,7 +853,7 @@ class WebaccessUrl {
 		if (!isset($this->_spool[0]['State']) || $this->_spool[0]['State'] != 'RECEIVE') {
 			// in case of (probably keepalive) connection closed by server
 			if ($this->_socket && @feof($this->_socket)){
-				//print_r($this->_webaccess_str . 'Socket closed by server (' . $this->_host . ')');
+				//print_r($this->_webaccess_str . 'Socket closed by server (' . $this->_host . ')' . PHP_EOL);
 				$this->_state = 'CLOSED';
 				@fclose($this->_socket);
 				$this->_socket = null;
@@ -877,7 +877,7 @@ class WebaccessUrl {
 			$this->_spool[0]['Retries']++;
 			if ($this->_spool[0]['Retries'] > 2) {
 				// 3 tries failed, remove entry from spool
-				print_r($this->_webaccess_str . "failed {$this->_spool[0]['Retries']} times: skip current request");
+				print_r($this->_webaccess_str . "failed {$this->_spool[0]['Retries']} times: skip current request" . PHP_EOL);
 				array_shift($this->_spool);
 			}
 
@@ -901,7 +901,7 @@ class WebaccessUrl {
 
 			if (!$this->_keepalive || $this->_spool[0]['Close']) {
 				//if ($this->_spool[0]['Close'])
-				// print_r($this->_webaccess_str . 'close connection (asked in headers)');
+				// print_r($this->_webaccess_str . 'close connection (asked in headers)' . PHP_EOL);
 				$this->_state = 'CLOSED';
 				@fclose($this->_socket);
 				$this->_socket = null;
@@ -1150,7 +1150,7 @@ class WebaccessUrl {
 		// if the server reply ask to close, then close
 		if (!isset($headers['connection'][0]) || $headers['connection'][0] == 'close') {
 			//if (!$this->_spool[0]['Close'])
-			// print_r($this->_webaccess_str . 'server ask to close connection');
+			// print_r($this->_webaccess_str . 'server ask to close connection' . PHP_EOL);
 			$this->_spool[0]['Close'] = true;
 		}
 
@@ -1166,7 +1166,7 @@ class WebaccessUrl {
 				$this->_serv_keepalive_timeout = $headers['keep-alive']['timeout'];
 			if (isset($headers['keep-alive']['max']))
 				$this->_serv_keepalive_max = $headers['keep-alive']['max'];
-			//print_r($this->_webaccess_str . 'max=' . $this->_serv_keepalive_max . ', timeout=' . $this->_serv_keepalive_timeout . "\n");
+			//print_r($this->_webaccess_str . 'max=' . $this->_serv_keepalive_max . ', timeout=' . $this->_serv_keepalive_timeout . "\n" . PHP_EOL);
 		}
 
 		// store complete reply message for the request
@@ -1193,7 +1193,7 @@ class WebaccessUrl {
 				          $this->_spool[0]['Times']['receive'][2],
 				          $this->_query_num, $this->_spool[0]['DatasSize'],
 				          $size, $this->_spool[0]['ResponseSize']);
-			print_r($msg);
+			print_r($msg . PHP_EOL);
 		}
 	}  // infos
 

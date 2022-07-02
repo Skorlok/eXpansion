@@ -14,6 +14,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Chat;
 
+use Exception;
 use ManiaLib\Utils\Formatting;
 use ManiaLive\Data\Player;
 use ManiaLive\DedicatedApi\Callback\Event;
@@ -457,8 +458,12 @@ class Chat extends ExpPlugin
      */
     public function eXpOnUnload()
     {
-        Dispatcher::unregister(Event::getClass(), $this, Event::ON_PLAYER_CHAT);
-        $this->connection->chatEnableManualRouting(false);
-        ChatSelect::EraseAll();
+        try {
+			Dispatcher::unregister(Event::getClass(), $this, Event::ON_PLAYER_CHAT);
+            $this->connection->chatEnableManualRouting(false);
+            ChatSelect::EraseAll();
+		} catch (Exception $e) {
+			return;
+		}
     }
 }

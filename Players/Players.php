@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Players;
 
-use ManiaLivePlugins\MatchMakingLobby\Windows\PlayerList;
+use ManiaLivePlugins\eXpansion\Players\Gui\Windows\Playerlist;
 
 class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {

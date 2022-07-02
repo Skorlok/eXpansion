@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\CustomUI_MP3;
 
+use Exception;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 
 class CustomUI_MP3 extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -76,6 +77,10 @@ class CustomUI_MP3 extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 		$ui .= '<multilap_info visible="true" pos="152. 49.5 5." />';
 		$ui .= '</ui_properties>';
 
-        $this->connection->triggerModeScriptEvent("UI_SetProperties", $ui);
+		try {
+			$this->connection->triggerModeScriptEvent("UI_SetProperties", $ui);
+		} catch (Exception $e) {
+			return;
+		}
 	}
 }

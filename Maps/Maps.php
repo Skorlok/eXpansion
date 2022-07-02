@@ -174,6 +174,23 @@ class Maps extends ExpPlugin
         $this->preloadHistory();
     }
 
+    public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
+    {
+        $this->config = Config::getInstance();
+
+        if ($this->config->showCurrentMapWidget) {
+            $this->showCurrentMapWidget();
+        } else {
+            CurrentMapWidget::EraseAll();
+        }
+
+        if ($this->config->showNextMapWidget) {
+            $this->showNextMapWidget();
+        } else {
+            NextMapWidget::EraseAll();
+        }
+    }
+
     /**
      *
      * @return boolean
@@ -710,10 +727,10 @@ class Maps extends ExpPlugin
     public function gotoMap($login, Map $map)
     {
         try {
-
             $player = $this->storage->getPlayerObject($login);
 
             $this->connection->chooseNextMap($map->fileName);
+            $this->is_onEndMatch = true; // Make eXpansion ignore jukebox
             $map = $this->connection->getNextMapInfo();
             $this->connection->nextMap();
             $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName);
@@ -1108,6 +1125,9 @@ class Maps extends ExpPlugin
 
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action#added previous map #variable#%3$s #admin_action# to the playlist');
             $this->eXpChatSendServerMessage( $msg, null, array(Formatting::stripCodes($player->nickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
+            if ($this->config->showNextMapWidget) {
+                $this->showNextMapWidget();
+            }
         } else {
             $msg = eXpGetMessage('#admin_error# $iThere are no previously played challenge!');
             $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
