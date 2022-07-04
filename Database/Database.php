@@ -326,13 +326,12 @@ class Database extends ExpPlugin
                                     `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
                                     `challenge_addedby` VARCHAR(200),
                                     `challenge_addtime` INT(9)
-                                    ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = MYISAM ;";
+                                    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = MYISAM ;";
         $this->db->execute($q);
     }
 
     public function updateMapsTableTo3()
     {
-
         $sql = "ALTER TABLE `exp_maps` 
               ADD `mx_trackID` INT UNSIGNED NULL , 
               ADD `mx_userID` INT UNSIGNED NULL , 
@@ -368,7 +367,8 @@ class Database extends ExpPlugin
               ADD `mx_commentsCount` INT NULL,
               ADD `mx_awardCount` INT NULL,
               ADD `mx_hasScreenshot` BOOLEAN NULL,
-              ADD `mx_hasThumbnail` BOOLEAN NULL;";
+              ADD `mx_hasThumbnail` BOOLEAN NULL,
+              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
         $this->db->execute($sql);
         $this->setDatabaseVersion('exp_maps', 3);
     }

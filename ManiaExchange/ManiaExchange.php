@@ -697,7 +697,7 @@ class ManiaExchange extends ExpPlugin
                      `mx_commentsCount`=" . $db->quote($map->commentCount) . ",
                      `mx_awardCount`=" . $db->quote($map->awardCount) . ",
                      `mx_hasScreenshot`=" . $db->quote(intval($map->hasScreenshot)) . ",
-                     `mx_hasThumbnail`=" . $db->quote($map->hasThumbnail) . "                   
+                     `mx_hasThumbnail`=" . $db->quote(intval($map->hasThumbnail)) . "                   
                     WHERE `challenge_uid`=" . $db->quote($map->trackUID) . ";";
             $db->execute($sql);
         } catch (\Exception $ex) {

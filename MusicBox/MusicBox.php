@@ -172,6 +172,11 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->showWidget();
     }
 
+    public function onBeginMatch()
+    {
+        $this->ignore = false;
+    }
+
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {

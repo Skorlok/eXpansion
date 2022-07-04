@@ -81,9 +81,7 @@ class Chat extends ExpPlugin
             $this->enabled = false;
         }
 
-        if (Config::getInstance()->useChannels) {
-            $this->initChat();
-        }
+        $this->initChat();
 
         $this->config = Config::getInstance();
     }
@@ -97,7 +95,9 @@ class Chat extends ExpPlugin
         $all = $this->storage->players + $this->storage->spectators;
         foreach ($all as $login => $player) {
             self::$playerChannels[$login] = "Public";
-            $this->displayWidget($login);
+            if (Config::getInstance()->useChannels) {
+                $this->displayWidget($login);
+            }
         }
     }
 
@@ -240,8 +240,8 @@ class Chat extends ExpPlugin
      */
     public function onPlayerDisconnect($login, $reason = null)
     {
-        if (isset(self::$playerChannels['login'])) {
-            unset(self::$playerChannels['login']);
+        if (isset(self::$playerChannels[$login])) {
+            unset(self::$playerChannels[$login]);
         }
         $player = $this->storage->getPlayerObject($login);
         if (empty($player)) {

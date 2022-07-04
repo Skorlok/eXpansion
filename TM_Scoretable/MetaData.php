@@ -23,8 +23,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
 
-        $this->addGameModeCompability(GameInfos::GAMEMODE_SCRIPT, "TimeAttack.Script.txt");
-        $this->setScriptCompatibilityMode(false);
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK);
 
         $this->setRelaySupport(true);
 

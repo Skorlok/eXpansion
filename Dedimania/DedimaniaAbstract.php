@@ -190,6 +190,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         $this->endMapTriggered = true;
         $this->records = array();
+        if ($this->storage->currentMap->nbCheckpoints <= 1) {
+            return;
+        }
         $this->dedimania->getChallengeRecords();
     }
 
@@ -197,6 +200,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         if (!$this->endMapTriggered) {
             $this->records = array();
+            if ($this->storage->currentMap->nbCheckpoints <= 1) {
+                return;
+            }
             $this->dedimania->getChallengeRecords();
         }
     }
@@ -324,7 +330,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
         $this->dedimania->playerMultiConnect($players);
 
-        $this->dedimania->getChallengeRecords();
+        if ($this->storage->currentMap->nbCheckpoints > 1) {
+            $this->dedimania->getChallengeRecords();
+        }
 
         $this->rankings = array();
     }

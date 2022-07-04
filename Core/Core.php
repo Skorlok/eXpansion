@@ -546,23 +546,23 @@ EOT;
 					if (isset($params['players']) && is_array($params['players'])) {
 						foreach ($params['players'] as $item) {
 							$scores[] = array(
-                                'login'				=> $item['login'],
-								'nickName'			=> $item['name'],
-								'rank'				=> $item['rank'],
-								'round_points'			=> $item['roundpoints'],
-								'map_points'			=> $item['mappoints'],
-								'match_points'			=> $item['matchpoints'],
-								'best_race_time'		=> $item['bestracetime'],
-								'best_race_respawns'		=> $item['bestracerespawns'],
-								'best_race_checkpoints'		=> $item['bestracecheckpoints'],
-								'bestTime'			=> $item['bestlaptime'],
-								'best_lap_respawns'		=> $item['bestlaprespawns'],
-								'best_lap_checkpoints'		=> $item['bestlapcheckpoints'],
-								'prev_race_time'		=> $item['prevracetime'],
-								'prev_race_respawns'		=> $item['prevracerespawns'],
-								'prev_race_checkpoints'		=> $item['prevracecheckpoints'],
-								'stunts_score'			=> $item['stuntsscore'],
-								'prev_stunts_score'		=> $item['prevstuntsscore'],
+                                'login'				=> isset($item['login']) ? $item['login'] : "",
+								'nickName'			=> isset($item['name']) ? $item['name'] : "",
+								'rank'				=> isset($item['rank']) ? $item['rank'] : 0,
+								'round_points'			=> isset($item['roundpoints']) ? $item['roundpoints'] : 0,
+								'map_points'			=> isset($item['mappoints']) ? $item['mappoints'] : 0,
+								'match_points'			=> isset($item['matchpoints']) ? $item['matchpoints'] : 0,
+								'best_race_time'		=> isset($item['bestracetime']) ? $item['bestracetime'] : 0,
+								'best_race_respawns'		=> isset($item['bestracerespawns']) ? $item['bestracerespawns'] : 0,
+								'best_race_checkpoints'		=> isset($item['bestracecheckpoints']) ? $item['bestracecheckpoints'] : array(),
+								'bestTime'			=> isset($item['bestlaptime']) ? $item['bestlaptime'] : 0,
+								'best_lap_respawns'		=> isset($item['bestlaprespawns']) ? $item['bestlaprespawns'] : 0,
+								'best_lap_checkpoints'		=> isset($item['bestlapcheckpoints']) ? $item['bestlapcheckpoints'] : array(),
+								'prev_race_time'		=> isset($item['prevracetime']) ? $item['prevracetime'] : 0,
+								'prev_race_respawns'		=> isset($item['prevracerespawns']) ? $item['prevracerespawns'] : 0,
+								'prev_race_checkpoints'		=> isset($item['prevracecheckpoints']) ? $item['prevracecheckpoints'] : array(),
+								'stunts_score'			=> isset($item['stuntsscore']) ? $item['stuntsscore'] : 0,
+								'prev_stunts_score'		=> isset($item['prevstuntsscore']) ? $item['prevstuntsscore'] : 0
 							);
 						}
 					}
@@ -1893,16 +1893,7 @@ EOT;
         } elseif ($a->bestTime > 0 && $b->bestTime > 0 && $a->bestTime > $b->bestTime) {
             return 1;
         }
-        // all same... test time of previous checks
-        for ($key = $a->curCpIndex - 1; $key >= 0; $key--) {
-            if ($a->checkpoints[$key] < $b->checkpoints[$key]) {
-                return -1;
-            } elseif ($a->checkpoints[$key] > $b->checkpoints[$key]) {
-                return 1;
-            }
-        }
         // really all same, use login  :p
-        //    echo "use login";
         return strcmp($a->login, $b->login);
     }
 }

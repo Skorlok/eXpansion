@@ -614,7 +614,6 @@ class Connection extends Singleton implements AppListener, TickListener
         }
         if (!empty($data[0][0]['Error'])) {
             $this->console("Authentication Error occurred: ".$data[0][0]['Error']);
-
             return;
         }
     }
@@ -633,7 +632,6 @@ class Connection extends Singleton implements AppListener, TickListener
 
         if (!empty($data[0]['Error'])) {
             $this->console("Error from dediserver: ".$data[0]['Error']);
-
             return;
         }
 
@@ -652,7 +650,6 @@ class Connection extends Singleton implements AppListener, TickListener
 
         if (!$data[0]['Records']) {
             $this->debug("No records found.");
-
             return;
         }
 

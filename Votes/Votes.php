@@ -476,11 +476,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
             if ($cmdName == "Add") {
                 if (Core::$isTimeExtendable) {
-                    $timeToAdd = intval($cmdParam*60);
+                    $timeToAdd = intval(preg_replace("/[^0-9.]/", "", $cmdParam)*60);
                     $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $timeToAdd);
                 }
                 if (Core::$isPointExtendable) {
-                    $pointsToAdd = intval($cmdParam);
+                    $pointsToAdd = intval(preg_replace("/[^0-9.]/", "", $cmdParam));
                     $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $pointsToAdd);
                 }
             }
