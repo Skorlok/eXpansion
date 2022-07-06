@@ -39,9 +39,9 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->quadImage = new \ManiaLib\Gui\Elements\Quad(80, 50);
         $this->quadImage->setAlign("left", "top");
         if (ManiaExchange::$mxInfo->HasScreenshot) {
-            $this->quadImage->setImage("https://" . $title . ".mania-exchange.com/maps/" . ManiaExchange::$mxInfo->TrackID . "/image/1?.png", true);
+            $this->quadImage->setImage("http://" . $title . ".mania-exchange.com/maps/" . ManiaExchange::$mxInfo->TrackID . "/image/1?.png", true);
         } else {
-            $this->quadImage->setImage("https://" . $title . ".mania-exchange.com/tracks/screenshot/normal/" . ManiaExchange::$mxInfo->TrackID . "/?.jpg", true);
+            $this->quadImage->setImage("http://" . $title . ".mania-exchange.com/tracks/screenshot/normal/" . ManiaExchange::$mxInfo->TrackID . "/?.jpg", true);
         }
         $this->frameImage->addComponent($this->quadImage);
         $this->mainFrame->addComponent($this->frameImage);

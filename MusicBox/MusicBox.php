@@ -100,6 +100,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MusicBox [getter] ver 0.1");
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $data = curl_exec($ch);
         $status = curl_getinfo($ch);

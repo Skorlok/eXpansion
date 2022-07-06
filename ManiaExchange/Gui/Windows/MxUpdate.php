@@ -90,7 +90,7 @@ class MxUpdate extends Window
         if ($config->key) {
             $key = "&key=" . $config->key;
         }
-        $query = 'https://api.mania-exchange.com/' . $title . '/maps?ids=' . $uids . $key;
+        $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $uids . $key;
 
         $access = DataAccess::getInstance();
         $options = array(CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));

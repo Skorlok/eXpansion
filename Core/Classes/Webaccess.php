@@ -600,7 +600,7 @@ class WebaccessUrl
                     }
                 }
                 $msg .= "Content-type: " . $query['MimeType'] . "; charset=UTF-8\r\n";
-                $msg .= "Content-length: " . strlen($query['QueryDatas']) . "\r\n";
+                $msg .= "Content-length: " . is_null($query['QueryDatas']) ? "0" : strlen($query['QueryDatas']) . "\r\n";
                 $query['HDatas'] = $msg;
 
                 $query['State'] = 'OPEN';

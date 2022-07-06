@@ -12,9 +12,9 @@ class LongDate extends AbstractFormater
 
     public function format($val)
     {
-        $minutes = (int)(($val / 60) % 60);
-        $hours = (int)(($val / 3600) % 24);
-        $days = (int)(($val / (3600 * 24)) % 30);
+        $minutes = (intval(($val) / 60) % 60);
+        $hours = (intval(($val) / 3600) % 24);
+        $days = (intval(($val) / (3600 * 24)) % 30);
         $text = $days . 'd ' . $hours . 'h ' . $minutes . 'min';
 
         $month = (int)(($val / (3600 * 24 * 30)));
