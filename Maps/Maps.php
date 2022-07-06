@@ -14,7 +14,7 @@ use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\DonatePanel\Config as DonateConfig;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
-use ManiaLivePlugins\eXpansion\Helpers\GbxReader\Map as MapReader;
+use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Widgets\CurrentMapWidget;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Widgets\NextMapWidget;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\AddMaps;
@@ -22,6 +22,7 @@ use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Jukelist;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Maplist;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapSortMode;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapWish;
+use ManiaLivePlugins\eXpansion\Maps\Structures\MapInfos;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\Map;
 
@@ -298,9 +299,31 @@ class Maps extends ExpPlugin
             if (count($this->queue) > 0) {
                 reset($this->queue);
                 $queue = current($this->queue);
-                $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
+                
+                if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName)) {
+                    $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                    $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
+                } else {
+                    $gbxInfo = new MapInfos();
+                    $gbxInfo->name = $queue->map->name;
+                    $gbxInfo->authorNick = $queue->map->author;
+                    $gbxInfo->envir = $queue->map->environnement;
+                    $gbxInfo->author = $queue->map->author;
+                }
+
             } else {
-                $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName);
+
+                if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName)) {
+                    $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                    $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName);
+                } else {
+                    $gbxInfo = new MapInfos();
+                    $gbxInfo->name = $this->storage->nextMap->name;
+                    $gbxInfo->authorNick = $this->storage->nextMap->author;
+                    $gbxInfo->envir = $this->storage->nextMap->environnement;
+                    $gbxInfo->author = $this->storage->nextMap->author;
+                }
+
             }
             $info->setMap($gbxInfo);
             $info->show();
@@ -330,8 +353,15 @@ class Maps extends ExpPlugin
                 $this->connection->chooseNextMap($queue->map->fileName);
 
                 if ($this->config->showEndMatchNotices || $this->config->showEndMatchNoticesJukebox) {
-                    $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
-                    $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->author->nickname, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+
+                    if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName)) {
+                        $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                        $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
+                        $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+                    } else {
+                        $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+                    }
+
                 }
             } catch (Exception $e) {
                 $this->eXpChatSendServerMessage('Error: %s', $queue->player->login, array($e->getMessage()));
@@ -342,8 +372,14 @@ class Maps extends ExpPlugin
         } else {
             if ($this->config->showEndMatchNotices) {
                 $map = $this->storage->nextMap;
-                $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName);
-                $this->eXpChatSendServerMessage($this->msg_nextMap, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->author->nickname));
+
+                if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName)) {
+                    $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                    $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName);
+                    $this->eXpChatSendServerMessage($this->msg_nextMap, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->authorNick));
+                } else {
+                    $this->eXpChatSendServerMessage($this->msg_nextMap, null, array(Formatting::stripCodes($map->name, 'wosnm'), $this->storage->nextMap->author));
+                }
             }
         }
     }
@@ -733,8 +769,15 @@ class Maps extends ExpPlugin
             $this->is_onEndMatch = true; // Make eXpansion ignore jukebox
             $map = $this->connection->getNextMapInfo();
             $this->connection->nextMap();
-            $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName);
-            $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->author->nickname, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+
+            if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName)) {
+                $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName);
+                $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+            } else {
+                $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+            }
+
         } catch (Exception $e) {
             $this->eXpChatSendServerMessage(__('Error: %s', $login, $e->getMessage()));
         }
@@ -937,11 +980,25 @@ class Maps extends ExpPlugin
             if (count($this->queue) > 0) {
                 reset($this->queue);
                 $queue = current($this->queue);
-                $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
-                $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->author->nickname, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+
+                if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName)) {
+                    $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                    $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
+                    $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+                } else {
+                    $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+                }
+
             } else {
-                $gbxInfo = MapReader::read($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName);
-                $this->eXpChatSendServerMessage($this->msg_nextMap, $login, array(Formatting::stripCodes($this->storage->nextMap->name, 'wosnm'), $gbxInfo->author->nickname));
+
+                if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName)) {
+                    $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                    $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $this->storage->nextMap->fileName);
+
+                    $this->eXpChatSendServerMessage($this->msg_nextMap, $login, array(Formatting::stripCodes($this->storage->nextMap->name, 'wosnm'), $gbxInfo->authorNick));
+                } else {
+                    $this->eXpChatSendServerMessage($this->msg_nextMap, $login, array(Formatting::stripCodes($this->storage->nextMap->name, 'wosnm'), $this->storage->nextMap->author));
+                }
             }
         }
     }

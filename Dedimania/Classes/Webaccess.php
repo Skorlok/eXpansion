@@ -475,18 +475,12 @@ class WebaccessUrl {
 
 		// if asynch, in error, and maximal timeout, then forget the request and return false
 		if (($query['Callback'] != null) && ($this->_state == 'BAD')) {
-			if ($this->_bad_timeout > $_web_access_retry_timeout_max) {
-				print_r($this->_webaccess_str . 'Request refused for consecutive errors (' . $this->_bad_timeout . ' / ' . $_web_access_retry_timeout_max . ')' . PHP_EOL);
-				return false;
-
-			} else {
-				// if not max then accept the request and try a request (minimum $_web_access_retry_timeout/2 after previous try)
-				$time = time();
-				$timeout = ($this->_bad_timeout / 2) - ($time - $this->_bad_time);
-				if ($timeout < 0)
-					$timeout = 0;
-				$this->_bad_time = $time - $this->_bad_timeout + $timeout;
-			}
+			// accept the request and try a request (minimum $_web_access_retry_timeout/2 after previous try)
+			$time = time();
+			$timeout = ($this->_bad_timeout / 2) - ($time - $this->_bad_time);
+			if ($timeout < 0)
+				$timeout = 0;
+			$this->_bad_time = $time - $this->_bad_timeout + $timeout;
 		}
 
 		// build data to send

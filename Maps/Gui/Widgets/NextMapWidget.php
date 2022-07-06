@@ -90,10 +90,10 @@ class NextMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     {
         $this->map = $map;
         $this->labelName->setText($this->map->name);
-        $this->labelAuthor->setText($this->map->author->nickname);
-        $this->environment->setText($map->environment);
+        $this->labelAuthor->setText($this->map->authorNick);
+        $this->environment->setText($map->envir);
 
-        if ($map->author->login == "Nadeo") {
+        if ($map->author == "Nadeo") {
             $this->country->setImage("http://reaby.kapsi.fi/ml/flags/France.dds", true);
         }
     }

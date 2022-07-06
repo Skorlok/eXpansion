@@ -1476,7 +1476,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
 
         if (Core::$isTimeExtendable) {
-            if ($params[0] == null){
+            if (!isset($params[0]) || !$params[0]) {
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
                 $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit.', null, array($admin->nickName));
@@ -1498,7 +1498,7 @@ class ChatAdmin extends ExpPlugin
         }
 
         if (Core::$isPointExtendable) {
-            if ($params[0] == null){
+            if (!isset($params[0]) || !$params[0]) {
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
                 $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit.', null, array($admin->nickName));
