@@ -119,7 +119,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = $json[0];
 
         if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
-            $query = "https://tm.mania.exchange/api/replays/get_replays/" .$json[0]->TrackID;
+            $query = "http://tm.mania.exchange/api/replays/get_replays/" .$json[0]->TrackID;
 
             $ch = curl_init($query);
             curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -229,7 +229,7 @@ class ManiaExchange extends ExpPlugin
 
         $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($packId));
 
-        $query = 'https://' . $title . '.mania-exchange.com/api/mappack/get_mappack_tracks/' . $packId;
+        $query = 'http://' . $title . '.mania-exchange.com/api/mappack/get_mappack_tracks/' . $packId;
         
         $ch = curl_init($query);
         curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -291,7 +291,7 @@ class ManiaExchange extends ExpPlugin
             $title = "sm";
         }
 
-        $query = 'https://' . $title . '.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
+        $query = 'http://' . $title . '.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
 
         $ch = curl_init($query);
         curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -377,10 +377,10 @@ class ManiaExchange extends ExpPlugin
         $query = "";
         switch ($this->expStorage->simpleEnviTitle) {
             case "SM":
-                $query = 'https://sm.mania-exchange.com/tracks/download/' . $mxId;
+                $query = 'http://sm.mania-exchange.com/tracks/download/' . $mxId;
                 break;
             case "TM":
-                $query = 'https://tm.mania-exchange.com/tracks/download/' . $mxId;
+                $query = 'http://tm.mania-exchange.com/tracks/download/' . $mxId;
                 break;
         }
 
@@ -429,7 +429,7 @@ class ManiaExchange extends ExpPlugin
                 $title = "sm";
             }
 
-            $query = "https://" . $title . ".mania-exchange.com/api/maps/get_map_info/id/" . $mxId;
+            $query = "http://" . $title . ".mania-exchange.com/api/maps/get_map_info/id/" . $mxId;
 
             $ch = curl_init($query);
             curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
@@ -622,7 +622,7 @@ class ManiaExchange extends ExpPlugin
             $title = "sm";
         }
 
-        $query = 'https://api.mania-exchange.com/' . $title . '/maps?ids=' . $mapUid . $this->getKey(true);
+        $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $mapUid . $this->getKey(true);
 
         $options = array(CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
         $this->dataAccess->httpCurl($query, array($this, "xUpdateInfo"), null, $options);
@@ -732,10 +732,10 @@ class ManiaExchange extends ExpPlugin
         $query = "";
         switch ($this->expStorage->simpleEnviTitle) {
             case "SM":
-                $query = 'https://sm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
+                $query = 'http://sm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
                 break;
             case "TM":
-                $query = 'https://tm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
+                $query = 'http://tm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
                 break;
         }
 
