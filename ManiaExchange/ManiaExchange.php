@@ -377,10 +377,10 @@ class ManiaExchange extends ExpPlugin
         $query = "";
         switch ($this->expStorage->simpleEnviTitle) {
             case "SM":
-                $query = 'http://sm.mania-exchange.com/tracks/download/' . $mxId;
+                $query = 'https://sm.mania-exchange.com/tracks/download/' . $mxId;
                 break;
             case "TM":
-                $query = 'http://tm.mania-exchange.com/tracks/download/' . $mxId;
+                $query = 'https://tm.mania-exchange.com/tracks/download/' . $mxId;
                 break;
         }
 
