@@ -281,6 +281,7 @@ EOT;
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
         $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
+        $this->connection->triggerModeScriptEventArray('XmlRpc.SetApiVersion', array('2.5.0'));
     }
 
 
@@ -403,30 +404,28 @@ EOT;
         // which is not needed anymore as of 09/2014
         // $this->connection->keepPlayerSlots(true);
 
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-            $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
-            $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
+        $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
+        $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
 
-            // Make sure the callbacks will be receive for MP3 scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for MP3 scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
+        }
 
-            // Make sure the callbacks will be receive for MP3 scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for MP3 scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
+        }
 
-            // Make sure the callbacks will be receive for MP4 scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for MP4 scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
         }
 
         //extend time or point compatibility
@@ -899,6 +898,7 @@ EOT;
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+        $this->connection->triggerModeScriptEventArray('XmlRpc.SetApiVersion', array('2.5.0'));
     }
 
     public function onBeginMatch()
@@ -1179,42 +1179,41 @@ EOT;
         }
 
         //prevent bugs when switching from MP3 gamemode to MP4
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-            $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
-            $this->enableScriptEvents("LibXmlRpc_Callbacks");
-            $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
 
-            $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
-            $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
-            $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
-            $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
-            $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
+        $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
+        $this->enableScriptEvents("LibXmlRpc_Callbacks");
+        $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
 
-            $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
-            $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
-            self::optimizeScriptCallbacks();
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
+        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+        $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
+        $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
+
+        $this->connection->triggerModeScriptEvent("LibXmlRpc_ListCallbacks", "");
+        $this->connection->triggerModeScriptEventArray('XmlRpc.EnableCallbacks', array('true'));
+        self::optimizeScriptCallbacks();
 
 
-            // Make sure the callbacks will be receive for MP3 scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for MP3 scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseScriptCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
+        }
 
-            // Make sure the callbacks will be receive for all scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for all scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseLegacyCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
+        }
 
-            // Make sure the callbacks will be receive for MP4 scripts mode
-            try {
-                $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
-            } catch (\Exception $ex) {
-                // Do nothing
-            }
+        // Make sure the callbacks will be receive for MP4 scripts mode
+        try {
+            $this->connection->setModeScriptSettings(array("S_UseLegacyXmlRpcCallbacks" => true));
+        } catch (\Exception $ex) {
+            // Do nothing
         }
     }
 
