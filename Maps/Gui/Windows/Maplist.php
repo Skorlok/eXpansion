@@ -338,8 +338,9 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->maps[] = $map;
             }
         }
-        $this->searchBox->setText(Maps::$searchTerm[$login]);
-
+        if (isset(Maps::$searchTerm[$login])) {
+            $this->searchBox->setText(Maps::$searchTerm[$login]);
+        }
 
         if ($column !== null) {
             if ($column != Maps::$playerSortModes[$login]->column) {
