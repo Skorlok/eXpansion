@@ -128,12 +128,18 @@ class Help extends Window
     {
         if (empty($searchCriteria)) {
             return true;
-        } else if (strpos($cmd->getCmd(), $searchCriteria) !== false) {
-            return true;
-        } else if(strpos($cmd->getHelp(), $searchCriteria)) {
-            return true;
-        } else if(strpos($cmd->getHelpMore(), $searchCriteria)) {
-            return true;
+        } else if (!is_null($cmd->getCmd())) {
+            if (strpos($cmd->getCmd(), $searchCriteria) !== false) {
+                return true;
+            }
+        } else if(!is_null($cmd->getHelp())) {
+            if(strpos($cmd->getHelp(), $searchCriteria)) {
+                return true;
+            }
+        } else if(!is_null($cmd->getHelpMore())) {
+            if(strpos($cmd->getHelpMore(), $searchCriteria)) {
+                return true;
+            }
         } else {
             foreach ($cmd->getAliases() as $alias) {
                 if (strpos($alias, $searchCriteria)) {

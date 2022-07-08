@@ -42,7 +42,8 @@ class HelpItem extends Control
         $gui_scmd = new Label(20 * (1/0.8), 4);
         $gui_scmd->setAlign('left', 'center');
         if (!empty($cmd->getAliases())) {
-            $gui_scmd->setText(array_pop($cmd->getAliases()));
+            $alias = $cmd->getAliases();
+            $gui_scmd->setText(array_pop($alias));
         }
         $gui_scmd->setScale(0.8);
         $frame->addComponent($gui_scmd);
