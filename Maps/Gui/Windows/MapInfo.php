@@ -62,11 +62,10 @@ class MapInfo extends Window
         $this->frame2->clearComponents();
 
         $map = ArrayOfObj::getObjbyPropValue($storage->maps, "uId", $uid);
-        $map->{"nick"} = "n/a";
-
         if ($map === false) {
             return false;
         }
+        $map->{"nick"} = "n/a";
 
         $this->setTitle("Map Info", $map->name);
         $lbl = new Label($x, 6);
@@ -83,6 +82,10 @@ class MapInfo extends Window
         try {
             $this->connection = Singletons::getInstance()->getDediConnection();
             $mapPath = $this->connection->getMapsDirectory();
+
+            if (!file_exists($mapPath . DIRECTORY_SEPARATOR . $map->fileName)) {
+                return;
+            }
 
             $gbxInfo = new GBXChallMapFetcher(true, false, false);
             $gbxInfo->processFile($mapPath . DIRECTORY_SEPARATOR . $map->fileName);

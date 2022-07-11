@@ -5,8 +5,11 @@ namespace ManiaLivePlugins\eXpansion\Dedimania;
 use ManiaLive\Application\ErrorHandling;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Time;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
@@ -51,8 +54,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     /* @var integer $recordCount */
     protected $recordCount = 30;
 
-    /* @var bool $warmup */
-    protected $wasWarmup = false;
     protected $msg_norecord;
     protected $msg_welcome;
     protected $msg_premium;
@@ -142,6 +143,8 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                     $this->registerChatCommand("dedicps", "showCps", 0, true);
                     $this->registerChatCommand("dediseccps", "showSecCps", 0, true);
                     $this->registerChatCommand("dedicps", "showCpDiff", 1, true);
+                    $cmd = AdminGroups::addAdminCommand("savededi", $this, "force_dedisave", Permission::GAME_SETTINGS);
+                    $cmd->setHelp("Force dedimania to send dedi records");
                     $this->setPublicMethod("showRecs");
                     $this->setPublicMethod("showCps");
                     $this->setPublicMethod("showSecCps");
@@ -222,7 +225,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         if (!$this->running) {
             return;
         }
-        $this->wasWarmup = $this->connection->getWarmUp();
     }
 
     /**
@@ -603,6 +605,64 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $window->setSize(200, 100);
         $window->centerOnScreen();
         $window->show();
+    }
+
+    public function force_dedisave($fromLogin, $params)
+    {
+        if ($this->storage->currentMap->nbCheckpoints <= 1) {
+            $this->eXpChatSendServerMessage("#admin_error#Map not supported (need at least 1 CP), dedimania records not sent !", $fromLogin);
+            return;
+        }
+
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+
+        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+            return;
+        }
+
+        $rankings = array();
+        foreach(Core::$rankings as $rank) {
+
+            if (isset($rank->best_lap_checkpoints) && $rank->bestTime > 0) {
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP) {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->best_race_checkpoints));
+                } else {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->best_race_checkpoints));
+                }
+            }
+
+            elseif (isset($rank->bestCheckpoints) && $rank->bestTime > 0) {
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP) {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->bestCheckpoints));
+                } else {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->bestCheckpoints));
+                }
+            }
+        }
+
+        if (count($rankings) < 1) {
+            $this->eXpChatSendServerMessage("#admin_error#No score found, dedi not sent !", $fromLogin);
+            return;
+        }
+        usort($rankings, array($this, "compare_BestTime"));
+
+        $this->rankings = $rankings;
+
+        $firstPlayerInfos = ArrayOfObj::getObjbyPropValue(Core::$rankings, "login", $rankings[0]['Login']);
+
+        if (isset($firstPlayerInfos->best_race_checkpoints)) {
+            $this->getVReplay($rankings[0]['Login'], $firstPlayerInfos->best_race_checkpoints);
+        } else {
+            $this->getVReplay($rankings[0]['Login'], array());
+        }
+        $this->getGReplay($rankings[0]['Login']);
+
+        $this->sendScores();
+        $this->EndMatch();
+        $this->records = array();
+        $this->dedimania->getChallengeRecords();
+
+        $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
     }
 
     public function isRunning()

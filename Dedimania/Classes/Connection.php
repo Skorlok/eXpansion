@@ -181,9 +181,9 @@ class Connection extends Singleton implements AppListener, TickListener
             return;
         }
 
-        // only special maps under 8 seconds are allowed
-        if ($map->authorTime < 8000 && strtolower($map->author) != 'nadeo') {
-            $this->console("[Notice] Author time under 8 seconds, will not send records.");
+        // only special maps under 6.2 seconds are allowed
+        if ($map->authorTime < 6200 && strtolower($map->author) != 'nadeo') {
+            $this->console("[Notice] Author time under 6.2 seconds, will not send records.");
             return;
         }
 
