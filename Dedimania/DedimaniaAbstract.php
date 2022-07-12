@@ -617,7 +617,12 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
         if ($gamemode == GameInfos::GAMEMODE_TEAM) {
-            return;
+            $this->sendScores();
+            $this->EndMatch();
+            $this->records = array();
+            $this->dedimania->getChallengeRecords();
+
+            $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
         }
 
         $rankings = array();

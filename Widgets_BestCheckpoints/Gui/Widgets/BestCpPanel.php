@@ -7,49 +7,37 @@ use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Config;
 
 class BestCpPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
-
     protected $cps = array();
-    protected $maxCpIndex = 12;
-
     protected $frame;
-    protected $storage;
-    protected $timeScript;
 
     protected function eXpOnBeginConstruct()
     {
-        $this->maxCpIndex = Config::getInstance()->CPNumber;
-
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Flow(220, 20));
         $this->frame->setSize(220, 20);
         $this->frame->setPosY(-2);
         $this->addComponent($this->frame);
         $this->setName("Best CheckPoints Widget");
-        $this->storage = \ManiaLive\Data\Storage::getInstance();
-
-        $this->timeScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script('Widgets_BestCheckpoints/Gui/Scripts/BestCps');
-        $this->timeScript->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
-        $this->registerScript($this->timeScript);
     }
 
     public function onDraw()
     {
+        parent::onDraw();
+    }
 
-        $this->timeScript->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
-
+    public function populateList($checkpoints)
+    {
         foreach ($this->cps as $cp) {
             $cp->destroy();
         }
+
         $this->cps = array();
         $this->frame->clearComponents();
 
-        for ($x = 0; $x < 24 && $x < $this->storage->currentMap->nbCheckpoints; $x++) {
-            $this->cps[$x] = new CheckpointElem($x);
+        for ($x = 0; $x < Config::getInstance()->CPNumber && $x < count($checkpoints); $x++) {
+            $this->cps[$x] = new CheckpointElem($x, $checkpoints[$x]);
             $this->frame->addComponent($this->cps[$x]);
         }
-
-        $this->timeScript->setParam("maxCpIndex", $this->maxCpIndex);
-        parent::onDraw();
     }
 
     public function destroy()

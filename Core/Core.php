@@ -225,10 +225,6 @@ EOT;
             $bExitApp = true;
         }
 
-        if (!$this->checkPhpExtensions()) {
-            $bExitApp = true;
-        }
-
         $this->console('Version ' . \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . ' build ' . date("Y-m-d h:i:s A", Helper::getBuildDate()) . '');
 
         //List of supported languages found
@@ -324,17 +320,6 @@ EOT;
         $this->console('');
 
         return $status;
-    }
-
-    public function checkPhpExtensions()
-    {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            if (!extension_loaded('com_dotnet')) {
-                $this->console("eXpansion needs PHP extension com_dotnet to run. Enable it to run eXpansion => extension=php_com_dotnet.dll");
-                return false;
-            }
-        }
-        return true;
     }
 
     /**

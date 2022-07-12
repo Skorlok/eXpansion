@@ -20,7 +20,7 @@ class CheckpointElem extends Control
 
     protected $time;
 
-    public function __construct($x, Checkpoint $cp = null)
+    public function __construct($x, Checkpoint $cp)
     {
         $sizeX = 35;
         $sizeY = 5;
@@ -32,8 +32,7 @@ class CheckpointElem extends Control
         $this->bg->setStyle("BgsPlayerCard");
         $this->bg->setSubStyle("BgRacePlayerName");
         $this->bg->setAlign('left', 'center');
-        $this->bg->setColorize($config->style_widget_bgColorize); // tämä
-        $this->bg->setHidden(1);
+        $this->bg->setColorize($config->style_widget_bgColorize);
         $this->addComponent($this->bg);
 
         $this->label = new Label(3, 4);
@@ -42,6 +41,7 @@ class CheckpointElem extends Control
         $this->label->setId("CpPos" . $x);
         $this->label->setPosX(2);
         $this->label->setTextColor($this->getColor("#rank#"));
+        $this->label->setText($x+1 . ".");
         $this->addComponent($this->label);
 
         $this->label = new Label(9, 4);
@@ -50,14 +50,21 @@ class CheckpointElem extends Control
         $this->label->setId("CpTime" . $x);
         $this->label->setPosX(2.5);
         $this->label->setTextColor($this->getColor("#time#"));
-        $this->addComponent($this->label);
 
+        $time = \ManiaLive\Utilities\Time::fromTM($cp->time);
+        if (strpos($time, ":") == 1) {
+            $time = "0" . $time;
+        }
+
+        $this->label->setText($time);
+        $this->addComponent($this->label);
 
         $this->nick = new Label(21, 4);
         $this->nick->setAlign('left', 'center');
         $this->nick->setTextSize(1);
         $this->nick->setPosX(12);
         $this->nick->setId("CpNick_" . $x);
+        $this->nick->setText($cp->nickname);
         $this->addComponent($this->nick);
 
         $this->sizeX = $sizeX;

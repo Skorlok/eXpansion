@@ -63,7 +63,7 @@ class Dedimania extends DedimaniaAbstract
         $this->handlePlayerFinish($playerUid, $login, $time, $checkpoints);
     }
 
-    function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
+    public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
 	{
         if (!$this->running) {
             return;

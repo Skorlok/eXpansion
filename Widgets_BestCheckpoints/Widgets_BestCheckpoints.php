@@ -2,17 +2,20 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Gui\Widgets\BestCpPanel;
 use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Structures\Checkpoint;
 
 class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    public $BestCps = array();
+    public $bestCps = array();
+    public $finishTimes = array();
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->displayWidget();
+        $this->bestCps = array();
+        $this->finishTimes = array();
     }
 
     /**
@@ -20,29 +23,66 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
      *
      * @param string $login
      */
-    public function displayWidget($login = null)
+    public function displayWidget($checkpoints)
     {
-        $info = BestCpPanel::Create($login, true);
+        $info = BestCpPanel::Create(null, true);
+        $info->populateList($checkpoints);
         $info->setSize(190, 7);
         $info->show();
     }
 
     public function onBeginMatch()
     {
-        $this->BestCps = array();
-        $this->displayWidget();
+        $this->bestCps = array();
+        $this->finishTimes = array();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         BestCpPanel::EraseAll();
-        $this->BestCps = array();
+        $this->bestCps = array();
+        $this->finishTimes = array();
+    }
+
+    public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
+    {
+        if (($checkpointIndex + 1) == $this->storage->currentMap->nbCheckpoints * ($curLap)) {
+            $this->finishTimes[$login] = $timeOrScore;
+            return;
+        }
+
+        if (($checkpointIndex + 1) > $this->storage->currentMap->nbCheckpoints) {
+            $cpPassed = $this->storage->currentMap->nbCheckpoints * $curLap;
+            if (isset($this->finishTimes[$login])) {
+                $timeOrScore = $timeOrScore - $this->finishTimes[$login];
+                $checkpointIndex = $checkpointIndex - $cpPassed;
+                if ($checkpointIndex < 0) {
+                    $checkpointIndex = $this->storage->currentMap->nbCheckpoints - 1;
+                }
+            } else {
+                $checkpointIndex = $checkpointIndex - $cpPassed;
+                if ($checkpointIndex < 0) {
+                    $checkpointIndex = $this->storage->currentMap->nbCheckpoints - 1;
+                }
+            }
+        }
+
+        if (!isset($this->bestCps[$checkpointIndex])) {
+            $this->bestCps[$checkpointIndex] = new checkpoint($checkpointIndex, $login, Core::$players[$login], $timeOrScore);
+            $this->displayWidget($this->bestCps);
+        } else {
+            if ($this->bestCps[$checkpointIndex]->time > $timeOrScore) {
+                $this->bestCps[$checkpointIndex] = new checkpoint($checkpointIndex, $login, Core::$players[$login], $timeOrScore);
+                $this->displayWidget($this->bestCps);
+            }
+        }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         BestCpPanel::EraseAll();
-        $this->BestCps = array();
+        $this->bestCps = array();
+        $this->finishTimes = array();
     }
 
     public function eXpOnUnload()
