@@ -114,7 +114,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         if (count($textSplit) > 18) {
             $text = array_slice($textSplit, 0, 18);
             $text = implode("\n", $text);
-            $text .= "\n   ....";
+            $text .= "\n ....";
         }
         $this->label_map_comment->setText(__($text));
         $this->label_map_comment->setScale(1.2);

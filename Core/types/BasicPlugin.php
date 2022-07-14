@@ -715,9 +715,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             if ($soft) {
                 if (strpos($compatibility, 'TIMEATTACK') !== false) {
                     $compatibility = GameInfos::GAMEMODE_TIMEATTACK;
-                } elseif (strpos($compatibility, 'ROUNDS') !== false
-                    || strpos($compatibility, 'ROUNDSBASE') !== false
-                ) {
+                } elseif (strpos($compatibility, 'ROUNDS') !== false || strpos($compatibility, 'ROUNDSBASE') !== false) {
                     $compatibility = GameInfos::GAMEMODE_ROUNDS;
                 } elseif (strpos($compatibility, 'TEAM') !== false) {
                     $compatibility = GameInfos::GAMEMODE_TEAM;

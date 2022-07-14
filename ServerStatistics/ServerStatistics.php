@@ -27,17 +27,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         global $lang;
         //The Database plugin is needed.
-        $this->addDependency(
-            new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database")
-        );
-
-        // Make sure pcre and php_com_dotnet are loaded :)
-        if (!extension_loaded('pcre') && !function_exists('preg_match') && !function_exists('preg_match_all')) {
-            $message = 'ServerStatistics needs the `pcre` extension '
-                .'to be loaded. http://us2.php.net/manual/en/book.pcre.php';
-            $this->dumpException($message, new \Exception('`pcre` is missing'));
-            exit(1);
-        }
+        $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database"));
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->metrics = new Stats\StatsWindows();
@@ -94,18 +84,10 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         //Checking the version if the table
-        $version = $this->callPublicMethod(
-            '\ManiaLivePlugins\\eXpansion\\Database\\Database',
-            'getDatabaseVersion',
-            'exp_records'
-        );
+        $version = $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Database\\Database', 'getDatabaseVersion', 'exp_records');
+
         if (!$version) {
-            $version = $this->callPublicMethod(
-                '\ManiaLivePlugins\\eXpansion\\Database\\Database',
-                'setDatabaseVersion',
-                'exp_records',
-                1
-            );
+            $version = $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Database\\Database', 'setDatabaseVersion', 'exp_records', 1);
         }
 
         $this->nbPlayer = 0;
@@ -170,15 +152,14 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showStats($login)
     {
-
         $data = array();
+
+        $formatter = \ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate::getInstance();
 
         //Statistics
         $data['avgPlayer'] = 'unknown';
         $data['avgSpec'] = 'unknown';
-        $sql = 'SELECT AVG(server_nbPlayers) as avgPlayer, AVG(server_nbSpec) as avgSpec'
-            . ' FROM exp_server_stats'
-            . ' WHERE server_login = ' . $this->db->quote($this->storage->serverLogin);
+        $sql = 'SELECT AVG(server_nbPlayers) as avgPlayer, AVG(server_nbSpec) as avgSpec FROM exp_server_stats WHERE server_login = ' . $this->db->quote($this->storage->serverLogin);
         $result = $this->db->execute($sql)->fetchArrayOfObject();
 
         foreach ($result as $r) {
@@ -189,27 +170,21 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         //NbPlayers & Nations
         $data['nbPlayer'] = 'unknown';
         $data['nbNation'] = 'unknown';
-        $sql = 'SELECT COUNT(*) as nbPlayer, COUNT(DISTINCT player_nation) as nbNation'
-            . ' FROM exp_players';
+        $data['totalPlayersTimes'] = 'unknown';
+        $sql = 'SELECT COUNT(*) as nbPlayer, COUNT(DISTINCT player_nation) as nbNation, SUM(player_timeplayed) as totalPlayersTimes FROM exp_players';
         $result = $this->db->execute($sql)->fetchArrayOfObject();
         foreach ($result as $r) {
             $data['nbPlayer'] = $r->nbPlayer;
             $data['nbNation'] = $r->nbNation;
+            $data['totalPlayersTimes'] = $formatter->format($r->totalPlayersTimes);
         }
-        $formatter = \ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate::getInstance();
         $data['upTime'] = $formatter->format($this->expStorage->getExpansionUpTime());
         $data['upTimeDedi'] = $formatter->format($this->expStorage->getDediUpTime());
 
         $win = Gui\Windows\StatsWindow::Create($login);
         $win->setData($data, $this->storage);
-        $win->setTitle(
-            __(
-                'Welcome to : %1$s',
-                $login,
-                \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name)
-            )
-        );
-        $win->setSize(85, 70);
+        $win->setTitle(__('Welcome to : %1$s', $login, \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name)));
+        $win->setSize(85, 72);
         $win->show($login);
     }
 

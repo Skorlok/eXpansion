@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.0.1.8";
+    const EXP_VERSION = "1.0.1.9";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -1293,7 +1293,7 @@ EOT;
         $info = Gui\Windows\InfoWindow::Create($login);
         $info->setTitle("Server info");
         $info->centerOnScreen();
-        $info->setSize(100, 68);
+        $info->setSize(100, 75);
         $info->show();
     }
 

@@ -60,3 +60,6 @@ MXKarma: Yhteys muodostettu!
 
 #rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
 #rating#Kartan arvio: #variable#%2$s#rating# (#variable#%3$s #rating#ääntä), MX: ei ole vielä arvioitu.  Arviosi: #variable#%4$s#rating# / #variable#5
+
+#admin_error#You need to finish this Map at least #variable#%s#admin_error# time before being able to vote!
+#admin_error#Sinun on tehtävä tämä kartta vähintään #variable#%s#admin_error# kertaa ennen kuin voit äänestää!

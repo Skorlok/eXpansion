@@ -63,3 +63,6 @@ MXKarma saved successfully!
 
 #rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
 #rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
+
+#admin_error#You need to finish this Map at least #variable#%s#admin_error# time before being able to vote!
+#admin_error#Je moet deze kaart minstens #variable#%s#admin_error# keer afmaken voordat je kunt stemmen!

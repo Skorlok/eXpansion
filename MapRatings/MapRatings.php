@@ -70,6 +70,7 @@ class MapRatings extends ExpPlugin
         $this->msg_rating_mx = eXpGetMessage('#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5');
         $this->msg_rating_only_mx = eXpGetMessage('#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)');
         $this->msg_rating_mx_no_votes = eXpGetMessage('#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5');
+        $this->msg_not_enough_finishes = eXpGetMessage('#admin_error#You need to finish this Map at least #variable#%s#admin_error# time before being able to vote!');
         
         
         $this->msg_rating = eXpGetMessage('#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes).  Your Rating: #variable#%4$s#rating# / #variable#5');
@@ -212,6 +213,10 @@ class MapRatings extends ExpPlugin
 
     public function MXKarma_onError($state, $number, $reason)
     {
+        if ($reason == "invalid session") {
+            $this->mxConnection->connect($this->config->mxKarmaServerLogin, $this->config->mxKarmaApiKey);
+            return;
+        }
         $this->eXpChatSendServerMessage($this->mx_msg_error, null, array($state, $reason));
         $this->console("MXKarma error  " . $state . ": " . $reason);
     }
@@ -273,10 +278,6 @@ class MapRatings extends ExpPlugin
 
         $total = array_merge($spectators, $players);
         return $total;
-    }
-
-    public function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
-    {
     }
 
     public function getRatings()
@@ -388,6 +389,24 @@ class MapRatings extends ExpPlugin
     public function saveRating($login, $rating)
     {
         EndMapRatings::Erase($login);
+
+        if ($this->config->karmaRequireFinishes > 0) {
+            if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+                $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+
+                $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
+
+                if ($player_localrec) {
+                    if ($player_localrec->nbFinish < $this->config->karmaRequireFinishes) {
+                        $this->eXpChatSendServerMessage($this->msg_not_enough_finishes, $login, array($this->config->karmaRequireFinishes));
+                        return;
+                    }
+                } else {
+                    $this->eXpChatSendServerMessage($this->msg_not_enough_finishes, $login, array($this->config->karmaRequireFinishes));
+                    return;
+                }
+            }
+        }
 
         if ($this->config->mxKarmaEnabled) {
             $player = $this->storage->getPlayerObject($login);
@@ -739,6 +758,21 @@ class MapRatings extends ExpPlugin
                 if (array_key_exists($login, $ratings) == false) {
                     $logins[$login] = $login;
                 }
+                if ($this->config->karmaRequireFinishes > 0) {
+                    if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+                        $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+
+                        $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
+
+                        if ($player_localrec) {
+                            if ($player_localrec->nbFinish < $this->config->karmaRequireFinishes) {
+                                unset($logins[$login]);
+                            }
+                        } else {
+                            unset($logins[$login]);
+                        }
+                    }
+                }
                 if (array_key_exists($login, $this->pendingRatings)) {
                     unset($logins[$login]);
                 }
@@ -746,6 +780,21 @@ class MapRatings extends ExpPlugin
             foreach ($this->storage->spectators as $login => $player) {
                 if (array_key_exists($login, $ratings) == false) {
                     $logins[$login] = $login;
+                }
+                if ($this->config->karmaRequireFinishes > 0) {
+                    if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+                        $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+
+                        $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
+
+                        if ($player_localrec) {
+                            if ($player_localrec->nbFinish < $this->config->karmaRequireFinishes) {
+                                unset($logins[$login]);
+                            }
+                        } else {
+                            unset($logins[$login]);
+                        }
+                    }
                 }
                 if (array_key_exists($login, $this->pendingRatings)) {
                     unset($logins[$login]);

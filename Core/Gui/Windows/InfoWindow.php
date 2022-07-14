@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\InfoLine;
+use ManiaLivePlugins\eXpansion\Core\Config as CoreConfig;
 
 class InfoWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -61,16 +62,19 @@ class InfoWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $line = new Infoline(5, "Manialive version", \ManiaLive\Application\VERSION, 0);
         $this->frame->addComponent($line);
 
-        $line = new Infoline(
-            5,
-            "eXpansion version",
-            \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION
-            . " - " . (date("Y-m-d h:i:s A", Helper::getBuildDate())),
-            0
-        );
+        $line = new Infoline(5, "eXpansion version", \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . " - " . (date("Y-m-d h:i:s A", Helper::getBuildDate())), 0);
         $this->frame->addComponent($line);
 
         $line = new Infoline(5, "Php Version", phpversion(), 0);
+        $this->frame->addComponent($line);
+
+        $admContact = CoreConfig::getInstance()->contact;
+        if (strpos($admContact, '@') != false) {
+            $admContact = '$lmailto://' . $admContact;
+        } else {
+            $admContact = '$l' . $admContact;
+        }
+        $line = new Infoline(5, "Admin contact", $admContact, 0);
         $this->frame->addComponent($line);
 
         $this->frame->addComponent(new \ManiaLib\Gui\Elements\Label(10, 7));

@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\MapRatings;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 
 /**
  * Description of MetaData
@@ -17,7 +18,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Maps: Local Ratings");
+        $this->setName("Maps: Maps Ratings");
         $this->setDescription("Provides ratings for maps");
         $this->setGroups(array('Maps'));
 
@@ -43,6 +44,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setMin(10);
         $var->setMax(60);
         $var->setDefaultValue(30);
+        $this->registerVariable($var);
+
+        $var = new TypeInt("karmaRequireFinishes", "number of finishes before being able to vote", $config, true, false);
+        $var->setDescription('number of times a player should have finished a Map before being allowed to karma vote for it. $f00REQUIRE PLUGIN LOCALRECORDS !!!');
+        $var->setDefaultValue(0);
         $this->registerVariable($var);
 
 

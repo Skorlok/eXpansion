@@ -93,7 +93,7 @@ class MxUpdate extends Window
         $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $uids . $key;
 
         $access = DataAccess::getInstance();
-        $options = array(CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
         $access->httpCurl($query, array($this, "xUpdate"), null, $options);
     }
 

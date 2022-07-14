@@ -31,7 +31,7 @@ use Maniaplanet\DedicatedServer\Structures\GameInfos;
 /**
  * Description of Connection
  *
- * @author Reaby
+ * @author Reaby, improved by Skorlok
  */
 class Connection
 {
@@ -74,23 +74,22 @@ class Connection
             "applicationIdentifier" => "eXpansion " . Core::EXP_VERSION,
             "testMode" => "false"
         );
-        $this->dataAccess->httpGet(
-            $this->build("startSession", $params),
-            array($this, "xConnect"),
-            array(),
-            "ManiaLive - eXpansionPluginPack",
-            "application/json"
-        );
+
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30);
+
+        $this->dataAccess->httpCurl($this->build("startSession", $params), array($this, "xConnect"), null, $options);
     }
 
-    public function xConnect($answer, $httpCode)
+    public function xConnect($job, $jobData)
     {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
 
-        if ($httpCode != 200) {
+        if ($code != 200) {
             return;
         }
 
-        $data = $this->getObject($answer, "onConnect");
+        $data = $this->getObject($job->getResponse(), "onConnect");
 
         if ($data === null) {
             return;
@@ -102,23 +101,22 @@ class Connection
         $outHash = hash("sha512", ($this->apikey . $this->sessionSeed));
 
         $params = array("sessionKey" => $this->sessionKey, "activationHash" => $outHash);
-        $this->dataAccess->httpGet(
-            $this->build("activateSession", $params),
-            array($this, "xActivate"),
-            array(),
-            "ManiaLive - eXpansionPluginPack",
-            "application/json"
-        );
+
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30);
+
+        $this->dataAccess->httpCurl($this->build("activateSession", $params), array($this, "xActivate"), null, $options);
     }
 
-    public function xActivate($answer, $httpCode)
+    public function xActivate($job, $jobData)
     {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
 
-        if ($httpCode != 200) {
+        if ($code != 200) {
             return;
         }
 
-        $data = $this->getObject($answer, "onActivate");
+        $data = $this->getObject($job->getResponse(), "onActivate");
 
         if ($data === null) {
             return;
@@ -144,14 +142,11 @@ class Connection
             "getvotesonly" => $getVotesOnly,
             "playerlogins" => $players
         );
-        $this->dataAccess->httpPost(
-            $this->build("getMapRating", $params),
-            json_encode($postData),
-            array($this, "xGetRatings"),
-            array(),
-            "ManiaLive - eXpansionPluginPack",
-            "application/json"
-        );
+
+        $headers = array('Accept: */*', 'Content-Type: application/json');
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
+        
+        $this->dataAccess->httpCurl($this->build("getMapRating", $params), array($this, "xGetRatings"), null, $options);
     }
 
     public function saveVotes(\Maniaplanet\DedicatedServer\Structures\Map $map, $time, $votes)
@@ -171,24 +166,23 @@ class Connection
             "maptime" => $time,
             "votes" => $votes
         );
-        $this->dataAccess->httpPost(
-            $this->build("saveVotes", $params),
-            json_encode($postData),
-            array($this, "xSaveVotes"),
-            array(),
-            "ManiaLive - eXpansionPluginPack",
-            "application/json"
-        );
+
+        $headers = array('Accept: */*', 'Content-Type: application/json');
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
+
+        $this->dataAccess->httpCurl($this->build("saveVotes", $params), array($this, "xSaveVotes"), null, $options);
     }
 
-    public function xSaveVotes($answer, $httpCode)
+    public function xSaveVotes($job, $jobData)
     {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
 
-        if ($httpCode != 200) {
+        if ($code != 200) {
             return;
         }
 
-        $data = $this->getObject($answer, "getRatings");
+        $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
             return;
@@ -197,14 +191,16 @@ class Connection
         Dispatcher::dispatch(new MXKarmaEvent(MXKarmaEvent::ON_VOTE_SAVE, $data->updated));
     }
 
-    public function xGetRatings($answer, $httpCode)
+    public function xGetRatings($job, $jobData)
     {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
 
-        if ($httpCode != 200) {
+        if ($code != 200) {
             return;
         }
 
-        $data = $this->getObject($answer, "getRatings");
+        $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
             return;

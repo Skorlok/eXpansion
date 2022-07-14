@@ -872,11 +872,14 @@ class Maps extends ExpPlugin
             } else {
 
                 try {
-                    unlink(Helper::getPaths()->getDefaultMapPath() . $map->fileName);
-                    if ($found) {
-                        $additions = "playlist and disk!";
-                    } else {
-                        $additions = "disk!";
+                    if (file_exists(Helper::getPaths()->getDefaultMapPath() . $map->fileName)) {
+                        unlink(Helper::getPaths()->getDefaultMapPath() . $map->fileName);
+
+                        if ($found) {
+                            $additions = "playlist and disk!";
+                        } else {
+                            $additions = "disk!";
+                        }
                     }
                 } catch (\Exception $ex) {
                     if ($found) {

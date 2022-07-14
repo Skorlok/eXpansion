@@ -10,8 +10,8 @@ use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Tick\Event as TickEvent;
 use ManiaLive\Features\Tick\Listener as TickListener;
-use ManiaLivePlugins\eXpansion\Dedimania\Classes\Webaccess; // Thanks Undef for this class stolen from Uaseco
 use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Request as dediRequest;
 use ManiaLivePlugins\eXpansion\Dedimania\Config;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as dediEvent;
@@ -43,9 +43,6 @@ class Connection extends Singleton implements AppListener, TickListener
     /** @var \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer[] Cached players from dedimania */
     public static $players = array();
 
-    /** @var Webaccess */
-    private $webaccess;
-
     /** @var \Maniaplanet\DedicatedServer\Connection */
     private $connection;
 
@@ -57,10 +54,10 @@ class Connection extends Singleton implements AppListener, TickListener
 
     /** @var string $sessionId dedimania session id */
     private $sessionId = null;
-    // these are used for async webaccess
-    private $read;
-    private $write;
-    private $except;
+
+    /** @var DataAccess */
+    public $dataAccess;
+
     // cached records from dedimania
     private $dediRecords = array();
     private $dediBest = 0;
@@ -74,17 +71,13 @@ class Connection extends Singleton implements AppListener, TickListener
     {
         parent::__construct();
 
-        $this->webaccess = new Webaccess();
-
         // if you are developing change port to 8081, othervice use 8082
         $this->url = "http://dedimania.net:8082/Dedimania";
 
         /** @var \Maniaplanet\DedicatedServer\Connection connection */
+        $this->dataAccess = DataAccess::getInstance();
         $this->connection = Singletons::getInstance()->getDediConnection();
         $this->storage = Storage::getInstance();
-        $this->read = array();
-        $this->write = array();
-        $this->except = array();
         $this->lastUpdate = time();
         Dispatcher::register(TickEvent::getClass(), $this);
     }
@@ -94,7 +87,6 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function __destruct()
     {
-        $this->webaccess = null;
         Dispatcher::unregister(TickEvent::getClass(), $this);
     }
 
@@ -104,8 +96,6 @@ class Connection extends Singleton implements AppListener, TickListener
     public function onTick()
     {
         try {
-            $this->webaccess->select($this->read, $this->write, $this->except, 0, 0);
-
             if ($this->sessionId !== null && (time() - $this->lastUpdate) > 240) {
                 $this->debug("Dedimania connection keepalive!");
                 $this->updateServerPlayers($this->storage->currentMap);
@@ -244,7 +234,45 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function send(dediRequest $request, $callback)
     {
-        $this->webaccess->request($this->url,array(array($this, '_process'), $callback),$request->getXml(),true,600,3,5);
+        if (function_exists('gzdeflate')) {
+            $headers = array('Cache-Control: no-cache', 'Accept-Encoding: deflate', 'Content-Type: text/xml; charset=UTF-8', 'Content-Encoding: deflate', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
+
+            $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => gzdeflate($request->getXml()));
+        } else {
+            $headers = array('Cache-Control: no-cache', 'Content-Type: text/xml; charset=UTF-8', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
+
+            $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $request->getXml());
+        }
+
+        $this->dataAccess->httpCurl($this->url, array($this, "handleRequestResponse"), array("callback" => $callback), $options);
+    }
+
+    public function handleRequestResponse($job, $jobData)
+    {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
+        $data = $job->getResponse();
+        $additionalData = $job->__additionalData;
+
+        $callback = $additionalData['callback'];
+
+        if ($code != 200) {
+            $this->console("[Dedimania Error] Dedimania returned error code: " . $code);
+            return;
+        }
+
+        if ($data == null || $data == false) {
+            $this->console("[Dedimania Error] Can't find Message from Dedimania reply");
+            return;
+        }
+
+        if (function_exists('gzinflate')) {
+            $response = array('Message' => gzinflate($data));
+        } else {
+            $response = array('Message' => $data);
+        }
+
+        $this->_process($response, $callback);
     }
 
     /**
