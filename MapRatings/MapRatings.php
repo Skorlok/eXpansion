@@ -223,7 +223,7 @@ class MapRatings extends ExpPlugin
 
     public function MXKarma_onVotesRecieved(MXRating $votes)
     {
-        if ($this->mxRatings === null) {
+        if ($this->mxRatings == null) {
 
             $this->mxRatings = $votes;
             $this->mx_votes = array();
@@ -446,6 +446,9 @@ class MapRatings extends ExpPlugin
 
     public function vote($player, $vote)
     {
+        if ($this->mxRatings == null) {
+            return;
+        }
         $oldVote = $this->getObjbyPropValue($this->mxRatings->votes, "login", $player->login);
 
         if ($oldVote) {
@@ -513,7 +516,7 @@ class MapRatings extends ExpPlugin
     public function sendRatingMsg($login, $playerRating)
     {
         if ($login != null) {
-            if ($this->config->mxKarmaEnabled) {
+            if ($this->config->mxKarmaEnabled && $this->mxRatings != null) {
 
                 if ($this->ratingTotal == 0 && $this->mxRatings->votecount == 0) {
                     $this->eXpChatSendServerMessage($this->msg_noRating, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
@@ -641,13 +644,12 @@ class MapRatings extends ExpPlugin
     {
         if ($this->config->mxKarmaEnabled) {
             if ($this->mxConnection->isConnected()) {
-                $playerVote = ArrayOfObj::getObjbyPropValue($this->mxRatings->votes, "login", $login);
-                if ($playerVote) {
-                    // do nothing
-                } else {
-                    if (array_key_exists($login, $this->mx_votesTemp)) {
-                        // do nothing
-                    } else {
+                $playerVote = false;
+                if ($this->mxRatings != null) {
+                    $playerVote = ArrayOfObj::getObjbyPropValue($this->mxRatings->votes, "login", $login);
+                }
+                if (!$playerVote) {
+                    if (!array_key_exists($login, $this->mx_votesTemp)) {
                         $this->mxConnection->getRatings(array($login), true);
                     }
                 }

@@ -75,7 +75,7 @@ class Connection
             "testMode" => "false"
         );
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30);
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300);
 
         $this->dataAccess->httpCurl($this->build("startSession", $params), array($this, "xConnect"), null, $options);
     }
@@ -86,12 +86,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
+            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "onConnect");
 
         if ($data === null) {
+            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -102,7 +104,7 @@ class Connection
 
         $params = array("sessionKey" => $this->sessionKey, "activationHash" => $outHash);
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30);
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300);
 
         $this->dataAccess->httpCurl($this->build("activateSession", $params), array($this, "xActivate"), null, $options);
     }
@@ -113,12 +115,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
+            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "onActivate");
 
         if ($data === null) {
+            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -144,7 +148,7 @@ class Connection
         );
 
         $headers = array('Accept: */*', 'Content-Type: application/json');
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
         
         $this->dataAccess->httpCurl($this->build("getMapRating", $params), array($this, "xGetRatings"), null, $options);
     }
@@ -168,7 +172,7 @@ class Connection
         );
 
         $headers = array('Accept: */*', 'Content-Type: application/json');
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($postData));
 
         $this->dataAccess->httpCurl($this->build("saveVotes", $params), array($this, "xSaveVotes"), null, $options);
     }
@@ -179,12 +183,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
+            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
+            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -197,12 +203,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
+            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
+            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 

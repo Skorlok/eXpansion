@@ -237,11 +237,11 @@ class Connection extends Singleton implements AppListener, TickListener
         if (function_exists('gzdeflate')) {
             $headers = array('Cache-Control: no-cache', 'Accept-Encoding: deflate', 'Content-Type: text/xml; charset=UTF-8', 'Content-Encoding: deflate', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
 
-            $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => gzdeflate($request->getXml()));
+            $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => gzdeflate($request->getXml()));
         } else {
             $headers = array('Cache-Control: no-cache', 'Content-Type: text/xml; charset=UTF-8', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
 
-            $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $request->getXml());
+            $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $request->getXml());
         }
 
         $this->dataAccess->httpCurl($this->url, array($this, "handleRequestResponse"), array("callback" => $callback), $options);
@@ -582,13 +582,11 @@ class Connection extends Singleton implements AppListener, TickListener
 
                 if (array_key_exists("faultString", $array[0])) {
                     $this->console("Fault from dedimania server: ".$array[0]['faultString']);
-
                     return;
                 }
 
                 if (!empty($array[0][0]['Error'])) {
                     $this->console("Error from dedimania server: ".$array[0][0]['Error']);
-
                     return;
                 }
 

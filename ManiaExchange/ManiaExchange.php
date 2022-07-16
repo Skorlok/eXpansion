@@ -100,7 +100,7 @@ class ManiaExchange extends ExpPlugin
 
         $query = "http://api.mania-exchange.com/" . $title . "/tracks/" . $this->storage->currentMap->uId;
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xGetMapInfo"), null, $options);
     }
 
@@ -124,7 +124,7 @@ class ManiaExchange extends ExpPlugin
         if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
             $query = "https://tm.mania.exchange/api/replays/get_replays/" .$json[0]->TrackID;
 
-            $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
+            $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
             $this->dataAccess->httpCurl($query, array($this, "xGetReplaysInfo"), null, $options);
         }
     }
@@ -237,7 +237,7 @@ class ManiaExchange extends ExpPlugin
 
         $query = 'https://' . $title . '.mania-exchange.com/api/mappack/get_mappack_tracks/' . $packId;
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xAddMxPackAdmin"), array("login" => $login), $options);
     }
 
@@ -305,7 +305,7 @@ class ManiaExchange extends ExpPlugin
 
         $query = 'https://' . $title . '.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xAddRandomMapAdmin"), array("login" => $login), $options);
     }
 
@@ -407,7 +407,7 @@ class ManiaExchange extends ExpPlugin
         }
 
         $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($mxId));
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, $redirect), array("login" => $login, "mxId" => $mxId), $options);
     }
 
@@ -648,7 +648,7 @@ class ManiaExchange extends ExpPlugin
 
         $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $mapUid . $this->getKey(true);
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
         $this->dataAccess->httpCurl($query, array($this, "xUpdateInfo"), null, $options);
     }
 
@@ -763,7 +763,7 @@ class ManiaExchange extends ExpPlugin
                 break;
         }
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => "X-ManiaPlanet-ServerLogin:" . $this->storage->serverLogin);
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => "X-ManiaPlanet-ServerLogin:" . $this->storage->serverLogin);
         $this->dataAccess->httpCurl($query, array($this, "xVote"), array("login" => $login, "mxId" => $mxId), $options);
     }
 
