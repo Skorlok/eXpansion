@@ -2,10 +2,6 @@ declare CMlFrame Menu <=> (Page.GetFirstChild("Menu") as CMlFrame);
 
 Menu.Hide(); // reduce flicker on refresh
 
-declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntry);
-
-declare Text outText = "";
-
 declare Boolean toggleSubmenu = False;
 declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
 
@@ -34,15 +30,15 @@ declare Boolean needUpdate = True;
 declare Boolean needHidden = False;
 declare Text lastItem = "";
 
-if (!eXp_widgetVisible.existskey(version) ) {
+if (!eXp_widgetVisible.existskey(version)) {
 	eXp_widgetVisible[version] = Boolean[Text][Text];
 }
 
-if ( !eXp_widgetVisible[version].existskey(id) || forceReset) {
+if (!eXp_widgetVisible[version].existskey(id) || forceReset) {
 	eXp_widgetVisible[version][id] = Boolean[Text];
 }
 
-if ( !eXp_widgetVisible[version][id].existskey(gameMode) ) {
+if (!eXp_widgetVisible[version][id].existskey(gameMode)) {
 	eXp_widgetVisible[version][id][gameMode] = True;
 }
 
@@ -50,7 +46,7 @@ Menu.RelativePosition.Z = 30.0;
 
 Page.GetClassChildren("sub" , Menu , True);
 foreach (control in Page.GetClassChildren_Result) {
-   control.Hide();
+	control.Hide();
 }
 
 ClientUI.OverlayHideChat = False;

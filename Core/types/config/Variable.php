@@ -312,7 +312,9 @@ abstract class Variable
             if ($core != null) {
                 $phandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
                 try {
-                    $phandler->callPublicMethod($core, $this->pluginId, 'onSettingsChanged', array($this));
+                    if ($core->isPluginLoaded($this->pluginId)) {
+                        $phandler->callPublicMethod($core, $this->pluginId, 'onSettingsChanged', array($this));
+                    }
                 } catch (\Exception $ex) {
                     Console::println("error on settings change!" . $ex->getMessage());
                 }

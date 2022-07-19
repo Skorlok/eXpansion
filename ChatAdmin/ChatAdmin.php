@@ -226,13 +226,13 @@ class ChatAdmin extends ExpPlugin
         AdminGroups::addAlias($cmd, "pass"); // fast
 
         $cmd = AdminGroups::addAdminCommand('set server spec password', $this, 'setSpecPassword', Permission::SERVER_SPECPWD);
-        $cmd->setHelp('Changes the spectator password')->setHelpMore('$w/admin set server spec password #pwd$z will change the password needed for spectators to connect to this server')->setMinParam(1);
+        $cmd->setHelp('Changes the spectator password')->setHelpMore('$w/admin set server spec password #pwd$z will change the password needed for spectators to connect to this server')->setMinParam(0);
         AdminGroups::addAlias($cmd, "setspecpwd"); // xaseco
         AdminGroups::addAlias($cmd, "spectpass"); // fast
 
 
         $cmd = AdminGroups::addAdminCommand('set server ref password', $this, 'setRefereePassword', Permission::SERVER_REFPWD);
-        $cmd->setHelp('Changes the Referee password')->setMinParam(1);
+        $cmd->setHelp('Changes the Referee password')->setMinParam(0);
         AdminGroups::addAlias($cmd, "setrefpwd"); // xaseco
 
 
@@ -2159,11 +2159,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setMaxSpectators($params[0]);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets server maximum spectators to#variable# %s',
-                null,
-                array($admin->nickName, $params[0])
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets server maximum spectators to#variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2176,19 +2172,16 @@ class ChatAdmin extends ExpPlugin
     public function setServerPassword($fromLogin, $params)
     {
         try {
-            $this->connection->setServerPassword($params[0]);
-            $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin #variable# %s #admin_action# sets/unsets new server password.',
-                null,
-                array($admin->nickName)
-            );
-            $this->eXpChatSendServerMessage(
-                '#admin_action#New server password:#variable# %s',
-                null,
-                array($params[0]),
-                $fromLogin
-            );
+            if (isset($params[0]) && $params[0]) {
+                $this->connection->setServerPassword($params[0]);
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# sets new server password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#New server password:#variable# %s', null,array($params[0]), $fromLogin);
+            } else {
+                $this->connection->setServerPassword("");
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# unsets server password.', null, array($admin->nickName));
+            }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2201,19 +2194,16 @@ class ChatAdmin extends ExpPlugin
     public function setSpecPassword($fromLogin, $params)
     {
         try {
-            $this->connection->setServerPasswordForSpectator($params[0]);
-            $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets/unsets new spectator password.',
-                null,
-                array($admin->nickName)
-            );
-            $this->eXpChatSendServerMessage(
-                '#admin_action#New spectator password:#variable# %s',
-                null,
-                array($params[0]),
-                $fromLogin
-            );
+            if (isset($params[0]) && $params[0]) {
+                $this->connection->setServerPasswordForSpectator($params[0]);
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new spectator password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#New spectator password:#variable# %s', null, array($params[0]), $fromLogin);
+            } else {
+                $this->connection->setServerPasswordForSpectator("");
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets spectator password.', null, array($admin->nickName));
+            }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2226,19 +2216,16 @@ class ChatAdmin extends ExpPlugin
     public function setRefereePassword($fromLogin, $params)
     {
         try {
-            $this->connection->setRefereePassword($params[0]);
-            $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#sets/unsets new referee password.',
-                null,
-                array($admin->nickName)
-            );
-            $this->eXpChatSendServerMessage(
-                '#admin_action#New referee password:#variable# %s',
-                null,
-                array($params[0]),
-                $fromLogin
-            );
+            if (isset($params[0]) && $params[0]) {
+                $this->connection->setRefereePassword($params[0]);
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new referee password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#New referee password:#variable# %s', null, array($params[0]), $fromLogin);
+            } else {
+                $this->connection->setRefereePassword("");
+                $admin = $this->storage->getPlayerObject($fromLogin);
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets referee password.', null, array($admin->nickName));
+            }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }

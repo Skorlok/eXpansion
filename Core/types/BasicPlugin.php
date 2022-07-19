@@ -944,7 +944,7 @@ namespace {
     }
 
     // fix for  php 5.5.0
-    error_reporting(E_ALL ^ E_DEPRECATED);
+    error_reporting(E_ALL);
     // do custom logging also
     $limit = ini_get('memory_limit');
     if (shorthand2bytes($limit) < 512 * 1048576) {

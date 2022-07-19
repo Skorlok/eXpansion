@@ -33,12 +33,6 @@ class MenuWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
         }
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
         $this->registerScript($this->script);
-
-        $inputbox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("widgetStatus");
-        $inputbox->setPosition(900, 900);
-        $inputbox->setScriptEvents();
-        $this->addComponent($inputbox);
-
     }
 
     public function addGroup($name)

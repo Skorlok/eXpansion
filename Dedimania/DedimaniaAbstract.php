@@ -123,9 +123,11 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $this->settingsChanged[$var->getName()] = true;
-        if ($this->settingsChanged['login'] && $this->settingsChanged['code']) {
-            $this->tryConnection();
-            $this->settingsChanged = array();
+        if (isset($this->settingsChanged['login']) && isset($this->settingsChanged['code'])) {
+            if ($this->settingsChanged['login'] && $this->settingsChanged['code']) {
+                $this->tryConnection();
+                $this->settingsChanged = array();
+            }
         }
     }
 
@@ -623,6 +625,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             $this->dedimania->getChallengeRecords();
 
             $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
+            return;
         }
 
         $rankings = array();

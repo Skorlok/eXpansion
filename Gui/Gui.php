@@ -11,6 +11,7 @@ use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\HudPanel;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Configuration;
 use ManiaLivePlugins\eXpansion\Gui\Windows\ConfirmDialog;
 use ManiaLivePlugins\eXpansion\Gui\Windows\HudMove;
@@ -29,6 +30,8 @@ class Gui extends ExpPlugin
     // next 2 is used by contextMenu
     public static $items = array();
     public static $callbacks = array();
+
+    public $playersWidgets = array();
 
     public function eXpOnInit()
     {
@@ -49,9 +52,10 @@ class Gui extends ExpPlugin
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
         $this->setPublicMethod("hudCommands");
-        $this->setPublicMethod("showConfigWindow");
 
-        $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset");
+        GetPlayerWidgets::$parentPlugin = $this;
+
+        $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset, config");
         $this->msg_disabled = eXpGetMessage("#error#Server Admin has disabled personal huds. Sorry!");
 
         $this->preloader = Preloader::Create(null);
@@ -174,6 +178,9 @@ class Gui extends ExpPlugin
             case "lock":
                 $this->disableHudMove($login);
                 break;
+            case "config":
+                $this->getPlayersWidgets($login);
+                break;
             default:
                 $this->eXpChatSendServerMessage($this->msg_params, $login);
                 break;
@@ -202,17 +209,38 @@ class Gui extends ExpPlugin
         }
     }
 
+    public function getPlayersWidgets($login)
+    {
+        GetPlayerWidgets::EraseAll();
+        $widget = GetPlayerWidgets::Create($login);
+        $widget->show();
+    }
+
+    public function showHudConfig($login, $entries = array())
+    {
+        if (!isset($this->playersWidgets[$login])) {
+            $this->playersWidgets[$login] = "";
+        }
+        if (isset($entries['widgetStatus'])) {
+            if ($entries['widgetStatus'] != 'finished') {
+                $this->playersWidgets[$login] .= $entries['widgetStatus'];
+            } else {
+                $this->showConfigWindow($login, array('widgetStatus' => $this->playersWidgets[$login]));
+                unset($this->playersWidgets[$login]);
+            }
+        }
+    }
+
     public function showConfigWindow($login, $entries)
     {
-		return;
-        /*if (Config::getInstance()->disablePersonalHud) {
+        if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
             $window = Configuration::Create($login, true);
             $window->setSize(120, 90);
             $window->setData($entries);
             $window->show();
-        }*/
+        }
     }
 
     public function resetHud($login)

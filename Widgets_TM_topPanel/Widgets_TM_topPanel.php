@@ -27,21 +27,8 @@ namespace ManiaLivePlugins\eXpansion\Widgets_TM_topPanel;
 class Widgets_TM_topPanel extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    /** @var  \ManiaLive\PluginHandler\PluginHandler */
-    private $pluginhandler;
-
     public function eXpOnReady()
     {
-
-        $this->pluginhandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
-        $pluginsToUnload = array("Widgets_ServerInfo", "Widgets_Clock", "Widgets_BestCheckpoints");
-
-        foreach ($pluginsToUnload as $plugin) {
-            if ($this->isPluginLoaded($this->getPluginId($plugin))) {
-                $this->pluginhandler->unload($this->getPluginId($plugin));
-            }
-        }
-
         $this->enableDedicatedEvents();
 
         $widget = Gui\Widgets\TopPanel::Create(null);

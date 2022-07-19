@@ -10,8 +10,8 @@ Anwenden
 Cancel
 Schließen
 
-possible parameters: move, lock, reset
-Mögliche Parameter: move, lock, reset
+possible parameters: move, lock, reset, config
+Mögliche Parameter: move, lock, reset, config
 
 #error#Server Admin has disabled personal huds. Sorry!
 #error#Server Admin hat die persönliche Benutzeroberfläche (HUD) deaktiviert. Sorry!

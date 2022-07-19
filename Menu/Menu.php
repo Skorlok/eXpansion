@@ -269,7 +269,7 @@ class Menu extends ExpPlugin implements Listener
         return $this->isPluginLoaded($this->getPluginClass($plugin));
     }
 
-    public function actionHandler($login, $action, $entries = [])
+    public function actionHandler($login, $action)
     {
         $adminGrp = AdminGroups::getInstance();
         try {
@@ -338,7 +338,7 @@ class Menu extends ExpPlugin implements Listener
                     $this->callPublicMethod($this->getPluginClass("Gui"), "hudCommands", $login, "lock");
                     break;
                 case "!hudConfig":
-                    $this->callPublicMethod($this->getPluginClass("Gui"), "showConfigWindow", $login, $entries);
+                    $this->callPublicMethod($this->getPluginClass("Gui"), "hudCommands", $login, "config");
                     break;
                 case "!hudReset":
                     $this->callPublicMethod($this->getPluginClass("Gui"), "hudCommands", $login, "reset");

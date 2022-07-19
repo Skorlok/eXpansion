@@ -111,8 +111,14 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
 
     public function setSelected($index)
     {
+        $this->selectedIndex = $index;
         $this->label->setText($this->values[intval($index)]);
         $this->script->setParam("selected", intval($index));
+    }
+
+    public function getSelected()
+    {
+        return $this->selectedIndex;
     }
 
     public function onIsRemoved(\ManiaLive\Gui\Container $target)
