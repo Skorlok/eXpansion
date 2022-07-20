@@ -985,15 +985,18 @@ class AdminGroups extends ExpPlugin
         }, $matches[1], $matches[2]);
 
         //Lets see if the command is correct
-        $arg = strtolower(array_shift($args));
-        if (isset($cmds[$arg])) {
-            $this->doAdminCmd($cmds[$arg], $args, $login);
-        } else {
-            if ($errors) {
-                $this->eXpChatSendServerMessage($this->msg_cmdDontEx, $login);
+        $t = array_shift($args);
+
+        if ($t) {
+            $arg = strtolower($t);
+            if (isset($cmds[$arg])) {
+                $this->doAdminCmd($cmds[$arg], $args, $login);
+            } else {
+                if ($errors) {
+                    $this->eXpChatSendServerMessage($this->msg_cmdDontEx, $login);
+                }
             }
         }
-
     }
 
     /**
