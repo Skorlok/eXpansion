@@ -21,6 +21,7 @@ namespace ManiaLivePlugins\eXpansion\MapRatings\Classes;
 
 use ManiaLive\Data\Storage;
 use ManiaLive\Event\Dispatcher;
+use ManiaLive\Utilities\Console;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as Storage2;
@@ -86,14 +87,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
-            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
+            Console::println("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "onConnect");
 
         if ($data === null) {
-            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
+            Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -115,14 +116,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
-            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
+            Console::println("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "onActivate");
 
         if ($data === null) {
-            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
+            Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -183,14 +184,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
-            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
+            Console::println("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
-            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
+            Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
@@ -203,14 +204,14 @@ class Connection
         $code = $info['http_code'];
 
         if ($code != 200) {
-            $this->console("[MXKarma Error] MXKarma returned error code: " . $code);
+            Console::println("[MXKarma Error] MXKarma returned error code: " . $code);
             return;
         }
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
         if ($data === null) {
-            $this->console("[MXKarma Error] Can't find Message from MXKarma reply");
+            Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
 
