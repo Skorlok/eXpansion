@@ -43,7 +43,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_admin_action', 'Color code for actions made by admins', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$fff');
+        $var->setDefaultValue('$4c1');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_variable','Color code for all variables used in chatmessages', $config, false, true);
@@ -63,7 +63,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_dedirecord', 'Color code for dedimania record messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$2d0');
+        $var->setDefaultValue('$98f');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_rank', 'Color code for rank in records messages', $config, false, true);
@@ -78,7 +78,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_rating', 'Color code for map rating messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$f80');
+        $var->setDefaultValue('$d05');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_queue', 'Color code for map queue messages (jukebox)', $config, false, true);

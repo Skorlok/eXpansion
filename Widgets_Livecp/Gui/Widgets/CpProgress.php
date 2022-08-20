@@ -59,7 +59,7 @@ class CpProgress extends Widget
 
     protected function eXpOnEndConstruct()
     {
-        $this->setSize(54, 90);
+        $this->setSize(42, 45);
     }
 
     public function setData($playerData)

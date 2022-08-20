@@ -1,3 +1,4 @@
+
 declare Window <=> Page.GetFirstChild("<?php echo $win->getId() ?>");
 // set hidden to reduce flicker
 declare MoveWindow = False;

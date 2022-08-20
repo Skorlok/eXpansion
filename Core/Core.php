@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.0.1.9";
+    const EXP_VERSION = "1.2.0.0";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -268,9 +268,6 @@ EOT;
         $this->connection->triggerModeScriptEvent("LibXmlRpc_UnblockAllCallbacks", "");
         $this->enableScriptEvents("LibXmlRpc_Callbacks");
         $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
-
-        //Started paralel download utility, thanks to xymph and other devs to have coded it. it rocks
-        DataAccess::getInstance()->start();
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));

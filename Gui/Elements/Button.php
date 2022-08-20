@@ -276,6 +276,7 @@ class Button extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLi
             $this->backGround->setScriptEvents();
         }
 
+        $this->label->setId("eXp_ButtonLabel_" . $this->buttonId);
         $this->labelDesc->setId("eXp_ButtonDescText_" . $this->buttonId);
         $this->backGroundDesc->setId("eXp_ButtonDescBg_" . $this->buttonId);
     }

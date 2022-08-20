@@ -27,8 +27,8 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $config = Config::getInstance();
 
-        $var = new Boolean("use_votes", "Enable managed voting for this server ?", $config, false, false);
-        $var->setDefaultValue(true);
+        $var = new Boolean("use_callvotes", "Enable callvotes for this server ?", $config, false, false);
+        $var->setDefaultValue(false);
         $this->registerVariable($var);
 
 
@@ -48,13 +48,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(15);
         $this->registerVariable($var);
 
-        $var = new Boolean(
-            "restartVote_useQueue",
-            "Use track queue instead of intant restart for replay votes ?",
-            $config,
-            false,
-            false
-        );
+        $var = new Boolean("autoVoteStarter", "Automatically vote yes for the vote starter", $config, false, false);
+        $var->setDescription("if disabled, the player who start a vote will need to vote aswell");
+        $var->setDefaultValue(true);
+        $this->registerVariable($var);
+
+        $var = new Boolean("restartVote_useQueue", "Use track queue instead of intant restart for replay votes ?", $config, false, false);
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 
@@ -78,13 +77,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $type = new TypeString("", "", null);
         $var->setType($type);
         $var->setVisible(false);
-        $var->setDefaultValue(
-            array(
-                "NextMap", "RestartMap",
-                "Kick", "Ban", "SetModeScriptSettingsAndCommands",
-                "JumpToMapIdent", "SetNextMapIdent", "ExtendTime", "EndRound",
-                "AutoTeamBalance")
-        );
+        $var->setDefaultValue(array("NextMap", "RestartMap", "Kick", "Ban", "SetModeScriptSettingsAndCommands", "JumpToMapIdent", "SetNextMapIdent", "ExtendTime", "EndRound", "AutoTeamBalance"));
         $this->registerVariable($var);
 
         $var = new HashList("managedVote_ratios", "Managed vote ratios", $config, false, false);

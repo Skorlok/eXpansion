@@ -194,6 +194,7 @@ class Menu extends ExpPlugin implements Listener
         if ($group->hasPermission(Permission::SERVER_VOTES)) {
             $voteGroup->addItem("Config...", "!adm_votes", $this);
             $voteGroup->addItem('$f00Cancel', "!admcancel", $this);
+            $voteGroup->addItem('$0c0Pass', "!admpass", $this);
         }
 
         $hudGroup = $menu->addGroup("Hud");
@@ -315,6 +316,9 @@ class Menu extends ExpPlugin implements Listener
                     break;
                 case "!admcancel":
                     $adminGrp->adminCmd($login, "cancel");
+                    break;
+                case "!admpass":
+                    $adminGrp->adminCmd($login, "passvote");
                     break;
                 case "!admremovemap":
                     $adminGrp->adminCmd($login, "removethis");

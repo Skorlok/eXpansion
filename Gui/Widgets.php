@@ -183,4 +183,7 @@ class Widgets extends \ManiaLib\Utils\Singleton
 
     public $AroundMePanel_posX = array(self::config_default => -15);
     public $AroundMePanel_posY = array(self::config_default => -70);
+
+    public $VoteManagerWidget_posX = array(self::config_default => 4);
+    public $VoteManagerWidget_posY = array(self::config_default => 64);
 }

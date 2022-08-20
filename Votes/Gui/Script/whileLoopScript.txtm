@@ -1,0 +1,76 @@
+
+remaining = cooldown - (TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp);
+
+if (remaining >= 0.0) {
+    countdown.Ratio = (ML::NearestReal(remaining) / ML::NearestReal(cooldown));
+    countdownText.Value = remaining ^ " seconds left";
+} else {
+    countdown.Ratio = 0.0;
+    countdownText.Value = "Vote finished !";
+    Window.Hide();
+}
+
+foreach (Event in PendingEvents) {
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F1") {
+        if (canVote) {
+            TriggerPageAction(actionYes);
+        }
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F2") {
+        if (canVote) {
+            TriggerPageAction(actionNo);
+        }
+    }
+}
+
+
+//  Active Players => 0
+//  Players => 1
+//  Everybody => 2
+
+
+if ((Now - lastUpdateTime) >= 100) {
+    foreach (Player in Players) {
+        if (LocalUser != Null) {
+            if (Player.Login == LocalUser.Login) {
+                if (!Player.RequestsSpectate) {
+                    // PLAYER CASE
+                    showVoteButtons();
+                    canVote = True;
+                } else {
+                    // SPECTATOR CASE
+                    if (voters == 0) {
+                        hideVoteButtons();
+                        canVote = False;
+                    } else {
+                        if (voters == 1) {
+                            if (Player.Score != Null) {
+                                if (Player.Score.BestRace != Null) {
+                                    if (Player.Score.BestRace.Time > 0) {
+                                        showVoteButtons();
+                                        canVote = True;
+                                    } else {
+                                        hideVoteButtons();
+                                        canVote = False;
+                                    }
+                                } else {
+                                    hideVoteButtons();
+                                    canVote = False;
+                                }
+                            } else {
+                                hideVoteButtons();
+                                canVote = False;
+                            }
+                        } else {
+                            showVoteButtons();
+                            canVote = True;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    lastUpdateTime = Now;
+}

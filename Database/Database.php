@@ -267,7 +267,7 @@ class Database extends ExpPlugin
                     `database_version` mediumint(9) NOT NULL,
                      PRIMARY KEY (`database_id`),
                      KEY(`database_table`)
-                ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM;";
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
         $this->db->execute($q);
     }
 
@@ -287,7 +287,7 @@ class Database extends ExpPlugin
                     `player_ip` varchar(50),
                     `player_nation` varchar(100),
                     PRIMARY KEY (`player_login`)
-                ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM;";
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
         $this->db->execute($q);
     }
 

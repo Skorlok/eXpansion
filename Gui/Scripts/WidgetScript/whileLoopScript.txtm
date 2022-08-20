@@ -1,3 +1,4 @@
+
 <?php
 
     $deltaX = "DeltaPos.X = MouseX - lastMouseX;";
@@ -9,6 +10,7 @@
         $deltaY = "";
 
 ?>
+
 
 if(!disablePersonalHud){
 

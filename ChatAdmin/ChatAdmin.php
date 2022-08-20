@@ -1348,7 +1348,7 @@ class ChatAdmin extends ExpPlugin
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
+            $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
             $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
 
             $this->eXpChatSendServerMessage(
@@ -2587,11 +2587,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(["S_WarmUpDuration" => intval($newLimit)]);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes',
-                null,
-                array($admin->nickName, $params[0])
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -2603,24 +2599,20 @@ class ChatAdmin extends ExpPlugin
      */
     public function cancelVote($fromLogin)
     {
+        if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\\Votes\\Votes")) {
+            $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Votes\\Votes", "cancelVote", $fromLogin);
+            return;
+        }
+
         $admin = $this->storage->getPlayerObject($fromLogin);
         $vote = $this->connection->getCurrentCallVote();
         if (!empty($vote->cmdName)) {
             try {
                 $this->connection->cancelVote();
-                $this->eXpChatSendServerMessage(
-                    '#admin_action#Admin#variable# %s #admin_action#cancels the vote.',
-                    null,
-                    array($admin->nickName)
-                );
-
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cancels the vote.', null, array($admin->nickName));
                 return;
             } catch (Exception $e) {
-                $this->eXpChatSendServerMessage(
-                    '#admin_error#Error: Server said %1$s',
-                    $admin->login,
-                    array($e->getMessage())
-                );
+                $this->eXpChatSendServerMessage('#admin_error#Error: Server said %1$s', $admin->login, array($e->getMessage()));
             }
         } else {
             $this->eXpChatSendServerMessage('#admin_error#Can\'t cancel a vote, no vote in progress!', $admin->login);
@@ -2642,22 +2634,14 @@ class ChatAdmin extends ExpPlugin
                 $bool = true;
             } // ^^
         } else {
-            $this->sendErrorChat(
-                $fromLogin,
-                'Invalid parameter. Correct parameter for the command is either true or false.'
-            );
-
+            $this->sendErrorChat($fromLogin,'Invalid parameter. Correct parameter for the command is either true or false.');
             return;
         }
 
         try {
             $this->connection->setDisableRespawn($bool);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#set allow respawn to #variable# %s',
-                null,
-                array($admin->nickName, $params[0])
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set allow respawn to #variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }

@@ -29,16 +29,14 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
         $this->lastUpdate = time();
 
         if ($this->isPluginLoaded('\\ManiaLivePlugins\\eXpansion\\SM_ObstaclesScores\\SM_ObstaclesScores')) {
-            self::$localrecords = $this->callPublicMethod(
-                "\\ManiaLivePlugins\\eXpansion\\SM_ObstaclesScores\\SM_ObstaclesScores",
-                "getRecords"
-            );
+            self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\SM_ObstaclesScores\\SM_ObstaclesScores", "getRecords" );
         }
         $this->updateLocalPanel();
     }
 
     public function updateLocalPanel($login = null)
     {
+        LocalPanel::EraseAll();
         $widget = LocalPanel::Create($login);
         $widget->setPosition(114, 64);
         $widget->update();

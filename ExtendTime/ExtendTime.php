@@ -47,15 +47,16 @@ class ExtendTime extends ExpPlugin
             } else {
                 $this->eXpChatSendServerMessage("#vote#Vote to extend time: #vote_failure# Fail.");
             }
+
+            $this->voteCount++;
+
+            if ($this->voteCount >= Config::getInstance()->limit_votes && Config::getInstance()->limit_votes != -1) {
+                TimeExtendVote::EraseAll();
+            }
         }
 
         $this->votes = ["yes" => 0, "no" => 0];
         $this->voters = [];
-
-        $this->voteCount++;
-        if($this->voteCount >= Config::getInstance()->limit_votes && Config::getInstance()->limit_votes != -1) {
-            TimeExtendVote::EraseAll();
-        }
     }
 
     public function vote($login, $vote)

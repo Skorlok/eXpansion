@@ -552,6 +552,7 @@ class ManiaExchange extends ExpPlugin
                     $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
+                    $this->storage->resetMapInfos();
                 }
             } else {
                 $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file at remote host: " . $file, $login);
@@ -587,6 +588,7 @@ class ManiaExchange extends ExpPlugin
                     $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
+                    $this->storage->resetMapInfos();
                 }
             } else {
                 $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file: " . $file, $login);
@@ -763,7 +765,7 @@ class ManiaExchange extends ExpPlugin
                 break;
         }
 
-        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => "X-ManiaPlanet-ServerLogin:" . $this->storage->serverLogin);
+        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xVote"), array("login" => $login, "mxId" => $mxId), $options);
     }
 

@@ -5,10 +5,11 @@ namespace ManiaLivePlugins\eXpansion\Votes;
 class Config extends \ManiaLib\Utils\Singleton
 {
     public $restartLimit = 0;
-    public $use_votes = true;
+    public $use_callvotes = false;
     public $global_timeout = 30;
     public $limit_votes = 1;
     public $extendTimeLimit = 15;
+    public $autoVoteStarter = true;
 
     /**
      * @var bool Use track queue instead of instant restart, if 'eXpansion\Maps' plugin is loaded

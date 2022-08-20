@@ -341,7 +341,6 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
         if (AdminGroups::hasPermission($login, Permission::MAP_RES)) {
             if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\Maps\\Maps')) {
                 $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Maps\\Maps", "replayMap", $login);
-
                 return;
             }
 
@@ -358,12 +357,23 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
      */
     public function cancelVote($login)
     {
-        if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\\ChatAdmin\\ChatAdmin")) {
-            $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\ChatAdmin\\ChatAdmin", "cancelVote", $login);
-
+        if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\\Votes\\Votes")) {
+            $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Votes\\Votes", "cancelVote", $login);
             return;
         }
-        $this->connection->cancelVote();
+
+        $vote = $this->connection->getCurrentCallVote();
+        if (!empty($vote->cmdName)) {
+            try {
+                $this->connection->cancelVote();
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cancels the vote.', null, array($this->storage->getPlayerObject($login)->nickName));
+                return;
+            } catch (Exception $e) {
+                $this->eXpChatSendServerMessage('#admin_error#Error: Server said %1$s', $login, array($e->getMessage()));
+            }
+        } else {
+            $this->eXpChatSendServerMessage('#admin_error#Can\'t cancel a vote, no vote in progress!', $login);
+        }
     }
 
     /**
@@ -375,10 +385,9 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
     {
         if ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\\ChatAdmin\\ChatAdmin")) {
             $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\ChatAdmin\\ChatAdmin", "forceEndRound", $login);
-
             return;
         }
-        $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
+        $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
     }
 
     /**

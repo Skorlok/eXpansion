@@ -23,14 +23,10 @@ class MenuWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Menu\Gui\Script");
 
         $version = \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION;
+        $storage = \ManiaLive\Data\Storage::getInstance();
         $this->script->setParam("version", $version);
         $this->script->setParam("name", "Submenu");
-        $storage = \ManiaLive\Data\Storage::getInstance();
-        if ($storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
-            $this->script->setParam("gameMode", \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($storage->gameInfos->scriptName));
-        } else {
-            $this->script->setParam("gameMode", $storage->gameInfos->gameMode);
-        }
+        $this->script->setParam("gameMode", \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($storage->gameInfos->scriptName));
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
         $this->registerScript($this->script);
     }
@@ -69,6 +65,7 @@ class MenuWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
         $label->setStyle("TextRaceChat");
         $label->setTextColor("fff");
         $label->setAlign("left", "center");
+        //$label->setAction($action);
 
         $quad = new Quad(30, 5);
         $quad->setBgcolor($config->style_widget_bgColorize);
@@ -77,7 +74,6 @@ class MenuWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
         $quad->setAlign("left", "center");
         $quad->setScriptEvents();
         $quad->setAction($action);
-        // $label->setAction($action);
 
         $frame->addComponent($quad);
         $frame->addComponent($label);

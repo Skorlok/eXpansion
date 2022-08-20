@@ -2,6 +2,7 @@
 #Include "TextLib" as TextLib
 #Include "MathLib" as MathLib
 #Include "AnimLib" as AnimLib
+#Include "TimeLib" as TimeLib
 
 // do not remove, this is for animation and draggable libraries
 #Include "MathLib" as ML

@@ -35,8 +35,10 @@ class BestCpPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->frame->clearComponents();
 
         for ($x = 0; $x < Config::getInstance()->CPNumber && $x < count($checkpoints); $x++) {
-            $this->cps[$x] = new CheckpointElem($x, $checkpoints[$x]);
-            $this->frame->addComponent($this->cps[$x]);
+            if (isset($checkpoints[$x])) {
+                $this->cps[$x] = new CheckpointElem($x, $checkpoints[$x]);
+                $this->frame->addComponent($this->cps[$x]);
+            }
         }
     }
 

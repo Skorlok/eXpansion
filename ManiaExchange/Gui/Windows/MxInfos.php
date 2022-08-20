@@ -49,7 +49,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_mx_text = new \ManiaLib\Gui\Elements\Label(20, 6);
         $this->label_mx_text->setAlign('left', 'center');
         $this->label_mx_text->setSizeX(27);
-        $this->label_mx_text->setText(__("Top 25 MX Records"));
+        $this->label_mx_text->setText("Top 25 MX Records");
         $this->label_mx_text->setPosX(180);
         $this->mainFrame->addComponent($this->label_mx_text);
 
@@ -79,14 +79,14 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_map_name = new \ManiaLib\Gui\Elements\Label(37.5, 6.25);
         $this->label_map_name->setAlign('left', 'center');
         $this->label_map_name->setPosition(85, -11);
-        $this->label_map_name->setText(__(ManiaExchange::$mxInfo->Name));
+        $this->label_map_name->setText(ManiaExchange::$mxInfo->Name);
         $this->label_map_name->setScale(2);
         $this->mainFrame->addComponent($this->label_map_name);
 
         $this->label_map_author = new \ManiaLib\Gui\Elements\Label(37.5, 6.25);
         $this->label_map_author->setAlign('left', 'center');
         $this->label_map_author->setPosition(85, -18);
-        $this->label_map_author->setText(__(ManiaExchange::$mxInfo->Username));
+        $this->label_map_author->setText(ManiaExchange::$mxInfo->Username);
         $this->label_map_author->setScale(1);
         $this->mainFrame->addComponent($this->label_map_author);
 
@@ -94,7 +94,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_map_date->setAlign('left', 'center');
         $this->label_map_date->setPosition(132, -18);
         $date = substr(str_replace('T', " ", ManiaExchange::$mxInfo->UploadedAt), 0, 16);
-        $this->label_map_date->setText(__("Uploaded: " . $date));
+        $this->label_map_date->setText("Uploaded: " . $date);
         $this->label_map_date->setScale(0.90);
         $this->mainFrame->addComponent($this->label_map_date);
 
@@ -102,7 +102,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_map_date2->setAlign('left', 'center');
         $this->label_map_date2->setPosition(132, -22);
         $date = substr(str_replace('T', " ", ManiaExchange::$mxInfo->UpdatedAt), 0, 16);
-        $this->label_map_date2->setText(__("Updated: " . $date));
+        $this->label_map_date2->setText("Updated: " . $date);
         $this->label_map_date2->setScale(0.90);
         $this->mainFrame->addComponent($this->label_map_date2);
 
@@ -116,7 +116,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $text = implode("\n", $text);
             $text .= "\n ....";
         }
-        $this->label_map_comment->setText(__($text));
+        $this->label_map_comment->setText($text);
         $this->label_map_comment->setScale(1.2);
         $this->label_map_comment->setSizeY(10);
         $this->mainFrame->addComponent($this->label_map_comment);

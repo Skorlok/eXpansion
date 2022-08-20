@@ -569,7 +569,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             $this->eXpChatSendServerMessage($this->msg_norecord, $login);
             return;
         }
-        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\CpDiff::Erase($login);
 
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
             $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
@@ -589,6 +588,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                 $player = $player_localrec;
             }
         } else {
+            if (!isset($this->records[$login])) {
+                $this->eXpChatSendServerMessage("#admin_error#You must have a record on this map!", $login);
+                return;
+            }
             $player = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
             $player->place = $this->records[$login]->place;
             $player->nickName = $this->records[$login]->nickname;
@@ -596,11 +599,16 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
 
         $target_data = ArrayOfObj::getObjbyPropValue($this->records, "place", $params);
+        if (!$target_data) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
         $target = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
         $target->place = $target_data->place;
         $target->nickName = $target_data->nickname;
         $target->ScoreCheckpoints = explode(",", $target_data->checkpoints);
 
+        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\CpDiff::Erase($login);
         $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\CpDiff::Create($login);
         $window->setTitle(__('Dedimania CheckPoints Difference', $login));
         $window->populateList(array($player, $target));

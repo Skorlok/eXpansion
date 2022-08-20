@@ -101,6 +101,7 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->gameMode = $val[1];
             $items[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem($val[0], $val[1], $val[2]);
         }
+        shuffle($items);
 
         return $items;
     }

@@ -211,8 +211,8 @@ class Gui extends ExpPlugin
 
     public function getPlayersWidgets($login)
     {
-        GetPlayerWidgets::EraseAll();
-        $widget = GetPlayerWidgets::Create($login);
+        GetPlayerWidgets::Erase($login);
+        $widget = GetPlayerWidgets::Create($login, false);
         $widget->show();
     }
 
@@ -227,6 +227,7 @@ class Gui extends ExpPlugin
             } else {
                 $this->showConfigWindow($login, array('widgetStatus' => $this->playersWidgets[$login]));
                 unset($this->playersWidgets[$login]);
+                GetPlayerWidgets::Erase($login);
             }
         }
     }

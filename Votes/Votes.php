@@ -5,6 +5,8 @@ namespace ManiaLivePlugins\eXpansion\Votes;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
+use ManiaLivePlugins\eXpansion\Votes\Gui\Widgets\VoteManagerWidget;
+use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
@@ -14,19 +16,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     /** @var Config */
     private $config;
     private $useQueue = false;
-    private $timer = 0;
     private $voter = "";
     private $counters = array();
-    private $update = false;
     private $resCount = 0;
     private $lastMapUid = "";
-    /** @var int */
-    private $origTimeValue = 0;
-
 
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
+        VoteManagerWidget::$parentPlugin = $this;
     }
 
     /**
@@ -77,9 +75,13 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = $this->registerChatCommand("extend", "vote_Extend_Custom", 1, true);
         $cmd->help = 'Start a vote to extend timelimit';
 
-        $cmd = AdminGroups::addAdminCommand('cancelvote', $this, 'cancelVote', 'cancel_vote');
-        $cmd->setHelp = 'Cancel current running callvote';
-        AdminGroups::addAlias($cmd, "cancel");
+        $cmd = AdminGroups::addAdminCommand('cancel', $this, 'cancelVote', 'cancel_vote');
+        $cmd->setHelp = 'Cancel current running vote';
+        AdminGroups::addAlias($cmd, "can");
+
+        $cmd = AdminGroups::addAdminCommand('passvote', $this, 'passVote', 'pass_vote');
+        $cmd->setHelp = 'Pass current running vote';
+        AdminGroups::addAlias($cmd, "passv");
     }
 
     public function eXpOnReady()
@@ -88,12 +90,12 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->enableTickerEvent();
 
         $this->counters = array();
-        $this->timer = time();
         $this->setPublicMethod("vote_restart");
         $this->setPublicMethod("vote_skip");
         $this->setPublicMethod("vote_extend");
         $this->setPublicMethod("vote_endround");
         $this->setPublicMethod("showVotesConfig");
+        $this->setPublicMethod("cancelVote");
 
         $cmd = AdminGroups::addAdminCommand('votes', $this, 'showVotesConfig', 'server_votes');
         $cmd->setHelp('shows config window for managing votes');
@@ -109,29 +111,18 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->debug("[exp\Votes] Restart vote set to normal");
         }
 
-        $this->update = true;
-    }
-
-    public function showTimeOptions($login)
-    {
-
-    }
-
-    public function vote_time($login, $seconds)
-    {
-
+        $this->syncSettings();
     }
 
     public function syncSettings()
     {
-
         $managedVotes = $this->getVotes();
 
         foreach ($managedVotes as $cmd => $vote) {
             $ratios[] = new \Maniaplanet\DedicatedServer\Structures\VoteRatio($vote->command, $vote->ratio);
         }
         $this->connection->setCallVoteRatios($ratios, true);
-        if ($this->config->use_votes == false) {
+        if ($this->config->use_callvotes == false) {
             $this->connection->setCallVoteTimeOut(0);
         } else {
             $this->connection->setCallVoteTimeOut(($this->config->global_timeout * 1000));
@@ -141,7 +132,6 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function onBeginMatch()
     {
         $this->counters = array();
-        $this->timer = time();
 
         if ($this->storage->currentMap->uId == $this->lastMapUid) {
             $this->resCount++;
@@ -153,15 +143,87 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onTick()
     {
-        if ($this->update) {
-            $this->update = false;
-            $this->syncSettings();
+        if (isset($this->currentVote)) {
+            if (($this->currentVote->timestamp + $this->currentVote->votingTime) < time()) {
+
+                $totalVotes = count($this->currentVote->playerVotes);
+
+                if ($totalVotes >= 1 && ($this->currentVote->getYes() / $totalVotes) > $this->currentVote->voteRatio) {
+                    $this->handleEndVote(true);
+                } else {
+                    $this->handleEndVote(false);
+                }
+            }
         }
+    }
+
+    public function handlePlayerVote($login, $vote)
+    {
+        $this->currentVote->playerVotes[$login] = $vote;
+
+        // Check if vote passes when we suppose that all players that didn't vote would vote NO.
+        $playerCount = count($this->storage->players) + count($this->storage->spectators);
+        if ($playerCount > 0 && ($this->currentVote->getYes() / $playerCount) > $this->currentVote->voteRatio) {
+            $this->handleEndVote(true);
+            return;
+        }
+
+        $this->currentVoteWidget->setDatas($this->currentVote);
+        $this->currentVoteWidget->RedrawAll();
+    }
+
+    public function handleEndVote($state)
+    {
+        VoteManagerWidget::EraseAll();
+        unset($this->currentVoteWidget);
+
+        if ($state == true) {
+
+            $msg = eXpGetMessage('#vote_success# $iVote passed!');
+            $this->eXpChatSendServerMessage($msg, null);
+
+            if ($this->currentVote->action == "RestartMap") {
+                if (sizeof($this->storage->players) == 1) {
+                    \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_RESTART));
+                    $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Maps\\Maps', 'replayMapInstant', $this->currentVote->voteAuthor);
+                } else {
+                    $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Maps\\Maps', 'replayMap', $this->currentVote->voteAuthor);
+                }
+            }
+
+            if ($this->currentVote->action == "NextMap") {
+                $this->connection->nextMap();
+            }
+
+            if ($this->currentVote->action == "Extend") {
+                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
+            }
+
+            if ($this->currentVote->action == "Add") {
+                if (Core::$isTimeExtendable) {
+                    $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', intval($this->currentVote->actionParams * 60));
+                }
+                if (Core::$isPointExtendable) {
+                    $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', intval($this->currentVote->actionParams));
+                }
+            }
+
+            if ($this->currentVote->action == "EndRound") {
+                $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
+                $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
+            }
+
+        } else {
+            $msg = eXpGetMessage('#vote_failure# $iVote failed!');
+            $this->eXpChatSendServerMessage($msg, null);
+        }
+
+        unset($this->currentVote);
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-
+        $this->handleEndVote(false);
     }
 
     public function vote_Restart($login)
@@ -173,31 +235,63 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if (!array_key_exists('RestartMap', $managedVotes)) {
                 return;
             }
+
             // if vote is not managed...
             if ($managedVotes['RestartMap']->managed == false) {
                 return;
             }
+
             if ($managedVotes['RestartMap']->ratio == -1.) {
                 $this->eXpChatSendServerMessage(eXpGetMessage("#error#Restart vote is disabled!"), $login);
                 return;
             }
+
+            if (isset($this->currentVote)) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                return;
+            }
+
             $config = Config::getInstance();
+
             if ($config->restartLimit != 0 && $config->restartLimit <= $this->resCount) {
                 $this->eXpChatSendServerMessage(eXpGetMessage("#error#Map limit for voting restart reached."), $login, array($this->config->restartLimit));
                 return;
             }
 
-            $this->voter = $login;
+            if (!isset($this->counters["RestartMap"])) {
+                $this->counters["RestartMap"] = 0;
+            }
+
+            $this->counters["RestartMap"]++;
+
+            if ($config->limit_votes > 0) {
+                if ($this->counters["RestartMap"] > $config->limit_votes) {
+                    $msg = eXpGetMessage("Vote limit reached.");
+                    $this->eXpChatSendServerMessage($msg);
+                    return;
+                }
+            }
+
+
             $vote = $managedVotes['RestartMap'];
+
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "RestartMap", "", Core::$players[$login] . '$z$z want to replay this map, you too ?', $vote->voters, time());
+
             $this->debug("[exp\\Votes] Calling Restart (queue) vote..");
-            $vote->callerLogin = $this->voter;
-            $vote->cmdName = "Replay";
-            $vote->cmdParam = array("the current map");
-            $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+            VoteManagerWidget::EraseAll();
+            $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            $this->currentVoteWidget->setSize(90, 20);
+            $this->currentVoteWidget->setDatas($this->currentVote);
+            $this->currentVoteWidget->show();
 
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#variable#%s #vote#initiated restart map vote..');
             $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+
+            if ($config->autoVoteStarter) {
+                $this->handlePlayerVote($login, "yes");
+            }
         } catch (\Exception $e) {
             $this->connection->chatSendServerMessage("[Notice] " . $e->getMessage(), $login);
         }
@@ -207,30 +301,63 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         try {
             $managedVotes = $this->getVotes();
+
             // if vote is not managed...
             if (!array_key_exists('NextMap', $managedVotes)) {
                 return;
             }
+
             // if vote is not managed...
             if ($managedVotes['NextMap']->managed == false) {
                 return;
             }
+
             if ($managedVotes['NextMap']->ratio == -1.) {
                 $this->eXpChatSendServerMessage(eXpGetMessage("#error#Skip vote is disabled!"), $login);
                 return;
             }
 
-            $this->voter = $login;
+            if (isset($this->currentVote)) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                return;
+            }
+
+            $config = Config::getInstance();
+
+            if (!isset($this->counters["NextMap"])) {
+                $this->counters["NextMap"] = 0;
+            }
+
+            $this->counters["NextMap"]++;
+
+            if ($config->limit_votes > 0) {
+                if ($this->counters["NextMap"] > $config->limit_votes) {
+                    $msg = eXpGetMessage("Vote limit reached.");
+                    $this->eXpChatSendServerMessage($msg);
+                    return;
+                }
+            }
+
+
             $vote = $managedVotes['NextMap'];
+
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "NextMap", "", Core::$players[$login] . '$z$z want to skip this map, you too ?', $vote->voters, time());
+
             $this->debug("[exp\Votes] Calling Skip vote..");
-            $vote->callerLogin = $this->voter;
-            $vote->cmdName = "Skip";
-            $vote->cmdParam = array("the current map");
-            $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+            VoteManagerWidget::EraseAll();
+            $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            $this->currentVoteWidget->setSize(90, 20);
+            $this->currentVoteWidget->setDatas($this->currentVote);
+            $this->currentVoteWidget->show();
 
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#variable#%1$s #vote#initiated skip map vote..');
             $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+
+            if ($config->autoVoteStarter) {
+                $this->handlePlayerVote($login, "yes");
+            }
         } catch (\Exception $e) {
             $this->connection->chatSendServerMessage("[Notice] " . $e->getMessage(), $login);
         }
@@ -241,47 +368,86 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (Core::$isTimeExtendable || Core::$isPointExtendable) {
             try {
                 $managedVotes = $this->getVotes();
+
                 //if vote is not managed...
                 if (!array_key_exists('ExtendTime', $managedVotes)) {
                     return;
                 }
+
                 // if vote is not managed...
                 if ($managedVotes['ExtendTime']->managed == false) {
                     return;
                 }
+
                 if ($managedVotes['ExtendTime']->ratio == -1.) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#Extend vote is disabled!"), $login);
                     return;
                 }
 
+                if (isset($this->currentVote)) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                    return;
+                }
+
+                $config = Config::getInstance();
+
+                if (!isset($this->counters["Extend"])) {
+                    $this->counters["Extend"] = 0;
+                }
+
+                $this->counters["Extend"]++;
+
+                if ($config->limit_votes > 0) {
+                    if ($this->counters["Extend"] > $config->limit_votes) {
+                        $msg = eXpGetMessage("Vote limit reached.");
+                        $this->eXpChatSendServerMessage($msg);
+                        return;
+                    }
+                }
+
                 if (Core::$isTimeExtendable) {
 
-                    $this->voter = $login;
                     $vote = $managedVotes['ExtendTime'];
+
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", Core::$players[$login] . '$z$z want to extend the time limit, you too ?', $vote->voters, time());
+
                     $this->debug("[exp\Votes] Calling extend vote..");
-                    $vote->callerLogin = $this->voter;
-                    $vote->cmdName = "Extend";
-                    $vote->cmdParam = array("Timelimit");
-                    $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+                    VoteManagerWidget::EraseAll();
+                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    $this->currentVoteWidget->setSize(90, 20);
+                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend time vote..');
                     $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
 
+                    if ($config->autoVoteStarter) {
+                        $this->handlePlayerVote($login, "yes");
+                    }
+
                 } else {
 
-                    $this->voter = $login;
                     $vote = $managedVotes['ExtendTime'];
+
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", Core::$players[$login] . '$z$z want to extend the point limit, you too ?', $vote->voters, time());
+
                     $this->debug("[exp\Votes] Calling extend vote..");
-                    $vote->callerLogin = $this->voter;
-                    $vote->cmdName = "Extend";
-                    $vote->cmdParam = array("Pointlimit");
-                    $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+                    VoteManagerWidget::EraseAll();
+                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    $this->currentVoteWidget->setSize(90, 20);
+                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend point vote..');
                     $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
 
+                    if ($config->autoVoteStarter) {
+                        $this->handlePlayerVote($login, "yes");
+                    }
                 }
 
             } catch (\Exception $e) {
@@ -297,56 +463,96 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (Core::$isTimeExtendable || Core::$isPointExtendable) {
             try {
                 $managedVotes = $this->getVotes();
+
                 //if vote is not managed...
                 if (!array_key_exists('ExtendTime', $managedVotes)) {
                     return;
                 }
+
                 // if vote is not managed...
                 if ($managedVotes['ExtendTime']->managed == false) {
                     return;
                 }
+
                 if ($managedVotes['ExtendTime']->ratio == -1.) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#Extend vote is disabled!"), $login);
                     return;
                 }
+
+                if (isset($this->currentVote)) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                    return;
+                }
+
                 if (!is_numeric($params[0])) {
                     $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
                     return;
                 }
+
                 $config = Config::getInstance();
+
                 if ($config->extendTimeLimit != -1 && $params > $config->extendTimeLimit) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#You are trying to add too much time, the max time is $config->extendTimeLimit"), $login);
                     return;
                 }
 
+                if (!isset($this->counters["Extend"])) {
+                    $this->counters["Extend"] = 0;
+                }
+
+                $this->counters["Extend"]++;
+
+                if ($config->limit_votes > 0) {
+                    if ($this->counters["Extend"] > $config->limit_votes) {
+                        $msg = eXpGetMessage("Vote limit reached.");
+                        $this->eXpChatSendServerMessage($msg);
+                        return;
+                    }
+                }
+
                 if (Core::$isTimeExtendable) {
 
-                    $this->voter = $login;
                     $vote = $managedVotes['ExtendTime'];
+
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", Core::$players[$login] . "\$z\$z want to extend the time limit with $params minutes, you too ?", $vote->voters, time());
+
                     $this->debug("[exp\Votes] Calling extend vote..");
-                    $vote->callerLogin = $this->voter;
-                    $vote->cmdName = "Add";
-                    $vote->cmdParam = array("$params minutes");
-                    $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+                    VoteManagerWidget::EraseAll();
+                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    $this->currentVoteWidget->setSize(90, 20);
+                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend time vote..');
                     $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
 
+                    if ($config->autoVoteStarter) {
+                        $this->handlePlayerVote($login, "yes");
+                    }
+
                 } else {
 
-                    $this->voter = $login;
                     $vote = $managedVotes['ExtendTime'];
+
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", Core::$players[$login] . "\$z\$z want to extend the time limit with $params points, you too ?", $vote->voters, time());
+
                     $this->debug("[exp\Votes] Calling extend vote..");
-                    $vote->callerLogin = $this->voter;
-                    $vote->cmdName = "Add";
-                    $vote->cmdParam = array("$params point");
-                    $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+                    VoteManagerWidget::EraseAll();
+                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    $this->currentVoteWidget->setSize(90, 20);
+                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend point vote..');
                     $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
 
+                    if ($config->autoVoteStarter) {
+                        $this->handlePlayerVote($login, "yes");
+                    }
                 }
 
             } catch (\Exception $e) {
@@ -362,30 +568,63 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_CUP || $this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
             try {
                 $managedVotes = $this->getVotes();
+
                 // if vote is not managed...
                 if (!array_key_exists('EndRound', $managedVotes)) {
                     return;
                 }
+
                 // if vote is not managed...
                 if ($managedVotes['EndRound']->managed == false) {
                     return;
                 }
+
                 if ($managedVotes['EndRound']->ratio == -1.) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#End round vote is disabled!"), $login);
                     return;
                 }
 
-                $this->voter = $login;
+                if (isset($this->currentVote)) {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                    return;
+                }
+
+                $config = Config::getInstance();
+
+                if (!isset($this->counters["EndRound"])) {
+                    $this->counters["EndRound"] = 0;
+                }
+
+                $this->counters["EndRound"]++;
+
+                if ($config->limit_votes > 0) {
+                    if ($this->counters["EndRound"] > $config->limit_votes) {
+                        $msg = eXpGetMessage("Vote limit reached.");
+                        $this->eXpChatSendServerMessage($msg);
+                        return;
+                    }
+                }
+
+
                 $vote = $managedVotes['EndRound'];
+
+                $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "EndRound", "", Core::$players[$login] . '$z$z want to end the round, you too ?', $vote->voters, time());
+
                 $this->debug("[exp\Votes] Calling EndRound vote..");
-                $vote->callerLogin = $this->voter;
-                $vote->cmdName = "EndRound";
-                $vote->cmdParam = array("");
-                $this->connection->callVote($vote, $vote->ratio, ($vote->timeout * 1000), $vote->voters);
+
+                VoteManagerWidget::EraseAll();
+                $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                $this->currentVoteWidget->setSize(90, 20);
+                $this->currentVoteWidget->setDatas($this->currentVote);
+                $this->currentVoteWidget->show();
 
                 $player = $this->storage->getPlayerObject($login);
                 $msg = eXpGetMessage('#variable#%1$s #vote#initiated endround vote..');
                 $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+
+                if ($config->autoVoteStarter) {
+                    $this->handlePlayerVote($login, "yes");
+                }
             } catch (\Exception $e) {
                 $this->connection->chatSendServerMessage("[Notice] " . $e->getMessage(), $login);
             }
@@ -396,36 +635,12 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onVoteUpdated($stateName, $login, $cmdName, $cmdParam)
     {
-        // in case managed votes are disabled, return..
         $config = Config::getInstance();
 
-        if ($config->use_votes == false) {
-            return;
-        }
-
-        $managedVotes = $this->getVotes();
-
-        // disable default votes... and replace them with our own implementations
-        if ($stateName == "NewVote") {
-            if ($cmdName == "RestartMap") {
-                $this->connection->cancelVote();
-                $this->voter = $login;
-                $this->vote_Restart($login);
-
-                return;
-            }
-            if ($cmdName == "NextMap") {
-                $this->connection->cancelVote();
-                $this->voter = $login;
-                $this->vote_Skip($login);
-
-                return;
-            }
-        }
         // check for our stuff...
         if ($stateName == "NewVote") {
-            $login = $this->voter;
-            foreach ($managedVotes as $cmd => $vote) {
+
+            foreach ($this->getVotes() as $cmd => $vote) {
                 if ($cmdName == $cmd) {
                     if ($vote->ratio == -1.) {
                         $this->connection->cancelVote();
@@ -448,70 +663,39 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }
             }
         }
-
-
-        // own votes handling...
-
-        if ($stateName == "VotePassed") {
-            if ($cmdName != "Replay" && $cmdName != "Skip" && $cmdName!="Extend" && $cmdName!="EndRound" && $cmdName!="Add") {
-                return;
-            }
-
-            $msg = eXpGetMessage('#vote_success# $iVote passed!');
-            $this->eXpChatSendServerMessage($msg, null);
-            $voter = $this->voter;
-            if ($cmdName == "Replay") {
-                if (sizeof($this->storage->players) == 1) {
-                    \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_RESTART));
-                    $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Maps\\Maps', 'replayMapInstant', $voter);
-                } else {
-                    $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Maps\\Maps', 'replayMap', $voter);
-                }
-            }
-            if ($cmdName == "Skip") {
-                $this->connection->nextMap();
-            }
-            if ($cmdName == "Extend") {
-                $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
-            }
-            if ($cmdName == "Add") {
-                if (Core::$isTimeExtendable) {
-                    $timeToAdd = intval(preg_replace("/[^0-9.]/", "", $cmdParam)*60);
-                    $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $timeToAdd);
-                }
-                if (Core::$isPointExtendable) {
-                    $pointsToAdd = intval(preg_replace("/[^0-9.]/", "", $cmdParam));
-                    $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $pointsToAdd);
-                }
-            }
-            if ($cmdName == "EndRound") {
-                $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array((string)time()));
-                $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
-            }
-            $this->voter = null;
-        }
-
-        if ($stateName == "VoteFailed") {
-            if ($cmdName != "Replay" && $cmdName != "Skip" && $cmdName!="Extend" && $cmdName!="EndRound" && $cmdName!="Add") {
-                return;
-            }
-            $msg = eXpGetMessage('#vote_failure# $iVote failed!');
-            $this->eXpChatSendServerMessage($msg, null);
-            $this->voter = null;
-        }
     }
 
     public function cancelVote($login)
     {
-        $player = $this->storage->getPlayerObject($login);
+        $cancelled = false;
+
+        if (isset($this->currentVote)) {
+            $this->handleEndVote(false);
+            $cancelled = true;
+        }
+
         $vote = $this->connection->getCurrentCallVote();
         if (!empty($vote->cmdName)) {
             $this->connection->cancelVote();
+            $cancelled = true;
+        }
+
+        if ($cancelled) {
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!');
-            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm'), $login));
-            return;
+            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));
         } else {
             $this->connection->chatSendServerMessage('Notice: Can\'t cancel a vote, no vote in progress!', $login);
+        }
+    }
+
+    public function passVote($login)
+    {
+        if (isset($this->currentVote)) {
+            $this->handleEndVote(true);
+            $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# pass the vote!');
+            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));
+        } else {
+            $this->connection->chatSendServerMessage('Notice: Can\'t pass a vote, no vote in progress!', $login);
         }
     }
 
@@ -526,15 +710,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $window->show($login);
     }
 
-    public function eXpOnUnload()
-    {
-        VoteSettingsWindow::EraseAll();
-    }
-
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         if ($var->getConfigInstance() instanceof Config) {
-            $this->update = true;
+            $this->syncSettings();
         }
+    }
+
+    public function eXpOnUnload()
+    {
+        VoteSettingsWindow::EraseAll();
+        VoteManagerWidget::EraseAll();
     }
 }

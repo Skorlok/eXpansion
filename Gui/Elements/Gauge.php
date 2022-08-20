@@ -67,6 +67,32 @@ class Gauge extends \ManiaLib\Gui\Element
         return $this->ratio;
     }
 
+    /**
+     * @param string $drawBg
+     */
+    public function setDrawBg($drawBg)
+    {
+        $this->drawBg = $drawBg;
+    }
+
+    public function getDrawBg()
+    {
+        return $this->drawBg;
+    }
+
+    /**
+     * @param string $drawBlockBg
+     */
+    public function setDrawBlockBg($drawBlockBg)
+    {
+        $this->drawBlockBg = $drawBlockBg;
+    }
+
+    public function getDrawBlockBg()
+    {
+        return $this->drawBlockBg;
+    }
+
     protected function postFilter()
     {
         if ($this->colorize !== null) {

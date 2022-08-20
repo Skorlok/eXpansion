@@ -22,8 +22,7 @@ use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\Map;
-use /** @noinspection PhpUndefinedClassInspection */
-    Maniaplanet\DedicatedServer\Xmlrpc\Request;
+use Maniaplanet\DedicatedServer\Xmlrpc\Request;
 
 /**
  * Class Connection
@@ -31,9 +30,6 @@ use /** @noinspection PhpUndefinedClassInspection */
  */
 class Connection extends Singleton implements AppListener, TickListener
 {
-    // used for dedimania
-    private $version = 0.16;
-
     /** @var integer */
     public static $serverMaxRank = 15;
 

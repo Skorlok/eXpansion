@@ -10,14 +10,14 @@ class Config extends \ManiaLib\Utils\Singleton
     public $defaultLanguage = null;
     public $Colors_admin_error = '$f00'; // error message color for admin
     public $Colors_error = '$f00'; // general error message color
-    public $Colors_admin_action = '$fff'; // admin actions color
+    public $Colors_admin_action = '$4c1'; // admin actions color
     public $Colors_variable = '$fff'; // generic variable color
     public $Colors_record = '$3af'; // all other local records
     public $Colors_record_top = '$2d0'; // top5 local records
-    public $Colors_dedirecord = '$2d0'; // dedimania records
+    public $Colors_dedirecord = '$98f'; // dedimania records
     public $Colors_rank = '$dee'; // used in record messages and widgets for rank
     public $Colors_time = '$fff'; // used for record messages and widgets
-    public $Colors_rating = '$f80'; // map ratings color
+    public $Colors_rating = '$d05'; // map ratings color
     public $Colors_queue = '$ff0'; // map queue messages
     public $Colors_personalmessage = '$3bd'; // personal messages
     public $Colors_admingroup_chat = '$f00'; // admin chat channel

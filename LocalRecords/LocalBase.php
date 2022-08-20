@@ -1320,13 +1320,17 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showCpDiffWindow($login, $params)
     {
-        CpDiff::Erase($login);
+        if (!is_numeric($params)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
+            return;
+        }
+        $params = intval(preg_replace("/[^0-9]/", "", $params));
         $params-=1;
 
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             $dedirecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania", "getRecords");
         }
-        if ($dedirecs[$login]) {
+        if (isset($dedirecs[$login])) {
             if ($this->getCurrentChallangePlayerRecord($login)) {
                 if ($this->getCurrentChallangePlayerRecord($login)->time <= $dedirecs[$login]->time) {
                     $player = $this->getCurrentChallangePlayerRecord($login);
@@ -1346,8 +1350,14 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $player = $this->getCurrentChallangePlayerRecord($login);
         }
 
+        if (!isset($this->currentChallengeRecords[$params])) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
+
         $target = $this->currentChallengeRecords[$params];
 
+        CpDiff::Erase($login);
         $window = CpDiff::Create($login);
         $window->setTitle(__('Local CheckPoints Difference', $login));
         $window->populateList(array($player, $target));
@@ -1358,9 +1368,19 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showCpDiffNoDediWindow($login, $params)
     {
-        CpDiff::Erase($login);
+        if (!is_numeric($params)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
+            return;
+        }
+        $params = intval(preg_replace("/[^0-9]/", "", $params));
         $params-=1;
 
+        if (!isset($this->currentChallengeRecords[$params])) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
+
+        CpDiff::Erase($login);
         $window = CpDiff::Create($login);
         $window->setTitle(__('Local CheckPoints Difference', $login));
         $window->populateList(array($this->getCurrentChallangePlayerRecord($login), $this->currentChallengeRecords[$params]));
