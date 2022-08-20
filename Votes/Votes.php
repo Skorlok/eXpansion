@@ -223,7 +223,9 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        $this->handleEndVote(false);
+        if (isset($this->currentVote)) {
+            $this->handleEndVote(false);
+        }
     }
 
     public function vote_Restart($login)

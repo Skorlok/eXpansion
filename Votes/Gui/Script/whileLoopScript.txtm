@@ -1,8 +1,13 @@
 
-remaining = cooldown - (TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp);
+remaining = cooldown - ((TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp) - timeRemaining);
 
 if (remaining >= 0.0) {
-    countdown.Ratio = (ML::NearestReal(remaining) / ML::NearestReal(cooldown));
+    declare ratio = ML::NearestReal(remaining) / ML::NearestReal(cooldown);
+    if (ratio <= 1.0) {
+        countdown.Ratio = ratio;
+    } else {
+        countdown.Ratio = 1.0;
+    }
     countdownText.Value = remaining ^ " seconds left";
 } else {
     countdown.Ratio = 0.0;

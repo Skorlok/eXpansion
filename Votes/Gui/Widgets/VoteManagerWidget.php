@@ -194,7 +194,7 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         }
 
         $this->script->setParam("cooldown", $vote->votingTime);
-        $this->script->setParam("timestamp", $vote->timestamp);
+        $this->script->setParam("timeRemaining", $vote->timestamp - time());
         $this->script->setParam("votes", $voteData);
         $this->script->setParam("ratio", sprintf("%0.1f", ($vote->voteRatio * 58) + 16));
         $this->script->setParam("voteText", $vote->voteText);

@@ -3,16 +3,21 @@ declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";
 
 declare Integer cooldown = <?php echo $this->cooldown;?>;
-declare Integer timestamp = <?php echo $this->timestamp;?>;
+declare Integer timeRemaining = <?php echo $this->timeRemaining;?>;
+declare Integer timestamp = TextLib::ToInteger(TimeLib::GetCurrent());
 declare playersVote = <?php echo $this->votes;?>;
 
-declare Integer remaining = cooldown - (TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp);
-
+declare Integer remaining = cooldown - ((TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp) - timeRemaining);
 
 declare countdown = (Page.GetFirstChild("CountdownBar") as CMlGauge);
 declare countdownText = (Page.GetFirstChild("CountdownText") as CMlLabel);
 
-countdown.Ratio = (ML::NearestReal(remaining) / ML::NearestReal(cooldown));
+declare ratio = ML::NearestReal(remaining) / ML::NearestReal(cooldown);
+if (ratio <= 1.0) {
+    countdown.Ratio = ratio;
+} else {
+    countdown.Ratio = 1.0;
+}
 countdownText.Value = remaining ^ " seconds left";
 
 declare Integer voters = <?php echo $this->voters;?>;
