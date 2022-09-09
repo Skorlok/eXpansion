@@ -83,7 +83,6 @@ class Maps extends ExpPlugin
         $this->messages = new \StdClass();
 
         $this->config = Config::getInstance();
-        $this->config->bufferSize = $this->config->bufferSize + 1;
         $this->donateConfig = DonateConfig::getInstance();
 
         $this->setPublicMethod("queueMap");
@@ -249,6 +248,7 @@ class Maps extends ExpPlugin
                         $this->console($e->getMessage());
                     }
                 }
+                $this->tries = 0;
                 array_shift($this->queue);
             } else {
                 if ($this->tries < 3) {
@@ -699,8 +699,8 @@ class Maps extends ExpPlugin
             }
         }
 
-        if (!AdminGroups::hasPermission($login, 'map_jukebox') && $this->config->bufferSize > 0) {
-            for ($i = 0; $i <= $this->config->bufferSize; $i++) {
+        if (!AdminGroups::hasPermission($login, 'map_jukebox') && $this->config->bufferSize + 1 > 0) {
+            for ($i = 0; $i <= $this->config->bufferSize + 1; $i++) {
                 $cp = sizeof($this->history) - 1 - $i;
                 if (isset($this->history[$cp])) {
                     if ($this->history[$cp]->uId == $map->uId) {
@@ -792,6 +792,9 @@ class Maps extends ExpPlugin
             $this->is_onEndMatch = true; // Make eXpansion ignore jukebox
             $map = $this->connection->getNextMapInfo();
             $this->connection->nextMap();
+
+            NextMapWidget::EraseAll();
+            CurrentMapWidget::EraseAll();
 
             if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName)) {
                 try {

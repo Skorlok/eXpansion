@@ -115,7 +115,7 @@ class ManiaExchange extends ExpPlugin
         }
 
         $json = json_decode($data);
-        if ($json === false || sizeof($json) == 0) {
+        if ($json == false || !isset($json[0])) {
             return;
         }
 
@@ -164,7 +164,7 @@ class ManiaExchange extends ExpPlugin
         Gui\Widgets\MxWidget::Erase($login);
     }
 
-    public function chatMX($login, $arg = "", $param = null)
+    public function chatMX($login, $arg = "", $param = "")
     {
         switch ($arg) {
             case "add":
@@ -256,7 +256,7 @@ class ManiaExchange extends ExpPlugin
         }
 
         $json = json_decode($data);
-        if ($json === false || sizeof($json) == 0) {
+        if (!$json) {
             $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
             return;
         }
@@ -324,7 +324,7 @@ class ManiaExchange extends ExpPlugin
         }
 
         $json = json_decode($data);
-        if ($json === false) {
+        if (!$json) {
             $this->eXpChatSendServerMessage("#error#No maps found !", $login);
             return;
         }
@@ -661,14 +661,14 @@ class ManiaExchange extends ExpPlugin
         $data = $job->getResponse();
 
         if ($code !== 200) {
-            Console::out("mx returned http code: " . $code);
+            $this->console("mx returned http code: " . $code);
             return;
         }
 
         $json = json_decode($data, true);
 
-        if ($json === false) {
-            Console::out("Error when parsing mx json.");
+        if ($json == false || !isset($json[0])) {
+            $this->console("Error when parsing mx json.");
             return;
         }
 
@@ -727,7 +727,7 @@ class ManiaExchange extends ExpPlugin
                     WHERE `challenge_uid`=" . $db->quote($map->trackUID) . ";";
             $db->execute($sql);
         } catch (\Exception $ex) {
-            Console::out("Error: " . $ex->getMessage(), "Database", Console::b_red);
+            $this->console("Error: " . $ex->getMessage(), "Database", Console::b_red);
         }
     }
 

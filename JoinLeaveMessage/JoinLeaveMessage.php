@@ -234,7 +234,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
     {
         $path = str_replace("World|", "", $player->path);
         $country = explode("|", $path);
-        if (sizeof($country) > 0) {
+        if (sizeof($country) > 0 && isset($country[1])) {
             $country = $country[1];
         } else {
             $country = "Unknown";

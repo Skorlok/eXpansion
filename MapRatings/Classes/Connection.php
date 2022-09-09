@@ -93,7 +93,7 @@ class Connection
 
         $data = $this->getObject($job->getResponse(), "onConnect");
 
-        if ($data === null) {
+        if (!$data) {
             Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
@@ -122,7 +122,7 @@ class Connection
 
         $data = $this->getObject($job->getResponse(), "onActivate");
 
-        if ($data === null) {
+        if (!$data) {
             Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
@@ -190,7 +190,7 @@ class Connection
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
-        if ($data === null) {
+        if (!$data) {
             Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }
@@ -210,7 +210,7 @@ class Connection
 
         $data = $this->getObject($job->getResponse(), "getRatings");
 
-        if ($data === null) {
+        if (!$data) {
             Console::println("[MXKarma Error] Can't find Message from MXKarma reply");
             return;
         }

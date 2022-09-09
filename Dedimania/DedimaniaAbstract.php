@@ -678,6 +678,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->records = array();
         $this->dedimania->getChallengeRecords();
 
+        // rankings are reset in sensScores()
+        $this->rankings = $rankings;
+
         $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
     }
 

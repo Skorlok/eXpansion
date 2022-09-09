@@ -21,6 +21,7 @@ class Playeritem extends Control implements OptimizedPagerElement
 {
     protected $bg;
     protected $forceButton;
+    protected $guestButton;
     protected $ignoreButton;
     protected $kickButton;
     protected $banButton;

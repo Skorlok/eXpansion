@@ -134,7 +134,7 @@ class MxUpdate extends Window
 
         $json = json_decode($data, true);
 
-        if ($json === false) {
+        if (!$json) {
             $this->pager->addItem(new MxInfo(0, "Error while processing json data from MX.", $this->sizeX - 6));
             $this->redraw();
             return;
