@@ -16,7 +16,6 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     /** @var Config */
     private $config;
     private $useQueue = false;
-    private $voter = "";
     private $counters = array();
     private $resCount = 0;
     private $lastMapUid = "";
@@ -144,6 +143,9 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function onTick()
     {
         if (isset($this->currentVote)) {
+            
+            $this->currentVoteWidget->updateTimeleft(($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
+
             if (($this->currentVote->timestamp + $this->currentVote->votingTime) < time()) {
 
                 $totalVotes = count($this->currentVote->playerVotes);
@@ -168,7 +170,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->currentVoteWidget->setDatas($this->currentVote);
+        $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
         $this->currentVoteWidget->RedrawAll();
     }
 
@@ -284,7 +286,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             VoteManagerWidget::EraseAll();
             $this->currentVoteWidget = VoteManagerWidget::Create(null);
             $this->currentVoteWidget->setSize(90, 20);
-            $this->currentVoteWidget->setDatas($this->currentVote);
+            $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
             $this->currentVoteWidget->show();
 
             $player = $this->storage->getPlayerObject($login);
@@ -350,7 +352,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             VoteManagerWidget::EraseAll();
             $this->currentVoteWidget = VoteManagerWidget::Create(null);
             $this->currentVoteWidget->setSize(90, 20);
-            $this->currentVoteWidget->setDatas($this->currentVote);
+            $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
             $this->currentVoteWidget->show();
 
             $player = $this->storage->getPlayerObject($login);
@@ -418,7 +420,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
                     $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
                     $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
@@ -440,7 +442,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
                     $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
                     $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
@@ -523,7 +525,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
                     $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
                     $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
@@ -545,7 +547,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
                     $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
+                    $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
                     $this->currentVoteWidget->show();
 
                     $player = $this->storage->getPlayerObject($login);
@@ -617,7 +619,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 VoteManagerWidget::EraseAll();
                 $this->currentVoteWidget = VoteManagerWidget::Create(null);
                 $this->currentVoteWidget->setSize(90, 20);
-                $this->currentVoteWidget->setDatas($this->currentVote);
+                $this->currentVoteWidget->setDatas($this->currentVote, ($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
                 $this->currentVoteWidget->show();
 
                 $player = $this->storage->getPlayerObject($login);

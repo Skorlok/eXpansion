@@ -156,14 +156,9 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$3bd');
         $this->registerVariable($var);
 
-        $var = new Boolean('enableRanksCalc', 'Enable player position calculation', $config, false, true);
-        $var->setGroup("Misc");
-        $var->setDefaultValue(true);
-        $this->registerVariable($var);
-
         $var = new TypeString('defaultMatchSettingsFile', 'This servers autosave matchsettings file', $config, false);
         $var->setGroup("Config Files");
-        $var->setDefaultValue('eXpansion_autosave.txt');
+        $var->setDefaultValue('maplist.txt');
         $this->registerVariable($var);
 
         $var = new TypeString('dedicatedConfigFile', 'This servers autosave dedicated config file', $config, false);
@@ -192,7 +187,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new SortedList('roundsPoints', 'Round points', $config, false);
         $var->setVisible(false);
-        $var->setGroup("Misc");
         $var->setType(new TypeInt(""));
         $var->setOrder("desc");
         $var->setDefaultValue(array(10, 8, 7, 6, 5, 4, 3, 2, 1));
@@ -200,7 +194,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new SortedList('scriptRoundsPoints', 'Script Round points', $config, false);
         $var->setVisible(false);
-        $var->setGroup("Misc");
         $var->setType(new TypeString(""));
         $var->setOrder("desc");
         $var->setDefaultValue(array('10', '8', '7', '6', '5', '4', '3', '2', '1'));

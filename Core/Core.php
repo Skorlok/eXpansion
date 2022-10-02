@@ -94,9 +94,6 @@ class Core extends types\ExpPlugin
     /** @var bool $update flag to force calculate player positions */
     private $update = true;
 
-    /** @var bool $enableCalculation marks if player positions should be calculated */
-    private $enableCalculation = true;
-
     private $loopTimer = 0;
     private $postLoopStamp = 0;
     private $lastTick = 0;
@@ -363,11 +360,8 @@ EOT;
         // disable netStats Widget, comment next line
         $this->enableTickerEvent();
 
-        if ($this->config->enableRanksCalc == true) {
-            $this->enableApplicationEvents();
-        } else {
-            $this->enableCalculation = false;
-        }
+        $this->enableApplicationEvents();
+
         $this->lastServerSettings = clone $this->storage->server;
         $this->connection->dedicatedEcho("ManiaLive\\eXpansion", (string)getmypid());
         $this->connection->setForcedMusic(false, "");
@@ -376,10 +370,7 @@ EOT;
         $this->connection->triggerModeScriptEventArray('Rounds_SetPointsRepartition', $this->config->scriptRoundsPoints);
         $this->connection->resetServerTags();
         $this->connection->setServerTag("nl.controller", "ManiaLive / eXpansion");
-        $this->connection->setServerTag(
-            "nl.controller.version",
-            \ManiaLive\Application\VERSION . " / " . Core::EXP_VERSION
-        );
+        $this->connection->setServerTag("nl.controller.version", \ManiaLive\Application\VERSION . " / " . Core::EXP_VERSION);
         $this->syncAdminStatus();
 
         // this is a fix for servers with a password, if player chooses to spectate, he can now enter back to play,
@@ -418,7 +409,7 @@ EOT;
             try {
                 $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
             } catch (Exception $e) {
-                $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
+                // Do nothing
             }
         }
 
@@ -1378,7 +1369,7 @@ EOT;
     public function onPostLoop()
     {
         // check for update conditions
-        if ($this->enableCalculation == false || $this->expStorage->isRelay) {
+        if ($this->expStorage->isRelay) {
             return;
         }
         if ($this->storage->serverStatus->code == 4 && $this->update && (microtime(true) - $this->loopTimer) > 0.35) {
@@ -1483,7 +1474,7 @@ EOT;
      */
     public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
     {
-        if ($this->enableCalculation == false || $this->expStorage->isRelay) {
+        if ($this->expStorage->isRelay) {
             return;
         }
 
@@ -1528,7 +1519,7 @@ EOT;
     public function onPlayerInfoChanged($playerInfo)
     {
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
-        if ($this->enableCalculation == false || $this->expStorage->isRelay) {
+        if ($this->expStorage->isRelay) {
             return;
         }
 
@@ -1636,7 +1627,7 @@ EOT;
             $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         }
 
-        if ($this->enableCalculation == false || $this->expStorage->isRelay) {
+        if ($this->expStorage->isRelay) {
             return;
         }
 

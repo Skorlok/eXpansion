@@ -1,16 +1,16 @@
 
-remaining = cooldown - ((TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp) - timeRemaining);
+remaining = (timeleft - (TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp));
 
 if (remaining >= 0.0) {
-    declare ratio = ML::NearestReal(remaining) / ML::NearestReal(cooldown);
+    declare ratio = ML::NearestReal(remaining) / ML::NearestReal(countdown);
     if (ratio <= 1.0) {
-        countdown.Ratio = ratio;
+        countdownBar.Ratio = ratio;
     } else {
-        countdown.Ratio = 1.0;
+        countdownBar.Ratio = 1.0;
     }
     countdownText.Value = remaining ^ " seconds left";
 } else {
-    countdown.Ratio = 0.0;
+    countdownBar.Ratio = 0.0;
     countdownText.Value = "Vote finished !";
     Window.Hide();
 }
