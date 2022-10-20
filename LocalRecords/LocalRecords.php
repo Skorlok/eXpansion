@@ -52,7 +52,9 @@ class LocalRecords extends LocalBase
 
             $time = microtime();
             //We add the record to the buffer
-            $this->addRecord($login, $timeOrScore, $gamemode, $playerinfo[$login]->checkpoints);
+            if (isset($playerInfo[$login])) {
+                $this->addRecord($login, $timeOrScore, $gamemode, $playerinfo[$login]->checkpoints);
+            }
 
             if (($this->debug & self::DEBUG_RECPROCESSTIME) == self::DEBUG_RECPROCESSTIME) {
                 $this->debug("#### NEW RANK IN : " . (microtime() - $time) . "s BAD?");

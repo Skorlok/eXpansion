@@ -2406,7 +2406,7 @@ class ChatAdmin extends ExpPlugin
         $cmd = PHP_BINARY . " " . realpath($dir);
 
         //Getting the server arguments.
-        $args = getopt(null, array('help::', //Display Help
+        $args = getopt("", array('help::', //Display Help
             'manialive_cfg::', 'rpcport::', //Set the XML RPC Port to use
             'address::', //Set the adresse of the server
             'password::', //Set the User Password
