@@ -52,7 +52,7 @@ class LocalRecords extends LocalBase
 
             $time = microtime();
             //We add the record to the buffer
-            if (isset($playerInfo[$login])) {
+            if (isset($playerinfo[$login])) {
                 $this->addRecord($login, $timeOrScore, $gamemode, $playerinfo[$login]->checkpoints);
             }
 
