@@ -133,18 +133,25 @@ class Dedimania extends DedimaniaAbstract
         }
 
         $gamemode = self::eXpGetCurrentCompatibilityGameMode(); // special rounds mode with forced laps are ignored by dedimania
+        $scriptSettings = $this->connection->getModeScriptSettings();
+
         if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
             if ($this->storage->currentMap->nbLaps > 1) {
-                $ScriptSettings = $this->connection->getModeScriptSettings();
-                if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
-                    if ($ScriptSettings['S_ForceLapsNb'] != -1) {
-                        if ($ScriptSettings['S_ForceLapsNb'] != $this->storage->currentMap->nbLaps) {
+                if (isset($scriptSettings['S_ForceLapsNb'])) {
+                    if ($scriptSettings['S_ForceLapsNb'] != -1) {
+                        if ($scriptSettings['S_ForceLapsNb'] != $this->storage->currentMap->nbLaps) {
                             return;
                         }
                     }
                 }
             }
         }
+
+        if (isset($scriptSettings['S_Gravity'])) {
+            return; // gravity is not supported by dedimania
+        }
+
+
 
         if (!isset($this->rankings[$login]['BestTime'])) {
             $this->rankings[$login] = array('Login' => $login, 'BestTime' => $time, 'BestCheckpoints' => $checkpoints);

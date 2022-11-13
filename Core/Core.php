@@ -477,9 +477,9 @@ EOT;
 
             case "Maniaplanet.Pause.Status":
                 if ($params["active"] === true) {
-                    $this->eXpOnModeScriptCallback("Trackmania.WarmUp.Start", array());
+                    self::$warmUpActive = true;
                 } else {
-                    $this->eXpOnModeScriptCallback("Trackmania.WarmUp.End", array());
+                    self::$warmUpActive = false;
                 }
                 break;
 
@@ -488,9 +488,9 @@ EOT;
             case "Trackmania.WarmUp.Status":
             case "Maniaplanet.WarmUp.Status":
                 if ($params["active"] === true) {
-                    $this->eXpOnModeScriptCallback("Trackmania.WarmUp.Start", array());
+                    self::$warmUpActive = true;
                 } else {
-                    $this->eXpOnModeScriptCallback("Trackmania.WarmUp.End", array());
+                    self::$warmUpActive = false;
                 }
                 break;
                 
@@ -1501,6 +1501,7 @@ EOT;
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
+        $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
     }
 
     public function onEndRound()
