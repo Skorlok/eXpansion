@@ -1351,11 +1351,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
             $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
 
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#forces the round to end.',
-                null,
-                array($admin->nickName)
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the round to end.', null, array($admin->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1365,13 +1361,9 @@ class ChatAdmin extends ExpPlugin
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', array((string)time()));
+            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', array());
 
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.',
-                null,
-                array($admin->nickName)
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.', null, array($admin->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1381,13 +1373,9 @@ class ChatAdmin extends ExpPlugin
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound', array((string)time()));
+            $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound', array());
 
-            $this->eXpChatSendServerMessage(
-                '#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.',
-                null,
-                array($admin->nickName)
-            );
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.', null, array($admin->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2556,20 +2544,8 @@ class ChatAdmin extends ExpPlugin
         if (strtolower($gamemode) == "timeattack") {
             $gamemode = "TimeAttack";
         }
-        if (strtolower($gamemode) == "rounds") {
+        if (strtolower($gamemode) == "round") {
             $gamemode = "Rounds";
-        }
-        if (strtolower($gamemode) == "team") {
-            $gamemode = "Team";
-        }
-        if (strtolower($gamemode) == "cup") {
-            $gamemode = "Cup";
-        }
-        if (strtolower($gamemode) == "laps") {
-            $gamemode = "Laps";
-        }
-        if (strtolower($gamemode) == "grav") {
-            $gamemode = "Gravity";
         }
 
         $this->loadScript($fromLogin, [ucfirst($gamemode)]);

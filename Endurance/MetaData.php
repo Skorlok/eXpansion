@@ -47,6 +47,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(1);
         $this->registerVariable($var);
 
+        $var = new TypeInt("wu", "Warmup time between rounds", $config, false, false);
+        $var->setDefaultValue(15);
+        $this->registerVariable($var);
+
+        $var = new TypeInt("wustart", "Warmup time on new map", $config, false, false);
+        $var->setDefaultValue(23);
+        $this->registerVariable($var);
+
         $var = new TypeString("save_csv", "CSV file to store the final points when using //savepoints", $config, false, false);
         $var->setDefaultValue('enduro_results.csv');
         $this->registerVariable($var);

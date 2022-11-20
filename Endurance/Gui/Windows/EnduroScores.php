@@ -9,17 +9,15 @@ class EnduroScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
     protected $frame;
     protected $label_place;
-    protected $label_nickname;
     protected $label_score;
+    protected $label_nickname;
     protected $label_login;
-    protected $label_cp;
     protected $pager;
     protected $items = array();
 
     protected function onConstruct()
     {
         parent::onConstruct();
-        $login = $this->getRecipient();
 
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
@@ -45,10 +43,6 @@ class EnduroScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_login = new \ManiaLib\Gui\Elements\Label(40, 6);
         $this->label_login->setAlign('left', 'center');
         $this->frame->addComponent($this->label_login);
-
-        $this->label_cp = new \ManiaLib\Gui\Elements\Label(20, 6);
-        $this->label_cp->setAlign('left', 'center');
-        $this->frame->addComponent($this->label_cp);
     }
 
     public function onResize($oldX, $oldY)
@@ -56,14 +50,13 @@ class EnduroScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onResize($oldX, $oldY);
 
         $this->label_place->setSizeX(27);
-        $this->label_score->setSizeX(40);
-        $this->label_nickname->setSizeX(50);
+        $this->label_score->setSizeX(42);
+        $this->label_nickname->setSizeX(63);
         $this->label_login->setSizeX(40);
-        $this->label_cp->setSizeX(27);
 
-        $this->pager->setSize(200, 88);
+        $this->pager->setSize(170, 88);
         foreach ($this->items as $item) {
-            $item->setSizeX(195);
+            $item->setSizeX(165);
         }
     }
 
@@ -73,7 +66,6 @@ class EnduroScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_score->setText(__("Score"));
         $this->label_nickname->setText(__("Nickname"));
         $this->label_login->setText(__("Login"));
-        $this->label_cp->setText(__("Current ckeckpoint"));
     }
 
     public function destroy()
@@ -88,20 +80,11 @@ class EnduroScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::destroy();
     }
 
-    public function populateList($recs, $players_cp_index)
+    public function populateList($recs)
     {
         $x = 0;
-        $login = $this->getRecipient();
-
         foreach ($recs as $rec_login => $rec) {
-            
-            if (array_key_exists($rec_login, $players_cp_index)) {
-                $player_cp = $players_cp_index[$rec_login];
-            } else {
-                $player_cp = -1;
-            }
-            
-            $this->items[$x] = new EnduroScoreItem($x, $rec_login, $rec['name'], $rec['points'], $player_cp);
+            $this->items[$x] = new EnduroScoreItem($x, $rec_login, $rec['name'], $rec['points']);
             $this->pager->addItem($this->items[$x]);
             $x++;
             if ($x >= 520) {

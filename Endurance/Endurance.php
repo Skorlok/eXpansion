@@ -7,7 +7,6 @@ use ManiaLive\Utilities\Time;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Endurance\Gui\Windows\EnduroScores;
@@ -35,7 +34,6 @@ class Endurance extends ExpPlugin
     private $mapsdone = 0;
 	private $panelSizeX = 42;
 	private $isHorizontal = false;
-	private $player_current_cp = array();
 
 	public function eXpOnReady()
     {
@@ -52,6 +50,9 @@ class Endurance extends ExpPlugin
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
 		$this->isHorizontal = $config->isHorizontal;
+
+		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
+		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
         unset($config);
 
         $tableColumns = $this->db->execute('SHOW COLUMNS FROM `exp_players`;')->fetchArrayOfObject();
@@ -69,11 +70,20 @@ class Endurance extends ExpPlugin
 		$cmd = AdminGroups::addAdminCommand("resetpoints", $this, "chat_resetpoints", Permission::GAME_SETTINGS);
         $cmd->setHelp("Reset Endurance score");
 
+		$cmd = AdminGroups::addAdminCommand("resetmatch", $this, "chat_resetmatch", Permission::GAME_SETTINGS);
+        $cmd->setHelp("Reset Endurance match");
+
 		$cmd = $this->registerChatCommand("enduropoints", "chat_points", 0, true);
         $cmd->help = 'Show endurance point system';
 
 		$cmd = AdminGroups::addAdminCommand("setdecreaser", $this, "chat_setdecreaser", Permission::GAME_SETTINGS);
         $cmd->setHelp("Change decreaser(multiplication per CP) in Endurance gamemode");
+
+		$cmd = AdminGroups::addAdminCommand("endurowu", $this, "chat_endurowu", Permission::GAME_SETTINGS);
+        $cmd->setHelp("Change warmup time between rounds in Endurance gamemode");
+
+		$cmd = AdminGroups::addAdminCommand("endurowustart", $this, "chat_endurowustart", Permission::GAME_SETTINGS);
+        $cmd->setHelp("Change warmup time on new map in Endurance gamemode");
 
 		$cmd = AdminGroups::addAdminCommand("savepoints", $this, "chat_savepoints", Permission::GAME_SETTINGS);
         $cmd->setHelp("Save current (total) points in the CSV file");
@@ -98,6 +108,9 @@ class Endurance extends ExpPlugin
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
 		$this->isHorizontal = $config->isHorizontal;
+
+		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
+		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
         unset($config);
 
 		EnduroPanel::EraseAll();
@@ -108,7 +121,6 @@ class Endurance extends ExpPlugin
     {
         $this->finishtime = array();
 	    $this->lastcptime = array_fill_keys(array_keys($this->lastcptime), 0);
-		$this->player_current_cp = array();
 	    if (self::$enduro) {
 		    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound $FFF' . ($this->roundsdone+1) . '$z/' . $this->rounds . ' on map '  . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
 		    if ($this->roundsdone+1 >= $this->rounds) {
@@ -197,6 +209,8 @@ class Endurance extends ExpPlugin
 					EnduroPanel2::EraseAll();
 				} else {
 					$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zNext: map ' . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
+					EnduroPanel::EraseAll();
+					EnduroPanel2::EraseAll();
 				}
 			}
 		}
@@ -295,7 +309,6 @@ class Endurance extends ExpPlugin
 			    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iPlugin: ' . $this->enduro_version, null);
 			    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iScript: ' . $vars["version"], null);
 		    }
-			$this->player_current_cp = array();
 		    $this->getPoints();
 			$this->updateEnduroPanel();
 		}
@@ -307,7 +320,6 @@ class Endurance extends ExpPlugin
 
 			$player = $this->storage->getPlayerObject($login);
 			$this->lastcptime[$login] = $timeOrScore;
-			$this->player_current_cp[$login] = $checkpointIndex;
 
 			if (($checkpointIndex+1) % $this->storage->currentMap->nbCheckpoints == 0) {
 				if (($checkpointIndex+1) == $this->storage->currentMap->nbCheckpoints) {
@@ -366,8 +378,8 @@ class Endurance extends ExpPlugin
 
         $window = EnduroScores::Create($login);
         $window->setTitle(__('Current Points', $login));
-        $window->populateList(self::$enduro_total_points, $this->player_current_cp);
-        $window->setSize(200, 100);
+        $window->populateList(self::$enduro_total_points);
+        $window->setSize(170, 100);
         $window->centerOnScreen();
         $window->show();
 	}
@@ -415,6 +427,22 @@ class Endurance extends ExpPlugin
 	{
 		$this->resetPoints();
 		$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zTotal points has been reset', null);
+	}
+
+	public function chat_resetmatch($fromLogin, $params)
+	{
+		$this->roundsdone = 0;
+		$this->mapsdone = 0;
+
+		if ($this->roundsdone+1 >= $this->rounds) {
+			$this->connection->setModeScriptVariables(array('last_round' => true));
+			self::$last_round = true;
+		} else {
+			$this->connection->setModeScriptVariables(array('last_round' => false));
+			self::$last_round = false;
+		}
+
+		$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zMatch maps and rounds has been reset', null);
 	}
 
 	public function chat_points($fromLogin)
@@ -558,6 +586,54 @@ class Endurance extends ExpPlugin
 				$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zPoints of #'.($key-1).' has been removed', null);
 			}
 		}
+	}
+
+	public function chat_endurowu($fromLogin, $params)
+	{
+		if (!isset($params[0])) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Usage: //endurowu <seconds>', $fromLogin);
+			return;
+		}
+		if (!is_numeric($params[0])) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Value must be an integer', $fromLogin);
+			return;
+		}
+		if ($params[0] < 0) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Value must be positive', $fromLogin);
+			return;
+		}
+
+		$this->connection->setModeScriptVariables(array('WarmupTime' => $params[0]*1000));
+
+		$var = MetaData::getInstance()->getVariable('wu');
+		$var->setRawValue($params[0]);
+		\ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+		$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zEnduro WU set to '. $params[0] . " seconds", null);
+	}
+
+	public function chat_endurowustart($fromLogin, $params)
+	{
+		if (!isset($params[0])) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Usage: //endurowustart <seconds>', $fromLogin);
+			return;
+		}
+		if (!is_numeric($params[0])) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Value must be an integer', $fromLogin);
+			return;
+		}
+		if ($params[0] < 0) {
+			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i Value must be positive', $fromLogin);
+			return;
+		}
+
+		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $params[0]*1000));
+
+		$var = MetaData::getInstance()->getVariable('wustart');
+		$var->setRawValue($params[0]);
+		\ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+		$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zEnduro WU (new map) set to '. $params[0] . " seconds", null);
 	}
 
 	public function handleSpecialChars ($string)
