@@ -101,7 +101,7 @@ class KnockOut extends ExpPlugin
     {
         try {
             $command = array_shift($params);
-            switch (strtolower($command)) {
+            switch ($command ? strtolower($command) : "") {
                 case "start":
                     $this->koStart();
                     break;
@@ -122,7 +122,7 @@ class KnockOut extends ExpPlugin
                     break;
             }
         } catch (Exception $e) {
-            $this->eXpChatSendServerMessage('#admin_error#Error:' . $e->getMessage(), $fromLogin);
+            $this->eXpChatSendServerMessage('#admin_error#Error:' . $e->getMessage(), $login);
         }
     }
 
@@ -261,8 +261,6 @@ class KnockOut extends ExpPlugin
         if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
             $prop = "best_race_time";
         }
-
-        print_r($ranking);
 
         foreach ($ranking as $player) {
             if ($player->{$prop} <= 0) {
