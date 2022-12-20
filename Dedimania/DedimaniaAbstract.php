@@ -673,6 +673,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         $this->getGReplay($rankings[0]['Login']);
 
+        $gReplaySaved = $this->gReplay;
+        $vReplaySaved = $this->vReplay;
+
+        $this->dedimania->forceDediSend = true;
         $this->sendScores();
         $this->EndMatch();
         $this->records = array();
@@ -680,6 +684,8 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
         // rankings are reset in sensScores()
         $this->rankings = $rankings;
+        $this->gReplay = $gReplaySaved;
+        $this->vReplay = $vReplaySaved;
 
         $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
     }

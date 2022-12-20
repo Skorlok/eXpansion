@@ -309,7 +309,7 @@ class Database extends ExpPlugin
         $q = "CREATE TABLE `exp_maps` (
                                     `challenge_id` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
                                     `challenge_uid` VARCHAR( 27 ) NOT NULL ,
-                                    `challenge_name` VARCHAR( 100 ) NOT NULL ,
+                                    `challenge_name` VARCHAR( 300 ) NOT NULL ,
                                     `challenge_nameStripped` VARCHAR( 100 ) NOT NULL ,
                                     `challenge_file` VARCHAR( 200 ) NOT NULL ,
                                     `challenge_author` VARCHAR( 30 ) NOT NULL ,

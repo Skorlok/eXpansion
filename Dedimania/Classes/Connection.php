@@ -60,6 +60,8 @@ class Connection extends Singleton implements AppListener, TickListener
     private $dediUid = null;
     private $lastUpdate = 0;
 
+    public $forceDediSend = false;
+
     /**
      * Connection constructor.
      */
@@ -696,6 +698,10 @@ class Connection extends Singleton implements AppListener, TickListener
     public function xSetChallengeTimes($data)
     {
         $this->console("Sending times new times: \$0f0Success");
+        if ($this->forceDediSend) {
+            $this->getChallengeRecords();
+            $this->forceDediSend = false;
+        }
     }
 
     /**
