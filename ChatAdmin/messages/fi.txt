@@ -16,17 +16,17 @@ unIgnore
 possible parameters: limit, extend, wu, wunb
 #translate# possible parameters: limit, extend, wu, wunb
 
-possible parameters: laps, limit, wu, fto, ftimeout
-#translate# possible parameters: laps, limit, wu, fto, ftimeout
+possible parameters: laps, limit, wu, wunb, fto
+#translate# possible parameters: laps, limit, wu, wunb, fto
 
-possible parameters: pointslimit, newrules, wu, fto, ftimeout
-#translate# possible parameters: pointslimit, newrules, wu, fto, ftimeout
+possible parameters: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
+#translate# possible parameters: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
 
-possible parameters: limit, rounds, nbwin, wu, fto, ftimeout
-#translate# possible parameters: limit, rounds, nbwin, wu, fto, ftimeout
+possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
+#translate# possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
 
-possible parameters: limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
-#translate# possible parameters: limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
+possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
+#translate# possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
 
 blacklist
 #translate# blacklist
@@ -42,9 +42,6 @@ Ok
 
 Cancel
 Peruuta
-
-possible parameters: balance, limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
-#translate# possible parameters: balance, limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
 
 #admin_action#Admin #variable#%1$s $z$s#admin_action#shuffles the maps list!
 #admin_action#Admin #variable#%1$s $z$s#admin_action#sekoitti karttalistan järjestyksen!

@@ -16,17 +16,17 @@ Ignorieren aufheben
 possible parameters: limit, extend, wu, wunb
 Mögliche Parameter: limit, extend, wu, wunb
 
-possible parameters: laps, limit, wu, fto, ftimeout
-Mögliche Parameter: laps, limit, wu, fto, ftimeout
+possible parameters: laps, limit, wu, wunb, fto
+Mögliche Parameter: laps, limit, wu, wunb, fto
 
-possible parameters: pointslimit, newrules, wu, fto, ftimeout
-Mögliche Parameter: pointslimit, newrules, wu, fto, ftimeout
+possible parameters: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
+Mögliche Parameter: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
 
-possible parameters: limit, rounds, nbwin, wu, fto, ftimeout
-Mögliche Parameter: limit, rounds, nbwin, wu, fto, ftimeout
+possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
+Mögliche Parameter: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
 
-possible parameters: limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
-Mögliche Parameter: limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
+possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
+Mögliche Parameter: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
 
 blacklist
 Auf die Schwarze Liste setzen
@@ -42,9 +42,6 @@ OK
 
 Cancel
 Abbrechen
-
-possible parameters: balance, limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
-#translate# possible parameters: balance, limit, maxpoint, newrules, wu, fto, ftimeout, blue, red, gap
 
 #admin_action#Admin #variable#%1$s $z$s#admin_action#shuffles the maps list!
 #translate# #admin_action#Admin #variable#%1$s $z$s#admin_action#shuffles the maps list!
