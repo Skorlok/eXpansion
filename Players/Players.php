@@ -12,18 +12,14 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         parent::eXpOnInit();
 
-        $this->addDependency(
-            new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\ChatAdmin\\ChatAdmin")
-        );
+        $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\ChatAdmin\\ChatAdmin"));
 
         Gui\Windows\Playerlist::$mainPlugin = $this;
     }
 
     public function eXpOnLoad()
     {
-        $this->msg_broadcast = eXpGetMessage(
-            '%s$1 $z$s$fff is $f00broadcasting$fff at $lwww.twitch.tv$l, say hello to all the viewers :)'
-        );
+        $this->msg_broadcast = eXpGetMessage('%s$1 $z$s$fff is $f00broadcasting$fff at $lwww.twitch.tv$l, say hello to all the viewers :)');
     }
 
     public function eXpOnReady()
@@ -31,21 +27,12 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->enableDedicatedEvents();
         $this->registerChatCommand("players", "showPlayerList", 0, true); // xaseco
         $this->registerChatCommand("plist", "showPlayerList", 0, true); // fast
-        $this->registerChatCommand("play", "setPlay", 0, true); // fast
-        $this->registerChatCommand("spec", "setSpec", 0, true); // fast
 
         $this->setPublicMethod("showPlayerList");
 
         if ($this->isPluginLoaded('eXpansion\Menu')) {
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('Players'), false);
-            $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Menu',
-                'addItem',
-                __('Show Players'),
-                null,
-                array($this, 'showPlayerList'),
-                false
-            );
+            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addItem', __('Show Players'), null, array($this, 'showPlayerList'), false);
         }
     }
 
@@ -72,20 +59,6 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         foreach ($windows as $window) {
             $window->redraw($window->getRecipient());
         }
-    }
-
-    public function setPlay($login)
-    {
-        $player = $this->storage->getPlayerObject($login);
-        if (!$player->forceSpectator) {
-            $this->connection->forceSpectator($login, 2);
-            $this->connection->forceSpectator($login, 0);
-        }
-    }
-
-    public function setSpec($login)
-    {
-        $this->connection->forceSpectator($login, 3);
     }
 
     public function announceBroadcasting($login)

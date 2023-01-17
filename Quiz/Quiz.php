@@ -100,34 +100,28 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $command = $this->registerChatCommand("ask", "ask", -1, true);
         $command->help = '/ask Ask a question';
-        $command = $this->registerChatCommand("kysy", "ask", -1, true);
-        $command->help = '/kysy Ask a question';
+        
         $command = $this->registerChatCommand("points", "showPointsWindow", 0, true);
         $command->help = '/points Show points window';
-        $command = $this->registerChatCommand("pisteet", "showPointsWindow", 0, true);
-        $command->help = '/pisteet Show points window';
-        $command = $this->registerChatCommand("tilanne", "showPoints", 0, true);
-        $command->help = '/tilanne Show current points';
+        
+        $command = $this->registerChatCommand("pts", "showPoints", 0, true);
+        $command->help = '/pts Show current points';
+
         $command = $this->registerChatCommand("point", "addPointsWindow", 0, true);
         $command->help = '/piste add a point for any player on server';
-        $command = $this->registerChatCommand("piste", "addPointsWindow", 0, true);
-        $command->help = '/piste add a point for any player on server';
+        
         $command = $this->registerChatCommand("cancel", "cancel", 0, true);
         $command->help = '/cancel Cancels a question';
-        $command = $this->registerChatCommand("peruuta", "cancel", 0, true);
-        $command->help = '/peruuta Cancels a question';
+        
         $command = $this->registerChatCommand("answer", "showAnswer", 0, true);
         $command->help = '/answer Show the current right answers for a question';
-        $command = $this->registerChatCommand("vastaus", "showAnswer", 0, true);
-        $command->help = '/vastaus Show the current right answers for a question';
+        
         $command = $this->registerChatCommand("question", "displayQuestion", 0, true);
         $command->help = '/question Shows the current question again';
-        $command = $this->registerChatCommand("kysymys", "displayQuestion", 0, true);
-        $command->help = '/question Shows the current question again';
+        
         $command = $this->registerChatCommand("reset", "reset", 0, true);
         $command->help = '/reset resets the quiz points';
-        $command = $this->registerChatCommand("nollaa", "reset", 0, true);
-        $command->help = '/nollaa resets the quiz points';
+        
 
         $this->msg_questionPre = eXpGetMessage("#quiz#Question number:#variable# %s$1 #quiz#    Asker:#variable# %s$2");
         $this->msg_question = eXpGetMessage("#question#%s?");

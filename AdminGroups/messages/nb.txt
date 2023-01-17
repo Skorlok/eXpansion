@@ -4,8 +4,8 @@ Denne kommandoen trenger minst ett parameter
 #admin_error#You need to be an Admin to use that command
 #admin_error#Du må være admin for å bruke denne kommandoen
 
-#admin_error#That Admin command doesen't exist. Use #variable#/admin help #admin_error#to see all commands
-#admin_error#Denne kommandoen eksisterer ikke. Bruk #variable#/admin help #admin_error#for å se alle kommandoene
+#admin_error#That Admin command doesn't exist. Use #variable#//help #admin_error#to see all commands
+#admin_error#Denne kommandoen eksisterer ikke. Bruk #variable#//help #admin_error#for å se alle kommandoene
 
 #admin_error#You don't have the permission to use that admin command
 #admin_error#Du har ikke rettigheter til å bruke denne kommandoen

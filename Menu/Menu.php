@@ -35,7 +35,7 @@ class Menu extends ExpPlugin implements Listener
         Dispatcher::register(Event::getClass(), $this);
         $this->prepareMenu();
         $this->enableDedicatedEvents();
-        $this->registerChatCommand("menu", "prepareMenu", 0, false);
+        $this->registerChatCommand("menu", "chat_menu", -1, true);
     }
 
     public function eXpAdminAdded($login)
@@ -102,6 +102,11 @@ class Menu extends ExpPlugin implements Listener
     public function onPluginUnloaded($pluginId)
     {
         $this->prepareMenu();
+    }
+
+    public function chat_menu($login, $params = null) {
+        $this->prepareMenu();
+        $this->eXpChatSendServerMessage("Right click menu reloaded!", $login);
     }
 
     public function prepareMenu()

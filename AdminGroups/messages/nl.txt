@@ -4,8 +4,8 @@ Dit commando verwacht op zijn minst een parameter
 #admin_error#You need to be an Admin to use that command
 #admin_error#Je moet een Admin zijn om deze command te gebruiken
 
-#admin_error#That Admin command doesen't exist. Use #variable#/admin help #admin_error#to see all commands
-#admin_error#Dat Admin commando bestaat niet. Gebruik #variable#/admin help #admin_error#om alle commando\s te zien
+#admin_error#That Admin command doesn't exist. Use #variable#//help #admin_error#to see all commands
+#admin_error#Dat Admin commando bestaat niet. Gebruik #variable#//help #admin_error#om alle commando\s te zien
 
 #admin_error#You don't have the permission to use that admin command
 #admin_error#Je hebt geen permissie om dat Admin commando te gebruiken

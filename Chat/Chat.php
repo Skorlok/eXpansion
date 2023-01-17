@@ -73,7 +73,7 @@ class Chat extends ExpPlugin
         try {
             $this->connection->chatEnableManualRouting(true);
             $cmd = AdminGroups::addAdminCommand('chat', $this, 'admChat', Permission::GAME_SETTINGS);
-            $cmd->setHelp('/adm chat enable or disable');
+            $cmd->setHelp('//chat enable or disable');
             $this->registerChatCommand("chat", "cmdChat", 1, true);
             $this->registerChatCommand("chat", "cmdChat", 0, true);
         } catch (\Exception $e) {
@@ -178,14 +178,14 @@ class Chat extends ExpPlugin
                 if (array_key_exists($login, $this->exclude)) {
                     unset($this->exclude[$login]);
                 }
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
                 break;
             case "off":
                 $this->exclude[$login] = $login;
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
                 break;
             default:
-                $this->connection->chatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
                 break;
         }
     }
@@ -194,20 +194,25 @@ class Chat extends ExpPlugin
      * @param $login
      * @param $params
      */
-    public function admChat($login, $params)
+    public function admChat($login, $params = array())
     {
         $command = array_shift($params);
 
         $var = MetaData::getInstance()->getVariable('publicChatActive');
 
-        switch (strtolower($command)) {
+        switch ($command ? strtolower($command) : "") {
             case "enable":
+            case "on":
                 $var->setRawValue(true);
                 $this->eXpChatSendServerMessage("#admin_action#Public chat is now #variable#Enabled");
                 break;
             case "disable":
+            case "off":
                 $var->setRawValue(false);
                 $this->eXpChatSendServerMessage("#admin_action#Public chat is now #variable#Disabled");
+                break;
+            default:
+                $this->eXpChatSendServerMessage(eXpGetMessage("Usage: //chat on or //chat off."), $login);
                 break;
         }
     }

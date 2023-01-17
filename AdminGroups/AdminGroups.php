@@ -162,33 +162,16 @@ class AdminGroups extends ExpPlugin
 
         //Loading all Messages;
         $this->msg_needBeAdmin = eXpGetMessage('#admin_error#You need to be an Admin to use that command');
-        $this->msg_cmdDontEx = eXpGetMessage(
-            '#admin_error#That Admin command doesen\'t exist. '
-            . 'Use #variable#/admin help #admin_error#to see all commands'
-        );
+        $this->msg_cmdDontEx = eXpGetMessage('#admin_error#That Admin command doesn\'t exist. Use #variable#//help #admin_error#to see all commands');
         $this->msg_neeMorPerm = eXpGetMessage('#admin_error#You don\'t have the permission to use that admin command');
-        $this->msg_aInGroup = eXpGetMessage(
-            '#admin_error#Player #variable#%1$s #admin_error#is '
-            . 'already in a group #admin_error#%2$s. #admin_error#Remove him first'
-        );
-        $this->msg_paddSuc = eXpGetMessage(
-            '#admin_action#Player #variable# %1$s #admin_action#has been added to admin group #variable#%2$s'
-        );
-        $this->msg_paddFai = eXpGetMessage(
-            '#admin_action#Failed to add player #variable# %1$s #admin_action# to admin group #variable#%2$s'
-        );
-        $this->msg_premoveSelf = eXpGetMessage(
-            '#admin_error#Your are #variable#%1$s #admin_error#You can\'t remove yourself from a group'
-        );
-        $this->msg_pRemoveSuc = eXpGetMessage(
-            '#admin_action#Player : #variable#%1$s #admin_action#Has been removed from admin group #variable#%2$s'
-        );
+        $this->msg_aInGroup = eXpGetMessage('#admin_error#Player #variable#%1$s #admin_error#is  already in a group #admin_error#%2$s. #admin_error#Remove him first');
+        $this->msg_paddSuc = eXpGetMessage('#admin_action#Player #variable# %1$s #admin_action#has been added to admin group #variable#%2$s');
+        $this->msg_paddFai = eXpGetMessage('#admin_action#Failed to add player #variable# %1$s #admin_action# to admin group #variable#%2$s');
+        $this->msg_premoveSelf = eXpGetMessage('#admin_error#Your are #variable#%1$s #admin_error#You can\'t remove yourself from a group');
+        $this->msg_pRemoveSuc = eXpGetMessage('#admin_action#Player : #variable#%1$s #admin_action#Has been removed from admin group #variable#%2$s');
         $this->msg_pRemoveFa = eXpGetMessage('#admin_error#Player #variable#%1$s #admin_action#isn\'t in the group');
         $this->msg_masterMasterE = eXpGetMessage('#admin_error#Master Admins has all rights. You can\'t change that!');
-        $this->msg_removeMlAdmin = eXpGetMessage(
-            '#admin_error#Master admin #variable#%1$s has been '
-            . 'defined in config.ini and not throught eXpansion. Can\'t remove!'
-        );
+        $this->msg_removeMlAdmin = eXpGetMessage('#admin_error#Master admin #variable#%1$s has been  defined in config.ini and not throught eXpansion. Can\'t remove!');
         self::$txt_msg_cmdDontEx = $this->msg_cmdDontEx;
         self::$txt_noPermissionMsg = $this->msg_neeMorPerm;
         self::$txt_groupsTitle = eXpGetMessage('Admin Groups');
@@ -768,12 +751,11 @@ class AdminGroups extends ExpPlugin
      *
      * usage at plugin:
      *
-     * $cmd = AdminGroups::addAdminCommand('player kick', $this, 'kick', Permission::player_kick); //
+     * $cmd = AdminGroups::addAdminCommand('kick', $this, 'kick', Permission::player_kick);
      * $cmd->setHelp('kick the player from the server');
-     * $cmd->setHelpMore('$w/admin player kick #login$z will kick the player from the server. A kicked player may
+     * $cmd->setHelpMore('$w//kick #login$z will kick the player from the server. A kicked player may
      * return to the server whanever he desires.');
      * $cmd->setMinParam(1);
-     * AdminGroups::addAlias($cmd, "kick"); // xaseco & fast
      * AdminGroups::addAlias($cmd, "boot"); // just example on how to add multiple aliases
      *
      * function kick($fromLogin, $params)
@@ -817,7 +799,7 @@ class AdminGroups extends ExpPlugin
 
     /**
      * Adds a very short alias to an existing command.
-     * Very short aliases doesen't require /admin
+     * Very short aliases doesen't require //
      * They work the same way other commands works.
      *
      * @param \ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd $adminCmd

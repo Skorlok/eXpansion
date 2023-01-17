@@ -58,14 +58,10 @@ class KnockOut extends ExpPlugin
 
     public function eXpOnLoad()
     {
-        $this->msg_newRound = eXpGetMessage(
-            '#ko#KnockOut! Round: #variable#%1$s #ko#Players #variable#%2$s #ko#/#variable#%3$s remain'
-        );
+        $this->msg_newRound = eXpGetMessage('#ko#KnockOut! Round: #variable#%1$s #ko#Players #variable#%2$s #ko#/#variable#%3$s remain');
         $this->msg_koStart = eXpGetMessage('#ko#KnockOut #variable#starts #ko#after next map');
         $this->msg_koStop = eXpGetMessage('#ko#KnockOut has been #variable#stopped.');
-        $this->msg_knockout = eXpGetMessage(
-            '#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, but the game is still on!'
-        );
+        $this->msg_knockout = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, but the game is still on!');
         $this->msg_knockoutDNF = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, since no finish!');
         $this->msg_champ = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# is the CHAMP!!! congrats');
     }
@@ -78,7 +74,6 @@ class KnockOut extends ExpPlugin
 
         $this->adm_ko = AdminGroups::addAdminCommand('ko', $this, 'chatCommands', Permission::GAME_SETTINGS);
         $this->adm_ko->setHelp('/ko start, stop, res, skip');
-        $adminGroups->addShortAlias($this->adm_ko, 'ko');
 
         $this->colorParser->registerCode("ko", Config::getInstance(), "koColor");
 
