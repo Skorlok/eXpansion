@@ -1,5 +1,5 @@
 {
-  "name": "ml-expansion/expansion",
+  "name": "skorlok/expansion",
   "type": "library",
   "description": "Plugin pack for manialive server controler",
   "keywords": [
@@ -10,7 +10,6 @@
     "manialive",
     "next gen controller"
   ],
-  "homepage": "http://www.ml-expansion.com/",
   "license": "LGPL-3.0",
   "authors": [
     {
@@ -21,6 +20,11 @@
       "name": "Oliverde8",
       "email": "oliverde8@tm-teams.com",
       "homepage": "http://www.oliver-decramer.com"
+    },
+    {
+      "name": "Skorlok",
+      "email": "contact@skorlok.com",
+      "homepage": "https://skorlok.com"
     }
   ],
   "support": {
@@ -41,12 +45,9 @@
     }
   ],
   "require": {
-    "php": ">=5.4",
+    "php": ">=5.5",
     "ext-curl": "*",
-    "ext-json": "*",
-    "maniaplanet/manialive-lib": "1.0.1.*",
-    "monolog/monolog": "1.0.*",
-    "oliverde8/asynchronous-jobs": "1.0.*"
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
