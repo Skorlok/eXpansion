@@ -1,0 +1,233 @@
+This command expect at least one parameter
+This command expect at least one parameter
+
+#admin_error#You need to be an Admin to use that command
+#admin_error#You need to be an Admin to use that command
+
+#admin_error#That Admin command doesn't exist. Use #variable#//help #admin_error#to see all commands
+#admin_error#That Admin command doesn't exist. Use #variable#//help #admin_error#to see all commands
+
+#admin_error#You don't have the permission to use that admin command
+#admin_error#You don't have the permission to use that admin command
+
+#admin_error#Player #variable#%1$s #admin_error#is already in a group #admin_error#%2$s. #admin_error#Remove him first
+#admin_error#Player #variable#%1$s #admin_error#is already in a group #admin_error#%2$s. #admin_error#Remove him first
+
+#admin_action#Player #variable# %1$s #admin_action#has been added to admin group #variable#%2$s
+#admin_action#Player #variable# %1$s #admin_action#has been added to admin group #variable#%2$s
+
+#admin_error#Your are #variable#%1$s #admin_error#You can't remove yourself from a group
+#admin_error#Your are #variable#%1$s #admin_error#You can't remove yourself from a group
+
+#admin_action#Player : #variable#%1$s #admin_action#Has been removed from admin group #variable#%2$s
+#admin_action#Player : #variable#%1$s #admin_action#Has been removed from admin group #variable#%2$s
+
+#admin_error#Player #variable#%1$s #admin_action#isn't in the group
+#admin_error#Player #variable#%1$s #admin_action#isn't in the group
+
+#admin_error#Master Admins has all rights. You can't change that!
+#admin_error#Master Admins has all rights. You can't change that!
+
+#admin_error#Master admin #variable#%1$s has been defined in config.ini and not throught eXpansion. Can't remove!
+#admin_error#Master admin #variable#%1$s has been defined in config.ini and not throught eXpansion. Can't remove!
+
+Admin Groups
+Admin Groups
+
+Admin Commands Help
+Admin Commands Help
+
+Admin Group Permission - %1$s
+Admin Group Permission - %1$s
+
+Admin Group Players - %1$s
+Admin Group Players - %1$s
+
+New Group Name :
+New Group Name :
+
+Add
+Add
+
+Group Name
+Group Name
+
+Nb Players
+Nb Players
+
+Player List
+Player List
+
+Change Permissions
+Change Permissions
+
+Delete Group
+Delete Group
+
+Remove Player
+Remove Player
+
+Command
+Command
+
+Description
+Description
+
+More
+More
+
+Aliases
+Aliases
+
+OK
+OK
+
+Cancel
+Cancel
+
+Login : 
+Login : 
+
+Permission_server_admin
+General Server Administration Permissions 
+
+Permission_player_kick
+Can Kick a Player
+
+Permission_player_ban
+Can ban a player
+
+Permission_player_unBan
+Can remove a players ban
+
+Permission_player_cleanBan
+Can remove ban of all banned players
+
+Permission_player_black
+Can add player to BlackList
+
+Permission_player_unBlack
+Can remove a player from BlackList
+
+Permission_player_cleanBlack
+Can remove all players from BlackList
+
+Permission_player_guest
+Can add player to guest list
+
+Permission_player_unGuest
+Can remove player from guest list
+
+Permission_player_ignore
+Can ignore a players
+
+Permission_player_unIgnore
+Can remove ignore of a player
+
+Permission_player_spec
+Can force player to Spectator
+
+Permission_server_pay
+Can use servers money
+
+Permission_server_planets
+Can see number of planets server has
+
+Permission_server_name
+Can change server name
+
+Permission_server_comment
+Can change server comment
+
+Permission_server_password
+Can change server player password
+
+Permission_server_specpwd
+Can change server spectator password
+
+Permission_server_maxplayer
+Can change server Max Players
+
+Permission_server_maxspec
+Can change server Max Spectators
+
+Permission_server_chattime
+Can change server Chat Time
+
+Permission_server_stopServer
+Can stop server
+
+Permission_server_stopManialive
+Can stop manialive
+
+Permission_server_map
+Can enable or disable map download
+
+Permission_server_public
+Can make server public or private
+
+Permission_map_skip
+Can skip map
+
+Permission_map_res
+Can restart map
+
+Permission_map_jukebox_free
+Can add maps to wish list for free
+
+Permission_game_gamemode
+Can change game mode
+
+Permission_game_settings
+Can change game mode settings
+
+Permission_map_endRound
+Can end a round
+
+Permission_map_remove
+Can remove a map
+
+Permission_map_erease
+Can Erease a Map(Removes and delete file)
+
+Permission_cancel_vote
+Can cancel any vote
+
+Permission_map_add
+Can add a map
+
+Permission_oliverde8_SeeAdminHudMenu
+Can see the oliverde8 HudMenu
+
+Permission_group_admin
+Administrate Admin groups(All)
+
+Permission_own_group
+Administrate own group
+
+Permission_server_refpwd
+Can change referee password
+
+Permission_server_refmode
+Can change referee mode
+
+Permission_records_save
+Can change referee mode
+
+Inherits
+Inherits
+
+Admin Group Inherits - %1$s
+Admin Group Inherits - %1$s
+
+Permission_
+Permission_
+
+#admin_action#Failed to add player #variable# %1$s #admin_action# to admin group #variable#%2$s
+#admin_action#Failed to add player #variable# %1$s #admin_action# to admin group #variable#%2$s
+
+Select
+Select
+
+#admin_error#
+#admin_error#

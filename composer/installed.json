@@ -1,0 +1,593 @@
+{
+    "packages": [
+        {
+            "name": "maniaplanet/dedicated-server-api",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eXpansionPluginPack/dedicated-server-api.git",
+                "reference": "0177f7cb7ae5966e4f2176db177d08357346167e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eXpansionPluginPack/dedicated-server-api/zipball/0177f7cb7ae5966e4f2176db177d08357346167e",
+                "reference": "0177f7cb7ae5966e4f2176db177d08357346167e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "time": "2014-12-06T09:20:51+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Maniaplanet\\": "libraries/Maniaplanet"
+                }
+            },
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "NadeoLive",
+                    "email": "livedev@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "XML-RPC library to connect to ManiaPlanet server",
+            "homepage": "https://github.com/maniaplanet/dedicated-server-api",
+            "keywords": [
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania"
+            ],
+            "support": {
+                "forum": "http://forum.maniaplanet.com/viewforum.php?f=40",
+                "source": "https://github.com/eXpansionPluginPack/dedicated-server-api/tree/e-0.9.8.7"
+            },
+            "install-path": "../maniaplanet/dedicated-server-api"
+        },
+        {
+            "name": "maniaplanet/manialib",
+            "version": "dev-beta4",
+            "version_normalized": "dev-beta4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eXpansionPluginPack/manialib.git",
+                "reference": "d672da1eb5bee49576a8232dae66f5a5cb0fe829"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eXpansionPluginPack/manialib/zipball/d672da1eb5bee49576a8232dae66f5a5cb0fe829",
+                "reference": "d672da1eb5bee49576a8232dae66f5a5cb0fe829",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "time": "2017-02-09T19:07:03+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "libraries/ManiaLib"
+                ]
+            },
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nadeo",
+                    "email": "contact@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "ManiaLib is a lightweight PHP framework for Manialink and Web developement.",
+            "homepage": "https://github.com/maniaplanet/manialib",
+            "keywords": [
+                "ManiaLib",
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania"
+            ],
+            "support": {
+                "forum": "http://forum.maniaplanet.com/viewforum.php?f=40",
+                "source": "https://github.com/eXpansionPluginPack/manialib/tree/master",
+                "issues": "https://github.com/eXpansionPluginPack/manialib/issues"
+            },
+            "install-path": "../maniaplanet/manialib"
+        },
+        {
+            "name": "maniaplanet/manialive-lib",
+            "version": "dev-beta4",
+            "version_normalized": "dev-beta4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eXpansionPluginPack/manialive-lib.git",
+                "reference": "ca6a8ed58defecf36452986170774b16efe0499d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eXpansionPluginPack/manialive-lib/zipball/ca6a8ed58defecf36452986170774b16efe0499d",
+                "reference": "ca6a8ed58defecf36452986170774b16efe0499d",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "maniaplanet/dedicated-server-api": "dev-master",
+                "maniaplanet/manialib": "dev-beta4",
+                "maniaplanet/maniaplanet-ws-sdk": "dev-master",
+                "php": ">=5.3"
+            },
+            "time": "2017-03-10T18:26:12+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "ManiaLive\\": "ManiaLive/"
+                }
+            },
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "NadeoLive",
+                    "email": "livedev@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "ManiaLive library",
+            "homepage": "https://github.com/maniaplanet/manialive-lib",
+            "keywords": [
+                "application",
+                "maniaplanet",
+                "shootmania",
+                "socket",
+                "trackmania",
+                "xml-rpc"
+            ],
+            "support": {
+                "forum": "http://forum.maniaplanet.com/viewforum.php?f=463",
+                "source": "https://github.com/eXpansionPluginPack/manialive-lib/tree/beta4"
+            },
+            "install-path": "../maniaplanet/manialive-lib"
+        },
+        {
+            "name": "maniaplanet/maniaplanet-ws-sdk",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maniaplanet/maniaplanet-ws-sdk.git",
+                "reference": "027a458388035fe66f2f56ff3ea1f85eff2a5a4e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maniaplanet/maniaplanet-ws-sdk/zipball/027a458388035fe66f2f56ff3ea1f85eff2a5a4e",
+                "reference": "027a458388035fe66f2f56ff3ea1f85eff2a5a4e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=5.3"
+            },
+            "time": "2014-11-18T09:21:19+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Maniaplanet\\": "libraries/Maniaplanet"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nadeo",
+                    "email": "contact@nadeo.com",
+                    "homepage": "http://www.nadeo.com/"
+                }
+            ],
+            "description": "SDK for the ManiaPlanet Web Services API.",
+            "homepage": "https://github.com/maniaplanet/maniaplanet-ws-sdk",
+            "keywords": [
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania",
+                "curl",
+                "oauth2",
+                "rest",
+                "web services"
+            ],
+            "install-path": "../maniaplanet/maniaplanet-ws-sdk"
+        },
+        {
+            "name": "ml-expansion/expansion",
+            "version": "1.1.0.2",
+            "version_normalized": "1.1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eXpansionPluginPack/eXpansion.git",
+                "reference": "4a8c302a82d450bb27e741c3b41535927c572f1f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eXpansionPluginPack/eXpansion/zipball/4a8c302a82d450bb27e741c3b41535927c572f1f",
+                "reference": "4a8c302a82d450bb27e741c3b41535927c572f1f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "maniaplanet/manialive-lib": "dev-beta4",
+                "monolog/monolog": "1.0.*",
+                "oliverde8/asynchronous-jobs": "1.0.*",
+                "php": ">=5.4"
+            },
+            "time": "2017-11-02T20:54:43+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "ManiaLivePlugins\\eXpansion\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Oliverde8",
+                    "email": "oliverde8@tm-teams.com",
+                    "homepage": "http://www.oliver-decramer.com"
+                },
+                {
+                    "name": "Reaby",
+                    "email": "petri.jarvisalo@gmail.com"
+                }
+            ],
+            "description": "Plugin pack for manialive server controler",
+            "homepage": "http://www.ml-expansion.com/",
+            "keywords": [
+                "ManiaPlanet",
+                "ShootMania",
+                "TrackMania",
+                "application",
+                "manialive",
+                "next gen controller"
+            ],
+            "install-path": "../ml-expansion/expansion"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.0.2",
+            "version_normalized": "1.0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "b704c49a3051536f67f2d39f13568f74615b9922"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/b704c49a3051536f67f2d39f13568f74615b9922",
+                "reference": "b704c49a3051536f67f2d39f13568f74615b9922",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "2011-10-24T09:39:02+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Monolog": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Logging for PHP 5.3",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging"
+            ],
+            "install-path": "../monolog/monolog"
+        },
+        {
+            "name": "oliverde8/asynchronous-jobs",
+            "version": "1.0.6",
+            "version_normalized": "1.0.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oliverde8/PHP-AsynchronousJobs.git",
+                "reference": "5c847a32d50cee0e5eb442b1c74f1838ce3bd226"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oliverde8/PHP-AsynchronousJobs/zipball/5c847a32d50cee0e5eb442b1c74f1838ce3bd226",
+                "reference": "5c847a32d50cee0e5eb442b1c74f1838ce3bd226",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*"
+            },
+            "time": "2016-03-14T18:52:29+00:00",
+            "bin": [
+                "bin/AsynchronousJobsRun.php"
+            ],
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "oliverde8\\AsynchronousJobs\\": "src/AsynchronousJobs"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oliver de Cramer",
+                    "homepage": "http://oliver-decramer.com"
+                }
+            ],
+            "description": "Execute new php instances easily as you would threads.",
+            "install-path": "../oliverde8/asynchronous-jobs"
+        },
+        {
+            "name": "phine/exception",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kherge-abandoned/lib-exception.git",
+                "reference": "3f50754bcc416df91235766cc3d5d5ce6ed6d612"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kherge-abandoned/lib-exception/zipball/3f50754bcc416df91235766cc3d5d5ce6ed6d612",
+                "reference": "3f50754bcc416df91235766cc3d5d5ce6ed6d612",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "league/phpunit-coverage-listener": "~1.0"
+            },
+            "time": "2013-12-11T23:42:48+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Phine\\Exception": "src/lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                }
+            ],
+            "description": "A PHP library for improving the use of exceptions.",
+            "homepage": "https://github.com/phine/lib-exception",
+            "keywords": [
+                "exception"
+            ],
+            "abandoned": true,
+            "install-path": "../phine/exception"
+        },
+        {
+            "name": "phine/observer",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kherge-abandoned/lib-observer.git",
+                "reference": "a3ed2f81c79a056ba1fc4949e03c3e1601665106"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kherge-abandoned/lib-observer/zipball/a3ed2f81c79a056ba1fc4949e03c3e1601665106",
+                "reference": "a3ed2f81c79a056ba1fc4949e03c3e1601665106",
+                "shasum": ""
+            },
+            "require": {
+                "phine/exception": "~1.0",
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "league/phpunit-coverage-listener": "~1.0",
+                "phine/test": "~1.0"
+            },
+            "time": "2013-12-17T23:50:08+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Phine\\Observer": "src/lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                }
+            ],
+            "description": "A PHP library that implements the observer pattern.",
+            "homepage": "https://github.com/phine/lib-observer",
+            "keywords": [
+                "observer"
+            ],
+            "abandoned": true,
+            "install-path": "../phine/observer"
+        },
+        {
+            "name": "phine/path",
+            "version": "1.1.0",
+            "version_normalized": "1.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/box-project/box2-path.git",
+                "reference": "cbe1a5eb6cf22958394db2469af9b773508abddd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/box-project/box2-path/zipball/cbe1a5eb6cf22958394db2469af9b773508abddd",
+                "reference": "cbe1a5eb6cf22958394db2469af9b773508abddd",
+                "shasum": ""
+            },
+            "require": {
+                "phine/exception": "~1.0",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "league/phpunit-coverage-listener": "~1.0"
+            },
+            "time": "2013-10-15T22:58:04+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Phine\\Path": "src/lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                }
+            ],
+            "description": "A PHP library for improving the use of file system paths.",
+            "homepage": "https://github.com/phine/lib-path",
+            "keywords": [
+                "file",
+                "path",
+                "system"
+            ],
+            "abandoned": true,
+            "install-path": "../phine/path"
+        },
+        {
+            "name": "phine/phar",
+            "version": "dev-master",
+            "version_normalized": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kherge-abandoned/lib-phar.git",
+                "reference": "458ee3f113b12a5d41e540407b2c2efae8a35313"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kherge-abandoned/lib-phar/zipball/458ee3f113b12a5d41e540407b2c2efae8a35313",
+                "reference": "458ee3f113b12a5d41e540407b2c2efae8a35313",
+                "shasum": ""
+            },
+            "require": {
+                "phine/exception": "~1.0",
+                "phine/observer": "~2.0.0",
+                "phine/path": "~1.0",
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "league/phpunit-coverage-listener": "~1.0",
+                "phine/test": "~1.0"
+            },
+            "suggest": {
+                "ext-phar": "For creating PHP archives."
+            },
+            "time": "2014-01-13T23:03:23+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Phine\\Phar": "src/lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kevin Herrera",
+                    "email": "kevin@herrera.io",
+                    "homepage": "http://kevin.herrera.io"
+                }
+            ],
+            "description": "A PHP library for creating and reading (without the phar extension) PHP archives.",
+            "homepage": "https://github.com/phine/lib-phar",
+            "keywords": [
+                "phar"
+            ],
+            "abandoned": "box-project/box2",
+            "install-path": "../phine/phar"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": [
+        "phine/exception",
+        "phine/observer",
+        "phine/path",
+        "phine/phar"
+    ]
+}

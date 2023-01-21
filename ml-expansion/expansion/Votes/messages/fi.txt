@@ -1,0 +1,56 @@
+Error: %s
+Virhe: %s
+
+Votes
+Äänestys
+
+Restart Map
+Pelaa uudelleen
+
+Skip Map
+Seuraava kartta
+
+Cancel Vote
+Peruuta äänestys
+
+#variable#%1$s #vote#initiated restart map vote..
+#variable#%1$s #vote#pyytää äänestämään: pelaataanko kartta uudelleen? F1 = kyllä, F2 = ei
+
+#vote_failure# $iMust run skip vote within first %1$s seconds of match start..
+#vote_failure# $iMust run skip vote within first %1$s seconds of match start..
+
+#variable#%1$s #vote#initiated skip map vote..
+#variable#%1$s #vote#pyytää äänestämään: hyppää seuraavaan karttaan? F1 = kyllä, F2 = ei
+
+#vote_success# $iVote passed!
+#vote_success# $iÄänestys onnistui!
+
+#vote_failure# $iVote failed!
+#vote_failure# $iÄänestys ei onnistunut!
+
+#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!
+#admin_action#Admin #variable#%1$s #admin_action# hylkäsi äänestyksen!
+
+Apply
+Käytä
+
+Cancel
+Peruuta
+
+#variable#%s #vote#initiated restart map vote..
+#variable#%s #vote#pyytää äänestämään: pelaataanko kartta uudelleen? F1 = kyllä, F2 = ei
+
+Vote limit reached.
+Äänetyksen raja saavutettu.
+
+Configure Votes
+Säädä Äänestyksiä
+
+#error#Restart vote is disabled!
+#error#Uudelleen pelaamisen äänestys on poistettu käytöstä!
+
+#error#Map limit for voting restart reached.
+#error#Kartan uudelleen pelaamisen rajoitus saavutettu.
+
+#error#Skip vote is disabled!
+#error#Seuraava kartta -äänestys on poistettu käytöstä!

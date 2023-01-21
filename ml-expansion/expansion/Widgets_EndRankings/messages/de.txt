@@ -1,0 +1,11 @@
+Server Ranks
+Server Ränge
+
+Generic Panel
+#translate# Generic Panel
+
+Top Playtime
+#translate# Top Playtime
+
+Top Donators
+#translate# Top Donators

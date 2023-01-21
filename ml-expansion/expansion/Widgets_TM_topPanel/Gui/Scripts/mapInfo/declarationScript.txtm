@@ -1,0 +1,2 @@
+declare mapIcon <=> (Page.GetFirstChild("mapIcon") as CMlQuad);
+mapIcon.ChangeImageUrl(Map.AuthorZoneIconUrl);

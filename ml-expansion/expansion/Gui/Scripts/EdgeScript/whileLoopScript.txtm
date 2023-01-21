@@ -1,0 +1,28 @@
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "Edge" )) {
+
+           edge_isLockedVisible2 = !edge_isLockedVisible2;
+
+           if (edge_isLockedVisible2) {
+                edge_isMinimized = False;
+                 Edge.Colorize = imageOff;
+            }
+           else {
+                Edge.Colorize = imageOn;
+
+           }
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "Diff" )) {
+
+           edge_showDiff = !edge_showDiff;
+
+           if (edge_showDiff) {
+                 Diff.Colorize = imageOn;
+           }
+           else {
+                Diff.Colorize = imageOff;
+           }
+    }
+
+}

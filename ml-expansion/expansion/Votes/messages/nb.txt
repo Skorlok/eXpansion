@@ -1,0 +1,56 @@
+Error: %s
+Feil: %s
+
+Votes
+Avstemming
+
+Restart Map
+Start banen på nytt
+
+Skip Map
+Neste bane
+
+Cancel Vote
+Kanseller avstemming
+
+#variable#%1$s #vote#initiated restart map vote..
+#variable#%1$s #vote#Start avstemming om bane-restart.
+
+#vote_failure# $iMust run skip vote within first %1$s seconds of match start..
+#vote_failure# $iAvstemming om å gå til neste bane må starte %1$s sekunder før kampstart..
+
+#variable#%1$s #vote#initiated skip map vote..
+#variable#%1$s #vote#Startet avstemming om banebytte..
+
+#vote_success# $iVote passed!
+#vote_success# $iAvstemming vellykket!
+
+#vote_failure# $iVote failed!
+#vote_failure# $iAvstemming mislykket!
+
+#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!
+#admin_action#Admin #variable#%1$s #admin_action# kansellerte avstemmingen!
+
+Apply
+#translate# Apply
+
+Cancel
+#translate# Cancel
+
+#variable#%s #vote#initiated restart map vote..
+#translate# #variable#%s #vote#initiated restart map vote..
+
+Vote limit reached.
+#translate# Vote limit reached.
+
+Configure Votes
+#translate# Configure Votes
+
+#error#Restart vote is disabled!
+#translate# #error#Restart vote is disabled!
+
+#error#Map limit for voting restart reached.
+#translate# #error#Map limit for voting restart reached.
+
+#error#Skip vote is disabled!
+#translate# #error#Skip vote is disabled!

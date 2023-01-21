@@ -1,0 +1,68 @@
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes).  Your Rating: #variable#%4$s#rating# / #variable#5
+#rating#Map Goedkeuring Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes).  Je Rating: #variable#%4$s#rating# / #variable#5
+
+#rating# $iMap has not been rated yet!
+#rating# $iMap is nog niet op gestemd!
+
+#rank#$iVote Registered!!
+#rank#$iVote Geregistreerd!!
+
+#rank# $iUsage /rate #, where number is 1-5..
+#rank# $iGebruik /rate #, waar nummer is 1-5..
+
+Please rate the map!
+#translate# Please rate the map!
+
+votes
+#translate# votes
+
+Map Rating
+#translate# Map Rating
+
+Remove
+#translate# Remove
+
+Close
+#translate# Close
+
+Maps with bad rating removed successfully.
+#translate# Maps with bad rating removed successfully.
+
+Ratings Manager
+#translate# Ratings Manager
+
+No
+#translate# No
+
+Yes
+#translate# Yes
+
+Did you like the map ?
+#translate# Did you like the map ?
+
+MX Map Rating
+MX Map Rating
+
+MXKarma error %1$s: %2$s
+MXKarma error %1$s: %2$s
+
+MXKarma connection Success!
+MXKarma connection Success!
+
+Vote registered for MXKarma
+Vote registered for MXKarma
+
+MXKarma saved successfully!
+MXKarma saved successfully!
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5
+
+#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)
+#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
+
+#admin_error#You need to finish this Map at least #variable#%s#admin_error# time before being able to vote!
+#admin_error#Je moet deze kaart minstens #variable#%s#admin_error# keer afmaken voordat je kunt stemmen!

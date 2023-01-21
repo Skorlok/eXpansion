@@ -1,0 +1,171 @@
+
+foreach (Player in Players) {
+
+    declare <?php echo $this->varName ?> for Player = -1;
+
+    if (<?php echo $this->varName ?> != Player.CurRace.Checkpoints.count) {	
+		//Update the current checkpoint of this user
+		declare curCp = Player.CurRace.Checkpoints.count -1 ;	
+		<?php echo $this->varName ?> = curCp+1;
+
+
+		//Check if valid checkpoint
+		if(curCp >= 0){
+			if((curCp+1) == totalCp*nbLaps){
+			nbFinish += 1;
+			}
+			needUpdate = True;
+			//Check if max Checkpoint
+			if(maxCp <= curCp){
+			maxCp = curCp+1;
+			}
+
+			declare <?php echo $this->varName ?>_cpPosition for Player = -1;
+			declare newCpPosition = 0;
+
+			playersTeam[Player.Login] = Player.RequestedClan;
+
+			//Register Checkpoint time
+			if(!playerTimes.existskey(curCp)){
+				//Is it first player throught this checkpoint?
+				playerTimes[curCp] = Integer[Text];
+				playerNickNames[curCp] = Text[Text];
+				bestCps[curCp] = Player.CurRace.Checkpoints[curCp];
+			}else{
+				if(bestCps[curCp] > Player.CurRace.Checkpoints[curCp]){
+					bestCps[curCp] = Player.CurRace.Checkpoints[curCp];
+				}
+			}
+			playerTimes[curCp][Player.Login] = Player.CurRace.Checkpoints[curCp];
+			playerNickNames[curCp][Player.Login] = Player.Name;
+			updatedPlayers[Player.Login] = True;
+			//Remove from older checkpoint
+			if(curCp > 0){
+				if(playerTimes.existskey(curCp-1)){
+					playerTimes[curCp-1].removekey(Player.Login);
+					playerNickNames[curCp-1].removekey(Player.Login);
+				}
+			}
+		}
+    }
+}
+
+//Get player being spectated if possible
+if (GUIPlayer != Null) {
+    currentPlayerName = GUIPlayer.Name;
+} else {
+    currentPlayerName = LocalUser.Name;
+}
+
+//Refresh Widget if spectating player has changed
+if (currentPlayerName != prevPlayerName){
+    prevPlayerName = currentPlayerName;
+    needUpdate = True;
+}
+
+if(!needUpdate){
+    lastUpdateTime = Now;
+}
+
+if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+
+    needUpdate = False;
+    lastUpdateTime = Now;
+
+    declare myDiff = -1;
+    declare worseDiff = -1;
+    declare betterDiff = -1;
+
+    declare cpIndex = maxCp -1;
+    declare i = 0;
+    while(cpIndex >= 0){
+        if(playerTimes.existskey(cpIndex)){
+            playerTimes[cpIndex] = playerTimes[cpIndex].sort();
+            declare Players2 = playerTimes[cpIndex];
+            foreach(p => Score in Players2){
+
+                //Player behind me
+                if(myDiff != -1 && worseDiff == -1){
+                    worseDiff =  Score - bestCps[cpIndex];
+                    break;
+                }
+
+                //Me
+                if (playerNickNames[cpIndex][p] == currentPlayerName) {
+                    myDiff =  Score - bestCps[cpIndex];
+                }
+
+                //Player infront of me
+                if(myDiff == -1){
+                    betterDiff = Score - bestCps[cpIndex];
+                }
+
+                i += 1;
+            }
+            if(myDiff != -1 && worseDiff != -1 && betterDiff!= -1){
+                break;
+            }
+        }
+        cpIndex -= 1;
+    }
+
+    if(myDiff != -1){
+
+        declare frontLabel = (Page.GetFirstChild("frontLabel") as CMlLabel);
+        declare behindLabel = (Page.GetFirstChild("behindLabel") as CMlLabel);
+
+        frontLabel.SetText("$FFF");
+        if(betterDiff != -1){
+            declare diff = myDiff - betterDiff;
+
+            if(diff == frontLastDif && frontLastDif != -1 && frontLastColor != -1){
+                if(frontLastColor == 1){
+                    frontLabel.SetText("$0F0"^TimeToText(diff));
+                }else{
+                    frontLabel.SetText("$F00"^TimeToText(diff));
+                }
+            }else if(diff < frontLastDif && frontLastDif != -1){
+                frontLastColor = 1;
+                frontLabel.SetText("$0F0"^TimeToText(diff));
+            }else if(diff > frontLastDif && frontLastDif != -1){
+                frontLastColor = 2;
+                frontLabel.SetText("$F00"^TimeToText(diff));
+            }else{
+                frontLastColor = -1;
+                frontLabel.SetText("$FFF"^TimeToText(diff));
+            }
+            frontLastDif = diff;
+        }else{
+            frontLastColor = -1;
+            frontLastDif = -1;
+        }
+
+        behindLabel.SetText("$FFF");
+        if(worseDiff != -1){
+            declare diff = worseDiff - myDiff;
+
+            if(diff == behindLastDif && behindLastDif != -1 && behindLastColor != -1){
+                if(behindLastColor == 1){
+                    behindLabel.SetText("$F00"^TimeToText(diff));
+                }else{
+                    behindLabel.SetText("$0F0"^TimeToText(diff));
+                }
+            }else if(diff < behindLastDif && behindLastDif != -1){
+                behindLastColor = 1;
+                behindLabel.SetText("$F00"^TimeToText(diff));
+            }else if(behindLastDif != -1){
+                behindLastColor = 2;
+                behindLabel.SetText("$0F0"^TimeToText(diff));
+            }else{
+                behindLastColor = -1;
+                behindLabel.SetText("$FFF"^TimeToText(diff));
+            }
+
+            behindLastDif = diff;
+        }else{
+            behindLastColor = -1;
+            behindLastDif = -1;
+         }
+    }
+}
+

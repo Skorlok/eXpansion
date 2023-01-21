@@ -1,0 +1,56 @@
+Error: %s
+Error: %s
+
+Votes
+Votes
+
+Restart Map
+Restart Map
+
+Skip Map
+Skip Map
+
+Cancel Vote
+Cancel Vote
+
+#variable#%1$s #vote#initiated restart map vote..
+#variable#%1$s #vote#initiated restart map vote..
+
+#vote_failure# $iMust run skip vote within first %1$s seconds of match start..
+#vote_failure# $iMust run skip vote within first %1$s seconds of match start..
+
+#variable#%1$s #vote#initiated skip map vote..
+#variable#%1$s #vote#initiated skip map vote..
+
+#vote_success# $iVote passed!
+#vote_success# $iVote passed!
+
+#vote_failure# $iVote failed!
+#vote_failure# $iVote failed!
+
+#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!
+#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!
+
+Apply
+Apply
+
+Cancel
+Cancel
+
+#variable#%s #vote#initiated restart map vote..
+#variable#%s #vote#initiated restart map vote..
+
+Vote limit reached.
+Vote limit reached.
+
+Configure Votes
+Configure Votes
+
+#error#Restart vote is disabled!
+#error#Restart vote is disabled!
+
+#error#Map limit for voting restart reached.
+#error#Map limit for voting restart reached.
+
+#error#Skip vote is disabled!
+#error#Skip vote is disabled!

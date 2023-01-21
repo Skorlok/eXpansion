@@ -1,0 +1,374 @@
+﻿Server Management
+Palvelimen hallinta
+
+Force Scores
+Pakota pisteet
+
+Server ControlPanel
+Palvelimen ohjauskeskus
+
+Server Options
+Palvelimen asetukset
+
+Game Options
+Pelisäädöt
+
+Match Settings
+Kartta-asetukset
+
+Script Settings
+Script-asetukset
+
+Load
+Lataa
+
+Save
+Tallenna
+
+Delete
+Poista
+
+Apply
+Käytä
+
+Cancel
+Peruuta
+
+Time Attack
+Time Attack
+
+Rounds
+Rounds
+
+Cup
+Cup
+
+Laps
+Laps
+
+Team
+Team
+
+Error in filename
+Tiedostonimessä on virhe
+
+File '%s' deleted from filesystem!
+Tiedosto'%s' poistettu levyltä!
+
+Saved MatchSettings to file: %s
+Karttaluettelo tallennettu tiedostoon: %s
+
+Loaded MatchSettings from file: %s
+Karttaluettelo ladattu tiedostosta: %s
+
+Server management
+Palvelimen hallinta
+
+Server options
+Palvelimen säädöt
+
+Game options
+Peliasetukset
+
+Admin Groups
+Ylläpitoryhmät
+
+Match settings
+Kartta-asetukset
+
+ScriptMode settings
+ScriptMode-asetukset
+
+Database tools
+Tietokannan ylläpito
+
+Close
+Sulje
+
+Stop Server
+Pysäytä palvelin
+
+Stop Manialive
+Pysäytä Manialive
+
+Server Name
+Palvelimen nimi
+
+Server comment
+Kommentti
+
+Players
+Pelaajat
+
+Spectators
+Spekkaajat
+
+Ladderpoints minimum
+Ladderpoints minimi
+
+Ladderpoints Maximum
+Ladderpoints maksimi
+
+Password for server
+Salasana palvelimelle
+
+Password for spectators
+Salasana spekkaajille
+
+Referee password
+Salasana referenssille
+
+Show Server in public server list
+Näytä palvelin julkisessa listassa
+
+Ladder server
+Ladderpalvelin
+
+Allow map download using ingame menu
+Salli karttojen lataaminen pelivalikon kautta
+
+Allow Peer-2-Peer download
+Salli Peer-2-Peer lataus
+
+Allow Peer-2-Peer upload
+Salli Peer-2-Peer upload
+
+Allow changing validation seed
+Käytä vaihtuvaa validaatioavainta
+
+Enable Referee-mode
+Salli referee-moodi
+
+ForceScores can be used only with rounds or team mode
+Voit pakottaa pisteitä vain rounds- tai team-pelimoodeissa.
+
+ScriptSettings available only in script mode
+Scriptiasetukset ovat käytettävissä vain script-pelimoodissa.
+
+Database plugin not loaded!
+Tietokanta (Database) liitännäistä ei ole ladattu.
+
+#admin_action#Admin %s $z$s#admin_action#sets custom round points to #variable#%s
+#admin_action#Ylläpitäjä %s $z$s#admin_action#asettaa uudet rounds-pisteet: #variable#%s
+
+Podium Chat time
+Palkintokorokeen chat-aika
+
+All Warmup Duration
+All Warmup Duration
+
+finishTimeout
+finishTimeout
+
+timeAttackLimit
+timeAttackLimit
+
+timeAttackSynchStartPeriod
+timeAttackSynchStartPeriod
+
+roundsPointsLimit
+roundsPointsLimit
+
+roundsForcedLaps
+roundsForcedLaps
+
+roundsPointsLimitNewRules
+roundsPointsLimitNewRules
+
+teamPointsLimit
+teamPointsLimit
+
+teamMaxPoints
+teamMaxPoints
+
+teamPointsLimitNewRules
+teamPointsLimitNewRules
+
+cupPointsLimit
+cupPointsLimit
+
+cupNbWinners
+cupNbWinners
+
+cupRoundsPerMap
+cupRoundsPerMap
+
+Choose Gamemode:
+Valitse pelimoodi:
+
+Additional Options:
+Lisäasetuset:
+
+Rounds: use new rules
+Rounds: käytä uusia sääntöjä
+
+Team: use new rules
+Team: käytä uusia sääntöjä
+
+Disable Respawn
+Estä uudelleen aloittaminen
+
+Force Show All Opponents
+Pakota näyttämään kaikki pelaajat
+
+Save MatchSettings as
+Tallenna peliasetukset nimellä
+
+Round points
+Rounds pisteet
+
+The restart of this track is in progress!
+Kartan uudelleenaloitus on jo käynnissä!
+
+#error#Player can't restart tracks on this server
+#error#Et voi uudelleenaloittaa karttaa tällä palvelmella
+
+#error#The map has already been restarted. Limit reached!
+#error#Kartta on pelattu jo uudelleen riittävän monta kertaa!
+
+#error#You can't skip tracks on this server.
+#error#Et voi siirtyä toiseen karttaan.
+
+#error#You have skipped to many maps already!
+#error#Olet jo siirtänyt karttaa toiseen liian monesti!
+
+#player#Player #variable# %s #player#pays and restarts the challenge!
+#player#Pelaaja#variable# %s #player#maksoi, joten kartta pelataan uudelleen!
+
+#player#Player#variable# %s #player#pays and skips the challenge!
+#player#Pelaaja#variable# %s #player#maksoi, joten kartta vaihdetaan seuraavaan!
+
+Are you sure you want to restart this map
+Oletko varma, että haluat pelata uudelleen kartan ?
+
+Are you sure you want to skip this map
+Oletko varma, että haluat vaihtaa kartan ?
+
+Podium: Chat Time
+Podium: Keskusteluaika
+
+All: Warmup Duration
+Kaikki: Lämmittelyn kesto
+
+All: Finish Timeout
+Kaikki: Läpäisyyn aikaa
+
+TimeAttack: Time Limit
+TimeAttack: Ajoaika
+
+TimeAttack: Synch Start Period
+TimeAttack: Synch Start Period
+
+Rounds: Points Limit
+Rounds: Pisteraja
+
+Rounds: Set Number of Forced Laps
+Rounds: Pakotettujen kierrosten määrä
+
+Rounds: Points Limit (NewRules)
+Rounds: Pisteraja (Uudet säännöt)
+
+Team: Points Limit
+Team: Pisteraja
+
+Team: Max Points For a Round
+Team: Max Pisteraja kierrokselle
+
+Team: Points Limit (NewRules)
+Team: Pisteraja (Uudet säännöt)
+
+Cup: Points Limit
+Cup: Pisteraja
+
+Cup: Number of Winners
+Cup: Voittajien lkm.
+
+cup Rounds Per Map
+cup: Kierroksia kartassa
+
+Laps: Number of Laps
+Laps: Kierrosten määrä
+
+Laps: Time Limit
+Laps: Ajoaika
+
+Deciated Control
+Palvelimen säädöt
+
+Disable Horns
+Disable Horns
+
+Disable Announces
+Disable Announces
+
+Autosave All Replays
+Tallenna kaikki ajot (replay)
+
+Autosave Validation Replays
+Tallenna Validaatio ajot (replay)
+
+Set
+Aseta
+
+eXpansion Settings
+eXpansionin Asetukset
+
+Plugin Management
+Plugin -hallinta
+
+Configure Votes
+Äänestyksen Ylläpito
+
+Custom point
+Omavalintaiset pisteet
+
+Load MatchSettings by name
+Lataa Karttalista nimellä
+
+File listing disabled since you are running remote
+Tiedostolistaus on poistettu käytöstä sillä etäkäyttö palvelimeen nähden
+
+You can tho save and load files from server by the filename!
+Voit kuitenkin ladata ja tallentaa tiedostoja palvelimelta tiedostonimeä käyttämällä!
+
+Server Comment
+Kommentti
+
+Keep Player Slots
+Pidä pelaajapaikat
+
+Settings not changed.
+Asetuksia ei tallennettu.
+
+Server Control
+Palvelimen Säädöt
+
+Custom Round Points
+Omavalintaiset Round-pisteet
+
+#admin_error#Error: %s
+#admin_error#Virhe: %s
+
+Reset scores
+Nollaa pisteet
+
+Skip & reset
+Skip & nollaus
+
+Restart & reset
+Aloita Uudelleen & nollaus
+
+$f00$oError $z$s$fff%s
+$f00$oVirhe $z$s$fff%s
+
+File  deleted from filesystem!
+Tiedosto poistettu!
+
+Control Panel
+Control Panel
+
+Rounds: Points Limit (NewRules
+#translate# Rounds: Points Limit (NewRules
+
+Team: Points Limit (NewRules
+#translate# Team: Points Limit (NewRules

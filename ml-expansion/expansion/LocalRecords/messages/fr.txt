@@ -1,0 +1,155 @@
+#variable#%1$s  #record#secured their #rank#%2$s#record#. Local Record! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+#variable#%1$s  #record#a assuré le #rank#%2$s#record#. record local! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+
+#variable#%1$s  #record#claimed the #rank#%2$s#record#. Local Record! #time#%3$s
+#variable#%1$s  #record#a obtenu le #rank#%2$s#record#. record local! #time#%3$s
+
+#variable#%1$s  #record#claimed the #rank#%2$s#record#. Local Record! #rank#%2$s: #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+#variable#%1$s  #record#a amélioré le #rank#%2$s#record# record local! #rank#%2$s: #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+
+#variable#%1$s  #record_top#secured their #rank#%2$s#record_top#. Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+#variable#%1$s  #record_top#a assuré le #rank#%2$s#record_top#. record local! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+#variable#%1$s  #record_top#claimed the #rank#%2$s#record_top#. Local Record! #time#%3$s
+#variable#%1$s  #record_top#a obtenu le #rank#%2$s#record_top#. record local! #time#%3$s
+
+#variable#%1$s  #record_top#claimed the #rank#%2$s#record_top#. Local Record! #rank#%2$s: #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+#variable#%1$s  #record_top#a amélioré le #rank#%2$s#record_top# record local! #rank#%2$s: #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s! #variable#%1$s  #record_top#secured their #rank#%2$s#record_top#. Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+$FF0Fé$FE0li$FD0ci$FC0ta$FB0ti$FA0on$F90s! #variable#%1$s  #record_top#a assuré le #rank#%2$s#record_top#. record local! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s! #variable#%1$s  #record_top#claimed the #rank#%2$s#record_top#. Local Record! #time#%3$s
+$FF0Fé$FE0li$FD0ci$FC0ta$FB0ti$FA0on$F90s! #variable#%1$s  #record_top#a obtenu le #rank#%2$s#record_top#. record local! #time#%3$s
+
+$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s! #variable#%1$s  #record_top#claimed the #rank#%2$s#record_top#. Local Record! #rank#%2$s: #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+$FF0Fé$FE0li$FD0ci$FC0ta$FB0ti$FA0on$F90s! #variable#%1$s  #record_top#a amélioré le #rank#%2$s#record_top# record local! #rank#%2$s: #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+#variable#%1$s  #record#is a new Map. Currently no record!
+#variable#%1$s  #record#est une nouvelle carte. Aucun record pour le moment!
+
+#record#Current record on #variable#%1$s  #record#is #time#%2$s #record#by #variable#%3$s
+#record#Le record actuel sur #variable#%1$s  #record#est #time#%2$s #record#by #variable#%3$s
+
+#record#Personal Best: #time#%1$s  #record#($n #rank#%2$s$n #record#)  Average: #time#%3$s #record#($n #variable#%4$s #record#$n finishes $n)
+#record#Record personnel: #time#%1$s  #record#($n #rank#%2$s$n #record#)  Moyenne: #time#%3$s #record#($n #variable#%4$s #record#$n achèvements $m)
+
+#admin_error# $iYou have not finished this map yet..
+#admin_error# $iVous n'avez pas encore terminé cette carte..
+
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s
+#record#Rang serveur: #rank#%1$s#record#/#rank#%2$s
+
+#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s
+#record#Rang serveur: #rank#%1$s#record#/#rank#%2$s #record#Moyenne: $s#time#%3$s
+
+#admin_error#$iNot enough local records to obtain ranking yet..
+#admin_error#$iNombre de records locaux insuffisant pour obtenir un rang..
+
+#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]
+#record#Le prochain joueur le mieux classé est #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Moyenne: $s#time#%4$s [$s#time#%5$s]
+
+#record#You are already the best ranked player
+#record#Vous êtes déjà le meilleur joueur classé
+
+#
+#
+
+NickName
+Pseudonyme
+
+Score
+Score
+
+Average Score
+Score moyen
+
+Finishes
+Achèvements
+
+Nb Wins
+Nombre de victoires
+
+Last Rec Date
+Date du dernier record
+
+Play Time
+Temps de jeu
+
+nb Rec
+Nombre de records
+
+Records
+Records
+
+Map Records
+Records de cartes
+
+#admin_action#Records saved sucessfully into the database
+Les records ont été enregistre avec succès a la base de donnée
+
+Sector
+Secteur
+
+CheckPoint Times
+Temps des CheckPoints
+
+Cps
+Cps
+
+Local Records
+Record Locaux
+
+Records on a Map
+Records sur une carte
+
+Server Ranks
+Rangs Server
+
+CheckPoints on Map
+CheckPoints sur une carte
+
+Sector Times on Map
+Temps des secteurs sur la carte
+
+Login
+Login
+
+#variable#%1$s #record#secures #rank#%2$s. #record#Local Record!#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+#variable#%1$s #record#sécurise #rank#%2$s. #record#Record Local! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+
+#variable#%1$s #record#new #rank#%2$s.#record# Local Record! #time#%3$s
+#variable#%1$s #record#nouveau #rank#%2$s.#record# Record Local! #time#%3$s
+
+#record#Oops! #variable#%1$s #record#equals #rank#%2$s#record#. Local Record! #time#%3$s
+#record#Oops! #variable#%1$s #record#égalise #rank#%2$s#record#. Record Local! #time#%3$s
+
+#variable#%1$s #record#improves #rank#%2$s. #record#Local Record! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+#variable#%1$s #record#améliore #rank#%2$s. #record#Record Local! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)
+
+#variable#%1$s #record_top#secures #rank#%2$s.#record_top# Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+#variable#%1$s #record_top#sécurise #rank#%2$s.#record_top# Record Local! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+#variable#%1$s #record_top#new #rank#%2$s.#record_top# Local Record! #time#%3$s
+#variable#%1$s #record_top#nouveau #rank#%2$s.#record_top# Record Local! #time#%3$s
+
+#record_top#Oops! #variable#%1$s #record_top#equals #rank#%2$s#record_top#. Local Record! #time#%3$s
+#record_top#Oops! #variable#%1$s #record_top#égalise #rank#%2$s#record_top#. Record Local! #time#%3$s
+
+#variable#%1$s #record_top#improves #rank#%2$s.#record_top# Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+#variable#%1$s #record_top#améliore #rank#%2$s.#record_top# Record Local! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)
+
+$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)
+$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Record Local! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)
+
+$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s
+$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Record Local! #time#%3$s
+
+$o$0CFO$2DFo$3DFo$5EFo$6EFp$8FFs$9FF!$fff %1$s $z$s$9ff$oequals #rank#%2$s.$9ff$o Local Record! #time#%3$s
+$o$0CFO$2DFo$3DFo$5EFo$6EFp$8FFs$9FF!$fff %1$s $z$s$9ff$oequals #rank#%2$s.$9ff$o Record Local! #time#%3$s
+
+$z$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$F90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)
+$z$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$F90!$z$s$o$fff %2$s.$f90 Record Local! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)
+
+#record#Personal Best: #time#%1$s  #record#($n #rank#%2$s$n #record#)
+#record#Meilleur Temps Personnel: #time#%1$s  #record#($n #rank#%2$s$n #record#)

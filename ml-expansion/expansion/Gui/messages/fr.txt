@@ -1,0 +1,50 @@
+Hud positions reset! Please reconnect to server :)
+Reset des positions de l'interface! Veuillez vous vous reconnecter au serveur :)
+
+Configure HUD
+Configurer l'interface
+
+Apply
+Appliquer
+
+Cancel
+Annuler
+
+possible parameters: move, lock, reset, config
+Paramètres possible: move, lock, reset, config
+
+#error#Server Admin has disabled personal huds. Sorry!
+L'Admin a désactivé les huds personnalisé. Pardon!
+
+Hud reset done!
+Hud réinitialisé
+
+Starting hud reset, please wait
+Démarrage de la réinitialisation du hud, s'il vous plaît patienter
+
+Yes
+Oui
+
+No
+Non
+
+Really do this ?
+Faire cela? Vraiment?
+
+Hello World
+Bonjour le monde
+
+Close
+Fermer
+
+Notice
+Notice
+
+Auto hide
+Auto hide
+
+Show Diff
+Afficher Diff
+
+Error
+Erreur

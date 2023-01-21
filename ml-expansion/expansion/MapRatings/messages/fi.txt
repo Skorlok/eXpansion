@@ -1,0 +1,65 @@
+﻿#rank#$iVote Registered!!
+#rank#$iArvio rekisteröity!!
+
+#rank# $iUsage /rate #, where number is 1-5..
+#rank# $iKäytä /rate #, missä luku on väliltä 1-5..
+
+#rating# $iMap has not been rated yet!
+#rating# $iKarttaa ei ole vielä arvioitu!
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes).  Your Rating: #variable#%4$s#rating# / #variable#5
+#rating#Kartan arvio: #variable#%2$s#rating# (#variable#%3$s #rating#ääntä).  Arviosi: #variable#%4$s#rating# / #variable#5
+
+Please rate the map!
+Arvioi edellinen kartta!
+
+votes
+Ääntä
+
+Map Rating
+Kartan arvio
+
+Remove
+Poista
+
+Close
+Sulje
+
+#rank#$iVote Registered!!
+#rank#$iArvio rekisteröity!!
+
+Maps with bad rating removed successfully.
+Kartat joilla oli huono arvio on nyt poistettu.
+
+Ratings Manager
+Kartta-arvioiden hallinta
+
+No
+Ei
+
+Yes
+Kyllä
+
+Did you like the map ?
+Oliko kartta mieluinen ?
+
+MX Map Rating
+MX Kartan arvio
+
+MXKarma error %1$s: %2$s
+MXKarma virhe %1$s: %2$s
+
+MXKarma connection Success!
+MXKarma: Yhteys muodostettu!
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: #variable#%4$s#rating# (#variable#%5$s #rating#votes).  Your Rating: #variable#%6$s#rating# / #variable#5
+#rating#Kartan arvio: #variable#%2$s#rating# (#variable#%3$s #rating#ääntä), MX: #variable#%4$s#rating# (#variable#%5$s #rating#ääntä).  Arviosi: #variable#%6$s#rating# / #variable#5
+
+#rating#Map Approval Rating: not been rated yet, MX: #variable#%2$s#rating# (#variable#%3$s #rating#votes)
+#rating#Kartan arvio: ei ole vielä arvioitu, MX: #variable#%2$s#rating# (#variable#%3$s #rating#ääntä)
+
+#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes), MX: not been rated yet.  Your Rating: #variable#%4$s#rating# / #variable#5
+#rating#Kartan arvio: #variable#%2$s#rating# (#variable#%3$s #rating#ääntä), MX: ei ole vielä arvioitu.  Arviosi: #variable#%4$s#rating# / #variable#5
+
+#admin_error#You need to finish this Map at least #variable#%s#admin_error# time before being able to vote!
+#admin_error#Sinun on tehtävä tämä kartta vähintään #variable#%s#admin_error# kertaa ennen kuin voit äänestää!

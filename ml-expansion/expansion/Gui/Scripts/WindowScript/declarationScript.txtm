@@ -1,0 +1,277 @@
+<?php
+
+$startPosX = (-1 * intval($win->getSizeX() / 2)) . ".0";
+$startPosY = intval($win->getSizeY() / 2) . ".0";
+
+?>
+
+
+<script><!--
+#Include "MathLib" as MathLib
+#Include "TextLib" as TextLib
+#Include "AnimLib" as AnimLib
+
+// do not remvove, this is for animation and draggable libraries
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+#Include "AnimLib" as AL
+
+//Function definitions
+<?php echo $this->scriptLib ?>
+
+Void stackActivateWindow(Text window) {
+    declare Text[] exp_windowStack for UI = Text[];
+    declare Boolean exp_updateStack for UI;
+    declare Integer exp_stackCounter for UI;
+
+    declare Text[] outArray = Text[];
+
+    outArray.add(window);
+
+    foreach (value in exp_windowStack) {
+	if (value != window) {
+	    outArray.add(value);
+	}
+    }
+    exp_windowStack = outArray;
+    exp_updateStack = True;
+    exp_stackCounter = Now;
+}
+
+Void stackRemoveWindow(Text window) {
+    declare Text[] exp_windowStack for UI = Text[];
+    declare Boolean exp_updateStack for UI;
+    declare Integer exp_stackCounter for UI;
+
+    declare Text[] outArray = Text[];
+
+    foreach (key => value in exp_windowStack) {
+	if (value != window) {
+	    outArray.add(value);
+	}
+    }
+    exp_windowStack = outArray;
+    exp_updateStack = True;
+    exp_stackCounter = Now;
+}
+
+Boolean stackContainsWindow(Text window) {
+    declare Text[] exp_windowStack for UI = Text[];
+    foreach (key => value in exp_windowStack) {
+        if (value == window) {
+            return True;
+        }
+    }
+    return False;
+}
+
+//Main Function
+main () {
+
+    declare Boolean mouseButton for Page;
+    declare Integer tabIndex = -1;
+
+    declare Window <=> (Page.GetFirstChild("<?php echo $win->getId() ?>") as CMlFrame);
+    declare CMlLabel TitlebarText <=> (Page.GetFirstChild("TitlebarText") as CMlLabel);
+
+    declare MoveWindow = False;
+    declare Scroll = False;
+    declare closeWindow = False;
+    declare Text closeAction = "<?php echo $this->closeAction; ?>";
+
+    declare openWindow = False;
+
+    declare isMinimized = False;
+
+    declare Boolean active = False;
+    declare Boolean isTab = False;
+
+    declare Vec3 LastDelta = <Window.RelativePosition.X, Window.RelativePosition.Y, 0.0>;
+    declare Vec3 DeltaPos = <0.0, 0.0, 0.0>;
+    declare Vec2 Offset = <0., 0.>;
+
+    declare Text windowId = "<?php echo $win->getId() ?>";
+
+    declare Text id = "<?php echo $this->name ?>";
+    declare Boolean forceReset = <?php echo $this->forceReset; ?>;
+    declare Text version = "<?php echo $this->version; ?>";
+    declare Boolean disableAnimations = <?php echo $this->disableAnimations; ?>;
+    //declare Boolean disableAnimations = True;
+    declare persistent Vec3[Text][Text] exp_windowLastPosRel;
+    declare Text[] exp_windowStack for UI = Text[];
+    declare Boolean exp_updateStack for UI = False;
+    declare Integer exp_stackCounter for UI = 0;
+    declare Text exp_window = "";
+    declare Real zIndex = 0.;
+
+
+
+    //Declarations by containers included in this window
+    <?php echo $this->dDeclares ?>
+
+    if (!exp_windowLastPosRel.existskey(version)) {
+         exp_windowLastPosRel[version] = Vec3[Text];
+    }
+
+    if ( !exp_windowLastPosRel[version].existskey(id) || forceReset) {
+        exp_windowLastPosRel[version][id] = < <?php echo $startPosX ?>, <?php echo  $startPosY ?>, 0.0>;
+    }
+
+    LastDelta = exp_windowLastPosRel[version][id];
+    Window.RelativePosition = exp_windowLastPosRel[version][id];
+
+    if (!disableAnimations && !stackContainsWindow(id) ) {
+        Window.RelativePosition.Z = 0.;
+        Window.RelativeScale = 0.0;
+        openWindow = True;
+    }
+
+    stackActivateWindow(id);
+    declare Integer lastAction = Now;
+
+    while(True) {
+	yield;
+
+        <?php echo $this->wLoop ?>
+
+        if (openWindow) {
+            Window.RelativeScale = AL::Ease("SincOut", (Now - lastAction) * 1., 0.5, 0.5, 200.);
+        }
+
+        if (closeWindow) {
+          Window.RelativeScale = 1. - AL::Ease("SincOut", (Now - lastAction) * 1., 0., 0.5, 200.);
+        }
+
+        if (openWindow && lastAction + 200 <= Now ) {
+            openWindow = False;
+
+            //declare Real winX = exp_windowLastPosRel[version][id].X;
+            //declare Real winY = exp_windowLastPosRel[version][id].Y;
+            //declare Text pos = winX ^ " " ^ winY;
+            lastAction = 0;
+        }
+
+	if (closeWindow && lastAction + 200 <= Now ) {
+            closeWindow = False;
+            Window.Hide();
+            stackRemoveWindow(id);
+	    TriggerPageAction(closeAction);
+	    continue;
+	}
+
+	if (exp_updateStack == True) {
+	    foreach (key => value in exp_windowStack) {
+            	if (id == value) {
+                 Window.RelativePosition.Z = zIndex - ( 5. * key);
+                 // TitlebarText.Value = "id: " ^ id ^ " value: " ^value ^ " z: " ^ Window.RelativePosition.Z;
+                 }
+
+	    }
+
+	    if (exp_stackCounter + 100 <= Now) {
+		exp_updateStack = False;
+	    }
+	}
+
+        if (isTab == True) {
+            isTab = False;
+            Page.GetClassChildren("isTabIndex", Page.MainFrame, True);
+            declare CMlControl control;
+            declare Integer x = 0;
+
+            declare Integer mod = 1;
+            if (Page.GetClassChildren_Result.count > 0) {
+                mod = Page.GetClassChildren_Result.count;
+            }
+
+
+            tabIndex = (tabIndex + 1) % mod;
+
+            foreach (control in Page.GetClassChildren_Result) {
+                if (tabIndex == x) {
+                    control.Focus();
+
+                    if (control.HasClass("isEditable")) {
+                        declare CMlEntry entry <=> (control as CMlEntry);
+                         entry.StartEdition();
+                    }
+                }
+                x += 1;
+            }
+
+
+
+        }
+
+        if (MoveWindow) {
+             Window.RelativePosition.X = MouseX + Offset.X;
+	     Window.RelativePosition.Y = MouseY + Offset.Y;
+	     exp_windowLastPosRel[version][id] = Window.RelativePosition;
+	}
+
+
+
+        if (PendingEvents.count != 0) {
+	    foreach (Event in PendingEvents) {
+
+		if ( (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "Close")  || (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 35) ) {
+		    if (exp_windowStack.count > 0)
+                    {
+                     if (exp_windowStack[0] == id || Event.Type == CMlEvent::Type::MouseClick) {
+                            if (disableAnimations) {
+                                TriggerPageAction(closeAction);
+                                stackRemoveWindow(id);
+                                continue;
+                            } else {
+                           // declare Real winX = Window.RelativePosition.X + <?php echo $win->getSizeX()/2; ?>;
+                           //declare Real winY = Window.RelativePosition.Y;
+
+                            declare Real winX = 0.;
+                            declare Real winY = 0.;
+                            declare Text pos = winX ^ " " ^ winY;
+                           // LibManialink_Anim("<frame posn=\"" ^ pos ^ "\" scale=\"0\" id=\"" ^ windowId ^ "\" />", 250, "EaseOutLinear");
+                            closeWindow = True;
+                            lastAction = Now;
+                          }
+                         }
+                     }
+                }
+                if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "MainWindow" || Event.ControlId == "Titlebar" ) ) {
+                    stackActivateWindow(id);
+                }
+
+                if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 123) {
+		    if (exp_windowStack.count > 0)
+                    {
+                        if (exp_windowStack[0] == id) {
+                            isTab = True;
+                       }
+                    }
+                }
+
+            }
+	}
+
+	if (exp_windowStack.count == 0) {
+	    exp_window = "";
+	} else {
+	    exp_window = exp_windowStack[0];
+	}
+
+	if (MouseLeftButton == True && exp_window == id) {
+		foreach (Event in PendingEvents) {
+		    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "Titlebar")  {
+			stackActivateWindow(id);
+			Offset = <Window.RelativePosition.X - MouseX, Window.RelativePosition.Y - MouseY>;
+			MoveWindow = True;
+		     }
+		}
+	     } else {
+	     MoveWindow = False;
+	    }
+
+	}
+
+	// LibManialink_AnimLoop();
+}  //end of window
+--></script>

@@ -1,0 +1,14 @@
+declare CMlLabel Label <=> (Page.GetFirstChild("Label") as CMlLabel);
+declare CMlLabel DediLabel <=> (Page.GetFirstChild("DediLabel") as CMlLabel);
+declare CMlLabel Cp <=> (Page.GetFirstChild("Cp") as CMlLabel);
+declare CMlLabel CpTop1 <=> (Page.GetFirstChild("CpTop1") as CMlLabel);
+declare Integer[] Checkpoints = <?php echo $this->checkpoints ?>;
+declare Integer[] Deditimes = <?php echo $this->deditimes ?>;
+declare Integer curCp = 0;
+declare Integer totalCp = <?php echo $this->totalCp ?>;
+declare Integer lapRace = <?php echo $this->lapRace ?>;
+declare Text target = "<?php echo $this->target; ?>";
+declare Boolean playSound = <?php echo $this->playSound ?>;
+declare Integer reference = <?php echo $this->reference ?>;
+
+target = TextLib::Replace(target, "–", "-");

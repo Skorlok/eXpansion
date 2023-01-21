@@ -1,0 +1,20 @@
+
+if( (Now - eXp_lastClockUpdate) >= 1000 ){
+    declare nbSpec = 0;
+    declare nbPlayer = 0;
+    foreach (Player in Players) {
+        if(Player.Login != CurrentServerLogin){
+            if(!Player.RequestsSpectate){
+                //log(Player.Login^"Is Player");
+                nbPlayer += 1;
+            }else{
+                //log(Player.Login^"Is Spec");
+                nbSpec += 1;
+            }
+        }
+    } 
+    serverName.SetText("" ^ CurrentServerName);        
+    playerLabel.SetText("" ^ nbPlayer ^ "/" ^ maxPlayers);
+    specLabel.SetText("" ^ nbSpec ^ "/" ^ maxSpec);
+    eXp_lastClockUpdate = Now;
+}

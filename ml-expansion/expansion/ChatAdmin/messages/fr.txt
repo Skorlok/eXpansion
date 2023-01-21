@@ -1,0 +1,53 @@
+Guest Players on the server
+Joueurs invités sur le serveur
+
+Ignored Players on the server
+Joueurs ignorés sur le serveur
+
+unBan
+Ne plus bannir
+
+Remove
+Supprimer
+
+unIgnore
+Ne plus ignorer
+
+possible parameters: limit, extend, wu, wunb
+Paramètre possible : limit, extend, wu, wunb
+
+possible parameters: laps, limit, wu, wunb, fto
+Paramètre possible : laps, limit, wu, wunb, fto
+
+possible parameters: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
+Paramètre possible : pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
+
+possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
+Paramètre possible : limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
+
+possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
+Paramètre possible : limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
+
+blacklist
+blacklist
+
+ban
+bannir
+
+kick
+kick
+
+Ok
+Ok
+
+Cancel
+Annuler
+
+#admin_action#Admin #variable#%1$s $z$s#admin_action#shuffles the maps list!
+#admin_action#L'Admin #variable#%1$s $z$s#admin_action#mélange la liste des circuits!
+
+Blacklisted Players on the server
+Joueurs Blacklisté sur le serveur
+
+add
+ajouter

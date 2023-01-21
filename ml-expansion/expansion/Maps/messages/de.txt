@@ -1,0 +1,245 @@
+Add map
+Map hinzufügen
+
+Delete file
+Datei löschen
+
+Queue
+Warteschlange
+
+Recs
+Rekorde
+
+Go now
+Jetzt starten
+
+Remove
+Entfernen
+
+Current Map
+Aktuelle Map
+
+File '%s' deleted from filesystem!
+Datei '%s' wurde gelöscht!
+
+Removes current map from the playlist.
+Entfernt die aktuelle Strecke von der Liste.
+
+Sets current challenge to replay at end of match
+Am Ende des Wettkampfs wiederholen
+
+Maps
+Maps
+
+List maps
+Streckenliste
+
+#variable#%1$s  #queue#has been added to the map queue by #variable#%3$s#queue#, in the #variable#%5$s #queue#position
+#variable#%1$s  #queue#wurde an die Warteschlange eingetragen von #variable#%3$s#queue#, an der #variable#%5$s #queue#. Position
+
+#queue#Next map will be #variable#%1$s  #queue#by #variable#%2$s#queue#, as requested by #variable#%3$s
+#queue#Nächste Map: #variable#%1$s  #queue#von #variable#%2$s#queue#, gewünscht von #variable#%3$s
+
+#queue#Next map will be #variable#%1$s  #queue#by #variable#%2$s#queue#
+#queue#Nächste Map: #variable#%1$s  #queue#von #variable#%2$s#queue#
+
+#queue#Map changed to #variable#%1$s  #queue#by #variable#%2$s#queue#, as requested by #variable#%3$s
+#queue#Wechsel der Map zu #variable#%1$s  #queue#von #variable#%2$s#queue#, gewünscht von #variable#%3$s
+
+Error: %s
+Fehler: %s
+
+#admin_error# $iThis map is currently playing...
+#admin_error# $iDiese Map wird gerade gespielt...
+
+#admin_error# $iThis map is already in the queue...
+#admin_error# $iDiese Map ist bereits in der Warteschlange eingetragen...
+
+#admin_error# $iYou already have a map in the queue...
+#admin_error# $iDu hast bereits eine Map in der Warteschlange...
+
+#admin_error# $iMap has been played too recently...
+#admin_error# $iDiese Map wurde erst kürzlich gespielt...
+
+#admin_error# $iYou are not allowed to do that!
+#admin_error# $iDazu fehlt Dir die Berechtigung!
+
+#admin_action#Admin #variable#%1$s #admin_action#removed the map #variable#%3$s #admin_action# from the playlist
+#admin_action#Admin #variable#%1$s #admin_action# hat die Map #variable#%3$s #admin_action# von der Liste entfernt
+
+#variable#%1$s #queue#removed #variable#%2$s #queue#from the queue..
+#variable#%1$s #queue#hat #variable#%2$s #queue# aus der Warteschlange entfernt..
+
+#admin_action#Admin #variable#%1$s #admin_action#emptied the map queue list
+#admin_action#Admin #variable#%1$s #admin_action#hat die Strecken-Warteschlange geleert
+
+#admin_error# $iChallenge already set to be replayed!
+#admin_error# $iIst bereits zur Wiederholung vorgemerkt!
+
+#queue#Challenge set to be replayed!
+#queue#Wiederholung vorgemerkt!
+
+Add
+Hinzufügen
+
+Delete
+Löschen
+
+Drop
+Entfernen
+
+Add all
+Alle hinzufügen
+
+Map name
+Streckenname
+
+Author
+Autor
+
+Lenght
+Länge
+
+Records
+Rekorde
+
+Ratings
+Bewertungen
+
+Actions
+Aktionen
+
+adds a map via MX
+fügt eine Strecke via MX hinzu
+
+Jukebox
+Warteschlange
+
+#queue#/jb uses next params: drop, reset and show
+#queue#/jb braucht noch folgende Optionen: drop, reset oder show
+
+#admin_error#Error downloading, or MX is down!
+#admin_error#Kann nicht herunterladen, MX ist nicht erreichbar!
+
+#admin_error#The map is to large to be added to a server
+#admin_error#Die Strecke ist zu groß, um zum Server hinzugefügt zu werden
+
+#admin_error#You must include a MX map ID!
+#admin_error#Du musst eine ManiaExchange ID angeben
+
+#admin_action#Map #variable# %1$s #admin_action#added to playlist by #variable#%2$s
+#admin_action#Map #variable# %1$s #admin_action#zur Mapliste hinzugefügt von #variable#%2$s
+
+#admin_action#Admin #variable#%1$s #admin_action#erased the map #variable#%3$s #admin_action# from playlist and from disk!
+#admin_action#Admin #variable#%1$s #admin_action#hat #variable#%3$s #admin_action# von der Mapliste entfernt und die Datei gelöscht!
+
+Now Playing
+#translate# Now Playing
+
+Next Map
+#translate# Next Map
+
+File listing disabled since you are running eXpansion remote
+#translate# File listing disabled since you are running eXpansion remote
+
+#admin_error#This instance of eXpansion is runnin remotelly! Can't delete file #variable#'%s'
+#translate# #admin_error#This instance of eXpansion is runnin remotelly! Can't delete file #variable#'%s'
+
+Title
+Titel
+
+Length
+Länge
+
+Record
+Rekord
+
+Rating
+Bewertung
+
+Search maps
+Strecken durchsuchen
+
+Search Map
+Nach Strecke suchen
+
+Search Author
+Nach Autor suchen
+
+Sort By Add Date
+Streckenliste löschen
+
+Clear Maplist
+#translate# Clear Maplist
+
+Erases current map from the playlist.
+#translate# Erases current map from the playlist.
+
+#admin_error# $iA payment for wishin a track is in progress please try later.
+#admin_error# $iA Bezahlung um sich eine Strecke zu wünschen ist in Bearbeitung. Bitte versuche es später erneut.
+
+Are you sure you want to wish this map to be played
+Bist du dir sicher, dass du dir diese Strecke wünschen willst?
+
+#admin_error# $iYOu can't wish for a map at the moment.
+#admin_error# $iDu kannst dir momentan leider keine Strecke wünschen.
+
+#admin_action#Admin #variable#%1$s #admin_action#removed the map #variable#%3$s #admin_action# from playlist!
+#translate# #admin_action#Admin #variable#%1$s #admin_action#removed the map #variable#%3$s #admin_action# from playlist!
+
+#admin_error#Map #variable#%3$s #admin_error# not found at playlist, perhaps it was already removed ?
+#translate# #admin_error#Map #variable#%3$s #admin_error# not found at playlist, perhaps it was already removed ?
+
+#admin_action#Admin #variable#%1$s #admin_action#erased the map #variable#%3$s by %4$s #admin_action# from %5$s
+#translate# #admin_action#Admin #variable#%1$s #admin_action#erased the map #variable#%3$s by %4$s #admin_action# from %5$s
+
+#admin_error#Nothing to do, the map has been removed already from playlist and from disk!
+#translate# #admin_error#Nothing to do, the map has been removed already from playlist and from disk!
+
+#admin_error#Can't continue, since this instance of eXpansion is running remote agains the server
+#translate# #admin_error#Can't continue, since this instance of eXpansion is running remote agains the server
+
+Map Info
+#translate# Map Info
+
+Show Records
+#translate# Show Records
+
+$F22Remove this map from server
+#translate# $F22Remove this map from server
+
+Map %s $z$s$fffadded to playlist.
+#translate# Map %s $z$s$fffadded to playlist.
+
+#admin_error#This instance of eXpansion is runnin remotelly! Can%s, $this->getRecipient(
+#translate# #admin_error#This instance of eXpansion is runnin remotelly! Can%s, $this->getRecipient(
+
+File  deleted from filesystem!
+#translate# File  deleted from filesystem!
+
+$f00$oError $z$s$fff%s
+#translate# $f00$oError $z$s$fff%s
+
+Maps on server
+#translate# Maps on server
+
+History of Maps
+#translate# History of Maps
+
+Error:
+#translate# Error:
+
+Adds previous map back to the Jukebox.
+#translate# Adds previous map back to the Jukebox.
+
+#admin_error# $iThere are no previously played challenge!
+#translate# #admin_error# $iThere are no previously played challenge!
+
+Open
+#translate# Open
+
+#admin_error#This instance of eXpansion is running remote! Can%s, $this->getRecipient(
+#translate# #admin_error#This instance of eXpansion is running remote! Can%s, $this->getRecipient(
+
+Display is limiting to first %1$s maps.
+#translate# Display is limiting to first %1$s maps.

@@ -1,0 +1,27 @@
+
+declare Text outText = "";
+declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntry);
+
+declare Text action = "<?php echo $this->action;?>";
+
+
+outText = "";
+foreach (id => temp in eXp_widgetVisible[version]) {
+	if (!eXp_widgetVisible[version][id].existskey(gameMode)) {
+		continue;
+	}
+
+	declare status = eXp_widgetVisible[version][id][gameMode];
+	declare Text bool = "0";
+	if (status == True) {
+		bool = "1";
+	}
+
+	outText = id ^ ":" ^ gameMode ^ ":" ^ bool ^ "|";
+
+	widgetStatus.Value = outText;
+	TriggerPageAction(action);
+}
+
+widgetStatus.Value = "finished";
+TriggerPageAction(action);

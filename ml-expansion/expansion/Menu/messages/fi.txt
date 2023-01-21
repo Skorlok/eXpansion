@@ -1,0 +1,89 @@
+Help
+Ohje
+
+Maps
+Kartat
+
+Show Maps
+Listaa kartat
+
+Add Local Maps
+Lisää kartta
+
+ManiaExchange
+ManiaExchange
+
+Remove this
+Poista tämä
+
+Trash this
+Poista pysyvästi
+
+Records
+Ennätykset
+
+Dedimania
+Dedimania
+
+Local
+Ennätykset
+
+Hall of Fame
+Parhaat pelaajat
+
+Server ranks
+Palvelimen rankit
+
+Statistics
+Tilastot
+
+Server Info
+Tietoja...
+
+Players
+Pelaajat
+
+Hud
+Widgetit
+
+Move
+Siirrä
+
+Lock
+Lukitse
+
+Config...
+Asetukset...
+
+Reset
+Palauta
+
+Votes
+Äänestys
+
+Restart
+Uudelleen aloitus
+
+Skip
+Seuraava kartta
+
+Cancel Vote
+Peruuta äänestys
+
+Admin
+Admin
+
+Instant Restart
+Aloita heti
+
+Replay
+Aloita viiveellä
+
+End Round
+Päätä kierros
+
+Server Controls
+Palvelimen asetukset
+
+Balance Teams
+Balansoi tiimit

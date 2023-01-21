@@ -1,0 +1,122 @@
+Ignore
+Ignorer
+
+Kick
+Expulser
+
+Ban
+Bannir
+
+Blacklist
+Liste Noire
+
+Release Spec
+Relâcher Spectateur
+
+Force Spec
+Forcer Spectateur
+
+$ff3$iYou are not allowed to do that!
+$ff3$iTu n'as pas le droit de faire ça!
+
+Error: %s
+Erreur: %s
+
+Please behave next time you visit the server!
+Comporte toi bien la prochaine fois que tu visiteras le serveur!
+
+You are now banned from the server.
+Tu es banni du serveur.
+
+You are now blacklisted from the server.
+Tu es inscrit dans la liste noire du serveur.
+
+Admin has released you from spectate to play.
+L'admin t'a libéré du mode spectateur pour que tu puisse jouer.
+
+Players
+Joueurs
+
+Show Players
+Montrer les joueurs
+
+Admin has released you from specate to play.
+L'admin t'a libéré du mode spectateur pour que tu puisse jouer.
+
+NickName
+Pseudo
+
+Login
+Login
+
+Error:
+Erreur:
+
+%s$1 $z$s$fff is $f00broadcasting$fff at $lwww.twitch.tv$l, say hello to all the viewers :)
+%s$1 $z$s$fff est $f00broadcasting$fff à $lwww.twitch.tv$l, Dites bonjour au joueurs :)
+
+Ignore List
+Liste des ignorés
+
+Guest List
+Liste des invités
+
+Ban List
+Liste des bannis
+
+Black List
+Liste noir
+
+Ignore player %1$s 
+#translate# Ignore player %1$s 
+
+UnIgnore player %1$s 
+#translate# UnIgnore player %1$s 
+
+Kick player %1$s 
+#translate# Kick player %1$s 
+
+Ban player %1$s 
+#translate# Ban player %1$s 
+
+Blacklist player %1$s 
+#translate# Blacklist player %1$s 
+
+Force %1$s to play
+#translate# Force %1$s to play
+
+Add to guest list
+#translate# Add to guest list
+
+Force %1$s to spectate
+#translate# Force %1$s to spectate
+
+Ignore player
+#translate# Ignore player
+
+UnIgnore player
+#translate# UnIgnore player
+
+Kick player
+#translate# Kick player
+
+Ban player
+#translate# Ban player
+
+Blacklist player
+#translate# Blacklist player
+
+Force to play
+#translate# Force to play
+
+Force to spectate
+#translate# Force to spectate
+
+%s$z$s$fff was ignored by admin %s
+#translate# %s$z$s$fff was ignored by admin %s
+
+%s$z$s$fff was unignored by admin %s
+#translate# %s$z$s$fff was unignored by admin %s
+
+Admin has forced you to specate!
+#translate# Admin has forced you to specate!

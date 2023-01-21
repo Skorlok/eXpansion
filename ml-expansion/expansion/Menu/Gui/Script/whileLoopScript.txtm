@@ -1,0 +1,196 @@
+if (eXp_tabPressed == True && (Now - eXp_tabTime) > 50) {
+    eXp_tabPressed = False;
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 123)  {
+        eXp_tabTime = Now;
+        eXp_tabPressed = True;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick &&  Event.ControlId == "MenuButton") {
+        toggleSubmenu = True;
+        showStatus = True;
+        needUpdate = True;
+        firstClick = True;
+        Menu.RelativePosition.X = -159.;
+        Menu.RelativePosition.Y = 73.;
+        Menu.RelativePosition.Z = 50.0;
+    }
+}
+
+if (eXp_tabPressed) {
+    toggleSubmenu = False;
+    Menu.Hide();
+
+    if (showStatus) {
+        needUpdate = True;
+        showStatus = False;
+    }
+} else {
+    if (MouseRightButton && !eXp_mouseRightState && !eXp_tabPressed) {
+        eXp_mouseRightTime = Now;
+        eXp_mouseRightState = True;
+        toggleSubmenu = False;
+        lastMousePos = <MouseX, MouseY>;
+    } else if (!MouseRightButton && eXp_mouseRightState) {
+        eXp_mouseRightState = False;
+        toggleSubmenu = False;
+        
+        if ((Now - eXp_mouseRightTime) < 500) {
+            if (lastMousePos.X == MouseX && lastMousePos.Y == MouseY) {
+                toggleSubmenu = True;
+                showStatus = True;
+                needUpdate = True;
+                Menu.RelativePosition.X = MouseX-1.0;
+                Menu.RelativePosition.Y = MouseY+.5;
+                Menu.RelativePosition.Z = 50.0;
+            }
+        } else {
+            needUpdate = True;
+            showStatus = False;
+        }
+    }
+}
+
+if (MouseMiddleButton && !eXp_mouseMiddleState) {
+	eXp_mouseMiddleTime = Now;
+	eXp_mouseMiddleState = True;
+} else if(!MouseMiddleButton && eXp_mouseMiddleState) {
+    eXp_mouseMiddleState = False;
+
+	if((Now - eXp_mouseMiddleTime) < 200) {
+	    exp_enableHudMove = !exp_enableHudMove;
+	    exp_needToCheckPersistentVars = True;
+    }
+}
+
+/*
+if (IsSpectatorMode) {
+    toggleSubmenu = False;
+}
+*/
+
+if(eXp_tabPressed){
+    toggleSubmenu = False;
+}
+
+if (toggleSubmenu) {
+	foreach (Event in PendingEvents) {
+        if (Event.Type == CMlEvent::Type::MouseClick) {
+            declare Text action = Event.Control.DataAttributeGet("action");
+            if (action != "") {
+                // log(action);
+                TriggerPageAction(action);
+            }
+        }
+        if (Event.Type == CMlEvent::Type::MouseOver) {
+            if ( Event.Control.ControlClasses.count > 0) {
+                if (Event.Control.ControlClasses[0] == "group") {
+
+                    if (lastItem != Event.Control.DataAttributeGet("label") ) {
+                        hideSubMenu();
+                        lastItem = Event.Control.DataAttributeGet("label");
+                    }
+                    declare subFrame = (Page.GetFirstChild(Event.Control.DataAttributeGet("label")) as CMlFrame);
+                    Page.GetClassChildren("sub" , subFrame , True);
+                    foreach (control in Page.GetClassChildren_Result) {
+                        control.Show();
+                    }
+                }
+
+                if (Event.Control.ControlClasses[0] == "menu") {
+                    hideSubMenu();
+                }
+
+                lastItem = Event.Control.DataAttributeGet("label");
+            }
+
+            if (Event.Control.ControlClasses.count == 0) {
+                hideSubMenu();
+            }
+        }
+    }
+}
+
+if (needUpdate) {
+    needUpdate = False;
+
+    if (showStatus) {
+        Menu.Show();
+        showStamp = Now;
+        needHidden = True;
+    } else {
+        if (needHidden) {
+            showStamp = 0;
+            hideStamp = Now;
+            needHidden = False;
+            toggleSubmenu = False;
+            hideSubMenu();
+        }
+    }
+}
+
+if(!toggleSubmenu && Menu.Visible && (Now - hideStamp) > 1000) {
+    Menu.Hide();
+}
+
+if (hideStamp != 0) {
+    if ((Now - hideStamp) > 600) {
+        hideStamp = 0;
+    }
+    declare delay = 340;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("quad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare quad2 = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare time = (Now - hideStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        if (quad != Null) {
+            quad.Scale = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        }
+
+        if (quad2 != Null) {
+            quad2.Opacity = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        }
+
+        item.Opacity = AL::Ease("LinearOut", (time -delay) * 1., 1., -1., 350.);
+        delay -= 40;
+    }
+}
+
+if (showStamp != 0) {
+    if ((Now - showStamp) > 600) {
+        showStamp = 0;
+        firstClick = False;
+    }
+    declare delay = 0;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("quad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare quad2 = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare time = (Now - showStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        if (quad != Null) {
+            quad.Scale = AL::Ease("LinearOut", (time - delay) * 1.,  0., 0.75, 350.);
+        }
+        if (quad2 != Null) {
+            quad2.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 0.75, 350.);
+        }
+        item.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 1., 350.);
+        delay += 40;
+    }
+}
+
+if (MouseLeftButton && firstClick == False) {
+    showStatus = False;
+    needUpdate = True;
+}
