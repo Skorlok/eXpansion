@@ -47,8 +47,7 @@
   "require": {
     "php": ">=5.5",
     "ext-curl": "*",
-    "ext-json": "*",
-    "composer/installers": "~1.0"
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
