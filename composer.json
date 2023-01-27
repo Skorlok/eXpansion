@@ -50,9 +50,7 @@
     "ext-json": "*"
   },
   "autoload": {
-    "psr-4": {
-      "ManiaLivePlugins\\eXpansion\\": "."
-    }
+    "classmap": ["."]
   },
   "scripts": {
     "post-update-cmd": "ManiaLivePlugins\\eXpansion\\Core\\Install::postUpdate"
