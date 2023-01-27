@@ -47,7 +47,13 @@
   "require": {
     "php": ">=5.5",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "composer/installers": "~1.0"
+  },
+  "extra": {
+    "installer-paths": {
+        "vendor": ["vendor/skorlok/expansion"]
+    }
   },
   "autoload": {
     "psr-4": {
