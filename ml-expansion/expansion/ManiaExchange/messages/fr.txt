@@ -7,8 +7,8 @@
 #error#Map not found on ManiaExchange
 #error#Carte non trouvée sur ManiaExchange
 
-usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update, /mx pack [id]
-utilisation /mx add [id], /mx queue [id], /mx search "termes ici"  "nom de l'auteur", /mx author "nom", /mx infos, /mx random, /mx update, /mx pack [id]
+usage /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos
+utilisation /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos
 
 ManiaExchange Map Infos
 Informations de Map ManiaExchange

@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Quiz;
 
 use ManiaLive\Application\ErrorHandling;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Widget\QuizImageWidget;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\AddPoint;
@@ -52,6 +53,9 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $msg_pointRemove = "";
 
     private $msg_errorImageType = "";
+
+    private $cmd_reset;
+    private $cmd_points;
 
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess = null;
@@ -106,9 +110,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         
         $command = $this->registerChatCommand("pts", "showPoints", 0, true);
         $command->help = '/pts Show current points';
-
-        $command = $this->registerChatCommand("point", "addPointsWindow", 0, true);
-        $command->help = '/piste add a point for any player on server';
         
         $command = $this->registerChatCommand("cancel", "cancel", 0, true);
         $command->help = '/cancel Cancels a question';
@@ -118,9 +119,17 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         
         $command = $this->registerChatCommand("question", "displayQuestion", 0, true);
         $command->help = '/question Shows the current question again';
-        
-        $command = $this->registerChatCommand("reset", "reset", 0, true);
-        $command->help = '/reset resets the quiz points';
+
+        $cmd = AdminGroups::addAdminCommand('addquizpoint', $this, 'addPointsWindow', Permission::QUIZ_ADMIN);
+        $cmd->setHelp('add or remove points to a player for the quiz');
+        AdminGroups::addAlias($cmd, "quizpoints");
+        AdminGroups::addAlias($cmd, "quizpts");
+        $this->cmd_points = $cmd;
+
+        $cmd = AdminGroups::addAdminCommand('resetquiz', $this, 'reset', Permission::QUIZ_ADMIN);
+        $cmd->setHelp('resets the quiz points');
+        AdminGroups::addAlias($cmd, "quizreset");
+        $this->cmd_reset = $cmd;
         
 
         $this->msg_questionPre = eXpGetMessage("#quiz#Question number:#variable# %s$1 #quiz#    Asker:#variable# %s$2");
@@ -148,43 +157,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $data = $this->db->execute("SELECT * FROM `quiz_points` order by score desc;")->fetchArrayOfObject();
         foreach ($data as $player) {
-            $this->players[$player->login] = new Structures\QuizPlayer(
-                $player->login,
-                $player->nickName,
-                (int)$player->score
-            );
+            $this->players[$player->login] = new Structures\QuizPlayer($player->login, $player->nickName, (int)$player->score);
         }
 
         $this->setPublicMethod("ask");
-
-    }
-
-    public function chatquiz($login, $args)
-    {
-        $args = explode(" ", $args);
-        $action = array_shift($args);
-        $message = implode(" ", $args);
-
-        switch ($action) {
-            case 'ask':
-                $this->ask($login, $message);
-                break;
-            case 'points':
-                $this->showPoints($login);
-                break;
-            case 'cancel':
-                $this->cancel($login);
-                break;
-            case 'show':
-                $this->showQuestion();
-                break;
-            case 'addpoint':
-                $this->addPoint($login, $message);
-                break;
-            case 'reset':
-                $this->reset($login);
-                break;
-        }
     }
 
     /**
@@ -295,14 +271,8 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        if ($this->currentQuestion->asker->login == $login
-            || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)
-        ) {
-            $this->eXpChatSendServerMessage(
-                $this->msg_cancelQuestion,
-                null,
-                array($this->storage->getPlayerObject($login)->nickName)
-            );
+        if ($this->currentQuestion->asker->login == $login || AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+            $this->eXpChatSendServerMessage($this->msg_cancelQuestion, null, array($this->storage->getPlayerObject($login)->nickName));
             $this->currentQuestion = null;
             $this->chooseNextQuestion();
         }
@@ -310,7 +280,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function reset($login)
     {
-        if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+        if (!AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             return;
         }
         $this->players = array();
@@ -327,9 +297,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (!isset($this->currentQuestion->question)) {
             return;
         }
-        if ($login == $this->currentQuestion->asker->login
-            || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)
-        ) {
+        if ($login == $this->currentQuestion->asker->login || AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             $answer = "";
 
             foreach ($this->currentQuestion->answer as $ans) {
@@ -380,29 +348,17 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function addPoint($login, $target)
     {
-        if ($login == null || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+        if ($login == null || AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             if (!isset($this->players[$target])) {
-                $this->players[$target] = new Structures\QuizPlayer(
-                    $target,
-                    $this->storage->getPlayerObject($target)->nickName,
-                    1
-                );
+                $this->players[$target] = new Structures\QuizPlayer($target, $this->storage->getPlayerObject($target)->nickName, 1);
                 if ($login !== null) {
-                    $this->eXpChatSendServerMessage(
-                        $this->msg_pointAdd,
-                        null,
-                        array($this->players[$target]->nickName)
-                    );
+                    $this->eXpChatSendServerMessage($this->msg_pointAdd, null, array($this->players[$target]->nickName));
                 }
                 $this->showPoints();
             } else {
                 $this->players[$target]->points++;
                 if ($login !== null) {
-                    $this->eXpChatSendServerMessage(
-                        $this->msg_pointAdd,
-                        null,
-                        array($this->players[$target]->nickName)
-                    );
+                    $this->eXpChatSendServerMessage($this->msg_pointAdd, null, array($this->players[$target]->nickName));
                 }
                 $this->showPoints();
             }
@@ -428,9 +384,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function removePoint($login, $target)
     {
 
-        if ($login == null
-            || \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)
-        ) {
+        if ($login == null || AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             if (isset($this->players[$target])) {
                 if ($login !== null) {
                     $this->eXpChatSendServerMessage(
@@ -528,7 +482,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $widget->setImageSize($newWidth, $newHeight);
             $widget->show();
         } else {
-
             $this->eXpChatSendServerMessage($this->msg_errorImageType);
         }
     }
@@ -629,7 +582,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function addPointsWindow($login)
     {
-        if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+        if (!AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             return;
         }
         $window = Gui\Windows\AddPoint::Create($login);
@@ -659,5 +612,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Gui\Windows\Playerlist::EraseAll();
         QuestionWindow::EraseAll();
         Gui\Widget\QuizImageWidget::EraseAll();
+        AdminGroups::removeAdminCommand($this->cmd_reset);
+        AdminGroups::removeAdminCommand($this->cmd_points);
     }
 }

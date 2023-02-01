@@ -115,8 +115,8 @@ fügt eine Strecke via MX hinzu
 Jukebox
 Warteschlange
 
-#queue#/jb uses next params: drop, reset and show
-#queue#/jb braucht noch folgende Optionen: drop, reset oder show
+#queue#/jb uses next params: drop and show
+#queue#/jb braucht noch folgende Optionen: drop oder show
 
 #admin_error#Error downloading, or MX is down!
 #admin_error#Kann nicht herunterladen, MX ist nicht erreichbar!

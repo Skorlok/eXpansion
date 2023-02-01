@@ -1024,7 +1024,7 @@ class AdminGroups extends ExpPlugin
      */
     public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
     {
-        if (!$isRegistredCmd || strpos($text, "/admin") !== false || strpos($text, "/adm") !== false) {
+        if (!$isRegistredCmd || strpos($text, "/admin") !== false || strpos($text, "/adm") !== false || $text[0] == '/') {
             return;
         }
 

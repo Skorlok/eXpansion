@@ -115,8 +115,8 @@ Ajouter un circuit à travers MX
 Jukebox
 Jukebox
 
-#queue#/jb uses next params: drop, reset and show
-#queue#/jb a besoin des paramètres suivant: drop, reset and show
+#queue#/jb uses next params: drop and show
+#queue#/jb a besoin des paramètres suivant: drop et show
 
 #admin_error#Error downloading, or MX is down!
 #admin_error#Erreur de téléchargement, MX pourrait être en panne!

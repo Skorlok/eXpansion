@@ -37,6 +37,9 @@ class ManiaExchange extends ExpPlugin
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess;
     private $cmd_add;
+    private $cmd_update;
+    private $cmd_random;
+    private $cmd_pack;
 
     public static $mxInfo = array();
     public static $mxReplays = array();
@@ -62,11 +65,32 @@ class ManiaExchange extends ExpPlugin
         $this->registerChatCommand("mx", "chatMX", 0, true);
         $this->setPublicMethod("mxSearch");
 
-        $cmd = AdminGroups::addAdminCommand('add', $this, 'addMap', 'server_maps'); //
+        $cmd = AdminGroups::addAdminCommand('add', $this, 'addMap', Permission::MAP_ADD_MX);
         $cmd->setHelp('Adds a map from ManiaExchange');
-        $cmd->setHelpMore('$w/admin add #id$z will add a map with id fron ManiaExchange');
+        $cmd->setHelpMore('$w//add #id$z$w will add a map with id from ManiaExchange');
         $cmd->setMinParam(1);
+        AdminGroups::addAlias($cmd, "addmx");
+        AdminGroups::addAlias($cmd, "mxadd");
         $this->cmd_add = $cmd;
+
+        $cmd = AdminGroups::addAdminCommand('mxupdate', $this, 'mxUpdate', 'server_maps');
+        $cmd->setHelp('show updated maps from ManiaExchange');
+        $cmd->setHelpMore('$wShow a window with maps updated on ManiaExchange');
+        AdminGroups::addAlias($cmd, "updatemx");
+        $this->cmd_update = $cmd;
+
+        $cmd = AdminGroups::addAdminCommand('mxrandom', $this, 'mxRandom', Permission::MAP_ADD_MX);
+        $cmd->setHelp('Adds a random map from ManiaExchange');
+        $cmd->setHelpMore('$w//mxrandom will add a random map from ManiaExchange');
+        AdminGroups::addAlias($cmd, "randommx");
+        AdminGroups::addAlias($cmd, "rmx");
+        $this->cmd_random = $cmd;
+
+        $cmd = AdminGroups::addAdminCommand('addpack', $this, 'mxPack', Permission::MAP_ADD_MX);
+        $cmd->setHelp('Adds a pack of maps from ManiaExchange');
+        $cmd->setHelpMore('$w//addpack will add a pack of maps from ManiaExchange');
+        $cmd->setMinParam(1);
+        $this->cmd_pack = $cmd;
 
         if ($this->isPluginLoaded('eXpansion\Menu')) {
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('ManiaExchange'), false);
@@ -81,6 +105,28 @@ class ManiaExchange extends ExpPlugin
         $widget->show();
 
         $this->onBeginMap(null, null, null);
+    }
+
+    public function chatMX($login, $arg = "", $param = "")
+    {
+        switch ($arg) {
+            case "search":
+                $this->mxSearch($login, $param, "");
+                break;
+            case "author":
+                $this->mxSearch($login, "", $param);
+                break;
+            case "queue":
+                $this->mxVote($login, $param);
+                break;
+            case "infos":
+                $this->showMxInfos($login);
+                break;
+            default:
+                $msg = eXpGetMessage('usage /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos');
+                $this->eXpChatSendServerMessage($msg, $login);
+                break;
+        }
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -162,41 +208,6 @@ class ManiaExchange extends ExpPlugin
     {
         Gui\Windows\MxSearch::Erase($login);
         Gui\Widgets\MxWidget::Erase($login);
-    }
-
-    public function chatMX($login, $arg = "", $param = "")
-    {
-        switch ($arg) {
-            case "add":
-                $this->addMap($login, $param);
-                break;
-            case "search":
-                $this->mxSearch($login, $param, "");
-                break;
-            case "author":
-                $this->mxSearch($login, "", $param);
-                break;
-            case "queue":
-                $this->mxVote($login, $param);
-                break;
-            case "infos":
-                $this->showMxInfos($login);
-                break;
-            case "update":
-                $this->mxUpdate($login);
-                break;
-            case "random":
-                $this->mxRandom($login);
-                break;
-            case "pack":
-                $this->mxPack($login, $param);
-                break;
-            case "help":
-            default:
-                $msg = eXpGetMessage('usage /mx add [id], /mx queue [id], /mx search "terms here"  "authorname", /mx author "name", /mx infos, /mx random, /mx update, /mx pack [id]');
-                $this->eXpChatSendServerMessage($msg, $login);
-                break;
-        }
     }
 
     public function showMxInfos($login)
@@ -865,5 +876,8 @@ class ManiaExchange extends ExpPlugin
         MxWidget::EraseAll();
         MxSearch::EraseAll();
         AdminGroups::removeAdminCommand($this->cmd_add);
+        AdminGroups::removeAdminCommand($this->cmd_update);
+        AdminGroups::removeAdminCommand($this->cmd_random);
+        AdminGroups::removeAdminCommand($this->cmd_pack);
     }
 }

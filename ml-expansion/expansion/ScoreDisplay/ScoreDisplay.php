@@ -11,26 +11,31 @@ use ManiaLivePlugins\eXpansion\ScoreDisplay\Gui\Windows\ScoreSetup;
 class ScoreDisplay extends ExpPlugin
 {
 
+    private $cmd_scores;
+
     public function eXpOnReady()
     {
-        $this->registerChatCommand("scores", "scores", 0, true);
-        $this->registerChatCommand("scores", "scores", 1, true);
+        $cmd = AdminGroups::addAdminCommand('scores', $this, 'scores', Permission::QUIZ_ADMIN);
+        $cmd->setHelp('Setup the scores widget');
+        $cmd->setHelpMore('$wSetup the scores widget');
+        $this->cmd_scores = $cmd;
     }
 
 
-    public function scores($login, $value = false)
+    public function scores($login, $params = array())
     {
         if (!AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             $this->eXpChatSendServerMessage("No Permission.", $login);
             return;
         }
+        
+        $command = array_shift($params);
 
-
-        if ($value === false) {
+        if (!$command) {
             $this->eXpChatSendServerMessage("valid parameters: hide, setup", $login);
         }
 
-        if ($value == "setup") {
+        if ($command == "setup") {
             $window = ScoreSetup::Create($login);
             $window->setSize(120, 80);
             $window->setName("ScoreSetup");
@@ -38,8 +43,13 @@ class ScoreDisplay extends ExpPlugin
             return;
         }
 
-        if ($value == "hide") {
+        if ($command == "hide") {
             Scores::EraseAll();
         }
+    }
+
+    public function eXpOnUnload()
+    {
+        AdminGroups::removeAdminCommand($this->cmd_scores);
     }
 }

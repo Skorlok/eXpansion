@@ -70,7 +70,8 @@ class Maps extends ExpPlugin
     private $cmd_remove;
     private $cmd_erease;
     private $cmd_replay;
-    private $cmd_tag;
+    private $cmd_prev;
+    private $cmd_cjb;
 
     private $actions = array();
     private $maps = array();
@@ -105,7 +106,7 @@ class Maps extends ExpPlugin
         $this->msg_nextQueue = eXpGetMessage('#queue#Next map will be #variable#%1$s  #queue#by #variable#%2$s#queue#, as requested by #variable#%3$s'); // '%1$s' = Map Name, '%2$s' = Map author %, '%3$s' = nickname, '%4$s' = login
         $this->msg_nextMap = eXpGetMessage('#queue#Next map will be #variable#%1$s  #queue#by #variable#%2$s#queue#'); // '%1$s' = Map Name, '%2$s' = Map author
         $this->msg_queueNow = eXpGetMessage('#queue#Map changed to #variable#%1$s  #queue#by #variable#%2$s#queue#, as requested by #variable#%3$s'); // '%1$s' = Map Name, '%2$s' = Map author %, '%3$s' = nickname, '%4$s' = login
-        $this->msg_jukehelp = eXpGetMessage('#queue#/jb uses next params: drop, reset and show');
+        $this->msg_jukehelp = eXpGetMessage('#queue#/jb uses next params: drop and show');
         $this->msg_errDwld = eXpGetMessage('#admin_error#Error downloading, or MX is down!');
         $this->msg_errToLarge = eXpGetMessage('#admin_error#The map is to large to be added to a server');
         $this->msg_errMxId = eXpGetMessage("#admin_error#You must include a MX map ID!");
@@ -138,6 +139,12 @@ class Maps extends ExpPlugin
         $cmd->setMinParam(0);
         AdminGroups::addAlias($cmd, "prev");
         $this->cmd_prev = $cmd;
+
+        $cmd = AdminGroups::addAdminCommand('clearjukebox', $this, 'emptyWishes', Permission::MAP_JUKEBOX_ADMIN);
+        $cmd->setHelp(eXpGetMessage('Clear the Jukebox.'));
+        $cmd->setMinParam(0);
+        AdminGroups::addAlias($cmd, "cjb");
+        $this->cmd_cjb = $cmd;
 
         $this->registerChatCommand('list', "showMapList", -1, true);
         $this->registerChatCommand('maps', "showMapList", -1, true);
@@ -419,11 +426,6 @@ class Maps extends ExpPlugin
             switch (strtolower($args)) {
                 case "drop":
                     $this->chat_dropQueue($login);
-                    break;
-                case "reset":
-                    if (AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN)) {
-                        $this->emptyWishes($login);
-                    }
                     break;
                 case "list":
                 case "show":
@@ -1289,6 +1291,8 @@ class Maps extends ExpPlugin
         AdminGroups::removeAdminCommand($this->cmd_replay);
         AdminGroups::removeAdminCommand($this->cmd_erease);
         AdminGroups::removeAdminCommand($this->cmd_remove);
+        AdminGroups::removeAdminCommand($this->cmd_prev);
+        AdminGroups::removeAdminCommand($this->cmd_cjb);
 
         /** @var ActionHandler $action */
         $action = \ManiaLive\Gui\ActionHandler::getInstance();

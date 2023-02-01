@@ -115,8 +115,8 @@ adds a map via MX
 Jukebox
 #translate# Jukebox
 
-#queue#/jb uses next params: drop, reset and show
-#translate# #queue#/jb uses next params: drop, reset and show
+#queue#/jb uses next params: drop and show
+#translate# #queue#/jb uses next params: drop and show
 
 #admin_error#Error downloading, or MX is down!
 #translate# #admin_error#Error downloading, or MX is down!

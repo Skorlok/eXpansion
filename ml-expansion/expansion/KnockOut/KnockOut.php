@@ -170,10 +170,10 @@ class KnockOut extends ExpPlugin
 
                         $admin = $this->storage->getPlayerObject($login);
                         $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to ignore the next finish.', null, array($admin->nickName));
-                        break;
                     } else {
                         $this->eXpChatSendServerMessage('#admin_error#You can only ignore the next finish when ko is running!', $login);
                     }
+                    break;
 
                 default:
                     $this->eXpChatSendServerMessage("Possible values: start, stop, res, skip, endround, pause, resume, ignore", $login);
