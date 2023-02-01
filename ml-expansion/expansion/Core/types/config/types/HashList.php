@@ -79,7 +79,7 @@ class HashList extends \ManiaLivePlugins\eXpansion\Core\types\config\Variable
         $array = $this->getRawValue();
         $i = 0;
         foreach ($array as $key => $value) {
-            if ($i == $index) {
+            if ($key == $index) {
                 unset($array[$key]);
                 break;
             }

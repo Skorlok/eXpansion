@@ -246,6 +246,7 @@ class ChatAdmin extends ExpPlugin
         $cmd->setMinParam(0);
         AdminGroups::addAlias($cmd, "setspecpwd"); // xaseco
         AdminGroups::addAlias($cmd, "spectpass"); // fast
+        AdminGroups::addAlias($cmd, "specpass"); // fast
 
         $cmd = AdminGroups::addAdminCommand('refpassword', $this, 'setRefereePassword', Permission::SERVER_REFPWD);
         $cmd->setHelp('Changes the Referee password');
@@ -346,31 +347,27 @@ class ChatAdmin extends ExpPlugin
         $cmd = AdminGroups::addAdminCommand('endround', $this, 'forceEndRound', Permission::MAP_END_ROUND);
         $cmd->setHelp('Ends a round. Only work in round mode');
         AdminGroups::addAlias($cmd, 'end'); // fast
-        AdminGroups::addAlias($cmd, 'endround'); // xaseco
         AdminGroups::addAlias($cmd, 'er'); // xaseco
 		
 		$cmd = AdminGroups::addAdminCommand('endwu', $this, 'forceEndWu', Permission::MAP_END_ROUND);
         $cmd->setHelp('Ends the WarmUp. Only work in round mode');
-        AdminGroups::addAlias($cmd, 'endwu');
         AdminGroups::addAlias($cmd, 'ewu');
 		
 		$cmd = AdminGroups::addAdminCommand('endwuround', $this, 'forceEndWuR', Permission::MAP_END_ROUND);
         $cmd->setHelp('Ends the round of the WarmUp. Only work in round mode');
-        AdminGroups::addAlias($cmd, 'endwuround');
         AdminGroups::addAlias($cmd, 'ewur');
 
-        $cmd = AdminGroups::addAdminCommand('forceroundpoints', $this, 'forcePointsRounds', Permission::GAME_SETTINGS);
+        $cmd = AdminGroups::addAdminCommand('forcepoints', $this, 'forcePointsRounds', Permission::GAME_SETTINGS);
         $cmd->setHelp('Force the current scores of one player');
-        AdminGroups::addAlias($cmd, 'forcepoints');
         AdminGroups::addAlias($cmd, 'fpts');
 
         $cmd = AdminGroups::addAdminCommand('pause', $this, 'setPause', Permission::GAME_SETTINGS);
         $cmd->setHelp('Set the game to pause');
         AdminGroups::addAlias($cmd, 'p');
 
-        $cmd = AdminGroups::addAdminCommand('unpause', $this, 'setUnPause', Permission::GAME_SETTINGS);
+        $cmd = AdminGroups::addAdminCommand('resume', $this, 'setUnPause', Permission::GAME_SETTINGS);
         $cmd->setHelp('Continue the game after pause');
-        AdminGroups::addAlias($cmd, 'up');
+        AdminGroups::addAlias($cmd, 're');
 
         $cmd = AdminGroups::addAdminCommand('extend', $this, 'extendTimeOrPoints', Permission::GAME_SETTINGS);
         $cmd->setHelp('Extend current timelimit or pointslimit');

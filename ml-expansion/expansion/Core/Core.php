@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.0.0";
+    const EXP_VERSION = "1.2.1.0";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -54,6 +54,7 @@ class Core extends types\ExpPlugin
     public static $rankings = array();
 
     public static $warmUpActive = false;
+    public static $pauseActive = false;
 
     public static $players = array();
 
@@ -477,9 +478,9 @@ EOT;
 
             case "Maniaplanet.Pause.Status":
                 if ($params["active"] === true) {
-                    self::$warmUpActive = true;
+                    self::$pauseActive = true;
                 } else {
-                    self::$warmUpActive = false;
+                    self::$pauseActive = false;
                 }
                 break;
 

@@ -68,7 +68,7 @@ class CpProgress extends Widget
 
         $x = 0;
         foreach ($playerData as $login => $data) {
-            if ($x >= 16) {
+            if ($x >= 10) {
                 break;
             }
 

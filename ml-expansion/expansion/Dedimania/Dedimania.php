@@ -124,7 +124,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if (Core::$warmUpActive) {
+        if (Core::$warmUpActive || Core::$pauseActive) {
             return;
         }
 

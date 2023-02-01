@@ -61,7 +61,7 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $info->setData($this->players);
             $info->setPosition(120, -1);
             $info->show();
-            $this->lastsend = time();
+            $this->lastSend = time();
         }
     }
 
