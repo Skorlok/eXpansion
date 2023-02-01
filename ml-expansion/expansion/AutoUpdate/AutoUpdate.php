@@ -109,7 +109,7 @@ class AutoUpdate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 '#admin_error#Error while checking for updates of #variable#eXpansion & Components !!'
             );
         } else {
-            if ($this->arrayContainsText('Nothing to install or update', $results)) {
+            if ($this->arrayContainsText('Nothing to install, update or remove', $results)) {
                 $this->console('eXpansion & Components are up to date');
                 $AdminGroups->announceToPermission(
                     Permission::SERVER_UPDATE,
