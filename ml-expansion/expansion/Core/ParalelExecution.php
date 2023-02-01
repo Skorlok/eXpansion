@@ -178,8 +178,7 @@ class ParalelExecution implements \ManiaLive\Features\Tick\Listener
             return false;
         }
 
-        while (list(, $row) = each($output)) {
-
+        foreach ($output as $row) {
             $row_array = explode(" ", $row);
             $check_pid = $row_array[0];
 
