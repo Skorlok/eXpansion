@@ -27,6 +27,7 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected $labelReciever;
     protected $widgetScript;
     protected $sendscript;
+    protected $edgeWidget;
 
     /** @var \Maniaplanet\DedicatedServer\Structures\Player */
     protected $targetPlayer = false;
@@ -117,6 +118,10 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->sendscript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("PersonalMessages\Gui\Script");
         $this->sendscript->setParam("sendAction", $this->actionSend);
         $this->registerScript($this->sendscript);
+
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
+
         parent::eXpOnSettingsLoaded();
     }
 

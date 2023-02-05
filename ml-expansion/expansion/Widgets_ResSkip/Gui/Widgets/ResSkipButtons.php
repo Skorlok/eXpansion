@@ -48,8 +48,6 @@ class ResSkipButtons extends Widget
 
         $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
         $this->registerScript($this->edgeWidget);
-
-
     }
 
     public function setActions($res, $skip)

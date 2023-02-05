@@ -15,9 +15,9 @@ if (!edge_animatedId.existskey(id) ) {
 }
 
 declare Real edgeR = -200.;
-    if (p2.X > 1) {
-       edgeR = 200.;
-    }
+if (p2.X > 1) {
+    edgeR = 200.;
+}
 
 if (edge_isMinimized) {
     Window.RelativePosition.X = edgeR;

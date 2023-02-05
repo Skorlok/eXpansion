@@ -61,7 +61,7 @@ class KnockOut extends ExpPlugin
 
     public function eXpOnLoad()
     {
-        $this->msg_newRound = eXpGetMessage('#ko#KnockOut! Round: #variable#%1$s #ko#Players #variable#%2$s #ko#/#variable#%3$s remain');
+        $this->msg_newRound = eXpGetMessage('#ko#KnockOut! Round: #variable#%1$s#ko#, Players #variable#%2$s#ko#/#variable#%3$s #ko#remain');
         $this->msg_numberKicks = eXpGetMessage('#variable#%1$s #ko#players will be knocked out this round');
         $this->msg_koStart = eXpGetMessage('#ko#KnockOut #variable#starts #ko#after next round');
         $this->msg_koStop = eXpGetMessage('#ko#KnockOut has been #variable#stopped.');
@@ -245,19 +245,14 @@ class KnockOut extends ExpPlugin
         }
     }
 
-    public function onBeginMatch()
-    {
-        if ($this->isRunning && !Core::$warmUpActive && !Core::$pauseActive) {
-            $this->round++;
-            $this->eXpChatSendServerMessage($this->msg_newRound, null, array("" . $this->round, "" . count($this->players), "" . $this->playersAtStart));
-            $this->delay = false;
-        }
-    }
-
     public function onBeginRound()
     {
         $this->delay = false;
         if ($this->isRunning && !Core::$warmUpActive && !Core::$pauseActive) {
+
+            $this->round++;
+            $this->eXpChatSendServerMessage($this->msg_newRound, null, array("" . $this->round, "" . count($this->players), "" . $this->playersAtStart));
+
             $playerRange = Config::getInstance()->nbKicks;
             $this->nbKo = $playerRange[max(array_keys($playerRange))] * 2;
 

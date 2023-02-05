@@ -43,7 +43,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("90f");
+        $var->setDefaultValue("573170");
         $this->registerVariable($var);
 
 
@@ -52,7 +52,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("025");
+        $var->setDefaultValue("112035");
         $this->registerVariable($var);
 
 
@@ -70,7 +70,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("90f");
+        $var->setDefaultValue("A54B4B");
         $this->registerVariable($var);
 
 
@@ -96,21 +96,21 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("336");
+        $var->setDefaultValue("222");
         $this->registerVariable($var);
 
         $var = new BoundedTypeFloat("style_widget_bgOpacity", "Widget Background Opacity", $config);
         $var->setGroup("GUI");
         $var->setMin(0.0);
         $var->setMax(1.0);
-        $var->setDefaultValue(0.4);
+        $var->setDefaultValue(0.2);
         $this->registerVariable($var);
 
         $var = new ColorCode("style_widget_title_bgColorize", "Widget Titlebar Background color", $config);
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("90f");
+        $var->setDefaultValue("8E0CA4");
         $this->registerVariable($var);
 
         $var = new ColorCode("style_widget_title_lbColor", "Widget Titlebar Text color", $config);

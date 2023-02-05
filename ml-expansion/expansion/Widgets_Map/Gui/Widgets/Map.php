@@ -10,14 +10,12 @@ class Map extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected $specs;
     protected $map;
     protected $author;
+    protected $edgeWidget;
 
     protected function eXpOnBeginConstruct()
     {
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-        if ($storage->simpleEnviTitle == "TM") {
-            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-            $this->registerScript($this->edgeWidget);
-        }
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
 
         $this->setName("Mapinfo Widget");
         $clockBg = new \ManiaLib\Gui\Elements\Quad(45, 15);

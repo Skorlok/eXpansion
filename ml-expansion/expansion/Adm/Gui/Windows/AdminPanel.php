@@ -28,6 +28,7 @@ class AdminPanel extends Widget
     protected $actionSkip;
     protected $actionRestart;
     protected $actionBalance;
+    protected $edgeWidget;
     public static $mainPlugin;
 
     protected function eXpOnBeginConstruct()
@@ -110,6 +111,9 @@ class AdminPanel extends Widget
         $script->setParam('posX', -32);
         $script->setParam('posXMax', -4);
         $this->registerScript($script);
+
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
     }
 
     public function actions($login, $action)

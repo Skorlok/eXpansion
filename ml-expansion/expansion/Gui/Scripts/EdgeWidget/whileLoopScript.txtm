@@ -2,20 +2,25 @@ if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500 ) {
     if (InputPlayer != Null) {
         declare Real Speed = InputPlayer.Speed*3.6;
 
-        if (Speed < 30.0 || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
+        if (Speed < 10.0 || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
             if (lastValue == True) {
                 edge_isMinimized = False;
                 lastValue = False;
                 edge_animatedId[id] = True;
+            } else {
+                edge_isMinimized = False;
+                lastValue = False;
             }
         }
 
-
-        if (Speed > 30.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
+        if (Speed > 10.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
             if (lastValue == False) {
                 edge_isMinimized = True;
                 lastValue = True;
                 edge_animatedId[id] = True;
+            } else {
+                edge_isMinimized = True;
+                lastValue = True;
             }
         }
     }

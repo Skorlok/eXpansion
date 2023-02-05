@@ -6,10 +6,10 @@ class Config extends \ManiaLib\Utils\Singleton
 {
     public $logo = "http://reaby.kapsi.fi/ml/exp.png";
     public $windowTitleColor = "fff";
-    public $windowTitleBackgroundColor = "90f";
-    public $windowBackgroundColor = "025";
+    public $windowTitleBackgroundColor = "573170";
+    public $windowBackgroundColor = "112035";
     public $buttonTitleColor = "fff";
-    public $buttonBackgroundColor = "90f";
+    public $buttonBackgroundColor = "A54B4B";
     public $style_list_bgColor = array('aaa8', 'eee8');
     public $style_list_bgStyle = array('BgsPlayerCard', 'BgsPlayerCard');
     public $style_list_bgSubStyle = array('BgRacePlayerName', 'BgRacePlayerName');
@@ -27,11 +27,11 @@ class Config extends \ManiaLib\Utils\Singleton
     public $style_widget_bgColor = '';
     public $style_widget_bgStyle = 'Bgs1InRace';
     public $style_widget_bgSubStyle = 'NavButtonBlink'; // BgList
-    public $style_widget_bgColorize = '336'; // BgList
-    public $style_widget_bgOpacity = 0.4;
+    public $style_widget_bgColorize = '222'; // BgList
+    public $style_widget_bgOpacity = 0.2;
     public $style_widget_bgXOffset = 0;
     public $style_widget_bgYOffset = 0;
-    public $style_widget_title_bgColorize = '90f'; // BgList
+    public $style_widget_title_bgColorize = '8E0CA4'; // BgList
     public $style_widget_title_bgOpacity = 0.6;
     public $style_widget_title_bgXOffset = -0.1;
     public $style_widget_title_bgYOffset = 0.25;

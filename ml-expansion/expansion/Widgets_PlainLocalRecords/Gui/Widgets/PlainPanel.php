@@ -33,6 +33,8 @@ class PlainPanel extends Widget
     protected $bgTitle;
     protected $bgFirst;
 
+    protected $edgeWidget;
+
     /**
      * @var Button
      */
@@ -77,6 +79,9 @@ class PlainPanel extends Widget
         $this->frame->setLayout(new Column(-1));
         $this->_windowFrame->addComponent($this->frame);
         $this->setSize($sizeX, $sizeY);
+
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
     }
 
     public function onResize($oldX, $oldY)

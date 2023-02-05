@@ -11,14 +11,13 @@ class ServerInfo extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected $serverName;
     protected $maxPlayers;
     protected $script;
+    protected $edgeWidget;
 
     protected function eXpOnBeginConstruct()
     {
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-        if ($storage->simpleEnviTitle == "TM") {
-            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-            $this->registerScript($this->edgeWidget);
-        }
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
+
         $bg = new \ManiaLib\Gui\Elements\Quad(60, 10);
         $bg->setAlign("left", "top");
         $bg->setStyle("Bgs1InRace");

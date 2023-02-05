@@ -35,11 +35,8 @@ class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
         $this->setName("Map Ratings Widget");
 
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-        if ($storage->simpleEnviTitle == "TM") {
-            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-            $this->registerScript($this->edgeWidget);
-        }
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
     }
 
     public function onResize($oldX, $oldY)

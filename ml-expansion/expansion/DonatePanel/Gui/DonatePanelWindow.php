@@ -9,6 +9,7 @@ class DonatePanelWindow extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected $_mainWindow;
     protected $_minButton;
     protected $container;
+    protected $edgeWidget;
     public static $donatePlugin;
     protected $items = array();
 
@@ -68,6 +69,9 @@ class DonatePanelWindow extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $script->setParam('posX', -62);
         $script->setParam('posXMax', -2);
         $this->registerScript($script);
+
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
     }
 
     public function donate($login, $amount)

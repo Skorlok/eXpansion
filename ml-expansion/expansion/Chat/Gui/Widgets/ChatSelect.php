@@ -17,6 +17,7 @@ class ChatSelect extends Widget
     protected $channelSelect;
     protected $button;
     protected $frame;
+    protected $edgeWidget;
 
     public function eXpOnBeginConstruct()
     {
@@ -39,6 +40,9 @@ class ChatSelect extends Widget
         $this->setSize(30, 6);
         $this->setPosition(-153, 77);
         $this->setScale(0.9);
+
+        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+        $this->registerScript($this->edgeWidget);
     }
 
     public function ok($login, $entries)
