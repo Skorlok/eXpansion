@@ -180,9 +180,14 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
             $rank = $x + 1;
 
+            $recLogin = $record->login;
+            if ($recLogin == $record->nickName) {
+                $recLogin = $recLogin . ' '; // hack to make it work
+            }
+
             $this->pager->addSimpleItems(array($rank => -1,
-                ($record->nickName ? Gui::fixString($record->nickName) : '$f00N/A') => -1,
-                ($record->login ? Gui::fixString($record->login) : '$f00N/A') => -1,
+                Gui::fixString($record->nickName) => -1,
+                $recLogin => -1,
                 $localBase->formatScore($record->time) . " " => -1,
                 $localBase->formatScore($record->avgScore) . "" => -1,
                 "#" . $record->nbFinish => -1,
