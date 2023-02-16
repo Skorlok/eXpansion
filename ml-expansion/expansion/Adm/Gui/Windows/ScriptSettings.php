@@ -90,7 +90,9 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
         }
 
-        $this->connection->setModeScriptSettings($settings);
+        if ($settings) {
+            $this->connection->setModeScriptSettings($settings);
+        }
 
         $this->Erase($login);
     }

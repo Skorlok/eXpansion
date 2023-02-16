@@ -20,6 +20,7 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
+        Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
     }
 
     public function eXpOnReady()
@@ -83,11 +84,18 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
         $this->updateLocalPanel();
     }
 
+    public function onRecordDeleted($removedRecord, $records)
+    {
+        self::$localrecords = $records;
+        $this->updateLocalPanel();
+    }
+
     public function eXpOnUnload()
     {
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
+        Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
         LocalPanel::EraseAll();
     }
 

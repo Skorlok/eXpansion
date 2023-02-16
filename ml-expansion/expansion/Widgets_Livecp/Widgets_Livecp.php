@@ -99,6 +99,10 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
+        if (!isset($this->players[$login])) {
+            return;
+        }
+        
         if ($timeOrScore == 0) {
             if ($this->players[$login]->cpIndex != $this->storage->currentMap->nbCheckpoints - 1) {
                 $this->players[$login] = new CpInfo();

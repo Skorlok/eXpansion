@@ -19,11 +19,12 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $frame;
     protected $label_rank;
     protected $label_nick;
+    protected $label_login;
     protected $label_score;
     protected $label_avgScore;
     protected $label_nbFinish;
     protected $label_date;
-    protected $widths = array(1, 5, 3, 3, 2, 4, 5);
+    protected $widths = array(1, 7, 3, 3, 3, 3, 5, 5);
 
     /**
      * @var \ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager
@@ -41,10 +42,12 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     /** @var  LocalBase */
     protected $localBase;
 
+    public static $parentPlugin;
+
     protected function onConstruct()
     {
         parent::onConstruct();
-        $sizeX = 100;
+        $sizeX = 120;
         $scaledSizes = Gui::getScaledSize($this->widths, $sizeX / .8);
 
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager();
@@ -68,22 +71,27 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_nick->setScale(0.8);
         $this->frame->addComponent($this->label_nick);
 
-        $this->label_score = new \ManiaLib\Gui\Elements\Label($scaledSizes[2], 4);
+        $this->label_login = new \ManiaLib\Gui\Elements\Label($scaledSizes[2], 4);
+        $this->label_login->setAlign('left', 'center');
+        $this->label_login->setScale(0.8);
+        $this->frame->addComponent($this->label_login);
+
+        $this->label_score = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 4);
         $this->label_score->setAlign('left', 'center');
         $this->label_score->setScale(0.8);
         $this->frame->addComponent($this->label_score);
 
-        $this->label_avgScore = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 4);
+        $this->label_avgScore = new \ManiaLib\Gui\Elements\Label($scaledSizes[4], 4);
         $this->label_avgScore->setAlign('left', 'center');
         $this->label_avgScore->setScale(0.8);
         $this->frame->addComponent($this->label_avgScore);
 
-        $this->label_nbFinish = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 4);
+        $this->label_nbFinish = new \ManiaLib\Gui\Elements\Label($scaledSizes[5], 4);
         $this->label_nbFinish->setAlign('left', 'center');
         $this->label_nbFinish->setScale(0.8);
         $this->frame->addComponent($this->label_nbFinish);
 
-        $this->label_date = new \ManiaLib\Gui\Elements\Label($scaledSizes[3], 4);
+        $this->label_date = new \ManiaLib\Gui\Elements\Label($scaledSizes[6], 4);
         $this->label_date->setAlign('left', 'center');
         $this->label_date->setScale(0.8);
         $this->frame->addComponent($this->label_date);
@@ -111,10 +119,11 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->label_rank->setSizeX($scaledSizes[0]);
         $this->label_nick->setSizeX($scaledSizes[1]);
-        $this->label_score->setSizeX($scaledSizes[2]);
-        $this->label_avgScore->setSizeX($scaledSizes[3]);
-        $this->label_nbFinish->setSizeX($scaledSizes[4]);
-        $this->label_date->setSizeX($scaledSizes[5]);
+        $this->label_login->setSizeX($scaledSizes[2]);
+        $this->label_score->setSizeX($scaledSizes[3]);
+        $this->label_avgScore->setSizeX($scaledSizes[4]);
+        $this->label_nbFinish->setSizeX($scaledSizes[5]);
+        $this->label_date->setSizeX($scaledSizes[6]);
         $this->pager->setSize($this->getSizeX() - 1, $this->getSizeY() - 12);
         $this->pager->setPosY(-7);
         foreach ($this->items as $item) {
@@ -130,6 +139,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         $this->label_rank->setText(__(LocalRecords::$txt_rank, $this->getRecipient()));
         $this->label_nick->setText(__(LocalRecords::$txt_nick, $this->getRecipient()));
+        $this->label_login->setText(__(LocalRecords::$txt_login, $this->getRecipient()));
         $this->label_score->setText(__(LocalRecords::$txt_score, $this->getRecipient()));
         $this->label_avgScore->setText(__(LocalRecords::$txt_avgScore, $this->getRecipient()));
         $this->label_nbFinish->setText(__(LocalRecords::$txt_nbFinish, $this->getRecipient()));
@@ -172,14 +182,12 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
             $this->pager->addSimpleItems(array($rank => -1,
                 Gui::fixString($record->nickName) => -1,
+                $record->login => -1,
                 $localBase->formatScore($record->time) . " " => -1,
                 $localBase->formatScore($record->avgScore) . "" => -1,
                 "#" . $record->nbFinish => -1,
                 date('d/m/Y', $record->date) . "" => -1,
-                ($record->isDelete ? 'Undo' : 'Delete') => $this->createAction(
-                    array($this, 'toogleDelete'),
-                    $record
-                ),
+                'Delete' => ($currentMap ? $this->createAction(array($this, 'toogleDelete'), $record) : "")
             ));
             $x++;
         }
@@ -190,7 +198,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function toogleDelete($login, $record)
     {
-        $record->isDelete = !$record->isDelete;
+        self::$parentPlugin->actionDelete($login, $record);
 
         $this->populateList($this->recList, $this->limit, $this->currentMap, $this->localBase);
         $this->redraw($login);

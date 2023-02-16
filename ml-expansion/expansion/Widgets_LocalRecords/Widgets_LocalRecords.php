@@ -32,6 +32,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
+        Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
         $this->config = Config::getInstance();
     }
 
@@ -191,6 +192,12 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->updateLocalPanel();
     }
 
+    public function onRecordDeleted($removedRecord, $records)
+    {
+        self::$localrecords = $records;
+        $this->updateLocalPanel();
+    }
+
     public function eXpOnUnload()
     {
         Gui\Widgets\LocalPanel::EraseAll();
@@ -198,5 +205,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
+        Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
     }
 }

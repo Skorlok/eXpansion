@@ -23,6 +23,8 @@
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 
 class LocalRecords extends LocalBase
 {
@@ -40,25 +42,22 @@ class LocalRecords extends LocalBase
     {
         //Checking for valid time
         if (isset($this->storage->players[$login]) && $timeOrScore > 0) {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
+            
             //If laps mode we need to ignore. Laps has it's own end map event(end finish lap)
             //Laps mode has it own on Player finish event
-            if ($gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCount1lap) {
+            if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCountAllLaps) {
                 return;
             }
 
             $playerinfo = Core::$playerInfo;
 
-            $time = microtime();
+            $time = microtime(true);
             //We add the record to the buffer
             if (isset($playerinfo[$login])) {
-                $this->addRecord($login, $timeOrScore, $gamemode, $playerinfo[$login]->checkpoints);
+                $this->addRecord($login, $timeOrScore, $playerinfo[$login]->checkpoints);
             }
 
-            if (($this->debug & self::DEBUG_RECPROCESSTIME) == self::DEBUG_RECPROCESSTIME) {
-                $this->debug("#### NEW RANK IN : " . (microtime() - $time) . "s BAD?");
-            }
+            $this->debug("#### NEW RANK IN : " . (microtime(true) - $time) . "s BAD?");
         }
         parent::onPlayerFinish($playerUid, $login, $timeOrScore);
     }
@@ -71,11 +70,10 @@ class LocalRecords extends LocalBase
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-        if ($this->config->lapsModeCount1lap && isset($this->storage->players[$player->login]) && $time > 0) {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
+        if (($this->config->lapsModeCountAllLaps || Endurance::$enduro) && isset($this->storage->players[$player->login]) && $time > 0) {
+            
             //Laps mode has it own on Player finish event
-            if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro != true) {
+            if (self::eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_LAPS) {
                 return;
             }
 
@@ -85,7 +83,7 @@ class LocalRecords extends LocalBase
                 return;
             }
 
-            $this->addRecord($player->login, $time, $gamemode, $checkpoints);
+            $this->addRecord($player->login, $time, $checkpoints);
         }
         parent::onPlayerFinishLap($player, $time, $checkpoints, $nbLap);
     }
@@ -178,40 +176,21 @@ class LocalRecords extends LocalBase
      */
     public function getNbOfLaps()
     {
-        if ($this->storage->gameInfos->gameMode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
-            switch ($this->storage->gameInfos->gameMode) {
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS:
-                    if ($this->storage->gameInfos->roundsForcedLaps == 0) {
-                        return $this->storage->currentMap->nbLaps;
-                    } else {
-                        return $this->storage->gameInfos->roundsForcedLaps;
-                    }
+        if ($this->storage->currentMap->lapRace) {
 
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP:
-                    return $this->storage->currentMap->nbLaps;
-                    break;
-
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS:
-                    return $this->storage->gameInfos->lapsNbLaps;
-                    break;
-
-                default:
+            $scriptSettings = $this->connection->getModeScriptSettings();
+            
+            if (isset($scriptSettings['S_ForceLapsNb']) && $scriptSettings['S_ForceLapsNb'] > 0) {
+                return ($scriptSettings['S_ForceLapsNb']);
+            } else {
+                if (Endurance::$enduro || (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCountAllLaps)) {
                     return 1;
+                }
+                return ($this->storage->currentMap->nbLaps);
             }
+
         } else {
-            $settings = $this->connection->getModeScriptSettings();
-            switch (self::eXpGetCurrentCompatibilityGameMode()) {
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS:
-                    return $settings['S_ForceLapsNb'] == -1 ? 1 : $settings['S_ForceLapsNb'];
-                    break;
-
-                default:
-                    return 1;
-            }
+            return 1;
         }
     }
 }

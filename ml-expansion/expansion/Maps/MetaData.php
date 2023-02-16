@@ -23,6 +23,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $config = Config::getInstance();
 
+        $var = new Boolean("skipLeft", "Skip jukeboxed map if requester left ?", $config, false, false);
+        $var->setDefaultValue(true);
+        $this->registerVariable($var);
+
+        $var = new Boolean("skipRight", "Jukebox skipleft affect admins ?", $config, false, false);
+        $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
         $var = new SortedList("publicQueueAmount", "Jukeboxing costs", $config, false, true);
         $var->setGroup('Planets');
         $var->setType(new TypeInt("", "", null));

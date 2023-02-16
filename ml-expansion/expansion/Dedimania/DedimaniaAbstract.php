@@ -22,11 +22,6 @@ use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord;
  */
 abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements \ManiaLivePlugins\eXpansion\Dedimania\Events\Listener
 {
-    const DEBUG_NONE = 0; //00000
-    const DEBUG_MAX_RANKS = 1; //00001
-
-    public $debug = self::DEBUG_MAX_RANKS;
-
     protected $endMapTriggered = false;
 
     /** @var DediConnection */
@@ -53,6 +48,8 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     /* @var integer $recordCount */
     protected $recordCount = 30;
+
+    private $settingsChanged = array();
 
     protected $msg_norecord;
     protected $msg_welcome;
@@ -113,12 +110,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public function previewDediMessages()
     {
-        $this->eXpChatSendServerMessage($this->msg_record, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
+        $this->eXpChatSendServerMessage($this->msg_improved, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
 
-        $this->eXpChatSendServerMessage($this->msg_newRecord, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
+        $this->eXpChatSendServerMessage($this->msg_new, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
     }
-
-    private $settingsChanged = array();
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
@@ -262,6 +257,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                 if ($record->place > $maxrank) {
                     $this->debugMaxRanks("record place: " . $record->place . " is greater than max rank: " . $maxrank);
                     $this->debugMaxRanks("not adding record.");
+                    unset($this->records[$login]);
                     continue;
                 }
 
@@ -417,7 +413,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             if ($record->place <= Config::getInstance()->noRedirectTreshold) {
                 $noRedirect = true;
             }
-            $this->eXpChatSendServerMessage($this->msg_new,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"), $record->place, $time),$noRedirect);
+            $this->eXpChatSendServerMessage($this->msg_new,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wosnm"), $record->place, $time),$noRedirect);
         } catch (\Exception $e) {
             $this->console("Error: couldn't show dedimania message" . $e->getMessage());
         }
@@ -464,9 +460,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             }
 
             if ($oldRecord->place != $record->place) {
-                $this->eXpChatSendServerMessage($this->msg_improved,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+                $this->eXpChatSendServerMessage($this->msg_improved,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wosnm"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
             } else {
-                $this->eXpChatSendServerMessage($this->msg_secure,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+                $this->eXpChatSendServerMessage($this->msg_secure,$recepient,array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wosnm"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
             }
             $this->debug("message sent.");
         } catch (\Exception $e) {
@@ -697,8 +693,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     protected function debugMaxRanks($debugMsg)
     {
-        if (($this->debug & self::DEBUG_MAX_RANKS) == self::DEBUG_MAX_RANKS) {
-            $this->debug('[Max Ranks]' . $debugMsg);
-        }
+        $this->debug('[Max Ranks]' . $debugMsg);
     }
 }

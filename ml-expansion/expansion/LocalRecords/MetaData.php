@@ -59,7 +59,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(100);
         $this->registerVariable($var);
 
-        $var = new Boolean("lapsModeCount1lap", "Localrecords: Count in 1st lap in Laps-mode ?", $config, true, false);
+        $var = new Boolean("lapsModeCountAllLaps", "Localrecords: Count all lap in Laps-mode ?", $config, true, false);
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 

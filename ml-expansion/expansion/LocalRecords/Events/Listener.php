@@ -43,4 +43,10 @@ interface Listener extends EventListener
      * @param Record $record
      */
     public function onRecordPlayerFinished($record);
+
+    /**
+     * @param Record $emovedRecord
+     * @param Record[] $records
+     */
+    public function onRecordDeleted($removedRecord, $records);
 }

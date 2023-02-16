@@ -15,6 +15,8 @@ class Event extends \ManiaLive\Event\Event
 
     const ON_NEW_FINISH = 16;
 
+    const ON_RECORD_DELETED = 32;
+
     protected $params;
 
     public function __construct($onWhat)
@@ -43,6 +45,9 @@ class Event extends \ManiaLive\Event\Event
                 break;
             case self::ON_NEW_FINISH:
                 $listener->onRecordPlayerFinished($p[0]);
+                break;
+            case self::ON_RECORD_DELETED:
+                $listener->onRecordDeleted($p[0], $p[1]);
                 break;
         }
     }

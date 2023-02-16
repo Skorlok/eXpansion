@@ -54,6 +54,7 @@ class Maps extends ExpPlugin
     private $msg_errDwld;
     private $msg_errMxId;
     private $msg_mapAdd;
+    private $msg_skipleft;
     private $actionShowMapList;
     private $actionShowJukeList;
 
@@ -111,6 +112,7 @@ class Maps extends ExpPlugin
         $this->msg_errToLarge = eXpGetMessage('#admin_error#The map is to large to be added to a server');
         $this->msg_errMxId = eXpGetMessage("#admin_error#You must include a MX map ID!");
         $this->msg_mapAdd = eXpGetMessage('#admin_action#Map #variable# %1$s #admin_action#added to playlist by #variable#%2$s');
+        $this->msg_skipleft = eXpGetMessage('#queue#Skipping map #variable#%1$s #queue#, because #variable#%2$s #queue#left'); // '%1$s' = Map Name, '%2$s' = requester nickname
         $this->enableDedicatedEvents();
         $this->enableDatabase();
     }
@@ -372,6 +374,32 @@ class Maps extends ExpPlugin
         if (count($this->queue) > 0) {
             reset($this->queue);
             $queue = current($this->queue);
+
+            if ($this->config->skipLeft) {
+
+                while (!isset($this->storage->players[$queue->player->login]) && !isset($this->storage->spectators[$queue->player->login])) {
+
+                    if ($this->config->skipRight || !AdminGroups::hasPermission($queue->player->login, Permission::MAP_JUKEBOX_ADMIN)) {
+                        $this->eXpChatSendServerMessage($this->msg_skipleft, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), Formatting::stripCodes($queue->player->nickName, 'wosnm')));
+                        array_shift($this->queue);
+                    } else {
+                        break;
+                    }
+                    
+                    if (count($this->queue) > 0) {
+                        reset($this->queue);
+                        $queue = current($this->queue);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (count($this->queue) > 0) {
+            reset($this->queue);
+            $queue = current($this->queue);
+
             try {
                 $this->connection->chooseNextMap($queue->map->fileName);
 

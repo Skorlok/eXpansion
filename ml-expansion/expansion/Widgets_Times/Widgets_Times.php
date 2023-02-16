@@ -174,6 +174,11 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     }
 
+    public function onRecordDeleted($removedRecord, $records)
+    {
+        $this->showPanel($removedRecord->login, false);
+    }
+
     public function onPersonalBestRecord($data)
     {
         $this->showPanel($data->login, false);

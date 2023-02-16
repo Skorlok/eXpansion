@@ -295,6 +295,14 @@ class KnockOut extends ExpPlugin
         $ranking = Core::$rankings;
         $this->sortAsc($ranking);
 
+        if (count($ranking) <= 1) {
+            reset($this->players);
+            $player = current($this->players);
+            $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
+            $this->koStop();
+            return;
+        }
+
         $knockedOut = 0;
 
         $dnf = $this->findDNF($ranking);

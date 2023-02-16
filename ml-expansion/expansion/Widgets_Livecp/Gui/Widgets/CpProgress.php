@@ -72,14 +72,11 @@ class CpProgress extends Widget
                 break;
             }
 
-            $element = new CpItem(
-                $x,
-                $this->storage->getPlayerObject($login),
-                $data,
-                $this->storage->currentMap->nbCheckpoints
-            );
-            $this->frame->addComponent($element);
-            $x++;
+            if (isset($this->storage->players[$login]) || isset($this->storage->spectators[$login])) {
+                $element = new CpItem($x,$this->storage->getPlayerObject($login), $data, $this->storage->currentMap->nbCheckpoints);
+                $this->frame->addComponent($element);
+                $x++;
+            }
         }
 
 
