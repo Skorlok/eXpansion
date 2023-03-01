@@ -22,9 +22,7 @@ class MenuWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
 
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Menu\Gui\Script");
 
-        $version = \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION;
         $storage = \ManiaLive\Data\Storage::getInstance();
-        $this->script->setParam("version", $version);
         $this->script->setParam("name", "Submenu");
         $this->script->setParam("gameMode", \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($storage->gameInfos->scriptName));
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));

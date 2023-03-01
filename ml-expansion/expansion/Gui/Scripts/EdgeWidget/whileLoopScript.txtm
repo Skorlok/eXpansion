@@ -1,4 +1,4 @@
-if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500 ) {
+if (edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500) {
     if (InputPlayer != Null) {
         declare Real Speed = InputPlayer.Speed*3.6;
 
@@ -45,7 +45,7 @@ if (edge_animatedId[id] == True) {
     }
 
     if (animActive) {
-        p2 = eXp_widgetLastPosRel[version][id][gameMode];
+        p2 = EXP_widgetLastPosRel[id][gameMode];
         declare Text pos = "";
         declare Text scale = "1.";
 

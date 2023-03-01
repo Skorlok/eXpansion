@@ -75,11 +75,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd->help = 'Start a vote to extend timelimit';
 
         $cmd = AdminGroups::addAdminCommand('cancel', $this, 'cancelVote', 'cancel_vote');
-        $cmd->setHelp = 'Cancel current running vote';
+        $cmd->setHelp('Cancel current running vote');
         AdminGroups::addAlias($cmd, "can");
 
         $cmd = AdminGroups::addAdminCommand('passvote', $this, 'passVote', 'pass_vote');
-        $cmd->setHelp = 'Pass current running vote';
+        $cmd->setHelp('Pass current running vote');
         AdminGroups::addAlias($cmd, "passv");
     }
 

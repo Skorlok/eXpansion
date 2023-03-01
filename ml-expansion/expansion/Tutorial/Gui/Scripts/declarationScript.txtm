@@ -1,19 +1,15 @@
-declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
+declare persistent Boolean[Text][Text] EXP_widgetVisible;
 declare Text gamemode = "all";
 
-if (!eXp_widgetVisible.existskey(version) ) {
-    eXp_widgetVisible = Boolean[Text][Text][Text];
+if (!EXP_widgetVisible.existskey(id) || forceReset) {
+	EXP_widgetVisible[id] = Boolean[Text];
 }
 
-if ( !eXp_widgetVisible[version].existskey(id) ) {
-    eXp_widgetVisible[version][id] = Boolean[Text];
+if (!EXP_widgetVisible[id].existskey(gamemode) || forceReset) {
+	EXP_widgetVisible[id][gamemode] = True;
 }
 
-if ( !eXp_widgetVisible[version][id].existskey(gamemode) || forceReset) {
-	eXp_widgetVisible[version][id][gamemode] = True;
-}
-
-if (eXp_widgetVisible[version][id][gamemode] == False) {
+if (EXP_widgetVisible[id][gamemode] == False) {
     Window.Hide();
 }
 

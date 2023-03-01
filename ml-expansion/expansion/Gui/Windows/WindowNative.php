@@ -255,7 +255,6 @@ abstract class WindowNative extends \ManiaLive\Gui\Window
         $this->script->setParam("wLoop", $this->wLoop);
         $this->script->setParam("closeAction", $this->_closeAction);
         $this->script->setParam("disableAnimations", Config::getInstance()->disableAnimations ? "True" : "False");
-        $this->script->setParam("version", \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION);
         $reset = "False";
         if (DEBUG) {
             $reset = "True";

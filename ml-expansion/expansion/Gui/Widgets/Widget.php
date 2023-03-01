@@ -168,7 +168,6 @@ class Widget extends PlainWidget
 
         $this->script->setParam("name", $this->getName());
         $this->script->setParam("axisDisabled", $this->axisDisabled);
-        $this->script->setParam("version", \ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION);
 
         if ($this->storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
             $this->script->setParam("gameMode", Gui::fixString($this->storage->gameInfos->scriptName));

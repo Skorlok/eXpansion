@@ -322,7 +322,8 @@ class GBXBaseFetcher
     private function startTag($parser, $name, $attribs)
     {
         foreach ($attribs as $key => &$val) {
-            $val = utf8_decode($val);
+            //$val = utf8_decode($val);
+            $val = mb_convert_encoding($val, 'ISO-8859-1', 'UTF-8');
         }
         array_push($this->_parsestack, $name);
         if ($name == 'DEP') {
@@ -359,7 +360,8 @@ class GBXBaseFetcher
         // escape '&' characters unless already a known entity
         $xml = preg_replace('/&(?!(?:amp|quot|apos|lt|gt);)/', '&amp;', $this->xml);
 
-        if (!xml_parse($xml_parser, utf8_encode($xml), true)) {
+        // if (!xml_parse($xml_parser, utf8_encode($xml), true)) {
+        if (!xml_parse($xml_parser, mb_convert_encoding($xml, 'UTF-8', mb_list_encodings()), true)) {
             $this->errorOut(
                 sprintf(
                     'XML chunk parse error: %s at line %d',

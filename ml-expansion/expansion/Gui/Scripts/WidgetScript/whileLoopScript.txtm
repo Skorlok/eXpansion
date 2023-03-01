@@ -1,6 +1,5 @@
 
 <?php
-
     $deltaX = "DeltaPos.X = MouseX - lastMouseX;";
     $deltaY = "DeltaPos.Y = MouseY - lastMouseY;";
 
@@ -8,99 +7,75 @@
         $deltaX = "";
     if ($this->axisDisabled == "y")
         $deltaY = "";
-
 ?>
 
-
-if(!disablePersonalHud){
-
+if (!disablePersonalHud) {
     //Check if persistent variables needs to be checked, or first loop
-    if(exp_needToCheckPersistentVars || !eXp_firstPersistentCheckDone) {
-	exp_multipleCheckCount += 1;
-	eXp_firstPersistentCheckDone = True;
+    if (exp_needToCheckPersistentVars || !eXp_firstPersistentCheckDone) {
+		exp_multipleCheckCount += 1;
+		eXp_firstPersistentCheckDone = True;
 
-	if(exp_multipleCheckCount > 2) {
-	    exp_needToCheckPersistentVars = False;
-	    exp_multipleCheckCount = 0;
-	}
+		if (exp_multipleCheckCount > 2) {
+			exp_needToCheckPersistentVars = False;
+			exp_multipleCheckCount = 0;
+		}
 
-	    if (!eXp_widgetVisible.existskey(version) ) {
-		    eXp_widgetVisible[version] = Boolean[Text][Text];
+	    if (!EXP_widgetVisible.existskey(id) || forceReset) {
+		    EXP_widgetVisible[id] = Boolean[Text];
 	    }
 
-	    if ( !eXp_widgetVisible[version].existskey(id) || forceReset) {
-		    eXp_widgetVisible[version][id] = Boolean[Text];
+	    if (!EXP_widgetVisible[id].existskey(gameMode) ) {
+		    EXP_widgetVisible[id][gameMode] = <?php echo $win->getWidgetVisible(); ?>;
 	    }
 
-	    if ( !eXp_widgetVisible[version][id].existskey(gameMode) ) {
-		    eXp_widgetVisible[version][id][gameMode] = <?php echo $win->getWidgetVisible(); ?>;
+	    if (!EXP_widgetLayers.existskey(id) || forceReset) {
+		    EXP_widgetLayers[id] = Text[Text];
 	    }
 
-	    if (!eXp_widgetLayers.existskey(version) ) {
-		    eXp_widgetLayers[version] = Text[Text][Text];
-	    }
+		if (!EXP_widgetLayers[id].existskey(gameMode)) {
+			EXP_widgetLayers[id][gameMode] = activeLayer;
+		}
 
-	    if (!eXp_widgetLayers[version].existskey(id) || forceReset) {
-		    eXp_widgetLayers[version][id] = Text[Text];
-	    }
+		if (!EXP_widgetLastPosRel.existskey(id) || forceReset) {
+			EXP_widgetLastPosRel[id] = Vec3[Text];
+		}
 
-	    if (!eXp_widgetLayers[version][id].existskey(gameMode)) {
-		    eXp_widgetLayers[version][id][gameMode] = activeLayer;
-	    }
-
-	   if (!eXp_widgetLastPosRel.existskey(version)) {
-       	    eXp_widgetLastPosRel[version] = Vec3[Text][Text];
-       }
-
-       if (!eXp_widgetLastPosRel[version].existskey(id) || forceReset) {
-           eXp_widgetLastPosRel[version][id] = Vec3[Text];
-       }
-
-       if (!eXp_widgetLastPosRel[version][id].existskey(gameMode)) {
-       	eXp_widgetLastPosRel[version][id][gameMode] = < <?php echo $this->getNumber($win->getPosX()) ?>, <?php echo $this->getNumber($win->getPosY()) ?>, -3.0>;
-       }
+		if (!EXP_widgetLastPosRel[id].existskey(gameMode)) {
+			EXP_widgetLastPosRel[id][gameMode] = < <?php echo $this->getNumber($win->getPosX()) ?>, <?php echo $this->getNumber($win->getPosY()) ?>, -3.0>;
+		}
 
 
-    if (eXp_widgetVisible[version][id][gameMode] == True && eXp_widgetLayers[version][id][gameMode] == visibleLayerInit && exp_widgetCurrentVisible != eXp_widgetVisible[version][id][gameMode]) {
-	    Window.Show();
-	    exp_widgetCurrentVisible = True;
-	} else if(exp_widgetCurrentVisible != eXp_widgetVisible[version][id][gameMode] || eXp_widgetLayers[version][id][gameMode] != activeLayer) {
-	    Window.Hide();
-	    exp_widgetCurrentVisible = False;
-            yield;
-            continue;
-	}
+		if (EXP_widgetVisible[id][gameMode] == True && EXP_widgetLayers[id][gameMode] == visibleLayerInit && exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode]) {
+			Window.Show();
+			exp_widgetCurrentVisible = True;
+		} else if (exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer) {
+			Window.Hide();
+			exp_widgetCurrentVisible = False;
+			yield;
+			continue;
+		}
 
-	if (exp_enableHudMove == True) {
-		quad.Show();
-		/*coordLabel.Show();
-		coordButton.Show();
-		coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ "x" ^ roundFloat(Window.RelativePosition.Y);
-        coordInput.Value = coordLabel.Value;
-        */
+		if (exp_enableHudMove == True) {
+			quad.Show();
+		} else {
+			quad.Hide();
+		}
 
-	} else {
-		quad.Hide();
-		/*coordInput.Hide();
-        coordLabel.Hide();
-        coordButton.Hide();*/
-	}
-
-	exp_widgetLayersBuffered = eXp_widgetLayers[version][id][gameMode];
-	exp_widgetVisibleBuffered = eXp_widgetVisible[version][id][gameMode];
+		exp_widgetLayersBuffered = EXP_widgetLayers[id][gameMode];
+		exp_widgetVisibleBuffered = EXP_widgetVisible[id][gameMode];
 
     } else {
-	exp_multipleCheckCount = 0;
+		exp_multipleCheckCount = 0;
     }
 
     if (InputPlayer == Null) {
-	yield;
-	continue;
+		yield;
+		continue;
     }
 
     if(PageIsVisible == False){
-	yield;
-	continue;
+		yield;
+		continue;
     }
 
     if (exp_enableHudMove == True && MouseLeftButton == True) {
@@ -110,9 +85,8 @@ if(!disablePersonalHud){
 			    lastMouseY = MouseY;
 			    MoveWindow = True;
 		    }
-
 	    }
-    }else {
+    } else {
 	    MoveWindow = False;
     }
 
@@ -122,13 +96,9 @@ if(!disablePersonalHud){
 	    LastDelta += DeltaPos;
 	    LastDelta.Z = 0.0;
 	    Window.RelativePosition = LastDelta;
-        eXp_widgetLastPosRel[version][id][gameMode] = Window.RelativePosition;
+        EXP_widgetLastPosRel[id][gameMode] = Window.RelativePosition;
 
-	   // @todo enable when coordinates system is redone
-	   // coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ "x" ^ roundFloat(Window.RelativePosition.Y);
-       // coordInput.Value = coordLabel.Value;
-
-	     lastMouseX = MouseX;
+		lastMouseX = MouseX;
 	    lastMouseY = MouseY;
     }
 

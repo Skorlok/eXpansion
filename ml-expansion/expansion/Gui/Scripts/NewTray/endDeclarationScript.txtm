@@ -1,7 +1,7 @@
 declare Integer eXp_lastClockUpdate = Now;
 declare Integer start = Now-2000;
 declare persistent Boolean[Text] exp_trayId = Boolean[Text];
-declare Vec3 p = eXp_widgetLastPosRel[version][id][gameMode];
+declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
 
 // from edge script
 declare Boolean edge_isMinimized for UI = False;
@@ -24,15 +24,15 @@ if (!exp_trayId.existskey(id) ) {
 }
 
 declare Real diff = -(Window.Size.X / 2) + 8;
-    if (Window.RelativePosition.X > 1) {
-       diff = (Window.Size.X / 2) - 10 ;
-    }
+if (Window.RelativePosition.X > 1) {
+    diff = (Window.Size.X / 2) - 10 ;
+}
 
 if (exp_trayId[id]) {
     Window.RelativePosition.X = p.X + diff;
 }
 
 declare Real edge = -200.;
-    if (p.X > 1) {
-        edge = 200.;
-    }
+if (p.X > 1) {
+    edge = 200.;
+}

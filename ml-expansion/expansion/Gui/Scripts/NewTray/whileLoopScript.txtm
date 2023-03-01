@@ -51,7 +51,7 @@ if (edge_animatedId[id] == True) {
         animActive = False;
     }
 
-        p = eXp_widgetLastPosRel[version][id][gameMode];
+        p = EXP_widgetLastPosRel[id][gameMode];
 
         declare Real edge = -200.;
         if (p.X > 1) {

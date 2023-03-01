@@ -51,6 +51,9 @@ abstract class ErrorHandling
 	 */
 	public static function createExceptionFromError($errno, $errstr, $errfile, $errline)
 	{
+		if (str_contains($errstr, "Creation of dynamic property"))
+			return;
+
 		echo "[PHP Warning] $errstr on line $errline in file $errfile", PHP_EOL, PHP_EOL;
 		// We don't want to crash ML because of a silly notice or strict error.
 		static $ignores = array(2, 8, 32, 512, 1024, 2048);

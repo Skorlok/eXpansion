@@ -94,10 +94,9 @@ main () {
 
     declare Text id = "<?php echo $this->name ?>";
     declare Boolean forceReset = <?php echo $this->forceReset; ?>;
-    declare Text version = "<?php echo $this->version; ?>";
     declare Boolean disableAnimations = <?php echo $this->disableAnimations; ?>;
     //declare Boolean disableAnimations = True;
-    declare persistent Vec3[Text][Text] exp_windowLastPosRel;
+    declare persistent Vec3[Text] EXP_windowLastPosRel;
     declare Text[] exp_windowStack for UI = Text[];
     declare Boolean exp_updateStack for UI = False;
     declare Integer exp_stackCounter for UI = 0;
@@ -109,16 +108,12 @@ main () {
     //Declarations by containers included in this window
     <?php echo $this->dDeclares ?>
 
-    if (!exp_windowLastPosRel.existskey(version)) {
-         exp_windowLastPosRel[version] = Vec3[Text];
+    if ( !EXP_windowLastPosRel.existskey(id) || forceReset) {
+        EXP_windowLastPosRel[id] = < <?php echo $startPosX ?>, <?php echo  $startPosY ?>, 0.0>;
     }
 
-    if ( !exp_windowLastPosRel[version].existskey(id) || forceReset) {
-        exp_windowLastPosRel[version][id] = < <?php echo $startPosX ?>, <?php echo  $startPosY ?>, 0.0>;
-    }
-
-    LastDelta = exp_windowLastPosRel[version][id];
-    Window.RelativePosition = exp_windowLastPosRel[version][id];
+    LastDelta = EXP_windowLastPosRel[id];
+    Window.RelativePosition = EXP_windowLastPosRel[id];
 
     if (!disableAnimations && !stackContainsWindow(id) ) {
         Window.RelativePosition.Z = 0.;
@@ -144,10 +139,6 @@ main () {
 
         if (openWindow && lastAction + 200 <= Now ) {
             openWindow = False;
-
-            //declare Real winX = exp_windowLastPosRel[version][id].X;
-            //declare Real winY = exp_windowLastPosRel[version][id].Y;
-            //declare Text pos = winX ^ " " ^ winY;
             lastAction = 0;
         }
 
@@ -206,7 +197,7 @@ main () {
         if (MoveWindow) {
              Window.RelativePosition.X = MouseX + Offset.X;
 	     Window.RelativePosition.Y = MouseY + Offset.Y;
-	     exp_windowLastPosRel[version][id] = Window.RelativePosition;
+	     EXP_windowLastPosRel[id] = Window.RelativePosition;
 	}
 
 

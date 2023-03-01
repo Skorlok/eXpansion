@@ -113,11 +113,11 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
 
 foreach (Event in PendingEvents) {
     if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "setLayer") {
-        if (eXp_widgetLayers[version][id][gameMode] == "normal") {
-            eXp_widgetLayers[version][id][gameMode] = "scorestable";
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
             exp_needToCheckPersistentVars = True;
         } else {
-            eXp_widgetLayers[version][id][gameMode] = "normal";
+            EXP_widgetLayers[id][gameMode] = "normal";
             exp_needToCheckPersistentVars = True;
         }
     }

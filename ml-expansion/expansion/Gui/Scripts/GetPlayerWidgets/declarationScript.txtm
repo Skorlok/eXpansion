@@ -6,12 +6,12 @@ declare Text action = "<?php echo $this->action;?>";
 
 
 outText = "";
-foreach (id => temp in eXp_widgetVisible[version]) {
-	if (!eXp_widgetVisible[version][id].existskey(gameMode)) {
+foreach (id => temp in EXP_widgetVisible) {
+	if (!EXP_widgetVisible[id].existskey(gameMode)) {
 		continue;
 	}
 
-	declare status = eXp_widgetVisible[version][id][gameMode];
+	declare status = EXP_widgetVisible[id][gameMode];
 	declare Text bool = "0";
 	if (status == True) {
 		bool = "1";
