@@ -377,6 +377,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $this->getRanks();
 
+        $this->recordsUpdate = false;
+
         Records::$parentPlugin = $this;
     }
 
@@ -475,6 +477,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         // Consider save done.
         $this->lastSave = time();
+
+        $this->recordsUpdate = false;
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -509,6 +513,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
             }
         }
+
+        $this->recordsUpdate = false;
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
@@ -666,7 +672,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
             $nrecord->ScoreCheckpoints = $cpScore;
 
-            $this->console("$login new rec Rank found : " . $nrecord->place . " Old was : " . $recordrank_old);
+            $this->debug("$login new rec Rank found : " . $nrecord->place . " Old was : " . $recordrank_old);
 
             //If relay don't send message, host server will send one.
             if ($this->expStorage->isRelay) {
