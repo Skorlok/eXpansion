@@ -188,6 +188,10 @@ class LocalRecords extends LocalBase
                     }
                 }
 
+                if (Endurance::$enduro) {
+                    return 1; // Endurance is consired as cup so let this above Cup check 
+                }
+
                 if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_TEAM) {
                     return ($this->storage->currentMap->nbLaps);
                 }
