@@ -178,10 +178,22 @@ class LocalRecords extends LocalBase
             if (isset($scriptSettings['S_ForceLapsNb']) && $scriptSettings['S_ForceLapsNb'] > 0) {
                 return ($scriptSettings['S_ForceLapsNb']);
             } else {
-                if (Endurance::$enduro || (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCountAllLaps)) {
-                    return 1;
+                $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+
+                if ($gamemode == GameInfos::GAMEMODE_LAPS) {
+                    if ($this->config->lapsModeCountAllLaps) {
+                        return 1;
+                    } else {
+                        return ($this->storage->currentMap->nbLaps);
+                    }
                 }
-                return ($this->storage->currentMap->nbLaps);
+
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_TEAM) {
+                    return ($this->storage->currentMap->nbLaps);
+                }
+                
+                
+                return 1;
             }
 
         } else {
