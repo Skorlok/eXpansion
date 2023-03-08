@@ -45,17 +45,10 @@ class Database extends ExpPlugin
         }
 
         $this->setPublicMethod('getPlayer');
-        $this->setPublicMethod('getDatabaseVersion');
-        $this->setPublicMethod('setDatabaseVersion');
         $this->setPublicMethod('showDbMaintenance');
         $this->updateServerChallenges();
         // add admin command ;)
-        $cmd = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::addAdminCommand(
-            'dbtools',
-            $this,
-            'showDbMaintenance',
-            Permission::SERVER_DATABASE
-        );
+        $cmd = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::addAdminCommand('dbtools', $this, 'showDbMaintenance', Permission::SERVER_DATABASE);
         $cmd->setHelp('shows administrative window for database');
         $cmd->setMinParam(0);
     }
@@ -88,15 +81,13 @@ class Database extends ExpPlugin
 
             $dbPlayer = new DbPlayer($player->login, 0, $time, 0);
         } else {
-            $q = "UPDATE `exp_players`
-             SET
+            $q = "UPDATE `exp_players` SET
                 `player_nickname` = " . $this->db->quote($player->nickName) . ",
                 `player_nicknameStripped` = " . $this->db->quote(StringFormatting::stripStyles($player->nickName)) . ",
                 `player_updated` = " . $this->db->quote($time) . ",
                 `player_ip` =  " . $this->db->quote($player->iPAddress) . ",
                 `player_onlinerights` = " . $this->db->quote($player->onlineRights) . "
-             WHERE
-             `player_login` = " . $this->db->quote($login) . ";";
+             WHERE `player_login` = " . $this->db->quote($login) . ";";
             $this->db->execute($q);
 
             $query = $query->fetchObject();
@@ -141,9 +132,7 @@ class Database extends ExpPlugin
 
         if (isset($player->lastTimeUpdate)) {
             $playtime = $time - $player->lastTimeUpdate;
-            $q = "UPDATE `exp_players`
-             SET `player_timeplayed` = (`player_timeplayed` + $playtime)
-             WHERE `player_login` = " . $this->db->quote($player->login) . ";";
+            $q = "UPDATE `exp_players` SET `player_timeplayed` = (`player_timeplayed` + $playtime) WHERE `player_login` = " . $this->db->quote($player->login) . ";";
             $this->db->execute($q);
         }
         $player->lastTimeUpdate = $time;
@@ -232,145 +221,117 @@ class Database extends ExpPlugin
 
     public function initCreateTables()
     {
-        if (!$this->db->tableExists('exp_databaseversion')) {
-            $this->createDatabaseTable();
-        }
-
         if (!$this->db->tableExists('exp_players')) {
             $this->createPlayersTable();
         }
 
-        if ($this->getDatabaseVersion('exp_players') == 1) {
-            $this->updatePlayersTableTo2();
+        $playerDB = $this->db->execute("DESCRIBE `exp_players`")->fetchArrayOfObject();
+
+        if ($playerDB[5]->Type != 'int(12)') {
+            $q = "ALTER TABLE `exp_players` CHANGE `player_timeplayed` `player_timeplayed` INT( 12 ) NOT NULL DEFAULT '0';";
+            $this->db->execute($q);
         }
+        if ($playerDB[3]->Type != 'int(12)') {
+            $q = "ALTER TABLE `exp_players` CHANGE `player_updated` `player_updated` INT( 12 ) NOT NULL DEFAULT '0';";
+            $this->db->execute($q);
+        }
+
+
+        
 
         if (!$this->db->tableExists('exp_maps')) {
             $this->createMapTable();
         }
 
-        if ($this->getDatabaseVersion('exp_maps') < 2) {
+        $mapsDB = $this->db->execute("DESCRIBE `exp_maps`")->fetchArrayOfObject();
+
+        if (!$mapsDB[1]->Key) {
             $this->db->execute('ALTER TABLE exp_maps ADD KEY(challenge_uid);');
-            $this->setDatabaseVersion('exp_maps', 2);
         }
 
-        if ($this->getDatabaseVersion('exp_maps') == 2) {
-            $this->updateMapsTableTo3();
+        if (count($mapsDB) < 53) {
+            $sql = "ALTER TABLE `exp_maps` 
+                ADD `mx_trackID` INT UNSIGNED NULL , 
+                ADD `mx_userID` INT UNSIGNED NULL , 
+                ADD `mx_username` VARCHAR(100) NULL , 
+                ADD `mx_uploadedAt` DATETIME NULL , 
+                ADD `mx_updatedAt` DATETIME NULL , 
+                ADD `mx_typeName` VARCHAR(100) NULL , 
+                ADD `mx_mapType` VARCHAR(255) NULL , 
+                ADD `mx_titlePack` VARCHAR(255) NULL , 
+                ADD `mx_styleName` VARCHAR(255) NULL , 
+                ADD `mx_displayCost` INT NULL , 
+                ADD `mx_modName` VARCHAR(255) NULL , 
+                ADD `mx_lightMap` INT NULL ,
+                ADD `mx_exeVersion` VARCHAR(50) NULL ,
+                ADD `mx_exeBuild` VARCHAR(100) NULL , 
+                ADD `mx_environmentName` VARCHAR(255) NULL ,
+                ADD `mx_vehicleName` VARCHAR(255) NULL , 
+                ADD `mx_unlimiterRequired` BOOLEAN NULL , 
+                ADD `mx_routeName` VARCHAR(255) NULL , 
+                ADD `mx_lengthName` VARCHAR(100) NULL , 
+                ADD `mx_laps` INT NULL,
+                ADD `mx_difficultyName` VARCHAR(100) NULL,
+                ADD `mx_replayTypeName` VARCHAR(100) NULL,
+                ADD `mx_replayWRID` INT UNSIGNED NULL,
+                ADD `mx_replayWRTime` INT NULL,
+                ADD `mx_replayWRUserID` INT NULL,
+                ADD `mx_replayWRUsername` VARCHAR(255) NULL,
+                ADD `mx_ratingVoteCount` INT NULL,
+                ADD `mx_ratingVoteAverage` FLOAT NULL,
+                ADD `mx_replayCount` INT NULL,
+                ADD `mx_trackValue` INT NULL,
+                ADD `mx_comments` TEXT NULL,
+                ADD `mx_commentsCount` INT NULL,
+                ADD `mx_awardCount` INT NULL,
+                ADD `mx_hasScreenshot` BOOLEAN NULL,
+                ADD `mx_hasThumbnail` BOOLEAN NULL,
+                CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+            $this->db->execute($sql);
         }
-    }
-
-    public function createDatabaseTable()
-    {
-
-        $q = "CREATE TABLE `exp_databaseversion` (
-                    `database_id` mediumint(9) NOT NULL AUTO_INCREMENT,
-                    `database_table` varchar(50) NOT NULL,
-                    `database_version` mediumint(9) NOT NULL,
-                     PRIMARY KEY (`database_id`),
-                     KEY(`database_table`)
-                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
-        $this->db->execute($q);
     }
 
     public function createPlayersTable()
     {
-        if ($this->getDatabaseVersion('exp_players') == false) {
-            $this->setDatabaseVersion('exp_players', 1);
-        }
-        $q = "CREATE TABLE `exp_players` (
-                    `player_login` varchar(50) NOT NULL,
-                    `player_nickname` varchar(100) NOT NULL,
-                    `player_nicknameStripped` varchar(100) NOT NULL,
-                    `player_updated` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_wins` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_timeplayed` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_onlinerights` varchar(10) NOT NULL,
-                    `player_ip` varchar(50),
-                    `player_nation` varchar(100),
-                    PRIMARY KEY (`player_login`)
-                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
+        $q = "CREATE TABLE IF NOT EXISTS `exp_players` (
+                `player_login` varchar(50) NOT NULL,
+                `player_nickname` varchar(100) NOT NULL,
+                `player_nicknameStripped` varchar(100) NOT NULL,
+                `player_updated` mediumint(9) NOT NULL DEFAULT '0',
+                `player_wins` mediumint(9) NOT NULL DEFAULT '0',
+                `player_timeplayed` mediumint(9) NOT NULL DEFAULT '0',
+                `player_onlinerights` varchar(10) NOT NULL,
+                `player_ip` varchar(50),
+                `player_nation` varchar(100),
+                PRIMARY KEY (`player_login`)
+            ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
         $this->db->execute($q);
-    }
-
-    public function updatePlayersTableTo2()
-    {
-        $q = "ALTER TABLE `exp_players` CHANGE `player_timeplayed` `player_timeplayed` INT( 12 ) NOT NULL DEFAULT '0';";
-        $this->db->execute($q);
-        $q = "ALTER TABLE `exp_players` CHANGE `player_updated` `player_updated` INT( 12 ) NOT NULL DEFAULT '0';";
-        $this->db->execute($q);
-        $this->setDatabaseVersion('exp_players', 2);
     }
 
     public function createMapTable()
     {
-        if ($this->getDatabaseVersion('exp_maps') == false) {
-            $this->setDatabaseVersion('exp_maps', 1);
-        }
+        $q = "CREATE TABLE IF NOT EXISTS `exp_maps` (
+                `challenge_id` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                `challenge_uid` VARCHAR( 27 ) NOT NULL ,
+                `challenge_name` VARCHAR( 300 ) NOT NULL ,
+                `challenge_nameStripped` VARCHAR( 100 ) NOT NULL ,
+                `challenge_file` VARCHAR( 200 ) NOT NULL ,
+                `challenge_author` VARCHAR( 30 ) NOT NULL ,
+                `challenge_environment` VARCHAR( 15 ) NOT NULL,
 
-        $q = "CREATE TABLE `exp_maps` (
-                                    `challenge_id` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                                    `challenge_uid` VARCHAR( 27 ) NOT NULL ,
-                                    `challenge_name` VARCHAR( 300 ) NOT NULL ,
-                                    `challenge_nameStripped` VARCHAR( 100 ) NOT NULL ,
-                                    `challenge_file` VARCHAR( 200 ) NOT NULL ,
-                                    `challenge_author` VARCHAR( 30 ) NOT NULL ,
-                                    `challenge_environment` VARCHAR( 15 ) NOT NULL,
-
-                                    `challenge_mood` VARCHAR( 50 ) NOT NULL,
-                                    `challenge_bronzeTime` INT( 10 ) NOT NULL,
-                                    `challenge_silverTime` INT( 10 ) NOT NULL,
-                                    `challenge_goldTime` INT( 10 ) NOT NULL,
-                                    `challenge_authorTime` INT( 10 ) NOT NULL,
-                                    `challenge_copperPrice` INT( 10 ) NOT NULL,
-                                    `challenge_lapRace` INT( 3 ) NOT NULL,
-                                    `challenge_nbLaps` INT( 3 ) NOT NULL,
-                                    `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
-                                    `challenge_addedby` VARCHAR(200),
-                                    `challenge_addtime` INT(9)
-                                    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = MYISAM ;";
+                `challenge_mood` VARCHAR( 50 ) NOT NULL,
+                `challenge_bronzeTime` INT( 10 ) NOT NULL,
+                `challenge_silverTime` INT( 10 ) NOT NULL,
+                `challenge_goldTime` INT( 10 ) NOT NULL,
+                `challenge_authorTime` INT( 10 ) NOT NULL,
+                `challenge_copperPrice` INT( 10 ) NOT NULL,
+                `challenge_lapRace` INT( 3 ) NOT NULL,
+                `challenge_nbLaps` INT( 3 ) NOT NULL,
+                `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
+                `challenge_addedby` VARCHAR(200),
+                `challenge_addtime` INT(9)
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = MYISAM ;";
         $this->db->execute($q);
-    }
-
-    public function updateMapsTableTo3()
-    {
-        $sql = "ALTER TABLE `exp_maps` 
-              ADD `mx_trackID` INT UNSIGNED NULL , 
-              ADD `mx_userID` INT UNSIGNED NULL , 
-              ADD `mx_username` VARCHAR(100) NULL , 
-              ADD `mx_uploadedAt` DATETIME NULL , 
-              ADD `mx_updatedAt` DATETIME NULL , 
-              ADD `mx_typeName` VARCHAR(100) NULL , 
-              ADD `mx_mapType` VARCHAR(255) NULL , 
-              ADD `mx_titlePack` VARCHAR(255) NULL , 
-              ADD `mx_styleName` VARCHAR(255) NULL , 
-              ADD `mx_displayCost` INT NULL , 
-              ADD `mx_modName` VARCHAR(255) NULL , 
-              ADD `mx_lightMap` INT NULL ,
-              ADD `mx_exeVersion` VARCHAR(50) NULL ,
-              ADD `mx_exeBuild` VARCHAR(100) NULL , 
-              ADD `mx_environmentName` VARCHAR(255) NULL ,
-              ADD `mx_vehicleName` VARCHAR(255) NULL , 
-              ADD `mx_unlimiterRequired` BOOLEAN NULL , 
-              ADD `mx_routeName` VARCHAR(255) NULL , 
-              ADD `mx_lengthName` VARCHAR(100) NULL , 
-              ADD `mx_laps` INT NULL,
-              ADD `mx_difficultyName` VARCHAR(100) NULL,
-              ADD `mx_replayTypeName` VARCHAR(100) NULL,
-              ADD `mx_replayWRID` INT UNSIGNED NULL,
-              ADD `mx_replayWRTime` INT NULL,
-              ADD `mx_replayWRUserID` INT NULL,
-              ADD `mx_replayWRUsername` VARCHAR(255) NULL,
-              ADD `mx_ratingVoteCount` INT NULL,
-              ADD `mx_ratingVoteAverage` FLOAT NULL,                                          
-              ADD `mx_replayCount` INT NULL,
-              ADD `mx_trackValue` INT NULL,
-              ADD `mx_comments` TEXT NULL,
-              ADD `mx_commentsCount` INT NULL,
-              ADD `mx_awardCount` INT NULL,
-              ADD `mx_hasScreenshot` BOOLEAN NULL,
-              ADD `mx_hasThumbnail` BOOLEAN NULL,
-              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-        $this->db->execute($sql);
-        $this->setDatabaseVersion('exp_maps', 3);
     }
 
     public function getPlayer($login)
@@ -394,33 +355,23 @@ class Database extends ExpPlugin
 
     public function incrementWins($player)
     {
-        $q = "UPDATE `exp_players`
-             SET `player_wins` = (`player_wins` + 1)
-             WHERE `player_login` = " . $this->db->quote($player->login) . ";";
+        $q = "UPDATE `exp_players` SET `player_wins` = (`player_wins` + 1) WHERE `player_login` = " . $this->db->quote($player->login) . ";";
         $this->db->execute($q);
         if ($this->config->showWins) {
-            $q = "SELECT `player_wins` FROM `exp_players` WHERE `player_login` = "
-                . $this->db->quote($player->login) . ";";
+            $q = "SELECT `player_wins` FROM `exp_players` WHERE `player_login` = " . $this->db->quote($player->login) . ";";
             $query = $this->db->execute($q);
+
             $data = $query->fetchStdObject();
             $w = $data->player_wins;
-            $msg_pub = eXpGetMessage(
-                '#rank#Congratulations to #variable#%1$s#rank# for their #variable#%2$s#rank# win!'
-            );
+
+            $msg_pub = eXpGetMessage('#rank#Congratulations to #variable#%1$s#rank# for their #variable#%2$s#rank# win!');
             $msg_self = eXpGetMessage('#rank#Congratulations for your #variable#%1$s#rank# win!');
+
             $wins = $this->numberize($w);
             if ($w <= 100 && $w % 10 == 0) {
-                $this->eXpChatSendServerMessage(
-                    $msg_pub,
-                    null,
-                    array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins)
-                );
+                $this->eXpChatSendServerMessage($msg_pub, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins));
             } elseif ($w % 25 == 0) {
-                $this->eXpChatSendServerMessage(
-                    $msg_pub,
-                    null,
-                    array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins)
-                );
+                $this->eXpChatSendServerMessage($msg_pub, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins));
             } else {
                 $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
             }
@@ -442,19 +393,6 @@ class Database extends ExpPlugin
         }
 
         return $num;
-    }
-
-    public function getDatabaseVersion($table, $fromPlugin = null)
-    {
-        $g = "SELECT * FROM `exp_databaseversion` WHERE `database_table` = " . $this->db->quote($table) . ";";
-        $query = $this->db->execute($g);
-
-        if ($query->recordCount() == 0) {
-            return false;
-        } else {
-            $record = $query->fetchStdObject();
-            return (int)$record->database_version;
-        }
     }
 
     public function showDbMaintenance($login)
@@ -479,34 +417,6 @@ class Database extends ExpPlugin
             $window->centerOnScreen();
             $window->setSize(160, 100);
             $window->show();
-        }
-    }
-
-    public function setDatabaseVersion($table, $version)
-    {
-
-        $g = "SELECT * FROM `exp_databaseversion` WHERE `database_table` = " . $this->db->quote($table) . ";";
-        $query = $this->db->execute($g);
-
-        if ($query->recordCount() == 0) {
-
-            $q = "INSERT INTO `exp_databaseversion` (`database_table`,
-                                 `database_version`
-                                 ) VALUES (
-                                 " . $this->db->quote($table) . ",
-                                 " . $this->db->quote($version) . "
-                                 )";
-            $this->db->execute($q);
-        } else {
-            $record = $query->fetchStdObject();
-
-            if ($record->database_version < $version) {
-                $q = "UPDATE `exp_databaseversion`
-                SET `database_version` = " . $this->db->quote($version) . "
-                WHERE `database_table` = " . $this->db->quote($table) . ";";
-
-                $this->db->execute($q);
-            }
         }
     }
 }

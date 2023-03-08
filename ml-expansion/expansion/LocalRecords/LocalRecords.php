@@ -176,6 +176,11 @@ class LocalRecords extends LocalBase
             $scriptSettings = $this->connection->getModeScriptSettings();
             
             if (isset($scriptSettings['S_ForceLapsNb']) && $scriptSettings['S_ForceLapsNb'] > 0) {
+
+                if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCountAllLaps) {
+                    return 1;
+                }
+
                 return ($scriptSettings['S_ForceLapsNb']);
             } else {
                 $gamemode = self::eXpGetCurrentCompatibilityGameMode();
@@ -189,7 +194,7 @@ class LocalRecords extends LocalBase
                 }
 
                 if (Endurance::$enduro) {
-                    return 1; // Endurance is consired as cup so let this above Cup check 
+                    return 1; // Endurance is consired as cup so let this above Cup check
                 }
 
                 if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_TEAM) {

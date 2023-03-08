@@ -328,32 +328,26 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $this->db->execute($q);
         }
 
-        //Checking the version if the table
-        $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'getDatabaseVersion', 'exp_records');
-        if (!$version) {
-            $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_records', 1);
-        }
+        $database = $this->db->execute("DESCRIBE `exp_records`")->fetchArrayOfObject();
 
-        $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'getDatabaseVersion', 'exp_records');
-
-        // update for version2
-        if ($version == 1) {
-            $q = "ALTER TABLE `exp_records` CHANGE `record_date` `record_date` INT( 12 ) NOT NULL;";
-            $this->db->execute($q);
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_records', 2);
-        }
-
-        $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'getDatabaseVersion', 'exp_records');
-
-        //Update for version 3
-        if ($version <= 2) {
-            try {
-                $q = "ALTER TABLE `exp_records` ADD COLUMN score_type VARCHAR(10) DEFAULT 'time'";
-                $this->db->execute($q);
-            } catch (\Exception $e) {
-                $this->console("There was error while updating database structure to version 3, setting version 3 as mostlikely it's already converted..");
+        // CHECK
+        $recordDateFound = false;
+        foreach ($database as $field) {
+            if ($field->Field == "record_date") {
+                if ($field->Type != "int(12)") {
+                    $q = "ALTER TABLE `exp_records` CHANGE `record_date` `record_date` INT( 12 ) NOT NULL;";
+                    $this->db->execute($q);
+                }
             }
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_records', 3);
+
+            if ($field->Field == "score_type") {
+                $recordDateFound = true;
+            }
+        }
+
+        if (!$recordDateFound) {
+            $q = "ALTER TABLE `exp_records` ADD COLUMN score_type VARCHAR(10) DEFAULT 'time'";
+            $this->db->execute($q);
         }
 
 
@@ -509,7 +503,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $q = "SELECT rank_playerlogin FROM `exp_ranks` WHERE rank_challengeuid = " . $this->db->quote($this->storage->currentMap->uId) . " AND rank_nbLaps = " . $nbLaps;
             $data = $this->db->execute($q);
             $arr = $data->fetchArray();
-            if ($arr == false || sizeof($arr) == 0) {
+            if (($arr == false || sizeof($arr) == 0) && $this->currentChallengeRecords) {
                 $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
             }
         }
@@ -519,7 +513,20 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        $this->onEndMatch(array(), array());
+        $nbLaps = $this->getNbOfLaps();
+        
+        if ($this->recordsUpdate) {
+            $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
+        } else {
+            $q = "SELECT rank_playerlogin FROM `exp_ranks` WHERE rank_challengeuid = " . $this->db->quote($this->storage->currentMap->uId) . " AND rank_nbLaps = " . $nbLaps;
+            $data = $this->db->execute($q);
+            $arr = $data->fetchArray();
+            if (($arr == false || sizeof($arr) == 0) && $this->currentChallengeRecords) {
+                $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
+            }
+        }
+
+
         if ($this->ranks_reset) {
             $this->resetRanks();
         }
@@ -1601,18 +1608,20 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         
         $this->recordsUpdate = true;
 
-        $recordPlaceInArray = -1;
+        $killedRecordPlace = -1;
         foreach ($this->currentChallengeRecords as $i => $rec) {
             if ($rec->place > $record->place) {
                 $rec->place--;
             }
+            if ($killedRecordPlace > 0) {
+                $this->currentChallengeRecords[$i-1] = $this->currentChallengeRecords[$i];
+            }
             if ($rec->login == $record->login) {
-                $recordPlaceInArray = $i;
+                unset($this->currentChallengeRecords[$i]);
+                unset($this->currentChallengePlayerRecords[$record->login]);
+                $killedRecordPlace = $i;
             }
         }
-
-        unset($this->currentChallengeRecords[$recordPlaceInArray]);
-        unset($this->currentChallengePlayerRecords[$record->login]);
 
         \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_RECORD_DELETED, $record, $this->currentChallengeRecords));
 

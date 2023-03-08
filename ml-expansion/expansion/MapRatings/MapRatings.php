@@ -13,7 +13,6 @@ use ManiaLivePlugins\eXpansion\MapRatings\Gui\Windows\MapRatingsManager;
 use ManiaLivePlugins\eXpansion\MapRatings\Structures\PlayerVote;
 use ManiaLivePlugins\eXpansion\MapRatings\Classes\Connection as mxConnection;
 use ManiaLivePlugins\eXpansion\MapRatings\Events\MXKarmaEvent;
-use ManiaLivePlugins\eXpansion\MapRatings\Events\MXKarmaEventListener;
 use ManiaLivePlugins\eXpansion\MapRatings\Structures\MXRating;
 use ManiaLivePlugins\eXpansion\MapRatings\Structures\MXVote;
 
@@ -51,6 +50,11 @@ class MapRatings extends ExpPlugin
 
     private $mx_msg_error;
     private $mx_msg_connected;
+    private $msg_rating_only_mx;
+    private $msg_rating_mx;
+    private $msg_rating_mx_no_votes;
+
+    private $msg_not_enough_finishes;
 
     private $settingsChanged = array();
 
@@ -75,6 +79,8 @@ class MapRatings extends ExpPlugin
         
         $this->msg_rating = eXpGetMessage('#rating#Map Approval Rating: #variable#%2$s#rating# (#variable#%3$s #rating#votes).  Your Rating: #variable#%4$s#rating# / #variable#5');
         $this->msg_noRating = eXpGetMessage('#rating# $iMap has not been rated yet!');
+
+
         if (!$this->db->tableExists("exp_ratings")) {
             $this->db->execute(
                 'CREATE TABLE IF NOT EXISTS `exp_ratings` (
@@ -87,24 +93,11 @@ class MapRatings extends ExpPlugin
             );
         }
 
-        //Checking the version if the table
-        $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'getDatabaseVersion', 'exp_ratings');
-        if (!$version) {
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_records', 1);
-        }
+        $database = $this->db->execute("DESCRIBE `exp_ratings`")->fetchArrayOfObject();
 
-        $version = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'getDatabaseVersion', 'exp_ratings');
-
-        if ($version == 1) {
-            try {
-                $q = "ALTER TABLE `exp_ratings` CHANGE COLUMN `uid` `uid` VARCHAR(27) NOT NULL ;";
-                $this->db->execute($q);
-                $q = "CREATE INDEX `uid`  ON exp_ratings` (uid, rating) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT";
-                $this->db->execute($q);
-            } catch (\Exception $ex) {
-                $this->console("[MapRatings] There was error while changing your database structure to newer one, "."most likely the database is converted already!");
-            }
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Database\Database', 'setDatabaseVersion', 'exp_ratings', 2);
+        if ($database[1]->Type == 'text') {
+            $this->db->execute("ALTER TABLE `exp_ratings` CHANGE COLUMN `uid` `uid` VARCHAR(27) NOT NULL ;");
+            $this->db->execute("CREATE INDEX `uid`  ON `exp_ratings` (uid, rating) COMMENT '' ALGORITHM DEFAULT LOCK DEFAULT");
         }
 
         $cmd = $this->registerChatCommand("---", "vote_moinsmoinsmoins", 0, true);
@@ -305,7 +298,7 @@ class MapRatings extends ExpPlugin
         $uids = trim($uids, ",");
 
         $ratings = $this->db->execute("SELECT uid, avg(rating) AS rating, COUNT(rating) AS ratingTotal FROM exp_ratings WHERE uid IN (" . $uids . ") GROUP BY uid;")->fetchArrayOfObject();
-        $out = array();
+
         foreach ($ratings as $rating) {
             $mapsByUid[$rating->uid]->mapRating = new Structures\Rating($rating->rating, $rating->ratingTotal, $rating->uid);
         }
@@ -340,22 +333,14 @@ class MapRatings extends ExpPlugin
 
     public function reload()
     {
-        $database = $this->db->execute("SELECT avg(rating) AS rating, COUNT(rating) AS ratingTotal" . " FROM exp_ratings" . " WHERE `uid`=" . $this->db->quote($this->storage->currentMap->uId) . ";")->fetchObject();
-        $this->rating = 0;
-        $this->ratingTotal = 0;
-        if ($database) {
-            $this->rating = $database->rating;
-            $this->ratingTotal = $database->ratingTotal;
-            $this->oldRatings = $this->getVotesForMap($this->storage->currentMap->uId);
-            foreach ($this->storage->maps as $map) {
-                if ($map->uId == $this->storage->currentMap->uId) {
-                    $map->mapRating = new Structures\Rating($database->rating, $database->ratingTotal, $this->storage->currentMap->uId);
-                }
-            }
-        }
+        $database = $this->db->execute("SELECT avg(rating) AS rating, COUNT(rating) AS ratingTotal" . " FROM exp_ratings  WHERE `uid`=" . $this->db->quote($this->storage->currentMap->uId) . ";")->fetchObject();
+        
+        $this->rating = $database->rating;
+        $this->ratingTotal = $database->ratingTotal;
+        $this->oldRatings = $this->getVotesForMap($this->storage->currentMap->uId);
     }
 
-    public function saveRatings($uid)
+    public function saveRatings()
     {
         try {
 
@@ -371,15 +356,24 @@ class MapRatings extends ExpPlugin
                     $sqlInsert .= ", ";
                 }
                 $i++;
-                $sqlInsert .= "(" . $this->db->quote($uid) . "," . $this->db->quote($login) . "," . $this->db->quote($rating) . ")";
+                $sqlInsert .= "(" . $this->db->quote($this->storage->currentMap->uId) . "," . $this->db->quote($login) . "," . $this->db->quote($rating) . ")";
                 $loginList .= $this->db->quote($login) . ",";
             }
             $loginList = rtrim($loginList, ",");
 
-            $this->db->execute("DELETE FROM exp_ratings " . " WHERE `uid`= " . $this->db->quote($uid) . " " . " AND `login` IN (" . $loginList . ")");
+            $this->db->execute("DELETE FROM exp_ratings " . " WHERE `uid`= " . $this->db->quote($this->storage->currentMap->uId) . " AND `login` IN (" . $loginList . ")");
 
             $this->db->execute($sqlInsert);
             $this->pendingRatings = array();
+
+            $data = $this->db->execute("SELECT avg(rating) AS rating, COUNT(rating) AS ratingTotal" . " FROM exp_ratings  WHERE `uid`=" . $this->db->quote($this->storage->currentMap->uId) . ";")->fetchObject();
+            foreach ($this->storage->maps as $map) {
+                if ($map->uId == $this->storage->currentMap->uId) {
+                    $map->mapRating = new Structures\Rating($data->rating, $data->ratingTotal, $this->storage->currentMap->uId);
+                    break;
+                }
+            }
+
         } catch (\Exception $e) {
             $this->pendingRatings = array();
             $this->console("Error in MapRating: " . $e->getMessage());
@@ -673,10 +667,7 @@ class MapRatings extends ExpPlugin
             }
         }
 
-
         $this->reload();
-
-        $this->affectAllRatings();
 
         EndMapRatings::EraseAll();
 
@@ -702,7 +693,7 @@ class MapRatings extends ExpPlugin
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        $this->saveRatings($this->storage->currentMap->uId);
+        $this->saveRatings();
 
         //Updating ratings in map object
         if (!isset($this->storage->currentMap->mapRating)) {
@@ -735,9 +726,6 @@ class MapRatings extends ExpPlugin
 
     public function onBeginMatch()
     {
-        $this->saveRatings($this->storage->currentMap->uId);
-        $this->reload();
-
         EndMapRatings::EraseAll();
 
         if (!$this->config->mxKarmaEnabled) {
@@ -752,7 +740,6 @@ class MapRatings extends ExpPlugin
     {
 
         if ($this->config->showPodiumWindow) {
-            $this->reload();
             $ratings = $this->getVotesForMap(null);
 
             $logins = array();
