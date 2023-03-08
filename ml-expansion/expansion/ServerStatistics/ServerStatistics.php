@@ -83,13 +83,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->db->execute($q);
         }
 
-        //Checking the version if the table
-        $version = $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Database\\Database', 'getDatabaseVersion', 'exp_records');
-
-        if (!$version) {
-            $version = $this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Database\\Database', 'setDatabaseVersion', 'exp_records', 1);
-        }
-
         $this->nbPlayer = 0;
         foreach ($this->storage->players as $player) {
             if ($player->isConnected) {
