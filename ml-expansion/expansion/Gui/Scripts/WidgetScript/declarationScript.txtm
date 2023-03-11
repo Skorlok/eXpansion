@@ -1,12 +1,23 @@
-declare persistent Vec3[Text][Text][Text] eXp_widgetLastPos;
-declare persistent Vec3[Text][Text][Text] eXp_widgetLastPosRel;
-declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
-declare persistent Text[Text][Text][Text] eXp_widgetLayers;
+// KEEP THIS, IT WILL REMOVE OLD DATA
 
-eXp_widgetVisible = ["deleted"=>["deleted"=>["deleted"=>True]]];
-eXp_widgetLastPos = ["deleted"=>["deleted"=>["deleted"=>< 1.00, 1.00, 1.0>]]];
-eXp_widgetLastPosRel = ["deleted"=>["deleted"=>["deleted"=>< 1.00, 1.00, 1.0>]]];
-eXp_widgetLayers = ["deleted"=>["deleted"=>["deleted"=>"detete"]]];
+declare persistent Vec3[Text][Text][Text] eXp_widgetLastPos;
+eXp_widgetLastPos.clear();
+
+declare persistent Vec3[Text][Text][Text] eXp_widgetLastPosRel;
+eXp_widgetLastPosRel.clear();
+
+declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
+eXp_widgetVisible.clear();
+
+declare persistent Text[Text][Text][Text] eXp_widgetLayers;
+eXp_widgetLayers.clear();
+
+
+declare persistent Vec3[Text][Text] exp_windowLastPos;
+exp_windowLastPos.clear();
+
+declare persistent Vec3[Text][Text] exp_windowLastPosRel;
+exp_windowLastPosRel.clear();
 
 // KEEP THIS, IT WILL REMOVE OLD DATA
 
