@@ -20,6 +20,9 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $resCount = 0;
     private $lastMapUid = "";
 
+    public $currentVote = null;
+    public $currentVoteWidget = null;
+
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
@@ -142,7 +145,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onTick()
     {
-        if (isset($this->currentVote)) {
+        if ($this->currentVote) {
             
             $this->currentVoteWidget->updateTimeleft(($this->currentVote->timestamp - time()) + $this->currentVote->votingTime);
 
@@ -177,9 +180,9 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function handleEndVote($state)
     {
         VoteManagerWidget::EraseAll();
-        unset($this->currentVoteWidget);
+        $this->currentVoteWidget = null;
 
-        if ($state == true) {
+        if ($state) {
 
             $msg = eXpGetMessage('#vote_success# $iVote passed!');
             $this->eXpChatSendServerMessage($msg, null);
@@ -194,6 +197,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
 
             if ($this->currentVote->action == "NextMap") {
+                \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_SKIP));
                 $this->connection->nextMap();
             }
 
@@ -220,12 +224,12 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->eXpChatSendServerMessage($msg, null);
         }
 
-        unset($this->currentVote);
+        $this->currentVote = null;
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        if (isset($this->currentVote)) {
+        if ($this->currentVote) {
             $this->handleEndVote(false);
         }
     }
@@ -250,7 +254,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 return;
             }
 
-            if (isset($this->currentVote)) {
+            if ($this->currentVote) {
                 $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
                 return;
             }
@@ -321,7 +325,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 return;
             }
 
-            if (isset($this->currentVote)) {
+            if ($this->currentVote) {
                 $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
                 return;
             }
@@ -388,7 +392,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
-                if (isset($this->currentVote)) {
+                if ($this->currentVote) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
                     return;
                 }
@@ -483,7 +487,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
-                if (isset($this->currentVote)) {
+                if ($this->currentVote) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
                     return;
                 }
@@ -588,7 +592,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
-                if (isset($this->currentVote)) {
+                if ($this->currentVote) {
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
                     return;
                 }
@@ -673,7 +677,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $cancelled = false;
 
-        if (isset($this->currentVote)) {
+        if ($this->currentVote) {
             $this->handleEndVote(false);
             $cancelled = true;
         }
@@ -694,7 +698,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function passVote($login)
     {
-        if (isset($this->currentVote)) {
+        if ($this->currentVote) {
             $this->handleEndVote(true);
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# pass the vote!');
             $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));

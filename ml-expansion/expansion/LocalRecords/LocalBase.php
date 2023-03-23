@@ -1382,29 +1382,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      *
      * @return int
      */
-    public function getPlayerRank_old($login)
-    {
-        $id = -1;
-        foreach ($this->ranks as $id => $class) {
-            if (!property_exists($class, "rank_playerlogin")) {
-                return -1;
-            }
-
-            if ($class->rank_playerlogin == $login) {
-                return $id + 1;
-            }
-        }
-
-        return -1; // added failsafe
-    }
-
-    /**
-     * Returns the players server rank as it is buffered.
-     *
-     * @param $login
-     *
-     * @return int
-     */
     public function getPlayerRank($login)
     {
         if ($this->expStorage->isRelay) {

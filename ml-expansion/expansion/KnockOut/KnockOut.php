@@ -57,6 +57,8 @@ class KnockOut extends ExpPlugin
     private $msg_koStop;
     private $msg_knockout;
     private $msg_knockoutDNF;
+    private $msg_knockoutLeft;
+    private $msg_noOneLeft;
     private $msg_champ;
 
     public function eXpOnLoad()
@@ -67,6 +69,8 @@ class KnockOut extends ExpPlugin
         $this->msg_koStop = eXpGetMessage('#ko#KnockOut has been #variable#stopped.');
         $this->msg_knockout = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, but the game is still on!');
         $this->msg_knockoutDNF = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, since no finish!');
+        $this->msg_knockoutLeft = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# knocked out, since not in the game!');
+        $this->msg_noOneLeft = eXpGetMessage('#ko#KnockOut! Nobody left to knock out!, there is no winner!');
         $this->msg_champ = eXpGetMessage('#ko#KnockOut! #variable# %1$s $z$s#ko# is the CHAMP!!! congrats');
     }
 
@@ -292,13 +296,28 @@ class KnockOut extends ExpPlugin
             return;
         }
 
+        $out = array();
+        foreach ($this->players as $player) {
+            if (!isset($this->storage->players[$player->login])) {
+                $out[] = $player->nickName;
+                unset($this->players[$player->login]);
+            }
+        }
+        if (count($out) > 0) {
+            $this->eXpChatSendServerMessage($this->msg_knockoutLeft, null, array(implode('$z$s, ', $out)));
+        }
+
         $ranking = Core::$rankings;
         $this->sortAsc($ranking);
 
-        if (count($ranking) <= 1) {
+        if (count($this->players) == 1) {
             reset($this->players);
             $player = current($this->players);
             $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
+            $this->koStop();
+            return;
+        } else if (count($this->players) <= 0) {
+            $this->eXpChatSendServerMessage($this->msg_noOneLeft, null);
             $this->koStop();
             return;
         }
@@ -345,11 +364,16 @@ class KnockOut extends ExpPlugin
             $this->eXpChatSendServerMessage($this->msg_knockout, null, array(implode('$z$s', $out)));
         }
 
-        if (count($this->players) <= 1) {
+        if (count($this->players) == 1) {
             reset($this->players);
             $player = current($this->players);
             $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
             $this->koStop();
+            return;
+        } else if (count($this->players) <= 0) {
+            $this->eXpChatSendServerMessage($this->msg_noOneLeft, null);
+            $this->koStop();
+            return;
         }
     }
 
