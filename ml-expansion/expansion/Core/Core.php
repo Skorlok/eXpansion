@@ -1576,7 +1576,6 @@ EOT;
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
-        $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
 
     /**

@@ -772,6 +772,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         } else {
             \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_FINISH, $login));
+            $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         }
     }
 

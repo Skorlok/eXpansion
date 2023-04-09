@@ -571,7 +571,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
         if ($player_localrec) {
-            if ($this->records[$login]) {
+            if (isset($this->records[$login])) {
                 if ($this->records[$login]->time > $player_localrec->time) {
                     $player = $player_localrec;
                 } else {
