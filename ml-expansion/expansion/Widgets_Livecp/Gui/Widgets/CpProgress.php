@@ -52,8 +52,10 @@ class CpProgress extends Widget
         $this->frame->setLayout(new Column());
         $this->wframe->addComponent($this->frame);
 
-        $this->trayWidget = new Script("Gui/Scripts/NewTray");
-        $this->registerScript($this->trayWidget);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->trayWidget = new Script("Gui/Scripts/NewTray");
+            $this->registerScript($this->trayWidget);
+        }
 
     }
 

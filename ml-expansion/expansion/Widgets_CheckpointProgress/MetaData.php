@@ -16,5 +16,8 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->setName("Widget: Checkpoints Progressbar");
         $this->setDescription("Provides Checkpoint progress widget");
         $this->setGroups(array('Widgets'));
+
+        $this->addTitleSupport("TM");
+        $this->addTitleSupport("Trackmania");
     }
 }

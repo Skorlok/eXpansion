@@ -15,8 +15,10 @@ class ServerInfo extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnBeginConstruct()
     {
-        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-        $this->registerScript($this->edgeWidget);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
 
         $bg = new \ManiaLib\Gui\Elements\Quad(60, 10);
         $bg->setAlign("left", "top");

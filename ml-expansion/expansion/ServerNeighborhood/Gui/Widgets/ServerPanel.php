@@ -142,8 +142,10 @@ class ServerPanel extends Widget
         $script->setParam('refresh_interval', Config::getInstance()->refresh_interval * 1000);
         $this->registerScript($script);
 
-        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-        $this->registerScript($this->edgeWidget);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
 
         if ($this->config->snwidget_isDockable) {
             $script = new Script("Gui/Scripts/TrayWidget");

@@ -18,6 +18,10 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->setName("Tool: 3-2-1-GO Customizer");
         $this->setDescription("Replaces the 3-2-1-Go with custom images");
         $this->setGroups(array('Tools'));
+
+        $this->addTitleSupport("TM");
+        $this->addTitleSupport("Trackmania");
+
         $config = Config::getInstance();
 
         $var = new TypeString("sprite1", "3-2-1", $config, false, false);

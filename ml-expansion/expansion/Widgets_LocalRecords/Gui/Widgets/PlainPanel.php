@@ -91,8 +91,10 @@ class PlainPanel extends Widget
         $this->layer->setDescription("Switch from Race view to Score View(Visible on Tab)", 75);
         $this->addComponent($this->layer);
 
-        $this->edgeWidget = new Script("Gui/Scripts/EdgeWidget");
-        $this->registerScript($this->edgeWidget);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
 
         parent::eXpOnBeginConstruct();
     }

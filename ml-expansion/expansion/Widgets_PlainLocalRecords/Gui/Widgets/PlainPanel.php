@@ -80,8 +80,10 @@ class PlainPanel extends Widget
         $this->_windowFrame->addComponent($this->frame);
         $this->setSize($sizeX, $sizeY);
 
-        $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-        $this->registerScript($this->edgeWidget);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
     }
 
     public function onResize($oldX, $oldY)

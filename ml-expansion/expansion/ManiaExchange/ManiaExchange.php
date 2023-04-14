@@ -139,12 +139,11 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = array();
         self::$mxReplays = array();
 
-        $title = "tm";
         if ($this->expStorage->simpleEnviTitle == "SM") {
-            $title = "sm";
+            $query = "https://sm.mania.exchange/api/maps/get_map_info/multi/" . $this->storage->currentMap->uId;
+        } else {
+            $query = "http://api.mania-exchange.com/TM/tracks/" . $this->storage->currentMap->uId;
         }
-
-        $query = "http://api.mania-exchange.com/" . $title . "/tracks/" . $this->storage->currentMap->uId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xGetMapInfo"), null, $options);

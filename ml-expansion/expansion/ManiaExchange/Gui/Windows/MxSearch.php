@@ -188,7 +188,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $mapType = $storage->baseMapType;
             $parts = explode('@', $titlePack);
 
-            $query = 'https://sm.mania-exchange.com/tracksearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=All&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
+            $query = 'https://sm.mania-exchange.com/tracksearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
         } else {
             $query = 'https://tm.mania-exchange.com/tracksearch2/search?api=on&format=json';
             

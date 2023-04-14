@@ -105,10 +105,12 @@ class Edge extends Widget
         $script->setParam('posXMax', -4);
         $this->registerScript($script);
 
-        $this->sscript = new Script("Gui\Scripts\EdgeScript");
-        $this->sscript->setParam("imageOff", "<1.,0.,0.>");
-        $this->sscript->setParam("imageOn", "<0.,1.,0.>");
-        $this->registerScript($this->sscript);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->sscript = new Script("Gui\Scripts\EdgeScript");
+            $this->sscript->setParam("imageOff", "<1.,0.,0.>");
+            $this->sscript->setParam("imageOn", "<0.,1.,0.>");
+            $this->registerScript($this->sscript);
+        }
 
         $this->setSize($sizeX, $sizeY);
     }
