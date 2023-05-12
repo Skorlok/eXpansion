@@ -1041,7 +1041,7 @@ EOT;
                 "passwordForSpectator" => "password_spectator",
                 "hideServer" => "hide_server",
                 "nextMaxPlayers" => "max_players",
-                "nextMaxSpectatos" => "max_spectators",
+                "nextMaxSpectators" => "max_spectators",
                 "isP2PUpload" => "enable_p2p_upload",
                 "isP2PDownload" => "enable_p2p_download",
                 "nextLadderMode" => "ladder_mode",
