@@ -3,11 +3,10 @@ declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";
 
 declare Integer countdown = <?php echo $this->countdown;?>;
-declare Integer timeleft = <?php echo $this->timeleft;?>;
-declare Integer timestamp = TextLib::ToInteger(TimeLib::GetCurrent());
+declare Integer startTime = <?php echo $this->startTime;?>;
 declare playersVote = <?php echo $this->votes;?>;
 
-declare Integer remaining = (timeleft - (TextLib::ToInteger(TimeLib::GetCurrent()) - timestamp));
+declare Integer remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime));
 
 declare countdownBar = (Page.GetFirstChild("CountdownBar") as CMlGauge);
 declare countdownText = (Page.GetFirstChild("CountdownText") as CMlLabel);
@@ -45,8 +44,8 @@ foreach (Player in Players) {
                     canVote = False;
                 } else {
                     if (voters == 1) {
-                        if (Player.Score != Null) {
-                            if (Player.Score.BestRace != Null) {
+                        /*if (Player.Score != Null) {
+                            if (Player.Score.existskey(BestRace) && Player.Score.BestRace != Null) {
                                 if (Player.Score.BestRace.Time > 0) {
                                     showVoteButtons();
                                     canVote = True;
@@ -61,7 +60,7 @@ foreach (Player in Players) {
                         } else {
                             hideVoteButtons();
                             canVote = False;
-                        }
+                        }*/
                     } else {
                         showVoteButtons();
                         canVote = True;

@@ -175,7 +175,7 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         parent::onResize($oldX, $oldY);
     }
 
-    public function setDatas($vote, $timeleft)
+    public function setDatas($vote)
     {
         $voteData = "";
         $index = 1;
@@ -194,15 +194,10 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         }
 
         $this->script->setParam("countdown", $vote->votingTime);
-        $this->script->setParam("timeleft", $timeleft);
+        $this->script->setParam("startTime", $vote->timestamp);
         $this->script->setParam("votes", $voteData);
         $this->script->setParam("ratio", sprintf("%0.1f", ($vote->voteRatio * 58) + 16));
         $this->script->setParam("voteText", $vote->voteText);
         $this->script->setParam("voters", $vote->voters);
-    }
-
-    public function updateTimeleft($timeleft)
-    {
-        $this->script->setParam("timeleft", $timeleft);
     }
 }

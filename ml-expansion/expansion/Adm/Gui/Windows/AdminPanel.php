@@ -135,7 +135,7 @@ class AdminPanel extends Widget
                     self::$mainPlugin->restartMap($login);
                     break;
                 case "balanceTeams":
-                    AdminGroups::getInstance()->adminCmd($login, "setTeamBalance");
+                    AdminGroups::getInstance()->adminCmd($login, "team balance");
                     break;
             }
         } catch (Exception $e) {

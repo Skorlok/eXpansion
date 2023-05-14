@@ -1165,6 +1165,8 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
+            $this->connection->triggerModeScriptEventArray('Shootmania.ForceEndRound', array());
+            $this->connection->triggerModeScriptEventArray('Trackmania.Chase.ForceStopRound', array());
             $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
 
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the round to end.', null, array($admin->nickName));
@@ -1178,6 +1180,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', array());
+            $this->connection->triggerModeScriptEventArray('Shootmania.WarmUp.ForceStop', array());
 
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.', null, array($admin->nickName));
         } catch (Exception $e) {
@@ -1190,6 +1193,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound', array());
+            $this->connection->triggerModeScriptEventArray('Shootmania.WarmUp.ForceStopRound', array());
 
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.', null, array($admin->nickName));
         } catch (Exception $e) {
@@ -1199,7 +1203,7 @@ class ChatAdmin extends ExpPlugin
 
     public function forcePointsRounds($fromLogin, $params)
     {
-        if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
+        if (Core::$useTeams) {
 
             $admin = $this->storage->getPlayerObject($fromLogin);
             if (!isset($params[0]) || ($params[0] != "blue" && $params[0] != "red")) {
@@ -1220,6 +1224,7 @@ class ChatAdmin extends ExpPlugin
 
             try {
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
 
                 $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $params[0], $params[1]));
             } catch (Exception $e) {
@@ -1240,6 +1245,7 @@ class ChatAdmin extends ExpPlugin
             }
             try {
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
 
                 $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $player->nickName, $params[1]));
             } catch (Exception $e) {

@@ -53,6 +53,8 @@ class Core extends types\ExpPlugin
 
     public static $rankings = array();
 
+    public static $useTeams = false;
+
     public static $warmUpActive = false;
     public static $pauseActive = false;
 
@@ -268,6 +270,7 @@ EOT;
         $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
@@ -487,6 +490,7 @@ EOT;
 
 
             case "Trackmania.WarmUp.Status":
+            case "Shootmania.WarmUp.Status":
             case "Maniaplanet.WarmUp.Status":
                 if ($params["active"] === true) {
                     self::$warmUpActive = true;
@@ -499,6 +503,7 @@ EOT;
 
 			case 'Maniaplanet.WarmUp.Start':
 			case 'Trackmania.WarmUp.Start':
+			case 'Shootmania.WarmUp.Start':
             case 'LibXmlRpc_BeginWarmUp':
                 self::$warmUpActive = true;
 		    	break;
@@ -507,6 +512,7 @@ EOT;
 
 			case 'Maniaplanet.WarmUp.End':
 			case 'Trackmania.WarmUp.End':
+			case 'Shootmania.WarmUp.End':
             case 'LibXmlRpc_EndWarmUp':
                 self::$warmUpActive = false;
 		    	break;
@@ -514,7 +520,12 @@ EOT;
 
 
             case 'Trackmania.Scores':
-				if ($this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM) {
+            case 'Shootmania.Scores':
+                if (isset($params['useteams'])) {
+                    self::$useTeams = $params['useteams'];
+                }
+
+				if (!self::$useTeams) {
                     $scores = array();
 					if (isset($params['players']) && is_array($params['players'])) {
 						foreach ($params['players'] as $item) {
@@ -870,6 +881,7 @@ EOT;
 
         self::$rankings = array();
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         $this->connection->triggerModeScriptEventArray('XmlRpc.SetApiVersion', array('2.5.0'));
@@ -917,6 +929,7 @@ EOT;
         self::$isExtended = false;
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
@@ -1158,6 +1171,7 @@ EOT;
         $this->enableScriptEvents("LibXmlRpc_Callbacks");
         $this->enableScriptEvents(array("LibXmlRpc_TeamsScores", "LibXmlRpc_PlayersRanking", "LibXmlRpc_ScoresReady", "LibXmlRpc_BeginWarmUp", "LibXmlRpc_EndWarmUp"));
 
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
@@ -1500,6 +1514,7 @@ EOT;
         $this->update = true;
         $this->resetExpPlayers();
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         $this->connection->triggerModeScriptEventArray('Maniaplanet.WarmUp.GetStatus', array());
@@ -1509,6 +1524,7 @@ EOT;
     {
         $this->update = true;
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
     }
@@ -1575,6 +1591,7 @@ EOT;
         }
 
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
     }
 
@@ -1624,6 +1641,7 @@ EOT;
     {
         if ($timeOrScore != 0) {
             $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+            $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
             $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
             $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         }

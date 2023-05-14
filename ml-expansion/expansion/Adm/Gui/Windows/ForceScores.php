@@ -127,14 +127,17 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         foreach ($scores as $login => $val) {
             if ($val != null){
-                if (Core::eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TEAM) {
+                if (!Core::$useTeams) {
                     $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$login", "", "", "$val"));
+                    $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$login", "", "", "$val"));
                 } else {
                     $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$login", "", "$val", "$val"));
+                    $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$login", "", "$val", "$val"));
                 }
             }
         }
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         self::$mainPlugin->forceScoresOk();
         $this->erase($login);
     }
@@ -145,13 +148,16 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $outScores = array();
         foreach ($rankings as $rank) {
-            if (Core::eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TEAM) {
+            if (!Core::$useTeams) {
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$rank->login", "0", "0", "0"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$rank->login", "0", "0", "0"));
             } else {
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$rank->login", "0", "0", "0"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$rank->login", "0", "0", "0"));
             }
         }
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         self::$mainPlugin->forceScoresOk();
 
         $this->populateList();

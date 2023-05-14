@@ -388,6 +388,7 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
             return;
         }
         $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.ForceEndRound', array());
     }
 
     /**
