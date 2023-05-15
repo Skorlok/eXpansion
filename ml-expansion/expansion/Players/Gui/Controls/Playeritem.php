@@ -20,8 +20,10 @@ use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 class Playeritem extends Control implements OptimizedPagerElement
 {
     protected $bg;
-    protected $forceButton;
-    protected $switchButton;
+    protected $forceSpecButton;
+    protected $forcePlayButton;
+    protected $switchSpecButton;
+    protected $switchPlayButton;
     protected $guestButton;
     protected $ignoreButton;
     protected $kickButton;
@@ -57,7 +59,7 @@ class Playeritem extends Control implements OptimizedPagerElement
 
         $this->recipient = $login;
         $sizeY = 6;
-        $sizeX = 120;
+        $sizeX = 135;
         $this->bg = new ListBackGround($indexNumber, $sizeX, $sizeY);
         $this->addComponent($this->bg);
 
@@ -86,28 +88,13 @@ class Playeritem extends Control implements OptimizedPagerElement
         // admin additions
         if (AdminGroups::isInList($login)) {
             if (AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
-
-                $ignored = $this->connection->getIgnoreList(-1, 0);
-
-                $ignore = false;
-                foreach ($ignored as $p) {
-                    if ($p->login == $login) {
-                        $ignore = true;
-                        break;
-                    }
-                }
-
                 $this->ignoreButton = new MyButton(7, 5);
-                $this->ignoreButton->setDescription(__('Ignore player', $login), 50);
+                $this->ignoreButton->setDescription(__('Ignore/UnIgnore player', $login), 50);
                 $this->ignoreButton->setTextColor("fff");
                 $this->ignoreButton->colorize("a22");
                 $this->ignoreButton->setAction($action);
-                if ($ignore) {
-                    $this->ignoreButton->setDescription(__('UnIgnore player', $login), 50);
-                    $this->ignoreButton->setIcon('Icons128x128_1', 'Beginner');
-                } else {
-                    $this->ignoreButton->setIcon('Icons128x128_1', 'Easy');
-                }
+                $this->ignoreButton->setIcon('Icons128x128_1', 'Easy');
+                //$this->ignoreButton->setIcon('Icons128x128_1', 'Beginner'); IN CASE OF ALREADY MUTED
                 $this->ignoreButton->setId('column_' . $indexNumber . '_2');
                 $this->ignoreButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
@@ -123,9 +110,7 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->kickButton->setIcon('Icons128x128_1', 'Medium');
                 $this->kickButton->setId('column_' . $indexNumber . '_3');
                 $this->kickButton->setClass("eXpOptimizedPagerAction");
-
                 $this->columnCount++;
-
                 $this->frame->addComponent($this->kickButton);
             }
 
@@ -139,7 +124,6 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->banButton->setId('column_' . $indexNumber . '_4');
                 $this->banButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
-
                 $this->frame->addComponent($this->banButton);
             }
 
@@ -151,46 +135,57 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->blacklistButton->setAction($action);
                 $this->blacklistButton->setIcon('Icons128x128_1', 'Extreme');
                 $this->blacklistButton->setId('column_' . $indexNumber . '_5');
-
                 $this->blacklistButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
                 $this->frame->addComponent($this->blacklistButton);
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->switchButton = new MyButton(6, 5);
-                $this->switchButton->setAction($action);
-                $this->switchButton->colorize("2f2");
-                if (isset($this->storage->spectators[$login])) {
-                    $this->switchButton->setIcon('Icons64x64_1', 'Opponents');
-                    $this->switchButton->setDescription(__('Switch to play', $login), 50);
-                } else {
-                    $this->switchButton->setIcon('BgRaceScore2', 'Spectator');
-                    $this->switchButton->setDescription(__('Switch to spectate', $login), 50);
-                }
-                $this->switchButton->setId('column_' . $indexNumber . '_6');
-
-                $this->switchButton->setClass("eXpOptimizedPagerAction");
+                $this->switchSpecButton = new MyButton(6, 5);
+                $this->switchSpecButton->setAction($action);
+                $this->switchSpecButton->colorize("2f2");
+                $this->switchSpecButton->setIcon('BgRaceScore2', 'Spectator');
+                $this->switchSpecButton->setDescription(__('Switch to spectate', $login), 50);
+                $this->switchSpecButton->setId('column_' . $indexNumber . '_6');
+                $this->switchSpecButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
-                $this->frame->addComponent($this->switchButton);
+                $this->frame->addComponent($this->switchSpecButton);
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->forceButton = new MyButton(6, 5);
-                $this->forceButton->setAction($action);
-                $this->forceButton->colorize("2f2");
-                if (isset($this->storage->spectators[$login])) {
-                    $this->forceButton->setIcon('Icons64x64_1', 'Opponents');
-                    $this->forceButton->setDescription(__('Force to play', $login), 50);
-                } else {
-                    $this->forceButton->setIcon('BgRaceScore2', 'Spectator');
-                    $this->forceButton->setDescription(__('Force to spectate', $login), 50);
-                }
-                $this->forceButton->setId('column_' . $indexNumber . '_7');
-
-                $this->forceButton->setClass("eXpOptimizedPagerAction");
+                $this->switchPlayButton = new MyButton(6, 5);
+                $this->switchPlayButton->setAction($action);
+                $this->switchPlayButton->colorize("2f2");
+                $this->switchPlayButton->setIcon('Icons64x64_1', 'Opponents');
+                $this->switchPlayButton->setDescription(__('Switch to play', $login), 50);
+                $this->switchPlayButton->setId('column_' . $indexNumber . '_7');
+                $this->switchPlayButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
-                $this->frame->addComponent($this->forceButton);
+                $this->frame->addComponent($this->switchPlayButton);
+            }
+
+            if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
+                $this->forceSpecButton = new MyButton(6, 5);
+                $this->forceSpecButton->setAction($action);
+                $this->forceSpecButton->colorize("2f2");
+                $this->forceSpecButton->setIcon('BgRaceScore2', 'Spectator');
+                $this->forceSpecButton->setDescription(__('Force to spectate', $login), 50);
+                $this->forceSpecButton->setId('column_' . $indexNumber . '_8');
+                $this->forceSpecButton->setClass("eXpOptimizedPagerAction");
+                $this->columnCount++;
+                $this->frame->addComponent($this->forceSpecButton);
+            }
+
+            if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
+                $this->forcePlayButton = new MyButton(6, 5);
+                $this->forcePlayButton->setAction($action);
+                $this->forcePlayButton->colorize("2f2");
+                $this->forcePlayButton->setIcon('Icons64x64_1', 'Opponents');
+                $this->forcePlayButton->setDescription(__('Force to play', $login), 50);
+                $this->forcePlayButton->setId('column_' . $indexNumber . '_9');
+                $this->forcePlayButton->setClass("eXpOptimizedPagerAction");
+                $this->columnCount++;
+                $this->frame->addComponent($this->forcePlayButton);
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_GUEST)) {
@@ -199,7 +194,7 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->guestButton->colorize("2f2");
                 $this->guestButton->setIcon('Icons128x128_1', 'Buddies');
                 $this->guestButton->setDescription(__('Add to guest list', $login), 50);
-                $this->guestButton->setId('column_' . $indexNumber . '_8');
+                $this->guestButton->setId('column_' . $indexNumber . '_10');
 
                 $this->guestButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
@@ -212,7 +207,7 @@ class Playeritem extends Control implements OptimizedPagerElement
                 $this->teamButton->colorize("2f2");
                 $this->teamButton->setIcon('Icons128x32_1', 'RT_Team');
                 $this->teamButton->setDescription(__('Switch player team', $login), 50);
-                $this->teamButton->setId('column_' . $indexNumber . '_9');
+                $this->teamButton->setId('column_' . $indexNumber . '_11');
 
                 $this->teamButton->setClass("eXpOptimizedPagerAction");
                 $this->columnCount++;
@@ -239,8 +234,17 @@ class Playeritem extends Control implements OptimizedPagerElement
         if (is_object($this->banButton)) {
             $this->banButton->destroy();
         }
-        if (is_object($this->forceButton)) {
-            $this->forceButton->destroy();
+        if (is_object($this->switchSpecButton)) {
+            $this->switchSpecButton->destroy();
+        }
+        if (is_object($this->switchPlayButton)) {
+            $this->switchPlayButton->destroy();
+        }
+        if (is_object($this->forceSpecButton)) {
+            $this->forceSpecButton->destroy();
+        }
+        if (is_object($this->forcePlayButton)) {
+            $this->forcePlayButton->destroy();
         }
         if (is_object($this->kickButton)) {
             $this->kickButton->destroy();
@@ -253,6 +257,9 @@ class Playeritem extends Control implements OptimizedPagerElement
         }
         if (is_object($this->guestButton)) {
             $this->guestButton->destroy();
+        }
+        if (is_object($this->teamButton)) {
+            $this->teamButton->destroy();
         }
 
         $this->destroyComponents();

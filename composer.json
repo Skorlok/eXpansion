@@ -53,8 +53,5 @@
     "psr-4": {
       "ManiaLivePlugins\\eXpansion\\": "."
     }
-  },
-  "scripts": {
-    "post-update-cmd": "ManiaLivePlugins\\eXpansion\\Core\\Install::postUpdate"
   }
 }
