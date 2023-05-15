@@ -195,6 +195,7 @@ class Menu extends ExpPlugin implements Listener
         if ($this->pluginLoaded("Votes")) {
             $voteGroup->addItem("Extend Time", "!voteextend", $this);
             $voteGroup->addItem("End Round", "!voteend", $this);
+            $voteGroup->addItem("Balance Teams", "!votebalance", $this);
         }
         if ($group->hasPermission(Permission::SERVER_VOTES)) {
             $voteGroup->addItem("Config...", "!adm_votes", $this);
@@ -430,6 +431,12 @@ class Menu extends ExpPlugin implements Listener
                     $plugin = $this->getPluginClass("Votes");
                     if ($this->isPluginLoaded($plugin)) {
                         $this->callPublicMethod($plugin, "vote_endround", $login);
+                    }
+                    break;
+                case "!votebalance":
+                    $plugin = $this->getPluginClass("Votes");
+                    if ($this->isPluginLoaded($plugin)) {
+                        $this->callPublicMethod($plugin, "vote_balance", $login);
                     }
                     break;
                 default:

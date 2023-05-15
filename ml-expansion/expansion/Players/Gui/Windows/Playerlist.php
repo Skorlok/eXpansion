@@ -92,10 +92,10 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
             if ($ignore) {
                 $this->connection->ignore($target);
-                $this->connection->chatSendServerMessage(__('%s$z$s$fff was ignored by admin %s', $login, $player->nickName, $admin->nickName));
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was ignored by admin %s', null, $player->nickName, $admin->nickName));
             } else {
                 $this->connection->unignore($target);
-                $this->connection->chatSendServerMessage(__('%s$z$s$fff was unignored by admin %s', $login, $player->nickName, $admin->nickName));
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was unignored by admin %s', null, $player->nickName, $admin->nickName));
             }
 
             $this->show($login);
@@ -152,17 +152,46 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->connection->chatSendServerMessage(__('$ff3$iYou are not allowed to do that!', $login), $login);
             }
             $player = $this->storage->getPlayerObject($target);
+            $admin = $this->storage->getPlayerObject($login);
 
             if ($player->spectatorStatus == 0) {
                 $this->connection->forceSpectator($target, 1);
-                $this->connection->chatSendServerMessage(__('Admin has forced you to specate!', $target), $target);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was forced into spectator mode by admin %s', null, $player->nickName, $admin->nickName));
+                $this->show($login);
+                return;
+            }
+            if ($player->spectator == 1) {
+                $this->connection->forceSpectator($target, 2);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was forced into played mode by admin %s', null, $player->nickName, $admin->nickName));
+                $this->show($login);
+                return;
+            }
+        } catch (\Exception $e) {
+            Helper::logError("Error:" . $e->getMessage());
+        }
+    }
+
+    public function switchSpec($login, $target)
+    {
+        try {
+            $login = $this->getRecipient();
+            if (!AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
+                $this->connection->chatSendServerMessage(__('$ff3$iYou are not allowed to do that!', $login), $login);
+            }
+            $player = $this->storage->getPlayerObject($target);
+            $admin = $this->storage->getPlayerObject($login);
+
+            if ($player->spectatorStatus == 0) {
+                $this->connection->forceSpectator($target, 1);
+                $this->connection->forceSpectator($target, 0);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was switched into spectator mode by admin %s', null, $player->nickName, $admin->nickName));
                 $this->show($login);
                 return;
             }
             if ($player->spectator == 1) {
                 $this->connection->forceSpectator($target, 2);
                 $this->connection->forceSpectator($target, 0);
-                $this->connection->chatSendServerMessage(__("Admin has released you from specate to play.", $target), $target);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was switched into played mode by admin %s', null, $player->nickName, $admin->nickName));
                 $this->show($login);
                 return;
             }
@@ -188,11 +217,14 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         if (AdminGroups::hasPermission($login, Permission::PLAYER_CHANGE_TEAM)) {
             $player = $this->storage->getPlayerObject($target);
+            $admin = $this->storage->getPlayerObject($login);
             if ($player->teamId === 0) {
                 $this->connection->forcePlayerTeam($target, 1);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was forced into team $f00Red$fff by admin %s', null, $player->nickName, $admin->nickName));
             }
             if ($player->teamId === 1) {
                 $this->connection->forcePlayerTeam($target, 0);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff was forced into team $00fBlue$fff by admin %s', null, $player->nickName, $admin->nickName));
             }
             $this->show($login);
         }
@@ -205,15 +237,16 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items = array();
         $this->storage = \ManiaLive\Data\Storage::getInstance();
         $login = $this->getRecipient();
-        $isadmin = AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC);
 
         foreach ($this->storage->players as $player) {
             $ignoreAction = $this->createAction(array($this, 'ignorePlayer'), $player->login);
             $kickAction = $this->createAction(array($this, 'kickPlayer'), $player->login);
             $banAction = $this->createAction(array($this, 'banPlayer'), $player->login);
             $blacklistAction = $this->createAction(array($this, 'blacklistPlayer'), $player->login);
+            $switchAction = $this->createAction(array($this, 'switchSpec'), $player->login);
             $forceAction = $this->createAction(array($this, 'toggleSpec'), $player->login);
             $guestAction = $this->createAction(array($this, 'guestlistPlayer'), $player->login);
+            $teamAction = $this->createAction(array($this, 'toggleTeam'), $player->login);
 
             $this->pager->addSimpleItems(array(Gui::fixString($player->nickName) . " " => -1,
                 Gui::fixString($player->login) => -1,
@@ -221,8 +254,10 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 "kick" => $kickAction,
                 "ban" => $banAction,
                 "blacklist" => $blacklistAction,
+                "switch" => $switchAction,
                 "force" => $forceAction,
                 "guest" => $guestAction,
+                "team" => $teamAction
             ));
         }
         foreach ($this->storage->spectators as $player) {
@@ -231,8 +266,10 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $kickAction = $this->createAction(array($this, 'kickPlayer'), $player->login);
             $banAction = $this->createAction(array($this, 'banPlayer'), $player->login);
             $blacklistAction = $this->createAction(array($this, 'blacklistPlayer'), $player->login);
+            $switchAction = $this->createAction(array($this, 'switchSpec'), $player->login);
             $forceAction = $this->createAction(array($this, 'toggleSpec'), $player->login);
             $guestAction = $this->createAction(array($this, 'guestlistPlayer'), $player->login);
+            $teamAction = $this->createAction(array($this, 'toggleTeam'), $player->login);
 
             $this->pager->addSimpleItems(array(Gui::fixString($player->nickName) . " " => -1,
                 Gui::fixString($player->login) => -1,
@@ -240,8 +277,10 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 "kick" => $kickAction,
                 "ban" => $banAction,
                 "blacklist" => $blacklistAction,
+                "switch" => $switchAction,
                 "force" => $forceAction,
                 "guest" => $guestAction,
+                "team" => $teamAction
             ));
         }
 

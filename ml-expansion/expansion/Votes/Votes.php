@@ -77,6 +77,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = $this->registerChatCommand("extend", "vote_Extend_Custom", 1, true);
         $cmd->help = 'Start a vote to extend timelimit';
 
+        $cmd = $this->registerChatCommand("balance", "vote_balance", 0, true);
+        $cmd->help = 'Start a vote to balance teams';
+        $cmd = $this->registerChatCommand("bal", "vote_balance", 0, true);
+        $cmd->help = 'Start a vote to balance teams';
+
         $cmd = AdminGroups::addAdminCommand('cancel', $this, 'cancelVote', 'cancel_vote');
         $cmd->setHelp('Cancel current running vote');
         AdminGroups::addAlias($cmd, "can");
@@ -96,6 +101,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->setPublicMethod("vote_skip");
         $this->setPublicMethod("vote_extend");
         $this->setPublicMethod("vote_endround");
+        $this->setPublicMethod("vote_balance");
         $this->setPublicMethod("showVotesConfig");
         $this->setPublicMethod("cancelVote");
 
@@ -214,6 +220,10 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if ($this->currentVote->action == "EndRound") {
                 $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
                 $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
+            }
+
+            if ($this->currentVote->action == "AutoTeamBalance") {
+                $this->connection->autoTeamBalance();
             }
 
         } else {
@@ -635,6 +645,72 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
         } else {
             $this->connection->chatSendServerMessage("Not in Rounds, Cup or Team gamemode", $login);
+        }
+    }
+
+    public function vote_balance($login)
+    {
+        try {
+            $managedVotes = $this->getVotes();
+
+            // if vote is not managed...
+            if (!array_key_exists('AutoTeamBalance', $managedVotes)) {
+                return;
+            }
+
+            // if vote is not managed...
+            if ($managedVotes['AutoTeamBalance']->managed == false) {
+                return;
+            }
+
+            if ($managedVotes['AutoTeamBalance']->ratio == -1.) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#AutoTeamBalance vote is disabled!"), $login);
+                return;
+            }
+
+            if ($this->currentVote) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#There is already a vote in progress!"), $login);
+                return;
+            }
+
+            $config = Config::getInstance();
+
+            if (!isset($this->counters["AutoTeamBalance"])) {
+                $this->counters["AutoTeamBalance"] = 0;
+            }
+
+            $this->counters["AutoTeamBalance"]++;
+
+            if ($config->limit_votes > 0) {
+                if ($this->counters["AutoTeamBalance"] > $config->limit_votes) {
+                    $msg = eXpGetMessage("Vote limit reached.");
+                    $this->eXpChatSendServerMessage($msg);
+                    return;
+                }
+            }
+
+
+            $vote = $managedVotes['AutoTeamBalance'];
+
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "AutoTeamBalance", "", Core::$players[$login] . '$z$z want to balance teams, you too ?', $vote->voters, time());
+
+            $this->debug("[exp\Votes] Calling AutoTeamBalance vote..");
+
+            VoteManagerWidget::EraseAll();
+            $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            $this->currentVoteWidget->setSize(90, 20);
+            $this->currentVoteWidget->setDatas($this->currentVote);
+            $this->currentVoteWidget->show();
+
+            $player = $this->storage->getPlayerObject($login);
+            $msg = eXpGetMessage('#variable#%1$s #vote#initiated AutoTeamBalance vote..');
+            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+
+            if ($config->autoVoteStarter) {
+                $this->handlePlayerVote($login, "yes");
+            }
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage("[Notice] " . $e->getMessage(), $login);
         }
     }
 
