@@ -8,11 +8,6 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    public function eXpOnLoad()
-    {
-        // $this->enableDedicatedEvents();
-    }
-
     public function eXpOnReady()
     {
         $this->updateData();
@@ -47,6 +42,45 @@ class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 		$ui .= '</ui_properties>';
 
         $this->connection->triggerModeScriptEvent("Trackmania.UI.SetProperties", array($ui));
+
+
+		$ui  = '<ui_properties>';
+		$ui .= '<notices visible="' . (($this->config->notices) ? 'true' : 'false') . '" />';
+		$ui .= '<map_info visible="' . (($this->config->SMmap_info) ? 'true' : 'false') . '" />';
+		$ui .= '<chat visible="' . (($this->config->SMchat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($this->config->SMchatline) . '" />';
+		$ui .= '<countdown visible="' . (($this->config->SMcountdown) ? 'true' : 'false') . '" pos="' . floatval($this->config->SMcountdown_x).' '.floatval($this->config->SMcountdown_y).' '.floatval($this->config->SMcountdown_z). '" />';
+		$ui .= '<crosshair visible="' . (($this->config->crosshair) ? 'true' : 'false') . '" />';
+		$ui .= '<gauges visible="' . (($this->config->gauges) ? 'true' : 'false') . '" />';
+		$ui .= '<consumables visible="' . (($this->config->consumables) ? 'true' : 'false') . '" />';
+		$ui .= '<go visible="' . (($this->config->SMgo) ? 'true' : 'false') . '" />';
+		$ui .= '<chat_avatar visible="' . (($this->config->SMchat_avatar) ? 'true' : 'false') . '" />';
+		$ui .= '<endmap_ladder_recap visible="' . (($this->config->SMendmap_ladder_recap) ? 'true' : 'false') . '" />';
+		$ui .= '<scorestable alt_visible="' . (($this->config->SMscorestablealt) ? 'true' : 'false') . '" visible="' . (($this->config->SMscorestable) ? 'true' : 'false') . '" />';
+		$ui .= '</ui_properties>';
+
+		$this->connection->triggerModeScriptEvent("Shootmania.UI.SetProperties", array($ui));
+
+
+		$ui  = '<ui_properties>';
+        $ui .= '<map_info visible="' . (($this->config->MP3map_info) ? 'true' : 'false') . '" />';
+        $ui .= '<opponents_info visible="' . (($this->config->MP3opponents_info) ? 'true' : 'false') . '" />';
+        $ui .= '<chat visible="' . (($this->config->MP3chat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($this->config->MP3chatline) . '" />';
+		$ui .= '<checkpoint_list visible="' . (($this->config->MP3checkpoint_list) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3checkpoint_list_x).' '.floatval($this->config->MP3checkpoint_list_y).' '.floatval($this->config->MP3checkpoint_list_z). '" />';
+		$ui .= '<round_scores visible="' . (($this->config->MP3round_scores) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3round_scores_x).' '.floatval($this->config->MP3round_scores_y).' '.floatval($this->config->MP3round_scores_z). '" />';
+		$ui .= '<countdown visible="' . (($this->config->MP3countdown) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3countdown_x).' '.floatval($this->config->MP3countdown_y).' '.floatval($this->config->MP3countdown_z). '" />';
+		$ui .= '<go visible="' . (($this->config->MP3go) ? 'true' : 'false') . '" />';
+		$ui .= '<chrono visible="' . (($this->config->MP3chrono) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3chrono_x).' '.floatval($this->config->MP3chrono_y).' '.floatval($this->config->MP3chrono_z). '" />';
+		$ui .= '<speed_and_distance visible="' . (($this->config->MP3speed_and_distance) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3speed_and_distance_x).' '.floatval($this->config->MP3speed_and_distance_y).' '.floatval($this->config->MP3speed_and_distance_z). '" />';
+		$ui .= '<personal_best_and_rank visible="' . (($this->config->MP3personal_best_and_rank) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3personal_best_and_rank_x).' '.floatval($this->config->MP3personal_best_and_rank_y).' '.floatval($this->config->MP3personal_best_and_rank_z). '" />';
+        $ui .= '<position visible="true" />';
+		$ui .= '<checkpoint_time visible="' . (($this->config->MP3checkpoint_time) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3checkpoint_time_x).' '.floatval($this->config->MP3checkpoint_time_y).' '.floatval($this->config->MP3checkpoint_time_z). '" />';
+		$ui .= '<chat_avatar visible="' . (($this->config->MP3chat_avatar) ? 'true' : 'false') . '" />';
+		$ui .= '<warmup visible="' . (($this->config->MP3warmup) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3warmup_x).' '.floatval($this->config->MP3warmup_y).' '.floatval($this->config->MP3warmup_z). '" />';
+		$ui .= '<endmap_ladder_recap visible="' . (($this->config->MP3endmap_ladder_recap) ? 'true' : 'false') . '" />';
+		$ui .= '<multilap_info visible="' . (($this->config->MP3multilap_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3multilap_info_x).' '.floatval($this->config->MP3multilap_info_y).' '.floatval($this->config->MP3multilap_info_z). '" />';
+		$ui .= '</ui_properties>';
+
+        $this->connection->triggerModeScriptEvent("UI_SetProperties", $ui);
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -89,6 +123,53 @@ class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
 		try {
 			$this->connection->triggerModeScriptEvent("Trackmania.UI.SetProperties", array($ui));
+		} catch (Exception $e) {
+			return;
+		}
+
+
+		$ui  = '<ui_properties>';
+		$ui .= '<notices visible="true" />';
+		$ui .= '<map_info visible="true" />';
+		$ui .= '<chat visible="true" offset="0. 0." linecount="7" />';
+		$ui .= '<countdown visible="true" pos="0. 85." />';
+		$ui .= '<crosshair visible="true" />';
+		$ui .= '<gauges visible="true" />';
+		$ui .= '<consumables visible="true" />';
+		$ui .= '<go visible="true" />';
+		$ui .= '<chat_avatar visible="true" />';
+		$ui .= '<endmap_ladder_recap visible="true" />';
+		$ui .= '<scorestable alt_visible="true" visible="true" />';
+		$ui .= '</ui_properties>';
+
+		try {
+			$this->connection->triggerModeScriptEvent("Shootmania.UI.SetProperties", array($ui));
+		} catch (Exception $e) {
+			return;
+		}
+
+
+		$ui  = '<ui_properties>';
+		$ui .= '<map_info visible="true" />';
+		$ui .= '<opponents_info visible="true" />';
+		$ui .= '<chat visible="true" offset="0. 0." linecount="7" />';
+		$ui .= '<checkpoint_list visible="true" pos="40. -90. 5." />';
+		$ui .= '<round_scores visible="true" pos="104. 14. 5." />';
+		$ui .= '<countdown visible="true" pos="154. -57. 5." />';
+		$ui .= '<go visible="true" />';
+		$ui .= '<chrono visible="true" pos="0. -80. 5." />';
+		$ui .= '<speed_and_distance visible="true" pos="158. -79.5 5." />';
+		$ui .= '<personal_best_and_rank visible="true" pos="158. -61. 5." />';
+		$ui .= '<position visible="true" />';
+		$ui .= '<checkpoint_time visible="true" pos="-8. 31.8 -10." />';
+		$ui .= '<chat_avatar visible="true" />';
+		$ui .= '<warmup visible="true" pos="170. 27. 0." />';
+		$ui .= '<endmap_ladder_recap visible="true" />';
+		$ui .= '<multilap_info visible="true" pos="152. 49.5 5." />';
+		$ui .= '</ui_properties>';
+
+		try {
+			$this->connection->triggerModeScriptEvent("UI_SetProperties", $ui);
 		} catch (Exception $e) {
 			return;
 		}
