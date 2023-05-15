@@ -1,0 +1,129 @@
+
+declare Text actionYes = "<?php echo $this->actionYes;?>";
+declare Text actionNo = "<?php echo $this->actionNo;?>";
+
+declare Integer countdown = <?php echo $this->countdown;?>;
+declare Integer startTime = <?php echo $this->startTime;?>;
+declare playersVote = <?php echo $this->votes;?>;
+
+declare Integer remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime));
+
+declare countdownBar = (Page.GetFirstChild("CountdownBar") as CMlGauge);
+declare countdownText = (Page.GetFirstChild("CountdownText") as CMlLabel);
+
+declare ratio = ML::NearestReal(remaining) / ML::NearestReal(countdown);
+if (ratio <= 1.0) {
+    if (ratio < 0.0) {
+        ratio = 0.0;
+    }
+    countdownBar.Ratio = ratio;
+} else {
+    countdownBar.Ratio = 1.0;
+}
+countdownText.Value = remaining ^ " seconds left";
+
+declare Integer voters = <?php echo $this->voters;?>;
+
+declare lastUpdateTime = Now;
+
+
+//  Active Players => 0
+//  Players => 1
+//  Everybody => 2
+
+declare Boolean canVote = True;
+
+foreach (Player in Players) {
+    if (LocalUser != Null) {
+        if (Player.Login == LocalUser.Login) {
+            if (!Player.RequestsSpectate) {
+                // PLAYER CASE
+                showVoteButtons();
+                canVote = True;
+            } else {
+                // SPECTATOR CASE
+                if (voters == 0) {
+                    hideVoteButtons();
+                    canVote = False;
+                } else {
+                    if (voters == 1) {
+                        if (Player.Score is CSmScore) {
+                            if (Player.Score.Points > 0) {
+                                showVoteButtons();
+                                canVote = True;
+                            } else {
+                                hideVoteButtons();
+                                canVote = False;
+                            }
+                        } else {
+                            hideVoteButtons();
+                            canVote = False;
+                        }
+                    } else {
+                        showVoteButtons();
+                        canVote = True;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// INTERFACE CONFIGURATION UNDER THIS LINE
+
+
+declare textLabel = (Page.GetFirstChild("textLabel") as CMlLabel);
+textLabel.Value = "<?php echo $this->voteText;?>";
+textLabel.Show();
+
+declare bgRatio = (Page.GetFirstChild("bgRatio") as CMlQuad);
+bgRatio.PosnX = <?php echo $this->ratio;?>;
+bgRatio.Show();
+
+
+declare Integer nbYes = 0;
+declare Integer nbTotal = 0;
+declare Real agreeSize = 29.0;
+
+foreach (Login => Score in playersVote) {
+
+    if (Score == "yes") {
+        if (LocalUser != Null) {
+            if (Login == LocalUser.Login) {
+                declare confirmVoteYes = (Page.GetFirstChild("confirmVoteYes") as CMlQuad);
+                confirmVoteYes.Show();
+            }
+        }
+        nbYes += 1;
+    }
+
+    if (Score == "no") {
+        if (LocalUser != Null) {
+            if (Login == LocalUser.Login) {
+                declare confirmVoteNo = (Page.GetFirstChild("confirmVoteNo") as CMlQuad);
+                confirmVoteNo.Show();
+            }
+        }
+        
+    }
+    nbTotal +=1;
+}
+
+if (nbTotal > 0) {
+    agreeSize = ((ML::NearestReal(nbYes) / ML::NearestReal(nbTotal)) * 58);
+}
+
+declare bgYes = (Page.GetFirstChild("bgYes") as CMlQuad);
+declare bgYes2 = (Page.GetFirstChild("bgYes2") as CMlQuad);
+declare bgNo = (Page.GetFirstChild("bgNo") as CMlQuad);
+declare bgNo2 = (Page.GetFirstChild("bgNo2") as CMlQuad);
+
+bgYes.Size[0] = agreeSize + 0.1;
+bgYes2.Size[0] = agreeSize + 0.1;
+bgNo.Size[0] = 58.01 - agreeSize;
+bgNo2.Size[0] = 58.01 - agreeSize;
+
+bgYes.Show();
+bgYes2.Show();
+bgNo.Show();
+bgNo2.Show();

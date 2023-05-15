@@ -164,10 +164,17 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->blabel->setHidden(1);
         $this->addComponent($this->blabel);
 
-        $this->script = new Script("Votes/Gui/Script");
-        $this->script->setParam("actionYes", $actionYes);
-        $this->script->setParam("actionNo", $actionNo);
-        $this->registerScript($this->script);
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->script = new Script("Votes/Gui/ScriptTM");
+            $this->script->setParam("actionYes", $actionYes);
+            $this->script->setParam("actionNo", $actionNo);
+            $this->registerScript($this->script);
+        } else {
+            $this->script = new Script("Votes/Gui/ScriptSM");
+            $this->script->setParam("actionYes", $actionYes);
+            $this->script->setParam("actionNo", $actionNo);
+            $this->registerScript($this->script);
+        }
     }
 
     public function onResize($oldX, $oldY)

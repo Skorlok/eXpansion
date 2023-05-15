@@ -4,6 +4,9 @@ remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime)
 if (remaining >= 0.0) {
     declare ratio = ML::NearestReal(remaining) / ML::NearestReal(countdown);
     if (ratio <= 1.0) {
+        if (ratio < 0.0) {
+            ratio = 0.0;
+        }
         countdownBar.Ratio = ratio;
     } else {
         countdownBar.Ratio = 1.0;
@@ -51,8 +54,8 @@ if ((Now - lastUpdateTime) >= 100) {
                         canVote = False;
                     } else {
                         if (voters == 1) {
-                            /*if (Player.Score != Null) {
-                                if (Player.Score.existskey(BestRace) && Player.Score.BestRace != Null) {
+                            if (Player.Score != Null) {
+                                if (Player.Score.BestRace != Null) {
                                     if (Player.Score.BestRace.Time > 0) {
                                         showVoteButtons();
                                         canVote = True;
@@ -67,7 +70,7 @@ if ((Now - lastUpdateTime) >= 100) {
                             } else {
                                 hideVoteButtons();
                                 canVote = False;
-                            }*/
+                            }
                         } else {
                             showVoteButtons();
                             canVote = True;

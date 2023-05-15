@@ -246,7 +246,7 @@ class Menu extends ExpPlugin implements Listener
             }
 
             if ($group->hasPermission(Permission::GAME_SETTINGS)) {
-                $admGroup->addItem("End pause", "!admunpause", $this);
+                $admGroup->addItem("End pause", "!admresume", $this);
             }
 
             if ($group->hasPermission(Permission::TEAM_BALANCE)) {
@@ -307,8 +307,8 @@ class Menu extends ExpPlugin implements Listener
                 case "!admpause":
                     $adminGrp->adminCmd($login, "pause");
                     break;
-                case "!admunpause":
-                    $adminGrp->adminCmd($login, "unpause");
+                case "!admresume":
+                    $adminGrp->adminCmd($login, "resume");
                     break;
                 case "!admer":
                     $adminGrp->adminCmd($login, "er");
@@ -368,7 +368,7 @@ class Menu extends ExpPlugin implements Listener
                     $adminGrp->adminCmd($login, "replay");
                     break;
                 case "!teambalance":
-                    $adminGrp->adminCmd($login, "setTeamBalance");
+                    $adminGrp->adminCmd($login, "team balance");
                     break;
 
                 case "!adm_plugins":

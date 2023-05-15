@@ -71,7 +71,7 @@ class ChatAdmin extends ExpPlugin
         $this->setPublicMethod("forceEndWuR");
         $this->setPublicMethod("shuffleMaps");
         $this->setPublicMethod("setPause");
-        $this->setPublicMethod("setUnPause");
+        $this->setPublicMethod("setResume");
     }
 
     /**
@@ -365,7 +365,7 @@ class ChatAdmin extends ExpPlugin
         $cmd->setHelp('Set the game to pause');
         AdminGroups::addAlias($cmd, 'p');
 
-        $cmd = AdminGroups::addAdminCommand('resume', $this, 'setUnPause', Permission::GAME_SETTINGS);
+        $cmd = AdminGroups::addAdminCommand('resume', $this, 'setResume', Permission::GAME_SETTINGS);
         $cmd->setHelp('Continue the game after pause');
         AdminGroups::addAlias($cmd, 're');
 
@@ -1268,7 +1268,7 @@ class ChatAdmin extends ExpPlugin
         }
     }
 
-    public function setUnPause($fromLogin, $params)
+    public function setResume($fromLogin, $params)
     {
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
