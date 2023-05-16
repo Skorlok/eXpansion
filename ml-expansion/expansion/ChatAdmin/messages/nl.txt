@@ -25,8 +25,8 @@ possible parameters: pointslimit, newrules, wu, wunb, dtd, fto, laps, skip, res
 possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
 #translate# possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
 
-possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
-#translate# possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res
+possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res, display
+#translate# possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res, display
 
 blacklist
 #translate# blacklist

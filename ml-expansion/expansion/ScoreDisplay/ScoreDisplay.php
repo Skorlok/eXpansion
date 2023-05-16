@@ -38,7 +38,7 @@ class ScoreDisplay extends ExpPlugin
         if ($command == "setup") {
             $window = ScoreSetup::Create($login);
             $window->setSize(120, 80);
-            $window->setName("ScoreSetup");
+            $window->setTitle("ScoreSetup");
             $window->show();
             return;
         }

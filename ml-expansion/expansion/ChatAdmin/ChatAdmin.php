@@ -23,6 +23,7 @@ use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\GuestPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\IgnoredPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\GenericPlayerList;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\ParameterDialog;
+use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\TeamSetup;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Structures\ActionDuration;
 use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
@@ -43,9 +44,6 @@ use Phine\Exception\Exception as Exception2;
  */
 class ChatAdmin extends ExpPlugin
 {
-    /** @var integer $teamGap */
-    private $teamGap = 0;
-
     /** @var ActionDuration[] $durations */
     private $durations = array();
 
@@ -398,6 +396,13 @@ class ChatAdmin extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        TeamSetup::$mainPlugin = $this;
+
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+            $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1Color"]), '', $var["team2Name"], floatval($var["team2Color"]), '');
+        }
     }
 
     public function onTick()
@@ -712,7 +717,7 @@ class ChatAdmin extends ExpPlugin
                     $this->setTeamRed($fromLogin, $params);
                     break;
                 case "gap":
-                    $this->enableTeamGap($fromLogin, $params);
+                    $this->setTeamGap($fromLogin, $params);
                     break;
                 case "balance":
                     $this->setTeamBalance($fromLogin, $params);
@@ -723,13 +728,25 @@ class ChatAdmin extends ExpPlugin
                 case "res":
                     $this->restartScoreReset($fromLogin, $params);
                     break;
+                case "display":
+                    $this->setTeamDisplay($fromLogin, $params);
+                    break;
                 default:
-                    $msg = eXpGetMessage("possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res");
+                    $msg = eXpGetMessage("possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res, display");
                     $this->eXpChatSendServerMessage($msg, $fromLogin);
                     break;
             }
         } catch (Exception $e) {
 
+        }
+    }
+
+    public function onBeginMap($map, $warmUp, $matchContinuation)
+    {
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+            $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1Color"]), '', $var["team2Name"], floatval($var["team2Color"]), '');
         }
     }
 
@@ -749,6 +766,24 @@ class ChatAdmin extends ExpPlugin
     public function invokeNetStats($fromLogin, $params = null)
     {
         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', "showNetStats", $fromLogin);
+    }
+
+    public function setTeamDisplay($fromLogin, $params = null)
+    {
+        $window = TeamSetup::Create($fromLogin);
+        $window->setSize(38, 60);
+        $window->setTitle("Team names and colors");
+        $window->show();
+    }
+
+    public function setTeamDisplayAfterWindow($fromLogin, $params)
+    {
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams');
+        $var->setRawValue($params);
+        \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+        $this->connection->setTeamInfo($params["team1Name"], $params["team1Color"], '', $params["team2Name"], $params["team2Color"], '');
+        $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z$s#admin_action# Sets new teams name and color!', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
     }
 
     /**
@@ -787,75 +822,6 @@ class ChatAdmin extends ExpPlugin
             $this->connection->autoTeamBalance();
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage("#admin_error#error while AutoTeamBalance: " . $e->getMessage(), $fromLogin);
-        }
-    }
-
-    /**
-     * @param $login
-     * @param $params
-     */
-    public function enableTeamGap($login, $params)
-    {
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_TEAM) {
-            $this->eXpChatSendServerMessage("#admin_error#Not in teams mode!", $login);
-        }
-
-        if (sizeof($params) > 0 && is_numeric($params[0])) {
-            $this->teamGap = intval($params[0]);
-
-            $this->eXpChatSendServerMessage('#admin_action#Team gap set to #variable# %1$s!', $login, array($params[0]));
-            $this->connection->restartMap();
-        }
-    }
-
-    /**
-     * @param \ManiaLive\DedicatedApi\Callback\SPlayerRanking[] $rankings
-     * @param int|\ManiaLive\DedicatedApi\Callback\SMapInfo $winnerTeamOrMap
-     */
-    public function onEndMatch($rankings, $winnerTeamOrMap)
-    {
-        if ($this->teamGap > 1 && $this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_TEAM) {
-            $points = $this->teamGap * 10;
-            if ($this->teamGap <= 5) {
-                $points = 50;
-            }
-            $this->connection->setTeamPointsLimit($points);
-        }
-    }
-
-    /**
-     *
-     */
-    public function onEndRound()
-    {
-        $this->checkTeamGap();
-    }
-
-    /**
-     *
-     */
-    public function onBeginRound()
-    {
-        $this->checkTeamGap();
-    }
-
-    /**
-     *
-     */
-    public function checkTeamGap()
-    {
-        if ($this->teamGap >= 1) {
-
-            $ranking = $this->expStorage->getCurrentRanking();
-            $scoregap = abs($ranking[0]->score - $ranking[1]->score);
-            $scoremax = $ranking[0]->score > $ranking[1]->score ? $ranking[0]->score : $ranking[1]->score;
-            print_r($ranking);
-            print_r($this->storage->players);
-
-            echo "gap:" . $scoregap . " max:" . $scoremax . "\n";
-            if ($scoremax >= $this->teamGap && $scoregap >= 2) {
-                echo "next map\n";
-            }
         }
     }
 
@@ -1066,6 +1032,26 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points limit to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, 'Incompatible game mode');
+            return;
+        }
+    }
+
+    /**
+     * @param $fromLogin
+     * @param $params
+     */
+    public function setTeamGap($fromLogin, $params)
+    {
+        if (!isset($params[0])) {
+            $this->sendErrorChat($fromLogin, 'Please provide a number of points.');
+            return;
+        }
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->connection->setModeScriptSettings(["S_PointsGap" => intval($params[0])]);
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points gap to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
