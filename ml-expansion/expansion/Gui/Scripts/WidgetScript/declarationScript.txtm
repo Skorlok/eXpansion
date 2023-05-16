@@ -27,6 +27,10 @@ declare Window <=> Page.GetFirstChild("<?php echo $win->getId() ?>");
 declare MoveWindow = False;
 declare CMlQuad quad <=> (Page.GetFirstChild("enableMove") as CMlQuad);
 
+declare CMlLabel coordLabel <=> (Page.GetFirstChild("coordLabel") as CMlLabel);
+declare CMlLabel coordButton <=> (Page.GetFirstChild("coordButton") as CMlLabel);
+declare CMlEntry coordInput <=> (Page.GetFirstChild("_widgetPosition") as CMlEntry);
+
 declare Vec3 LastDelta = <Window.RelativePosition.X, Window.RelativePosition.Y, -3.0>;
 declare Vec3 DeltaPos = <0.0, 0.0, -3.0>;
 declare Real lastMouseX = 0.0;

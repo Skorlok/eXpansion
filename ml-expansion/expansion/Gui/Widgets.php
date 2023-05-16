@@ -79,6 +79,7 @@ class Widgets extends \ManiaLib\Utils\Singleton
         GameInfos::GAMEMODE_TEAM => 3,
         GameInfos::GAMEMODE_LAPS => 3,
         GameInfos::GAMEMODE_CUP => 3);
+
     public $LiveRankingsPanel_posX = array(self::config_default => 120,
         GameInfos::GAMEMODE_ROUNDS => 120,
         GameInfos::GAMEMODE_TEAM => 120,
@@ -127,21 +128,25 @@ class Widgets extends \ManiaLib\Utils\Singleton
     public $CheckpointprogressWidget_posX = array(self::config_default => -80);
     public $CheckpointprogressWidget_posY = array(self::config_default => -56);
 
-    public $ManiaExchangePanel_posX = array(self::config_default => -160);
-    public $ManiaExchangePanel_posY = array(self::config_default => 80);
-    public $ManiaExchangePanel_autoCloseTimeout = array(self::config_default => 0);
+    public $ManiaExchangePanel_posX = array(self::config_default => -160,
+        self::config_shootmania => -160);
+    public $ManiaExchangePanel_posY = array(self::config_default => 80,
+        self::config_shootmania => -49);
 
     public $FaqWidget_posX = array(self::config_default => -161);
     public $FaqWidget_posY = array(self::config_trackmania => 76,
         self::config_shootmania => -31);
 
-    public $DonatePanel_posX = array(self::config_default => -160);
+    public $DonatePanel_posX = array(self::config_default => -160,
+        self::config_shootmania => -160);
     public $DonatePanel_posY = array(self::config_trackmania => -42,
-        self::config_shootmania => -37);
+        self::config_shootmania => -42);
     public $DonatePanel_autoCloseTimeout = array(self::config_default => 0);
 
-    public $AdminPanel_posX = array(self::config_default => -160);
-    public $AdminPanel_posY = array(self::config_default => -48);
+    public $AdminPanel_posX = array(self::config_default => -160,
+        self::config_shootmania => -160);
+    public $AdminPanel_posY = array(self::config_default => -48,
+        self::config_shootmania => -6.5);
     public $AdminPanel_autoCloseTimeout = array(self::config_default => 0);
 
     public $PersonalChatWidget_posX = array(self::config_default => -160);
@@ -163,6 +168,13 @@ class Widgets extends \ManiaLib\Utils\Singleton
     public $AroundMePanel_posX = array(self::config_default => -15);
     public $AroundMePanel_posY = array(self::config_default => -70);
 
-    public $VoteManagerWidget_posX = array(self::config_default => 4);
-    public $VoteManagerWidget_posY = array(self::config_default => 64);
+    public $Localtime_posX = array(self::config_default => -160,
+        self::config_shootmania => -160);
+    public $Localtime_posY = array(self::config_default => 74,
+        self::config_shootmania => -13.5);
+
+    public $VoteManagerWidget_posX = array(self::config_default => 4,
+        self::config_shootmania => 17);
+    public $VoteManagerWidget_posY = array(self::config_default => 64,
+        self::config_shootmania => 79);
 }

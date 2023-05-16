@@ -3,9 +3,15 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Widgets;
 
 use ManiaLib\Gui\Elements\Label;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Core\ConfigManager;
+use ManiaLivePlugins\eXpansion\Gui\Config;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\MetaData;
 use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
+use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 
 /**
  * @abstract
@@ -38,10 +44,7 @@ class Widget extends PlainWidget
         parent::onConstruct();
         $this->eXpOnBeginConstruct();
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\WidgetScript");
-        $this->script->setParam(
-            'disablePersonalHud',
-            \ManiaLivePlugins\eXpansion\Gui\Config::getInstance()->disablePersonalHud ? 'True' : 'False'
-        );
+        $this->script->setParam('disablePersonalHud', \ManiaLivePlugins\eXpansion\Gui\Config::getInstance()->disablePersonalHud ? 'True' : 'False');
         $this->registerScript($this->script);
 
         $this->move = new \ManiaLib\Gui\Elements\Quad(45, 7);
@@ -53,16 +56,13 @@ class Widget extends PlainWidget
         $this->storage = \ManiaLive\Data\Storage::getInstance();
         $this->xml = new \ManiaLive\Gui\Elements\Xml();
 
-        // @todo enable this when saving coordinates is redone.
-
-        /*
         $this->_coord = new Label();
         $this->_coord->setAlign("center", "center");
         $this->_coord->setId("coordLabel");
         $this->_coord->setAttribute('hidden', "true");
         $this->addComponent($this->_coord);
 
-        $this->_input = new Inputbox("coordinates");
+        $this->_input = new Inputbox("_widgetPosition");
         $this->_input->setPosition(900, 900);
         $this->addComponent($this->_input);
 
@@ -74,7 +74,7 @@ class Widget extends PlainWidget
         $this->_save->setAttribute('hidden', "true");
         $this->_save->setAction($this->createAction(array($this, "_save")));
         $this->_save->setScale(0.7);
-        $this->addComponent($this->_save); */
+        $this->addComponent($this->_save);
 
         $this->eXpOnEndConstruct();
         $this->eXpLoadSettings();
@@ -82,8 +82,14 @@ class Widget extends PlainWidget
 
     public function _save($login, $entries)
     {
-        echo $login . "\n";
-        print_r($entries);
+        if (AdminGroups::hasPermission($login, Permission::GUI_SET_WIDGET_POSITION)) {
+            $var = MetaData::getInstance()->getVariable('allWidgetPositions');
+            $positions = $var->getRawValue();
+            $positions[str_replace(" ", "", $this->getName())] = str_replace('–', '-', $entries['_widgetPosition']);
+            $var->setRawValue($positions);
+            ConfigManager::getInstance()->check();
+            $this->autoSetPositions();
+        }
     }
 
 
@@ -158,6 +164,18 @@ class Widget extends PlainWidget
                 }
             }
         }
+        // override defaults!
+        $positions = Config::getInstance()->allWidgetPositions;
+        $name = str_replace(" ", "", $this->getName());
+        if (array_key_exists($name, $positions)) {
+            $pos = str_replace('–', '-', $positions[$name]);
+            $pos = explode("x", $pos);
+
+
+            $this->currentSettings['posX'] = floatval(Maniascript::getReal(trim($pos[0])));
+            $this->currentSettings['posY'] = floatval(Maniascript::getReal(trim($pos[1])));
+
+        }
 
         $this->autoSetPositions();
         $this->eXpOnSettingsLoaded();
@@ -186,8 +204,8 @@ class Widget extends PlainWidget
     {
         parent::onResize($oldX, $oldY);
         $this->move->setSize($this->getSizeX(), $this->getSizeY());
-     /*   $this->_coord->setPosition($this->getSizeX() / 2, -$this->getSizeY() / 2);
-        $this->_save->setPosition($this->getSizeX() / 2, -($this->getSizeY() / 2) - 5); */
+        $this->_coord->setPosition($this->getSizeX() / 2, -$this->getSizeY() / 2);
+        $this->_save->setPosition($this->getSizeX() / 2, -($this->getSizeY() / 2) - 5);
     }
 
     protected function autoSetPositions()

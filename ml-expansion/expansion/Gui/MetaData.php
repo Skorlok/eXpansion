@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\ColorCode;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\HashList;
 
 /**
  * Description of MetaData
@@ -131,6 +132,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setMin(0.5);
         $var->setMax(5.0);
         $var->setDefaultValue(1);
+        $this->registerVariable($var);
+
+        $var = new HashList("allWidgetPositions", "WidgetPositions (do not edit)", $config);
+        $var->setKeyType(new TypeString(""));
+        $var->setType(new TypeString(""));
+        $var->setDefaultValue(array());
+        $var->setGroup("GUI");
+        $var->setDescription('Automatically generated from widgets');
         $this->registerVariable($var);
     }
 }

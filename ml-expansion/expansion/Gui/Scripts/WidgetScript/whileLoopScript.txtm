@@ -57,8 +57,15 @@ if (!disablePersonalHud) {
 
 		if (exp_enableHudMove == True) {
 			quad.Show();
+			coordLabel.Show();
+			coordButton.Show();
+			coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ " x " ^ roundFloat(Window.RelativePosition.Y);
+			coordInput.Value = coordLabel.Value;
 		} else {
 			quad.Hide();
+			coordInput.Hide();
+			coordLabel.Hide();
+			coordButton.Hide();
 		}
 
 		exp_widgetLayersBuffered = EXP_widgetLayers[id][gameMode];
@@ -97,6 +104,9 @@ if (!disablePersonalHud) {
 	    LastDelta.Z = 0.0;
 	    Window.RelativePosition = LastDelta;
         EXP_widgetLastPosRel[id][gameMode] = Window.RelativePosition;
+
+		coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ " x " ^ roundFloat(Window.RelativePosition.Y);
+		coordInput.Value = coordLabel.Value;
 
 		lastMouseX = MouseX;
 	    lastMouseY = MouseY;
