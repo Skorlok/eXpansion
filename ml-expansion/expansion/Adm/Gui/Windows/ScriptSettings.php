@@ -20,6 +20,8 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     private $actionOk;
     private $actionCancel;
 
+    public static $mainPlugin;
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -81,17 +83,33 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function ok($login, $settings = null)
     {
+        $diffParams = array();
 
         foreach ($this->items as $item) {
             if ($item->checkBox !== null) {
-                $settings[$item->settingName] = $item->checkBox->getStatus();
+                if ($settings[$item->settingName] == 1) {
+                    $settings[$item->settingName] = true;
+                } else if ($settings[$item->settingName] == 0) {
+                    $settings[$item->settingName] = false;
+                } else {
+                    $settings[$item->settingName] = $item->checkBox->getStatus();
+                }
+
+                if ($item->checkBox->getStatus() != $settings[$item->settingName]) {
+                    $diffParams[$item->settingName] = array(($item->checkBox->getStatus() ? "True" : "False"), ($settings[$item->settingName] ? "True" : "False"));
+                }
             } else {
                 settype($settings[$item->settingName], $item->type);
+
+                if ($item->inputbox->getText() != $settings[$item->settingName]) {
+                    $diffParams[$item->settingName] = array(($item->inputbox->getText() ? $item->inputbox->getText() : '$iEmpty$i'), ($settings[$item->settingName] ? $settings[$item->settingName] : '$iEmpty$i'));
+                }
             }
         }
 
         if ($settings) {
             $this->connection->setModeScriptSettings($settings);
+            self::$mainPlugin->afterScriptSettings($login, $diffParams);
         }
 
         $this->Erase($login);

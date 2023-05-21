@@ -174,7 +174,7 @@ class Maps extends ExpPlugin
         Gui\Windows\AddMaps::$mapsPlugin = $this;
         /** @var \ManiaLive\Gui\ActionHandler */
         $action = \ManiaLive\Gui\ActionHandler::getInstance();
-        $this->actionShowMapList = $action->createAction(array($this, "showMapList"));
+        $this->actionShowMapList = $action->createAction(array($this, "showMapList_menu"));
         $this->actionShowJukeList = $action->createAction(array($this, "showJukeList"));
 
         $this->showCurrentMapWidget();

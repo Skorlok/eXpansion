@@ -7,8 +7,8 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     private $bg;
     private $label;
-    private $inputbox;
     private $frame;
+    public $inputbox = null;
     public $checkBox = null;
     public $settingName;
     public $type = null;
@@ -60,9 +60,8 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->frame->addComponent($spacer);
 
         if (is_bool($value) === true) {
-            $this->checkBox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox(4, 4);
+            $this->checkBox = new \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted(4, 4, 25, $settingName);
             $this->checkBox->setStatus($value);
-
             $this->frame->addComponent($this->checkBox);
         } else {
             $this->inputbox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox($settingName, 20);

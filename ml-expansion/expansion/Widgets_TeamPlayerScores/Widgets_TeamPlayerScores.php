@@ -47,44 +47,6 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         }
     }
 
-    public function test()
-    {
-        foreach ($this->storage->players as $login => $player) {
-            if (!array_key_exists($login, $this->playerScores)) {
-                $this->playerScores[$login] = new PlayerScore();
-                $this->playerScores[$login]->login = $login;
-                $this->playerScores[$login]->nickName = $player->nickName;
-            }
-        }
-
-        foreach (Core::$playerInfo as $player) {
-            // get points
-            $this->playerScores[$player->login]->score += $this->getScore($player->position);
-
-            // assign best time
-            if ($this->playerScores[$player->login]->bestTime == 0
-                || $player->finalTime < $this->playerScores[$player->login]->bestTime
-            ) {
-                $this->playerScores[$player->login]->bestTime = $player->finalTime;
-            }
-
-            // count wins
-            switch ($player->position) {
-                case 0:
-                    $this->playerScores[$player->login]->winScore[0]++;
-                    break;
-                case 1:
-                    $this->playerScores[$player->login]->winScore[1]++;
-                    break;
-                case 2:
-                    $this->playerScores[$player->login]->winScore[2]++;
-                    break;
-            }
-        }
-
-        $this->showWidget($this->showWidget(\ManiaLive\Gui\Window::LAYER_NORMAL));
-    }
-
     public function onBeginRound()
     {
         $this->hideWidget();
@@ -93,25 +55,20 @@ class Widgets_TeamPlayerScores extends ExpPlugin
 
     public function onEndRound()
     {
-        // create players
-        foreach ($this->storage->players as $login => $player) {
-            if (!array_key_exists($login, $this->playerScores)) {
-                $this->playerScores[$login] = new PlayerScore();
-                $this->playerScores[$login]->login = $login;
-                $this->playerScores[$login]->nickName = $player->nickName;
-            }
-        }
-
-        // count scores
         foreach (Core::$playerInfo as $player) {
-            if ($player->finalTime != 0 && !$player->isSpectator) {
+            if ($player->finalTime > 0 && !$player->isSpectator) {
+
+                if (!array_key_exists($player->login, $this->playerScores)) {
+                    $this->playerScores[$player->login] = new PlayerScore();
+                    $this->playerScores[$player->login]->login = $player->login;
+                    $this->playerScores[$player->login]->nickName = Core::$players[$player->login];
+                }
+                
                 // get points
                 $this->playerScores[$player->login]->score += $this->getScore($player->position);
 
                 // assign best time
-                if ($this->playerScores[$player->login]->bestTime == 0
-                    || $player->finalTime < $this->playerScores[$player->login]->bestTime
-                ) {
+                if ($this->playerScores[$player->login]->bestTime == 0 || $player->finalTime < $this->playerScores[$player->login]->bestTime) {
                     $this->playerScores[$player->login]->bestTime = $player->finalTime;
                 }
 
@@ -131,7 +88,7 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         }
         ArrayOfObj::asortDesc($this->playerScores, "score");
         $this->hideWidget();
-        $this->showWidget(\ManiaLive\Gui\Window::LAYER_NORMAL);
+        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
     }
 
     public function onBeginMatch()
@@ -158,12 +115,14 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         $this->playerScores = array();
     }
 
-    private function showWidget($layer)
+    private function showWidget($layer = null)
     {
         $widget = PlayerScoreWidget::Create();
         $widget->setSize(42, 56);
         $widget->setScores($this->playerScores);
-        $widget->setLayer($layer);
+        if ($layer != null) {
+            $widget->setLayer($layer);
+        }
         $widget->setPosition(-124, 6);
         $widget->show();
     }

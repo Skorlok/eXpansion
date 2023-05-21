@@ -119,21 +119,12 @@ class Widgets_TeamRoundScores extends ExpPlugin
 
         // assign total scores
         foreach (Core::$rankings as $ranking) {
-            $team = 0;
-            switch ($ranking->nickName) {
-                case '$F00Team Red':
-                    $team = 1;
-                    break;
-                case "$00FTeam Blue":
-                    $team = 0;
-                    break;
-            }
-            $score->totalScore[$team] = $ranking->score;
+            $score->totalScore[$ranking->login] = $ranking->score;
         }
 
         $this->roundScores[$this->roundNumber] = $score;
         $this->hideWidget();
-        $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_NORMAL);
+        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
 
         $this->roundNumber++;
     }
@@ -169,12 +160,14 @@ class Widgets_TeamRoundScores extends ExpPlugin
         $this->totalScores[-1] = 0;
     }
 
-    private function showWidget($layer)
+    private function showWidget($layer = null)
     {
         $widget = Gui\Widgets\RoundScoreWidget::Create();
         $widget->setSize(42, 56);
         $widget->setScores($this->roundScores);
-        $widget->setLayer($layer);
+        if ($layer != null) {
+            $widget->setLayer($layer);
+        }
         $widget->setPosition(-124, 58);
         $widget->show();
     }

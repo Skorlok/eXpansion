@@ -52,6 +52,8 @@ class PlainLivePanel extends PlainPanel
             $this->timeScript->setParam("nbLaps", 1);
             $this->timeScript->setParam("isLaps", "False");
             $this->timeScript->setParam("isTeam", "False");
+            $this->timeScript->setParam("team1Color", '$3AF');
+            $this->timeScript->setParam("team2Color", '$D00');
             $this->timeScript->setParam("playerTeams", "Integer[Text]");
 
 
@@ -114,6 +116,16 @@ class PlainLivePanel extends PlainPanel
 
             if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
                 $this->timeScript->setParam("isTeam", "True");
+
+                $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+                if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                    $this->timeScript->setParam("team1Color", '$' . $var["team1Color"]);
+                    $this->timeScript->setParam("team2Color", '$' . $var["team2Color"]);
+                } else {
+                    $this->timeScript->setParam("team1Color", '$3AF');
+                    $this->timeScript->setParam("team2Color", '$D00');
+                }
             }
 
             if (!empty(Widgets_LiveRankings::$roundPoints)) {

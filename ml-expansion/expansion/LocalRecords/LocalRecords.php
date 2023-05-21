@@ -53,7 +53,7 @@ class LocalRecords extends LocalBase
 
             $time = microtime(true);
             //We add the record to the buffer
-            if (isset($playerinfo[$login])) {
+            if (isset($playerinfo[$login]) && $timeOrScore < 8388608) {
                 $this->addRecord($login, $timeOrScore, $playerinfo[$login]->checkpoints);
             }
 
@@ -70,7 +70,7 @@ class LocalRecords extends LocalBase
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || Endurance::$enduro) && isset($this->storage->players[$player->login]) && $time > 0) {
+        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || Endurance::$enduro) && isset($this->storage->players[$player->login]) && $time > 0 && $time < 8388608) {
 
             // if normal map, don't trigger the event for first lap :)
             if ($this->storage->currentMap->nbLaps == 0) {

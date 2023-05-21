@@ -24,7 +24,7 @@ class CheckboxScripted extends \ManiaLivePlugins\eXpansion\Gui\Control implement
     protected $skin = "checkbox";
     protected $skinWidth = 5;
 
-    public function __construct($sizeX = 4, $sizeY = 4, $textWidth = 25)
+    public function __construct($sizeX = 4, $sizeY = 4, $textWidth = 25, $name = null)
     {
         $this->textWidth = $textWidth;
 
@@ -44,7 +44,11 @@ class CheckboxScripted extends \ManiaLivePlugins\eXpansion\Gui\Control implement
 
 
         $this->entry = new \ManiaLib\Gui\Elements\Entry(20, $sizeY);
-        $this->entry->setName('eXp_CheckboxE_' . $this->checkboxId);
+        if ($name == null) {
+            $this->entry->setName('eXp_CheckboxE_' . $this->checkboxId);
+        } else {
+            $this->entry->setName($name);
+        }
         $this->entry->setId('eXp_CheckboxE_' . $this->checkboxId);
         $this->addComponent($this->entry);
         $this->entry->setDefault($this->active ? "1" : "0");

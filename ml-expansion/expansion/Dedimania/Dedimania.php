@@ -38,7 +38,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if ($time == 0) {
+        if ($time == 0 || $time > 10800000) {
             return;
         }
 
@@ -60,6 +60,9 @@ class Dedimania extends DedimaniaAbstract
         }
 
         $playerinfo = Core::$playerInfo;
+        if (!isset($playerinfo[$login])) {
+            return;
+        }
         $checkpoints = implode(",", $playerinfo[$login]->checkpoints);
 
         $this->handlePlayerFinish($playerUid, $login, $time, $checkpoints);
@@ -71,7 +74,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if ($timeOrScore == 0) {
+        if ($timeOrScore == 0 || $timeOrScore > 10800000) {
             return;
         }
 

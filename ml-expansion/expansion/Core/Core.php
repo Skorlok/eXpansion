@@ -24,7 +24,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.1.3";
+    const EXP_VERSION = "1.2.1.4";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -565,12 +565,14 @@ EOT;
 							$rank_red = 1;
 						}
 
+                        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
 						$scores = array();
 
 						$scores[] = array(
 							'rank'				=> $rank_blue,
 							'login'				=> '0',
-							'nickName'			=> '$00FTeam Blue',
+							'nickName'			=> ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00FTeam Blue'),
 							'round_points'			=> $params['teams'][0]['roundpoints'],
 							'map_points'			=> $params['teams'][0]['mappoints'],
 							'score'			=> $params['teams'][0]['matchpoints'],
@@ -579,7 +581,7 @@ EOT;
 						$scores[] = array(
 							'rank'				=> $rank_red,
 							'login'				=> '1',
-							'nickName'			=> '$F00Team Red',
+							'nickName'			=> ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$F00Team Red'),
 							'round_points'			=> $params['teams'][1]['roundpoints'],
 							'map_points'			=> $params['teams'][1]['mappoints'],
 							'score'			=> $params['teams'][1]['matchpoints'],
@@ -1341,6 +1343,8 @@ EOT;
             if (sizeof($outPlayers) < 0) {
                 Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_NETLOST, $outPlayers));
             }
+
+            $this->debug("Memory usage: " . $this->echo_memory_usage());
         }
     }
 
@@ -1564,9 +1568,7 @@ EOT;
             $this->expPlayers[$login]->curCpIndex = -1;
             $this->expPlayers[$login]->isFinished = false;
             // in case player is joining to match in round, he needs to be marked as waiting
-            if ($this->storage->gameInfos->gameMode
-                != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK
-            ) {
+            if ($this->storage->gameInfos->gameMode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
                 $this->expPlayers[$login]->isWaiting = true;
             }
         }
@@ -1657,16 +1659,13 @@ EOT;
         }
 
         if ($timeOrScore == 0) {
-            if (array_key_exists($login, $this->expPlayers)) {
+            if (array_key_exists($login, $this->expPlayers) && !$this->expPlayers[$login]->isFinished) {
                 $this->expPlayers[$login]->checkpoints = array(0 => 0);
                 $this->expPlayers[$login]->finalTime = 0;
-                if ($this->storage->gameInfos->gameMode
-                    !== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK
-                ) {
+                $this->expPlayers[$login]->isFinished = true;
+                if ($this->storage->gameInfos->gameMode !== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
                     $this->expPlayers[$login]->hasRetired = true;
-                    Dispatcher::dispatch(
-                        new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_GIVEUP, $this->expPlayers[$login])
-                    );
+                    Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_GIVEUP, $this->expPlayers[$login]));
                 }
             }
 
@@ -1677,17 +1676,13 @@ EOT;
             if (array_key_exists($login, $this->expPlayers)) {
                 $this->expPlayers[$login]->finalTime = $timeOrScore;
                 $this->expPlayers[$login]->isFinished = true;
-                if ($this->storage->gameInfos->gameMode
-                    !== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK
-                ) {
+                if ($this->storage->gameInfos->gameMode !== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK) {
                     self::$roundFinishOrder[] = $login;
                 }
             }
 
             // set points
-            if ($this->storage->gameInfos->gameMode
-                == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM
-            ) {
+            if ($this->storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
                 $maxpoints = $this->storage->gameInfos->teamMaxPoints;
                 $total = 0;
                 // get total number if players
@@ -1811,14 +1806,7 @@ EOT;
             }
 
             if ($dispatch) {
-                Dispatcher::dispatch(
-                    new Events\PlayerEvent(
-                        Events\PlayerEvent::ON_PLAYER_POSITION_CHANGE,
-                        $this->expPlayers[$login],
-                        $oldPos,
-                        $pos
-                    )
-                );
+                Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_POSITION_CHANGE, $this->expPlayers[$login], $oldPos, $pos));
             }
             // set previous player
             if ($previousPlayerLogin == null) {
@@ -1829,9 +1817,7 @@ EOT;
         // export infos..
         self::$playerInfo = $this->expPlayers;
         \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc(self::$playerInfo, "position");
-        Dispatcher::dispatch(
-            new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_POSITIONS_CALCULATED, self::$playerInfo)
-        );
+        Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_POSITIONS_CALCULATED, self::$playerInfo));
     }
 
     /** converted from fast.. */

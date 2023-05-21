@@ -24,7 +24,10 @@ declare Boolean givePoints = <?php echo $this->givePoints ?>;
 declare points = <?php echo $this->points ?>;
 declare isLaps = <?php echo $this->isLaps ?>;
 declare nbLaps = <?php echo $this->nbLaps ?>;
+
 declare isTeam = <?php echo $this->isTeam ?>;
+declare team1Color = "<?php echo $this->team1Color ?>";
+declare team2Color = "<?php echo $this->team2Color ?>";
 
 declare maxPoint = <?php echo $this->maxPoint ?>;
 

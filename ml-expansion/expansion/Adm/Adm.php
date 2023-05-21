@@ -60,6 +60,7 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
         RoundPoints::$plugin = $this;
         ForceScores::$mainPlugin = $this;
         AdminPanel::$mainPlugin = $this;
+        ScriptSettings::$mainPlugin = $this;
 
 
         $cmd = AdminGroups::addAdminCommand('server control', $this, 'serverControlMain', Permission::SERVER_CONTROL_PANEL);
@@ -289,15 +290,19 @@ class Adm extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\E
     public function scriptSettings($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                $window = ScriptSettings::Create($login);
-                $window->setTitle(__('Script Settings', $login));
-                $window->centerOnScreen();
-                $window->setSize(160, 100);
-                $window->show();
-            } else {
-                $this->eXpChatSendServerMessage($this->msgScriptSettings, $login);
-            }
+            $window = ScriptSettings::Create($login);
+            $window->setTitle(__('Script Settings', $login));
+            $window->centerOnScreen();
+            $window->setSize(160, 100);
+            $window->show();
+        }
+    }
+
+    public function afterScriptSettings($login, $diffPameters = array())
+    {
+        $admin = $this->storage->getPlayerObject($login);
+        foreach ($diffPameters as $key => $value) {
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s#admin_action# changes script parameter #variable#%s#admin_action# to #variable#%s #admin_action#(#admin_action#Was #variable#%s#admin_action#)', null, array($admin->nickName, $key, $value[1], $value[0]));
         }
     }
 

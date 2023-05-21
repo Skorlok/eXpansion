@@ -11,6 +11,7 @@ use ManiaLive\Event\Dispatcher;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLive\PluginHandler\Dependency;
 use ManiaLive\Utilities\Time;
+use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ScriptSettings;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AdminGroups\types\Arraylist;
@@ -24,6 +25,7 @@ use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\IgnoredPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\GenericPlayerList;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\ParameterDialog;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\TeamSetup;
+use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\ClubLinksSetup;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Structures\ActionDuration;
 use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
@@ -32,9 +34,11 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
+use ManiaLivePlugins\eXpansion\Helpers\ColorConversion;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\Player;
 use Maniaplanet\DedicatedServer\Structures\PlayerBan;
+use oliverde8\AsynchronousJobs\Job\Curl;
 use Phine\Exception\Exception as Exception2;
 
 /**
@@ -46,6 +50,11 @@ class ChatAdmin extends ExpPlugin
 {
     /** @var ActionDuration[] $durations */
     private $durations = array();
+    /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
+    protected $dataAccess;
+    protected $clubLinks = array();
+    protected $clubLinksGet = 0;
+    protected $clubLinksExpected = 0;
 
     public static $showActions = array();
 
@@ -328,6 +337,10 @@ class ChatAdmin extends ExpPlugin
         $cmd->setMinParam(1);
         AdminGroups::addAlias($cmd, 'setgamemode'); //xaseco
 
+        $cmd = AdminGroups::addAdminCommand('script', $this, 'setModeScriptSettings', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Changes the script settings for the current gamemode');
+        AdminGroups::addAlias($cmd, 's');
+
         $cmd = AdminGroups::addAdminCommand('WarmUpDuration', $this, 'setAllWarmUpDuration', Permission::GAME_SETTINGS);
         $cmd->setHelp('Set the warmup duration at the begining of the maps for all gamemodes')->addchecker(1, Integer::getInstance());
         $cmd->addchecker(1, Time_ms::getInstance());
@@ -371,14 +384,15 @@ class ChatAdmin extends ExpPlugin
         $cmd->setHelp('Extend current timelimit or pointslimit');
         AdminGroups::addAlias($cmd, 'ext');
 
-        $cmd = AdminGroups::addAdminCommand('forcePlayerTeam', $this, 'forcePlayerTeam', Permission::GAME_SETTINGS);
-        $cmd->setHelp('Changes the Team for a Player by Forcing him');
-        $cmd->setMinParam(2);
-        $cmd->addchecker(2, Arraylist::getInstance()->items("0,1,red,blue"));
-
         $cmd = AdminGroups::addAdminCommand('shuffle', $this, 'shuffleMaps', Permission::GAME_SETTINGS);
         $cmd->setHelp('Shuffles the mapslist');
         $cmd->setMinParam(0);
+
+        $cmd = AdminGroups::addAdminCommand('forceclublinks', $this, 'forceClubLinks', Permission::GAME_SETTINGS);
+        $cmd->setHelp('Force the clublinks to be displayed');
+        $cmd->setMinParam(0);
+        AdminGroups::addAlias($cmd, 'clublinks');
+        AdminGroups::addAlias($cmd, 'clublink');
 
         $this->enableDatabase();
         $this->enableTickerEvent();
@@ -397,11 +411,24 @@ class ChatAdmin extends ExpPlugin
     {
         $this->enableDedicatedEvents();
         TeamSetup::$mainPlugin = $this;
+        ClubLinksSetup::$mainPlugin = $this;
+
+        $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
         $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
 
-        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
-            $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1Color"]), '', $var["team2Name"], floatval($var["team2Color"]), '');
+        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+            if (isset($var["team1Link"]) || isset($var["team2Link"])) {
+                if (isset($var["team1Link"]) && isset($var["team2Link"])) {
+                    $this->getClubLinks(null, array("team1Clublink" => $var["team1Link"], "team2Clublink" => $var["team2Link"]));
+                } elseif (isset($var["team1Link"])) {
+                    $this->getClubLinks(null, array("team1Clublink" => $var["team1Link"]));
+                } elseif (isset($var["team2Link"])) {
+                    $this->getClubLinks(null, array("team2Clublink" => $var["team2Link"]));
+                }
+            } else {
+                $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1ColorHSL"]), '', $var["team2Name"], floatval($var["team2ColorHSL"]), '');
+            }
         }
     }
 
@@ -741,12 +768,22 @@ class ChatAdmin extends ExpPlugin
         }
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
 
-        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
-            $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1Color"]), '', $var["team2Name"], floatval($var["team2Color"]), '');
+        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+            if (isset($var["team1Link"]) || isset($var["team2Link"])) {
+                if (isset($var["team1Link"]) && isset($var["team2Link"])) {
+                    $this->getClubLinks(null, array("team1Clublink" => $var["team1Link"], "team2Clublink" => $var["team2Link"]));
+                } elseif (isset($var["team1Link"])) {
+                    $this->getClubLinks(null, array("team1Clublink" => $var["team1Link"]));
+                } elseif (isset($var["team2Link"])) {
+                    $this->getClubLinks(null, array("team2Clublink" => $var["team2Link"]));
+                }
+            } else {
+                $this->connection->setTeamInfo($var["team1Name"], floatval($var["team1ColorHSL"]), '', $var["team2Name"], floatval($var["team2ColorHSL"]), '');
+            }
         }
     }
 
@@ -778,12 +815,155 @@ class ChatAdmin extends ExpPlugin
 
     public function setTeamDisplayAfterWindow($fromLogin, $params)
     {
+        $r1 = hexdec($params["team1Color"][0].$params["team1Color"][0]);
+		$g1 = hexdec($params["team1Color"][1].$params["team1Color"][1]);
+		$b1 = hexdec($params["team1Color"][2].$params["team1Color"][2]);
+
+        $r2 = hexdec($params["team2Color"][0].$params["team2Color"][0]);
+		$g2 = hexdec($params["team2Color"][1].$params["team2Color"][1]);
+		$b2 = hexdec($params["team2Color"][2].$params["team2Color"][2]);
+
+        $params["team1ColorHSL"] = (ColorConversion::RGBToHUE($r1, $g1, $b1)/360);
+        $params["team2ColorHSL"] = (ColorConversion::RGBToHUE($r2, $g2, $b2)/360);
+
         $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams');
         $var->setRawValue($params);
         \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
-        $this->connection->setTeamInfo($params["team1Name"], $params["team1Color"], '', $params["team2Name"], $params["team2Color"], '');
-        $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z$s#admin_action# Sets new teams name and color!', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+        $this->connection->setTeamInfo($params["team1Name"], $params["team1ColorHSL"], '', $params["team2Name"], $params["team2ColorHSL"], '');
+        $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new teams name and color.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+    }
+
+    public function forceClubLinks($fromLogin, $params)
+    {
+        $window = ClubLinksSetup::Create($fromLogin);
+        $window->setSize(38, 60);
+        $window->setTitle("Team clublinks");
+        $window->show();
+    }
+
+    public function getClubLinks($login, $data)
+    {
+        $this->clubLinksGet = 0;
+        $this->clubLinksExpected = 0;
+        if (isset($data["team1Clublink"]) && $data["team1Clublink"] != "") {
+            $this->clubLinksExpected++;
+            $options = array(CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 10);
+            $this->dataAccess->httpCurl($data["team1Clublink"], array($this, "clubLinkCallback"), array("Login" => $login, "clubLink" => "team1", "link" => $data["team1Clublink"]), $options);
+        }
+
+        if (isset($data["team2Clublink"]) && $data["team2Clublink"] != "") {
+            $this->clubLinksExpected++;
+            $options = array(CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 10);
+            $this->dataAccess->httpCurl($data["team2Clublink"], array($this, "clubLinkCallback"), array("Login" => $login, "clubLink" => "team2", "link" => $data["team2Clublink"]), $options);
+        }
+
+        if ($this->clubLinksExpected == 0) {
+            $this->forceClubLinksAfterWindow($login, array());
+        }
+    }
+
+    public function clubLinkCallback($job, $jobData)
+    {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
+        $data = $job->getResponse();
+        $additionalData = $job->__additionalData;
+
+        $login = $additionalData['Login'];
+        $teamId = $additionalData['clubLink'];
+        $link = $additionalData['link'];
+        $this->clubLinksGet++;
+
+        if (($data === false || $code !== 200) && $login != null) {
+            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink not found or not accessible for team #variable#%s", $login, array($teamId));
+            return;
+        }
+
+        try {
+            $clubLink = simplexml_load_string($data);
+        } catch (\Exception $e) {
+            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink is not a valid XML for team #variable#%s", $login, array($teamId));
+            return;
+        }
+        
+        if ((!isset($clubLink->name) || !isset($clubLink->color) || !isset($clubLink->color[0]->attributes()->primary)) && $login != null) {
+            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink doesn't contain required infos for team #variable#%s", $login, array($teamId));
+            return;
+        }
+        $name = (String)$clubLink->name[0];
+        $color = (String)$clubLink->color[0]->attributes()->primary[0];
+
+        if ((strlen($color) != 3) && $login != null) {
+            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink color for team #variable#%s #admin_error#is not valid", $login, array($teamId));
+            return;
+        }
+
+        $r = hexdec($color[0].$color[0]);
+		$g = hexdec($color[1].$color[1]);
+		$b = hexdec($color[2].$color[2]);
+        $colorHSL = (ColorConversion::RGBToHUE($r, $g, $b)/360);
+        $this->clubLinks[$teamId] = array("Name" => $name, "Color" => $color, "ColorHSL" => $colorHSL, "Link" => $link);
+        
+        if ($this->clubLinksGet == $this->clubLinksExpected) {
+            $this->forceClubLinksAfterWindow($login, $this->clubLinks);
+        }
+    }
+
+    public function forceClubLinksAfterWindow($fromLogin, $params)
+    {
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams');
+
+        if (isset($params["team1"]["Link"]) && isset($params["team2"]["Link"])) {
+            $this->connection->setForcedClubLinks($params["team1"]["Link"], $params["team2"]["Link"]);
+
+            $stored = array("team1Name" => $params["team1"]["Name"], "team2Name" => $params["team2"]["Name"], "team1Color" => $params["team1"]["Color"], "team2Color" => $params["team2"]["Color"], "team1ColorHSL" => $params["team1"]["ColorHSL"], "team2ColorHSL" => $params["team2"]["ColorHSL"], "team1Link" => $params["team1"]["Link"], "team2Link" => $params["team2"]["Link"]);
+            $var->setRawValue($stored);
+            \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+            if ($fromLogin != null) {
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+            }
+        } elseif (isset($params["team1"]["Link"])) {
+            $this->connection->setForcedClubLinks($params["team1"]["Link"], "");
+            if ($fromLogin != null) {
+
+                $stored = array("team1Name" => $params["team1"]["Name"], "team1Color" => $params["team1"]["Color"], "team1ColorHSL" => $params["team1"]["ColorHSL"], "team1Link" => $params["team1"]["Link"]);
+                $var->setRawValue($stored);
+                \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+            }
+        } else if (isset($params["team2"]["Link"])) {
+            $this->connection->setForcedClubLinks("", $params["team2"]["Link"]);
+            if ($fromLogin != null) {
+                
+                $stored = array("team2Name" => $params["team2"]["Name"], "team2Color" => $params["team2"]["Color"], "team2ColorHSL" => $params["team2"]["ColorHSL"], "team2Link" => $params["team2"]["Link"]);
+                $var->setRawValue($stored);
+                \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+            }
+        } else {
+            if ($fromLogin != null) {
+                $this->connection->setForcedClubLinks("", "");
+
+                $stored = array();
+                $var->setRawValue($stored);
+                \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Removes forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+            }
+        }
+    }
+
+    public function setModeScriptSettings($fromLogin, $params)
+    {
+        $window = ScriptSettings::Create($fromLogin);
+        $window->setTitle(__('Script Settings', $fromLogin));
+        $window->centerOnScreen();
+        $window->setSize(160, 100);
+        $window->show();
     }
 
     /**
@@ -863,9 +1043,12 @@ class ChatAdmin extends ExpPlugin
             return;
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
+        $player = $this->storage->getPlayerObject($params[0]);
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
         try {
             $this->connection->forcePlayerTeam($params[0], 0);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team $00fBlue.', null, array($admin->nickName, $params[0]));
+            $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00fBlue');
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -882,9 +1065,12 @@ class ChatAdmin extends ExpPlugin
             return;
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
+        $player = $this->storage->getPlayerObject($params[0]);
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
         try {
             $this->connection->forcePlayerTeam($params[0], 1);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team $f00Red.', null, array($admin->nickName, $params[0]));
+            $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$f00Red');
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -947,34 +1133,6 @@ class ChatAdmin extends ExpPlugin
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
-        }
-    }
-
-    /**
-     * @param $fromLogin
-     * @param $params
-     */
-    public function forcePlayerTeam($fromLogin, $params)
-    {
-        $admin = $this->storage->getPlayerObject($fromLogin);
-        $player = $this->storage->getPlayerObject($params[0]);
-        if ($player == null) {
-            $this->eXpChatSendServerMessage("#admin_action#Player #variable# %s #admin_action#doesn' exist.", null, array($params[0]));
-            return;
-        }
-
-        if ($params[1] == "red") {
-            $params[1] = 1;
-        }
-        if ($params[1] == "blue") {
-            $params[1] = 0;
-        }
-
-        try {
-            $this->connection->forcePlayerTeam($player, intval($params[0]));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces player #variable# %s #admin_action# to team#variable# %s #admin_action#.', null, array($admin->nickName, $player->nickName, $params[0]));
-        } catch (Exception $e) {
-            $this->sendErrorChat($fromLogin, $e->getMessage());
         }
     }
 
@@ -2227,7 +2385,7 @@ class ChatAdmin extends ExpPlugin
      */
     public function setAllWarmUpDuration($fromLogin, $params)
     {
-        if (!isset($params[0])) {
+        if (!isset($params[0]) || !is_numeric($params[0])) {
             $this->sendErrorChat($fromLogin, 'Please provide a duration in format: MM:SS');
             return;
         }

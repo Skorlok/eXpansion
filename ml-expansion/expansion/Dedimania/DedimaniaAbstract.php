@@ -623,6 +623,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
         if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+            $this->dedimania->forceDediSend = true;
             $this->sendScores();
             $this->EndMatch();
             $this->records = array();

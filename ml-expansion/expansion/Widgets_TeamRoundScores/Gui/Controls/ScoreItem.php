@@ -23,7 +23,13 @@ class ScoreItem extends Control
         $sizeX = 52;
         $sizeY = 4;
 
-        $color = array(-1 => "fff", 0 => "3af", 1 => "d00");
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+        if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+            $color = array(-1 => "fff", 0 => $var["team1Color"], 1 => $var["team2Color"]);
+        } else {
+            $color = array(-1 => "fff", 0 => "3af", 1 => "d00");
+        }
 
         $this->roundNumber = new Label(5, 4);
         $this->roundNumber->setAlign('right', 'center');
@@ -60,10 +66,10 @@ class ScoreItem extends Control
         $textColor = "fff";
         switch ($score->winningTeamId) {
             case 0:
-                $text = "Blue";
+                $text = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$3afBlue');
                 break;
             case 1:
-                $text = "Red";
+                $text = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$d00Red');
                 break;
             default:
                 $text = "Draw";

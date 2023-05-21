@@ -1591,7 +1591,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             if ($rec->place > $record->place) {
                 $rec->place--;
             }
-            if ($killedRecordPlace > 0) {
+            if ($killedRecordPlace >= 0) {
                 $this->currentChallengeRecords[$i-1] = $this->currentChallengeRecords[$i];
             }
             if ($rec->login == $record->login) {
@@ -1599,6 +1599,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 unset($this->currentChallengePlayerRecords[$record->login]);
                 $killedRecordPlace = $i;
             }
+        }
+        if ($killedRecordPlace >= 0) {
+            unset($this->currentChallengeRecords[count($this->currentChallengeRecords)-1]);
         }
 
         \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_RECORD_DELETED, $record, $this->currentChallengeRecords));

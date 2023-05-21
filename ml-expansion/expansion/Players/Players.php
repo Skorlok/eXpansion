@@ -225,12 +225,15 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (AdminGroups::hasPermission($login, Permission::PLAYER_CHANGE_TEAM)) {
             $player = $this->storage->getPlayerObject($target);
             $admin = $this->storage->getPlayerObject($login);
+            $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
             if ($player->teamId === 0) {
                 $this->connection->forcePlayerTeam($target, 1);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team $f00Red.', null, array($admin->nickName, $player->nickName));
+                $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$f00Red');
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
             } else if ($player->teamId === 1) {
                 $this->connection->forcePlayerTeam($target, 0);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team $00fBlue.', null, array($admin->nickName, $player->nickName));
+                $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00fBlue');
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
             } else {
                 $this->connection->chatSendServerMessage(__('%s$z$s$fff is a spectator and can not be forced into a team', $login, $player->nickName));
             }
