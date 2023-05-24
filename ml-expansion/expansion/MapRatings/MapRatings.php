@@ -39,6 +39,8 @@ class MapRatings extends ExpPlugin
 
     private $mxMapStart = -1;
 
+    private $mxErrorCount = 0;
+
     /** @var MXRating */
     private $mxRatings = null;
 
@@ -172,6 +174,7 @@ class MapRatings extends ExpPlugin
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $this->config = Config::getInstance();
+        $this->mxErrorCount = 0;
         if ($this->config->mxKarmaEnabled) {
             $this->settingsChanged[$var->getName()] = true;
             if (array_key_exists("mxKarmaApiKey", $this->settingsChanged) && array_key_exists("mxKarmaServerLogin", $this->settingsChanged)) {
@@ -206,7 +209,9 @@ class MapRatings extends ExpPlugin
 
     public function MXKarma_onError($state, $number, $reason)
     {
-        if ($reason == "invalid session") {
+        $this->mxErrorCount++;
+
+        if ($reason == "invalid session" || $this->mxErrorCount < 2) {
             $this->mxConnection->connect($this->config->mxKarmaServerLogin, $this->config->mxKarmaApiKey);
             return;
         }
@@ -664,6 +669,8 @@ class MapRatings extends ExpPlugin
         if ($this->config->mxKarmaEnabled) {
             if ($this->mxConnection->isConnected()) {
                 $this->mxConnection->getRatings($this->getPlayers(), false);
+            } else {
+                $this->tryConnect();
             }
         }
 
