@@ -18,6 +18,7 @@ class Config extends \ManiaLib\Utils\Singleton
 	public $user = 'SuperAdmin';
 	public $password = 'SuperAdmin';
 	public $timeout = 5;
+	public $isRemote = false;
 }
 
 ?>

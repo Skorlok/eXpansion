@@ -175,18 +175,12 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
 
         $this->serverAccount = $this->connection->getDetailedPlayerInfo($this->storage->serverLogin);
 
-        if (DedicatedConfig::getInstance()->host == "localhost"
-            || DedicatedConfig::getInstance()->host == "127.0.0.1"
-        ) {
+        if (DedicatedConfig::getInstance()->host == "localhost" || DedicatedConfig::getInstance()->host == "127.0.0.1" || !DedicatedConfig::getInstance()->isRemote) {
             $this->isRemoteControlled = false;
         } else {
             $this->isRemoteControlled = true;
         }
 
-        if (self::FORCEREMOTE) {
-            $this->isRemoteControlled = true;
-            $this->connection->chatSend('[notice] $$Exp_storage->isRemoteControlled is forced to True!', null, true);
-        }
         $this->dediUpTime = $this->connection->getNetworkStats()->uptime;
 
         $formatter = \ManiaLivePlugins\eXpansion\Gui\Formaters\Country::getInstance();
