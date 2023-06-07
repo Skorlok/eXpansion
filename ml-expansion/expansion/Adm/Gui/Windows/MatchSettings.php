@@ -197,7 +197,7 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $path = Helper::getPaths()->getMatchSettingPath() . "*.txt";
             $settings = glob($path);
             $x = 0;
-            if (count($settings) > 1) {
+            if (count($settings) > 0) {
                 foreach ($settings as $file) {
                     $this->items[$x] = new MatchSettingsFile($x, $file, $this, $this->getRecipient(), $this->sizeX);
                     $this->pager->addItem($this->items[$x]);
