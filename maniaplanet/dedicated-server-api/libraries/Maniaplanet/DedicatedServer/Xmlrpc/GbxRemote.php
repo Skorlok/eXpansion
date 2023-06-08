@@ -28,7 +28,7 @@ class GbxRemote
 	 * @param int $port
 	 * @param int $timeout Timeout when opening connection
 	 */
-	function __construct($host, $port, $timeout = 5)
+	function __construct($host, $port, $timeout = 300)
 	{
 		$this->requestHandle = (int) 0x80000000;
 		$this->connect($host, $port, $timeout);
@@ -75,9 +75,22 @@ class GbxRemote
 	 */
 	private function connect($host, $port, $timeout)
 	{
-		$this->socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
-		if(!$this->socket)
+		echo $timeout, PHP_EOL;
+		$init_time = microtime(true);
+		$init_timeout = 5; // retry every 5s
+
+		while (true) {
+			$this->socket = @fsockopen($host, $port, $errno, $errstr, $init_timeout);
+			if ($this->socket || (microtime(true) - $init_time >= $timeout))
+				break;
+			else
+				sleep($init_timeout);
+		}
+
+		if (!$this->socket) {
 			throw new TransportException('Cannot open socket', TransportException::NOT_INITIALIZED);
+			exit('Cannot open socket to connect with dedicated server.');
+		}
 
 		stream_set_read_buffer($this->socket, 0);
 		stream_set_write_buffer($this->socket, 0);
