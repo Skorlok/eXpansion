@@ -469,10 +469,10 @@ class Database extends ExpPlugin
         $dbconfig = \ManiaLive\Database\Config::getInstance();
         $dbName = $dbconfig->database;
 
-        $tables = $this->db->execute("SHOW TABLES in " . $dbName . ";")->fetchArrayOfRow();
+        $tables = $this->db->execute('SHOW TABLES in `' . $dbName . '`;')->fetchArrayOfRow();
 
         foreach ($tables as $table) {
-            $create = $this->db->execute("SHOW CREATE TABLE `" . $table[0] . "`;")->fetchAssoc();
+            $create = $this->db->execute('SHOW CREATE TABLE `' . $table[0] . '`;')->fetchAssoc();
 
             if (fwrite($fileHandler, "-- --------------------------------------------------------\n\n") === false) {
                 throw new \Exception("Writting to file failed!", 4);
