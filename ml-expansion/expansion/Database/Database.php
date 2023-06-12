@@ -17,12 +17,12 @@ use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
  */
 class Database extends ExpPlugin
 {
-
     private $config;
 
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
+        Gui\Windows\BackupRestore::$mainPlugin = $this;
     }
 
     public function eXpOnLoad()
@@ -35,6 +35,7 @@ class Database extends ExpPlugin
             die();
         }
         $this->enableDedicatedEvents();
+        $this->enableTickerEvent();
         $this->initCreateTables();
 
         foreach ($this->storage->players as $login => $player) { // get players
@@ -53,9 +54,26 @@ class Database extends ExpPlugin
         $cmd->setMinParam(0);
     }
 
+    public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
+    {
+        $this->config = Config::getInstance();
+    }
+
+    public function onTick()
+    {
+        if ($this->config->enableBackup) {
+            $interval = (intval($this->config->backupInterval * 60));
+            if ($interval < 1) {
+                $interval = 1;
+            }
+            if (time() % $interval == 0) {
+                $this->exportToSql(null, array("filename" => $this->storage->serverLogin . "_" . date("d-m-Y")));
+            }
+        }
+    }
+
     public function onPlayerConnect($login, $isSpec)
     {
-
         $g = "SELECT * FROM `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
         $query = $this->db->execute($g);
         // get player data
@@ -106,7 +124,7 @@ class Database extends ExpPlugin
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         $winner = ArrayOfObj::getObjbyPropValue(Core::$rankings, "rank", "1");
-        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode()!= GameInfos::GAMEMODE_TEAM && $winner && $winner->bestTime != -1) {
+        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TEAM && !Core::$useTeams && $winner && $winner->bestTime != -1) {
             $this->incrementWins($winner);
         }
 
@@ -196,8 +214,7 @@ class Database extends ExpPlugin
                                     `challenge_nbLaps`,
                                     `challenge_nbCheckpoints`,
                                     `challenge_addedby`,
-                                    `challenge_addtime`
-                                    )
+                                    `challenge_addtime`)
                                 VALUES (" . $this->db->quote($data->uId) . ",
                                 " . $this->db->quote($data->name) . ",
                                 " . $this->db->quote(StringFormatting::stripStyles($data->name)) . ",
@@ -214,8 +231,7 @@ class Database extends ExpPlugin
                                 " . $this->db->quote($data->nbLaps) . ",
                                 " . $this->db->quote($data->nbCheckpoints) . ",
                                 " . $this->db->quote($login) . ",
-                                " . $this->db->quote(time()) . "
-                                )";
+                                " . $this->db->quote(time()) . ")";
         $this->db->execute($q);
     }
 
@@ -236,8 +252,6 @@ class Database extends ExpPlugin
             $this->db->execute($q);
         }
 
-
-        
 
         if (!$this->db->tableExists('exp_maps')) {
             $this->createMapTable();
@@ -417,6 +431,86 @@ class Database extends ExpPlugin
             $window->centerOnScreen();
             $window->setSize(160, 100);
             $window->show();
+        }
+    }
+
+    public function exportToSql($login, $inputboxes = "")
+    {
+        if (empty($inputboxes['filename'])) {
+            if ($login !== null) {
+                $this->connection->chatSendServerMessage("No backup filename given, canceling backup!", $login);
+            }
+            return false;
+        }
+
+        if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                if ($login !== null) {
+                    $this->connection->chatSendServerMessage("Error while creating backup folder", $login);
+                }
+                return false;
+            }
+        }
+
+        $fileName = "./backup/" . $inputboxes['filename'] . ".sql";
+
+        if (file_exists($fileName)) {
+            if ($login !== null) {
+                $this->connection->chatSendServerMessage("Backup file already exists, canceling backup!", $login);
+            }
+            return false;
+        }
+
+        $fileHandler = fopen($fileName, "wb");
+        if ($login !== null) {
+            $this->connection->chatSendServerMessage("Creating database backup...", $login);
+        }
+
+        $dbconfig = \ManiaLive\Database\Config::getInstance();
+        $dbName = $dbconfig->database;
+
+        $tables = $this->db->execute("SHOW TABLES in " . $dbName . ";")->fetchArrayOfRow();
+
+        foreach ($tables as $table) {
+            $create = $this->db->execute("SHOW CREATE TABLE `" . $table[0] . "`;")->fetchAssoc();
+
+            if (fwrite($fileHandler, "-- --------------------------------------------------------\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "--\n-- Table structure for table `" . $table[0] . "`\n--\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "DROP TABLE IF EXISTS `" . $table[0] . "`;\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, $create['Create Table'] . ";\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "--\n-- Dumping data for table `" . $table[0] . "`\n--\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            
+            $data = $this->db->execute("SELECT * FROM `" . $table[0] . "`;")->fetchArrayOfRow();
+            foreach ($data as $row) {
+                $vals = array();
+                foreach ($row as $val) {
+                    $vals[] = is_null($val) ? "NULL" : $this->db->quote($val);
+                }
+                if (fwrite($fileHandler, "INSERT INTO `" . $table[0] . "` VALUES(" . implode(", ", $vals) . ");\n") === false) {
+                    throw new \Exception("Writting to file failed!", 4);
+                }
+            }
+            if (fwrite($fileHandler, "\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+        }
+
+        fclose($fileHandler);
+
+        if ($login !== null) {
+            $this->connection->chatSendServerMessage("Backup Complete!", $login);
+            Gui\Windows\BackupRestore::erase($login);
+            $this->showBackupRestore($login);
         }
     }
 }

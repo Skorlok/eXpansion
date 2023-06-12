@@ -25,15 +25,19 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $config = Config::getInstance();
 
-        $var = new \ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean(
-            "showWins",
-            "Show player win statistics at podium ?",
-            $config
-        );
+        $var = new \ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean("showWins", "Show player win statistics at podium ?", $config);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue(true)
-            ->setCanBeNull(false);
+        $var->setDefaultValue(true)->setCanBeNull(false);
+        $this->registerVariable($var);
 
+        $var = new \ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean("enableBackup", "Make a backup of the database every day ?", $config);
+        $var->setGroup("Database");
+        $var->setDefaultValue(true)->setCanBeNull(false);
+        $this->registerVariable($var);
+
+        $var = new \ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt("backupInterval", "Interval of time to check if today backup exist (in minutes)", $config);
+        $var->setGroup("Database");
+        $var->setDefaultValue(20);
         $this->registerVariable($var);
     }
 }

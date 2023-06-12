@@ -467,7 +467,13 @@ class Endurance extends ExpPlugin
 
 	public function chat_savepoints($fromLogin)
 	{
-		$csv_file = $this->connection->GameDataDirectory() . "../" . $this->save_csv;
+		if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                $this->connection->chatSendServerMessage("Error while creating backup folder", $fromLogin);
+                return;
+            }
+        }
+		$csv_file = "./backup/" . $this->save_csv;
 		$save_total_points = $this->save_total_points;
 
 		if ($save_total_points) {
@@ -565,7 +571,13 @@ class Endurance extends ExpPlugin
 
 	public function chat_removepoints($fromLogin)
 	{
-		$csv_file = $this->connection->GameDataDirectory() . "../" . $this->save_csv;
+		if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                $this->connection->chatSendServerMessage("Error while creating backup folder", $fromLogin);
+                return;
+            }
+        }
+		$csv_file = "./backup/" . $this->save_csv;
 
 		if (!file_exists($csv_file)) return;
 		if (($handle_read = fopen($csv_file,'r')) !== false && ($handle_write = fopen($csv_file.'.temp','w')) !== false) {

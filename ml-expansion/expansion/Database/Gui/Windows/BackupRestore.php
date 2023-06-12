@@ -7,6 +7,7 @@ use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 
 class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
+    public static $mainPlugin;
 
     private $pager;
 
@@ -21,8 +22,6 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     private $inputbox;
     private $actionBackup;
     private $actionCancel;
-    private $fileHandler;
-    private $fileName = "c:/temp/test.sql";
 
     /** @var  \ManiaLive\Database\Connection */
     private $db;
@@ -34,7 +33,7 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
-        $this->actionBackup = $this->createAction(array($this, "Backup"));
+        $this->actionBackup = $this->createAction(array(self::$mainPlugin, "exportToSql"));
         $this->actionCancel = $this->createAction(array($this, "Cancel"));
         $this->inputbox = new Inputbox("filename", 60);
         $this->inputbox->setLabel("Backup filename");
@@ -68,7 +67,6 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function populateList()
     {
-
         foreach ($this->items as $item) {
             $item->erase();
         }
@@ -76,21 +74,19 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items = array();
 
         $login = $this->getRecipient();
-        $x = 0;
 
-        $path = $this->getPath();
-        if (!$path) {
-            return;
+        if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                $this->connection->chatSendServerMessage("Error while creating backup folder", $login);
+                return false;
+            }
         }
-        $files = glob($path . "/*.sql");
 
+        $files = glob("./backup/*.sql");
+
+        $x = 0;
         foreach ($files as $file) {
-            $this->items[$x] = new \ManiaLivePlugins\eXpansion\Database\Gui\Controls\SqlFile(
-                $x,
-                $this,
-                $file,
-                $this->sizeX
-            );
+            $this->items[$x] = new \ManiaLivePlugins\eXpansion\Database\Gui\Controls\SqlFile($x, $this, $file, $this->sizeX);
             $this->pager->addItem($this->items[$x]);
             $x++;
         }
@@ -101,85 +97,33 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->db = $db;
     }
 
-    public function write($string)
-    {
-        if ($this->fileHandler === false) {
-            return;
-        }
-
-        if (fwrite($this->fileHandler, $string) === false) {
-            throw new \Exception("Writting to file failed!", 4);
-        }
-    }
-
-    public function getPath()
-    {
-        $login ='';
-        $path = $this->connection->GameDataDirectory();
-        $path = dirname($path) . "/backup";
-        if (!is_dir($path)) {
-            if (!mkdir($path, 0777)) {
-                $this->connection->chatSendServerMessage("Error while creating folder: " . $path, $login);
-
-                return false;
-            }
-        }
-
-        return $path;
-    }
-
-    public function Backup($login, $inputboxes = "")
-    {
-        if (empty($inputboxes['filename'])) {
-            $this->connection->chatSendServerMessage("No backup filename given, canceling backup!", $login);
-        }
-        $path = $this->getPath();
-        if (!$path) {
-            return;
-        }
-        $this->fileName = $path . "/" . $inputboxes['filename'] . ".sql";
-
-        $this->fileHandler = fopen($this->fileName, "wb");
-        $this->connection->chatSendServerMessage("Creating database backup...", $login);
-        $dbconfig = \ManiaLive\Database\Config::getInstance();
-        $dbName = $dbconfig->database;
-        $tables = $this->db->execute("SHOW TABLES in " . $dbName . ";")->fetchArrayOfRow();
-        foreach ($tables as $table) {
-            $create = $this->db->execute("SHOW CREATE TABLE `" . $table[0] . "`;")->fetchAssoc();
-
-            $this->write("-- --------------------------------------------------------\n\n");
-            $this->write("--\n-- Table structure for table `" . $table[0] . "`\n--\n\n");
-            $this->write("DROP TABLE IF EXISTS `" . $table[0] . "`;\n\n");
-            $this->write($create['Create Table'] . ";\n\n");
-
-            $this->write("--\n-- Dumping data for table `" . $table[0] . "`\n--\n\n");
-            $data = $this->db->execute("SELECT * FROM `" . $table[0] . "`;")->fetchArrayOfRow();
-            foreach ($data as $row) {
-                $vals = array();
-                foreach ($row as $val) {
-                    $vals[] = is_null($val) ? "NULL" : $this->db->quote($val);
-                }
-                $this->write("INSERT INTO `" . $table[0] . "` VALUES(" . implode(", ", $vals) . ");\n");
-            }
-            $this->write("\n");
-        }
-        fclose($this->fileHandler);
-        $this->fileHandler = false;
-        $this->connection->chatSendServerMessage("Backup Complete!", $login);
-        $this->populateList();
-        $this->RedrawAll();
-    }
-
     /** @todo imlement restore from .sql file */
     public function restoreFile($login, $file)
     {
-        $this->connection->chatSendServerMessage("Not implemented yet...");
+        $tempLine = '';
+        $lines = file($file);
+        foreach ($lines as $line) {
 
+            if (substr($line, 0, 2) == '--' || $line == '')
+                continue;
+
+            $tempLine .= $line;
+            if (substr(trim($line), -1, 1) == ';')  {
+                try {
+                    $this->db->execute($tempLine);
+                } catch (\Exception $e) {
+                    $this->connection->chatSendServerMessage("Error while restoring file: " . $e->getMessage(), $login);
+                    return;
+                }
+                $tempLine = '';
+            }
+        }
+        
+        $this->connection->chatSendServerMessage("Backup restored successfully.", $login);
     }
 
     public function deleteFile($login, $file)
     {
-
         unlink($file);
         $this->connection->chatSendServerMessage("Deleted.", $login);
         $this->populateList();

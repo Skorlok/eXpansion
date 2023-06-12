@@ -454,6 +454,8 @@ EOT;
         foreach ($this->storage->spectators as $player) {
             self::$players[$player->login] = $player->nickName;
         }
+
+        self::$useTeams = false;
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -812,9 +814,7 @@ EOT;
         //Check if game mode change
         if ($newGameMode != $this->lastGameMode) {
             //Trigger game mode change event.
-            Dispatcher::dispatch(
-                new GameSettingsEvent(GameSettingsEvent::ON_GAME_MODE_CHANGE, $this->lastGameMode, $newGameMode)
-            );
+            Dispatcher::dispatch(new GameSettingsEvent(GameSettingsEvent::ON_GAME_MODE_CHANGE, $this->lastGameMode, $newGameMode));
 
             $this->lastGameMode = $newGameMode;
             $this->lastGameSettings = clone $gameSettings;
@@ -831,14 +831,7 @@ EOT;
             } else {
                 $difs = $this->compareObjects($gameSettings, $this->lastGameSettings, array("gameMode", "scriptName"));
                 if (!empty($difs)) {
-                    Dispatcher::dispatch(
-                        new GameSettingsEvent(
-                            GameSettingsEvent::ON_GAME_SETTINGS_CHANGE,
-                            $this->lastGameSettings,
-                            $gameSettings,
-                            $difs
-                        )
-                    );
+                    Dispatcher::dispatch(new GameSettingsEvent(GameSettingsEvent::ON_GAME_SETTINGS_CHANGE, $this->lastGameSettings, $gameSettings, $difs));
                     $this->lastGameSettings = clone $gameSettings;
                 }
             }
@@ -849,20 +842,9 @@ EOT;
         if ($this->lastServerSettings == null) {
             $this->lastServerSettings = clone $serverSettings;
         } else {
-            $difs = $this->compareObjects(
-                $serverSettings,
-                $this->lastServerSettings,
-                array('useChangingValidationSeed')
-            );
+            $difs = $this->compareObjects($serverSettings, $this->lastServerSettings, array('useChangingValidationSeed'));
             if (!empty($difs)) {
-                Dispatcher::dispatch(
-                    new ServerSettingsEvent(
-                        ServerSettingsEvent::ON_SERVER_SETTINGS_CHANGE,
-                        $this->lastServerSettings,
-                        $serverSettings,
-                        $difs
-                    )
-                );
+                Dispatcher::dispatch(new ServerSettingsEvent(ServerSettingsEvent::ON_SERVER_SETTINGS_CHANGE, $this->lastServerSettings, $serverSettings, $difs));
                 $this->lastServerSettings = clone $serverSettings;
             }
         }
@@ -887,6 +869,7 @@ EOT;
         $this->connection->triggerModeScriptEventArray('LibXmlRpc_GetPlayersRanking', array('510','0'));
         $this->connection->triggerModeScriptEvent('LibXmlRpc_GetTeamsScores');
         $this->connection->triggerModeScriptEventArray('XmlRpc.SetApiVersion', array('2.5.0'));
+        self::$useTeams = false;
     }
 
     public function onBeginMatch()
@@ -1010,11 +993,8 @@ EOT;
      * @param \Maniaplanet\DedicatedServer\Structures\GameInfos $newSettings The new Game Infos
      * @param  array $changes Differences between both of them
      */
-    public function onGameSettingsChange(
-        \Maniaplanet\DedicatedServer\Structures\GameInfos $oldSettings,
-        \Maniaplanet\DedicatedServer\Structures\GameInfos $newSettings,
-        $changes
-    ) {
+    public function onGameSettingsChange(\Maniaplanet\DedicatedServer\Structures\GameInfos $oldSettings, \Maniaplanet\DedicatedServer\Structures\GameInfos $newSettings, $changes)
+    {
         $this->saveMatchSettings();
     }
 
@@ -1034,20 +1014,15 @@ EOT;
         }
 
         try {
-            $path = realpath(
-                Helper::getPaths()->getDefaultMapPath() . "../Config/" . $this->config->dedicatedConfigFile
-            );
+            $path = realpath(Helper::getPaths()->getDefaultMapPath() . "../Config/" . $this->config->dedicatedConfigFile);
             if (!file_exists($path)) {
                 return;
             }
             /** @var SimpleXMLElement */
             $oldXml = simplexml_load_file($path);
             if ($oldXml === false) {
-                $this->console(
-                    "ERROR while loading Dedicated server config file: " . $this->config->dedicatedConfigFile
-                );
+                $this->console("ERROR while loading Dedicated server config file: " . $this->config->dedicatedConfigFile);
                 $this->console("your settings are NOT saved!");
-
                 return;
             }
             $adapter = array("name" => "name",
@@ -1089,7 +1064,6 @@ EOT;
                     }
                 }
 
-
                 $oldXml->server_options->{$search}[0] = $out;
             }
 
@@ -1123,16 +1097,9 @@ EOT;
         //If the admin has declared a file name to save settings in
         if (!empty($this->config->defaultMatchSettingsFile)) {
             try {
-                $this->connection->saveMatchSettings(
-                    (empty($this->config->mapBase) ? "" : $this->config->mapBase . '/')
-                    . "MatchSettings"
-                    . DIRECTORY_SEPARATOR . $this->config->defaultMatchSettingsFile
-                );
+                $this->connection->saveMatchSettings((empty($this->config->mapBase) ? "" : $this->config->mapBase . '/') . "MatchSettings" . DIRECTORY_SEPARATOR . $this->config->defaultMatchSettingsFile);
             } catch (\Exception $ex) {
-                $this->console(
-                    "Error writing MatchSettings : " . $this->config->defaultMatchSettingsFile
-                    . " - " . $ex->getMessage()
-                );
+                $this->console("Error writing MatchSettings : " . $this->config->defaultMatchSettingsFile . " - " . $ex->getMessage());
             }
         }
     }
@@ -1290,8 +1257,7 @@ EOT;
     {
         //If server statistics are loaded put an action so that we can have a button to show them.
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics')) {
-            Gui\Windows\InfoWindow::$statsAction =
-                \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverStatAction;
+            Gui\Windows\InfoWindow::$statsAction = \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverStatAction;
         } else {
             Gui\Windows\InfoWindow::$statsAction = -1;
         }

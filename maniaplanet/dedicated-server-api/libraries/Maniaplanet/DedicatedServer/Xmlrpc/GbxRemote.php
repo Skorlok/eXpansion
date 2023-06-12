@@ -75,7 +75,6 @@ class GbxRemote
 	 */
 	private function connect($host, $port, $timeout)
 	{
-		echo $timeout, PHP_EOL;
 		$init_time = microtime(true);
 		$init_timeout = 5; // retry every 5s
 

@@ -12,7 +12,7 @@ class Boolean extends \ManiaLivePlugins\eXpansion\Core\types\config\Variable
 
 
     private $labelTrue = "True";
-    private $labelFalse = "True";
+    private $labelFalse = "False";
 
     public function setValue($value)
     {
