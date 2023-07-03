@@ -47,10 +47,10 @@ class RateButton2 extends \ManiaLivePlugins\eXpansion\Gui\Control
         switch ($number) {
             case 0:
                 $thumb->setAttribute("rot", "180");
-                $label->setText(eXpGetMessage("No"));
+                $label->setText(eXpGetMessage("No (F6)"));
                 break;
             case 5:
-                $label->setText(eXpGetMessage("Yes"));
+                $label->setText(eXpGetMessage("Yes (F5)"));
                 break;
         }
 

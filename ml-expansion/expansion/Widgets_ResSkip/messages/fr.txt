@@ -7,26 +7,26 @@ $s$fffen
 AddToFav:$s$fffFav's
 $s$fffFav
 
-AddToFav:$ff0Buy
-$ff0Acheter
+AddToFav:$s$ff0Buy
+$s$ff0Acheter
 
-AddToFav:$fffRestart
-$fffRedémarrage
+AddToFav:$s$fffRestart
+$s$fffRedémarrage
 
-AddToFav:$ff0Max
-$ff0Max
+AddToFav:$s$ff0Max
+$s$ff0Max
 
-AddToFav:$fffrestarts
-$fffRedémarrages
+AddToFav:$s$fffrestarts
+$s$fffRedémarrages
 
-AddToFav:$ff0reached
-$ff0atteint
+AddToFav:$s$ff0reached
+$s$ff0atteint
 
-AddToFav:$fffSkip
-$fffPasser
+AddToFav:$s$fffSkip
+$s$fffPasser
 
-AddToFav:$fffskips
-$fffskips
+AddToFav:$s$fffskips
+$s$fffskips
 
 Are you sure you want to restart this map
 #translate# Are you sure you want to restart this map

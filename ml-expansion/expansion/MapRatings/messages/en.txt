@@ -31,11 +31,11 @@ Maps with bad rating removed successfully.
 Ratings Manager
 Ratings Manager
 
-No
-No
+No (F6)
+No (F6)
 
-Yes
-Yes
+Yes (F5)
+Yes (F5)
 
 Did you like the map ?
 Did you like the map ?

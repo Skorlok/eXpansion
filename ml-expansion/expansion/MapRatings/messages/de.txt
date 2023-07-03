@@ -34,11 +34,11 @@ Bewertungs Manager
 Did you like the map ?
 #translate# Did you like the map ?
 
-No
-#translate# No
+No (F6)
+#translate# No (F6)
 
-Yes
-#translate# Yes
+Yes (F5)
+#translate# Yes (F5)
 
 MX Map Rating
 MX Map Rating

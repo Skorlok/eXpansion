@@ -67,9 +67,9 @@ class ResSkipButtons extends Widget
         if (is_numeric($amount)) {
             $this->btn_res->setText(
                 array(
-                    eXpGetMessage('AddToFav:$ff0Buy'),
-                    eXpGetMessage('AddToFav:$fffRestart'),
-                    '$ff0' . $amount . 'p'
+                    eXpGetMessage('AddToFav:$s$ff0Buy'),
+                    eXpGetMessage('AddToFav:$s$fffRestart'),
+                    '$s$ff0' . $amount . 'p'
                 )
             );
         }
@@ -77,9 +77,9 @@ class ResSkipButtons extends Widget
         if ($amount == "max") {
             $this->btn_res->setText(
                 array(
-                    eXpGetMessage('AddToFav:$ff0Max'),
-                    eXpGetMessage('AddToFav:$fffrestarts'),
-                    eXpGetMessage('AddToFav:$ff0reached'),
+                    eXpGetMessage('AddToFav:$s$ff0Max'),
+                    eXpGetMessage('AddToFav:$s$fffrestarts'),
+                    eXpGetMessage('AddToFav:$s$ff0reached'),
                 )
             );
             $this->btn_res->setAction(null);
@@ -91,18 +91,18 @@ class ResSkipButtons extends Widget
         if (is_numeric($amount)) {
             $this->btn_skip->setText(
                 array(
-                    eXpGetMessage('AddToFav:$ff0Buy'),
-                    eXpGetMessage('AddToFav:$fffSkip'),
-                    '$ff0' . $amount . 'p')
+                    eXpGetMessage('AddToFav:$s$ff0Buy'),
+                    eXpGetMessage('AddToFav:$s$fffSkip'),
+                    '$s$ff0' . $amount . 'p')
             );
         }
 
         if ($amount == "max") {
             $this->btn_skip->setText(
                 array(
-                    eXpGetMessage('AddToFav:$ff0Max'),
-                    eXpGetMessage('AddToFav:$fffskips'),
-                    eXpGetMessage('AddToFav:$ff0reached'),
+                    eXpGetMessage('AddToFav:$s$ff0Max'),
+                    eXpGetMessage('AddToFav:$s$fffskips'),
+                    eXpGetMessage('AddToFav:$s$ff0reached'),
                 )
             );
             $this->btn_skip->setAction(null);

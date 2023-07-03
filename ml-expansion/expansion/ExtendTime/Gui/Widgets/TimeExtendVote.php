@@ -47,11 +47,11 @@ class TimeExtendVote extends Widget
         $this->frame->setLayout($line);
         $this->addComponent($this->frame);
 
-        $this->btnNo = new RateButton2(0);
-        $this->frame->addComponent($this->btnNo);
-
         $this->btnYes = new RateButton2(5);
         $this->frame->addComponent($this->btnYes);
+
+        $this->btnNo = new RateButton2(0);
+        $this->frame->addComponent($this->btnNo);
         $this->setPosition(-45, -42);
 
         $this->script = new Script("ExtendTime/Gui/Script");

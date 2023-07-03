@@ -5,11 +5,8 @@ namespace ManiaLivePlugins\eXpansion\MapRatings\Gui\Widgets;
 class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
     protected $frame;
-    protected $starFrame;
-    protected $move;
     protected $gauge;
     protected $edgeWidget;
-    protected $stars = array();
     public static $parentPlugin;
 
     protected function eXpOnBeginConstruct()
@@ -26,11 +23,6 @@ class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $title->setText(eXpGetMessage('Map Rating'));
         $this->addComponent($title);
 
-
-        $this->starFrame = new \ManiaLive\Gui\Controls\Frame();
-        $this->starFrame->setPosition(2, -2);
-        $this->starFrame->setSize(34, 4);
-        $this->frame->addComponent($this->starFrame);
         $this->gauge = new \ManiaLive\Gui\Elements\Xml();
 
         $this->setName("Map Ratings Widget");
@@ -50,23 +42,18 @@ class RatingsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     {
         $this->frame->clearComponents();
 
-        $test = $number;
         $color = "fff";
-        if ($test < 30) {
+        if ($number < 30) {
             $color = "0ad";
         }
-        if ($test >= 30) {
+        if ($number >= 30) {
             $color = "2af";
         }
-        if ($test > 60) {
+        if ($number > 60) {
             $color = "0cf";
         }
 
-        $this->gauge->setContent(
-            '<gauge sizen="32 7" drawblockbg="1" style="ProgressBarSmall" color="'
-            . $color . '" drawbg="1" rotation="0" posn="0 -3.5" grading="1" ratio="'
-            . ($number / 100) . '" centered="0" />'
-        );
+        $this->gauge->setContent('<gauge sizen="32 7" drawblockbg="1" style="ProgressBarSmall" color="' . $color . '" drawbg="1" rotation="0" posn="1 -3.5" grading="1" ratio="' . ($number / 100) . '" centered="0" />');
         $this->frame->addComponent($this->gauge);
 
         $info = new \ManiaLib\Gui\Elements\Label();

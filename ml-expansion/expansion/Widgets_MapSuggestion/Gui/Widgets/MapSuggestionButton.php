@@ -23,7 +23,7 @@ class MapSuggestionButton extends Widget
 
         $this->btn_wish = new WidgetButton(10, 10);
         $this->btn_wish->setPositionZ(-1);
-        $this->btn_wish->setText(array("Wish", "for", "Map"));
+        $this->btn_wish->setText(array('$sWish', '$sfor', '$sMap'));
         $line->addComponent($this->btn_wish);
 
         $this->addComponent($line);

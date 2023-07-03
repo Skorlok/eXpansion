@@ -235,7 +235,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00fBlue');
                 $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
             } else {
-                $this->connection->chatSendServerMessage(__('%s$z$s$fff is a spectator and can not be forced into a team', $login, $player->nickName));
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff is a spectator and can not be forced into a team', $login, $player->nickName), $login);
             }
             $this->showPlayerList($login);
         }
