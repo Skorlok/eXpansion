@@ -185,7 +185,6 @@ class JobRunner
                 } else {
                     $pid = exec($cmd . " & echo $!");
                     $this->runningJobs[$hash][1] = $pid;
-                    echo "######################################################################################################################\nStarted job $pid\n";
                 }
             } else {
                 $this->pendingJobs[] = $job;
