@@ -228,7 +228,7 @@ class JobRunner
                 $job->end($jobData);
 
                 if (substr(php_uname(), 0, 7) != "Windows") {
-                    exec("kill -9" .  $this->runningJobs[$jobHash][1]);
+                    exec("kill " .  $this->runningJobs[$jobHash][1]);
                 }
 
                 // Delete data on this job.
