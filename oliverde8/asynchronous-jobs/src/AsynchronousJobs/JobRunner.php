@@ -170,7 +170,8 @@ class JobRunner
                 $jobData->job = $job;
                 $jobData->jobDir = $jobDir;
 
-                $this->runningJobs[spl_object_hash($job)] = $jobData;
+                $hash = spl_object_hash($job);
+                $this->runningJobs[$hash] = array($jobData, null);
 
                 $data = $job->getData();
                 $data['___class'] = get_class($job);
@@ -182,13 +183,14 @@ class JobRunner
                     $WshShell = new \COM("WScript.Shell");
                     $WshShell->Run("$cmd /C dir /S %windir%", 0, false);
                 } else {
-                    exec($cmd . " &");
+                    $pid = exec($cmd . " & echo $!");
+                    $this->runningJobs[$hash][1] = $pid;
+                    echo "######################################################################################################################\nStarted job $pid\n";
                 }
-
             } else {
                 $this->pendingJobs[] = $job;
             }
-        }else {
+        } else {
             $job->run();
             $job->end($jobData);
         }
@@ -220,10 +222,14 @@ class JobRunner
             if (file_exists("$jobDir/out.serialize")) {
                 $data = unserialize(file_get_contents("$jobDir/out.serialize"));
 
-                $jobData = $this->runningJobs[$jobHash];
+                $jobData = $this->runningJobs[$jobHash][0];
 
                 $job->setData($data);
                 $job->end($jobData);
+
+                if (substr(php_uname(), 0, 7) != "Windows") {
+                    exec("kill -9" .  $this->runningJobs[$jobHash][1]);
+                }
 
                 // Delete data on this job.
                 flock($jobData->lockFile, LOCK_UN);
@@ -289,7 +295,7 @@ class JobRunner
     public function proccess()
     {
         foreach ($this->runningJobs as $jobData) {
-            $this->isRunning($jobData->job);
+            $this->isRunning($jobData[0]->job);
         }
 
         foreach ($this->pendingJobs as $job) {
@@ -330,6 +336,4 @@ class JobRunner
         $this->waitForAll();
         $this->rm($this->getDirectory());
     }
-
-
 }
