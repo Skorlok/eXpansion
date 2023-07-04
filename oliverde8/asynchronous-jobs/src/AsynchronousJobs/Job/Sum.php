@@ -54,5 +54,6 @@ class Sum extends Job
      */
     public function end(JobData $jobData)
     {
+        exit();
     }
 }

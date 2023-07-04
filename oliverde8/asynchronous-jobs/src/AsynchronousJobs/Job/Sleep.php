@@ -45,5 +45,6 @@ class Sleep extends Job
      */
     public function end(JobData $data)
     {
+        exit();
     }
 }

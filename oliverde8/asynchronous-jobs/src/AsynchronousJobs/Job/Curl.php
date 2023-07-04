@@ -81,6 +81,7 @@ class Curl extends Job
      */
     public function end(JobData $data)
     {
+        exit();
     }
 
     /**
