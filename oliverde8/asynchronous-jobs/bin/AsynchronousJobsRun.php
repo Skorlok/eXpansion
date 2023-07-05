@@ -63,3 +63,5 @@ try {
 
 file_put_contents($argv[1] . '/out_temp.serialize', serialize($job->getData()));
 rename($argv[1] . '/out_temp.serialize', $argv[1] . '/out.serialize');
+
+exit();
