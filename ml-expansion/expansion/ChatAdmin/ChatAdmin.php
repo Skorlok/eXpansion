@@ -875,27 +875,35 @@ class ChatAdmin extends ExpPlugin
         $link = $additionalData['link'];
         $this->clubLinksGet++;
 
-        if (($data === false || $code !== 200) && $login != null) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink not found or not accessible for team #variable#%s", $login, array($teamId));
+        if (!$data || $code !== 200) {
+            if ($login != null) {
+                $this->eXpChatSendServerMessage("#admin_error#Error: Clublink not found or not accessible for team #variable#%s", $login, array($teamId));
+            }
             return;
         }
 
         try {
             $clubLink = simplexml_load_string($data);
         } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink is not a valid XML for team #variable#%s", $login, array($teamId));
+            if ($login != null) {
+                $this->eXpChatSendServerMessage("#admin_error#Error: Clublink is not a valid XML for team #variable#%s", $login, array($teamId));
+            }
             return;
         }
         
-        if ((!isset($clubLink->name) || !isset($clubLink->color) || !isset($clubLink->color[0]->attributes()->primary)) && $login != null) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink doesn't contain required infos for team #variable#%s", $login, array($teamId));
+        if (!isset($clubLink->name) || !isset($clubLink->color) || !isset($clubLink->color[0]->attributes()->primary)) {
+            if ($login != null) {
+                $this->eXpChatSendServerMessage("#admin_error#Error: Clublink doesn't contain required infos for team #variable#%s", $login, array($teamId));
+            }
             return;
         }
         $name = (String)$clubLink->name[0];
         $color = (String)$clubLink->color[0]->attributes()->primary[0];
 
-        if ((strlen($color) != 3) && $login != null) {
-            $this->eXpChatSendServerMessage("#admin_error#Error: Clublink color for team #variable#%s #admin_error#is not valid", $login, array($teamId));
+        if (strlen($color) != 3) {
+            if ($login != null) {
+                $this->eXpChatSendServerMessage("#admin_error#Error: Clublink color for team #variable#%s #admin_error#is not valid", $login, array($teamId));
+            }
             return;
         }
 
@@ -908,6 +916,9 @@ class ChatAdmin extends ExpPlugin
         if ($this->clubLinksGet == $this->clubLinksExpected) {
             $this->forceClubLinksAfterWindow($login, $this->clubLinks);
         }
+
+        $this->clubLinksGet = 0;
+        $this->clubLinksExpected = 0;
     }
 
     public function forceClubLinksAfterWindow($fromLogin, $params)

@@ -1361,7 +1361,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     public function getTotalRanked()
     {
         if ($this->total_ranks == -1 && !$this->expStorage->isRelay) {
-            $q = 'SELECT Count(*) as nbRanked FROM exp_ranks WHERE rank_challengeuid IN (' . $this->getUidSqlString() . ') GROUP BY rank_playerlogin HAVING COUNT(*) > 5';
+            $q = 'SELECT Count(*) as nbRanked FROM exp_ranks WHERE rank_challengeuid IN (' . $this->getUidSqlString() . ') GROUP BY rank_playerlogin';
 
             $data = $this->db->execute($q);
 
