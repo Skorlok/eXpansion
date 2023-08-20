@@ -879,6 +879,8 @@ class ChatAdmin extends ExpPlugin
             if ($login != null) {
                 $this->eXpChatSendServerMessage("#admin_error#Error: Clublink not found or not accessible for team #variable#%s", $login, array($teamId));
             }
+            $this->clubLinksGet--;
+            $this->clubLinksExpected--;
             return;
         }
 
@@ -888,6 +890,8 @@ class ChatAdmin extends ExpPlugin
             if ($login != null) {
                 $this->eXpChatSendServerMessage("#admin_error#Error: Clublink is not a valid XML for team #variable#%s", $login, array($teamId));
             }
+            $this->clubLinksGet--;
+            $this->clubLinksExpected--;
             return;
         }
         
@@ -895,6 +899,8 @@ class ChatAdmin extends ExpPlugin
             if ($login != null) {
                 $this->eXpChatSendServerMessage("#admin_error#Error: Clublink doesn't contain required infos for team #variable#%s", $login, array($teamId));
             }
+            $this->clubLinksGet--;
+            $this->clubLinksExpected--;
             return;
         }
         $name = (String)$clubLink->name[0];
@@ -904,6 +910,8 @@ class ChatAdmin extends ExpPlugin
             if ($login != null) {
                 $this->eXpChatSendServerMessage("#admin_error#Error: Clublink color for team #variable#%s #admin_error#is not valid", $login, array($teamId));
             }
+            $this->clubLinksGet--;
+            $this->clubLinksExpected--;
             return;
         }
 
@@ -916,9 +924,6 @@ class ChatAdmin extends ExpPlugin
         if ($this->clubLinksGet == $this->clubLinksExpected) {
             $this->forceClubLinksAfterWindow($login, $this->clubLinks);
         }
-
-        $this->clubLinksGet = 0;
-        $this->clubLinksExpected = 0;
     }
 
     public function forceClubLinksAfterWindow($fromLogin, $params)
@@ -935,7 +940,7 @@ class ChatAdmin extends ExpPlugin
             if ($fromLogin != null) {
                 $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
             }
-        } elseif (isset($params["team1"]["Link"])) {
+        } else if (isset($params["team1"]["Link"])) {
             $this->connection->setForcedClubLinks($params["team1"]["Link"], "");
             if ($fromLogin != null) {
 
@@ -966,6 +971,9 @@ class ChatAdmin extends ExpPlugin
                 $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Removes forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
             }
         }
+
+        $this->clubLinksGet = 0;
+        $this->clubLinksExpected = 0;
     }
 
     public function setModeScriptSettings($fromLogin, $params)
