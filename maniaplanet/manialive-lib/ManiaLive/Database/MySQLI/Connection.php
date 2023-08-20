@@ -54,25 +54,16 @@ class Connection extends \ManiaLive\Database\Connection implements TickListener
 	protected function connect($database)
 	{
 		// Connection
-		try
-		{
-			$this->connection = mysqli_connect(
-					$this->host,
-					$this->user,
-					$this->password,
-					$database,
-					$this->port
-			);
-		}
-		catch(\ErrorException $err)
-		{
+		try {
+			$this->connection = mysqli_connect($this->host, $this->user, $this->password, $database, $this->port);
+		} catch(\ErrorException $err) {
 			throw new ConnectionException($err->getMessage(), $err->getCode());
 		}
 
 		// Success ?
 		if (mysqli_connect_error()) {
-        		throw new ConnectionException('Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
-        	}
+			die('[MySQL] Connect Error (' . mysqli_connect_errno() . ') ' . mysqli_connect_error());
+		}
 
 		$this->select($database);
 	

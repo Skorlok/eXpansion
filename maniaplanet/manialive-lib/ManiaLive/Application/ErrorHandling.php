@@ -35,7 +35,7 @@ abstract class ErrorHandling
 		$config = \ManiaLive\Config\Config::getInstance();
 		if ($config->maxErrorCount !== false && self::$errorCount > $config->maxErrorCount) {
 			self::displayAndLogError(new ErrorLimitReached("Reached error limit of " . self::$errorCount . ". ManiaLive is shutting down"));
-			die();
+			die("Reached error limit of " . self::$errorCount . ". ManiaLive is shutting down");
 		}
 	}
 
@@ -51,7 +51,7 @@ abstract class ErrorHandling
 	 */
 	public static function createExceptionFromError($errno, $errstr, $errfile, $errline)
 	{
-		if (str_contains($errstr, "Creation of dynamic property"))
+		if (strpos($errstr, "Creation of dynamic property") !== false)
 			return;
 
 		echo "[PHP Warning] $errstr on line $errline in file $errfile", PHP_EOL, PHP_EOL;

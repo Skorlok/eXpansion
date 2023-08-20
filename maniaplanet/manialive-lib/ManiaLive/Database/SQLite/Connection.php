@@ -34,14 +34,11 @@ class Connection extends \ManiaLive\Database\Connection
 			mkdir($datapath);
 
 		$this->filename = $datapath.'/'.$host.'.db';
-		try
-		{
+		try {
 			$this->connection = new \SQLite3($this->filename);
-		}
-		catch(\Exception $e)
-		{
-			$this->connection = null;
-			throw new ConnectionException($e->getMessage());
+		} catch(\Exception $e) {
+			die('[SQLite] Connect Error (' . $e->getMessage() . ')');
+			throw new ConnectionException();
 		}
 	}
 
