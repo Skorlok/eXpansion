@@ -35,7 +35,7 @@ abstract class ErrorHandling
 		$config = \ManiaLive\Config\Config::getInstance();
 		if ($config->maxErrorCount !== false && self::$errorCount > $config->maxErrorCount) {
 			self::displayAndLogError(new ErrorLimitReached("Reached error limit of " . self::$errorCount . ". ManiaLive is shutting down"));
-			die("Reached error limit of " . self::$errorCount . ". ManiaLive is shutting down");
+			exit(1);
 		}
 	}
 
@@ -167,7 +167,7 @@ abstract class ErrorHandling
 		// log and display error, then die!
 		error_log($message, 3, Path::getInstance()->getLog(true) . 'ErrorLog_' . getmypid() . '.txt');
 
-		die($message);
+		exit(1);
 	}
 
 	/**

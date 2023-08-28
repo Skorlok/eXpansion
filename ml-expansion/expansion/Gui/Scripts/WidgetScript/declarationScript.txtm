@@ -1,10 +1,10 @@
 // KEEP THIS, IT WILL REMOVE OLD DATA
 
-declare persistent Vec3[Text][Text][Text] eXp_widgetLastPos;
-eXp_widgetLastPos.clear();
-
 declare persistent Vec3[Text][Text][Text] eXp_widgetLastPosRel;
 eXp_widgetLastPosRel.clear();
+
+declare persistent Vec3[Text][Text][Text] eXp_widgetLastPos;
+eXp_widgetLastPos.clear();
 
 declare persistent Boolean[Text][Text][Text] eXp_widgetVisible;
 eXp_widgetVisible.clear();
