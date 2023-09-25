@@ -20,8 +20,6 @@ class MxWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
         $this->setName("ManiaExchange Panel");
 
-        $login = $this->getRecipient();
-
         $this->_windowFrame = new \ManiaLive\Gui\Controls\Frame();
         $this->_windowFrame->setAlign("left", "top");
         $this->_windowFrame->setId("Frame");
