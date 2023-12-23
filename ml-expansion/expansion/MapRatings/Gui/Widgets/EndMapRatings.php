@@ -39,10 +39,7 @@ class EndMapRatings extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->addComponent($this->bg);
 
 
-        $bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle($sizeX, 4.6);
-        $bg->setAlign("center", "top");
-        $bg->setPosX($sizeX / 2);
-        $this->titlebg = $bg;
+        $this->titlebg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle($sizeX, 4.6);
         $this->addComponent($this->titlebg);
 
 

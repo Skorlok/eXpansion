@@ -8,7 +8,6 @@ use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\HudPanel;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
@@ -40,8 +39,6 @@ class Gui extends ExpPlugin
 
     public function eXpOnLoad()
     {
-        HudPanel::$mainPlugin = $this;
-
         $config = Config::getInstance();
     }
 
@@ -69,10 +66,6 @@ class Gui extends ExpPlugin
         }
 
         $this->loadWidgetConfigs();
-
-        $edge = Widgets\Edge::Create(null);
-        $edge->setPosition(-160, -35);
-        $edge->show();
     }
 
     public static function getScaledSize($sizes, $totalSize)
@@ -113,20 +106,11 @@ class Gui extends ExpPlugin
             /** @var GuiHandler */
             $guiHandler = GuiHandler::getInstance();
             foreach ($this->resetLogins as $login => $value) {
-                $this->resetLogins[$login]++;
-                switch ($this->resetLogins[$login]) {
-                    case 1:
-                        ResetHud::Erase($login);
-                        break;
-                    case 2:
-                        $guiHandler->toggleGui($login);
-                        break;
-                    case 3:
-                        $guiHandler->toggleGui($login);
-                        unset($this->resetLogins[$login]);
-                        $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
-                        break;
-                }
+                ResetHud::Erase($login);
+                $guiHandler->toggleGui($login);
+                $guiHandler->toggleGui($login);
+                unset($this->resetLogins[$login]);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
             }
         }
         if ($this->counter != 0 && time() - $this->counter > 2) {
@@ -159,6 +143,78 @@ class Gui extends ExpPlugin
         } catch (Exception $e) {
             $this->console("Error while disabling alt menu : " . $e->getMessage());
         }
+
+        $this->connection->sendDisplayManialinkPage(null,
+<<<EOT
+<manialink id="GuiChecker" version="2" layer="normal" name="GuiChecker"><dico></dico><script><!--
+main () {
+    declare persistent Boolean exp_isWidgetsHidden = False;
+    declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+    declare persistent Boolean edge_isLockedVisible = True;
+    declare Boolean edge_isMinimized for UI = False;
+    declare Boolean lastValue = edge_isMinimized;
+    declare Boolean is_edge_animated for UI = edge_isMinimized;
+    declare Integer eXp_lastClockUpdate = Now;
+
+    while(True) {
+        yield;
+        foreach (Event in PendingEvents) {
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F8") {
+                exp_isWidgetsHidden = !exp_isWidgetsHidden;
+                if (exp_isWidgetsHidden == True) {
+                    exp_needToCheckPersistentVars = True;
+                } else {
+                    exp_needToCheckPersistentVars = True;
+                }
+            }
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F9") {
+                edge_isLockedVisible = !edge_isLockedVisible;
+            }
+        }
+
+        if (edge_isLockedVisible == False && (Now - eXp_lastClockUpdate) >= 50) {
+            if (InputPlayer != Null) {
+                declare Real Speed = InputPlayer.Speed*3.6;
+        
+                if ((Speed < 10.0 && Speed > -10.0) || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
+                    if (lastValue == True) {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                    }
+                }
+        
+                if ((Speed > 10.0 || Speed < -10.0) && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
+                    if (lastValue == False) {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                    }
+                }
+            }
+        
+            eXp_lastClockUpdate = Now;
+        }
+
+        if (edge_isLockedVisible == True && (Now - eXp_lastClockUpdate) >= 500) {
+            if (lastValue == True) {
+                edge_isMinimized = False;
+                lastValue = False;
+                is_edge_animated = True;
+            }
+        }
+    }
+}
+--></script></manialink>
+EOT
+            , 0, false);
     }
 
     public function onPlayerDisconnect($login, $reason = null)

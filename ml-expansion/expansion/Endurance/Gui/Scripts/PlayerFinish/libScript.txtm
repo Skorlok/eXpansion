@@ -1,22 +1,31 @@
-Void putRecordTo(Integer i, Integer Rank, Integer Score, Text Login, Text nick, Boolean mine){
-    declare persistent Boolean edge_showDiff = False;
+Void putRecordTo (Integer i, Integer Rank, Integer Score, Text Login, Text nick, Boolean mine, Boolean edge_showDiff, Integer myRank) {
 	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
 	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
 	declare highliteQuad = (Page.GetFirstChild("RecBg_"^i) as CMlQuad);
 
 	declare Text prefix = "$fff";
-	if (i > 1 && edge_showDiff) prefix = "$ff0";
+	if (edge_showDiff) {
+		if (myRank > -1 && !mine) {
+			if (myRank <= Rank) {
+				prefix = "$ff0–";
+			} else {
+				prefix = "$ff0+";
+			}
+		} else if (i > 1 && myRank == -1) {
+			prefix = "$ff0–";
+		}
+	}
 
-	if(nickLabel != Null){
+	if (nickLabel != Null) {
 		nickLabel.Value = TextLib::Trim(nick);
-		timeLabel.Value = prefix ^ "  " ^(Score);
+		timeLabel.Value = "  " ^ prefix ^ (Score);
 
 		declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
 		rank.SetText(""^Rank^".");
 
 		declare bg = (Page.GetFirstChild("RecBgBlink_"^i) as CMlQuad);
 
-		if(mine){
+		if (mine) {
 			bg.Show();
 		} else {
 			bg.Hide();

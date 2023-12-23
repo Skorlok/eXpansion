@@ -1,5 +1,189 @@
-if (edge_showDiff != old_showDiff) {
-    old_showDiff = edge_showDiff;
+if (EXP_widgetLastPosRel.existskey(id) && EXP_widgetLastPosRel[id].existskey(gameMode)) {
+    declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
+    declare MenuIcon = (Page.GetFirstChild("toggleMicroMenu") as CMlQuad);
+    declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+
+    if (p.X > 0) {
+        MenuIcon.PosnX = 0.0;
+        MicroMenu.PosnX = -31.0;
+    } else {
+        MenuIcon.PosnX = 49.0;
+        MicroMenu.PosnX = 43.0;
+    }
+    MicroMenu.PosnY = -3.0;
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "toggleMicroMenu") {
+        showMenu[id] = !showMenu[id];
+
+        if (showMenu[id]) {
+            showStamp = Now;
+            MicroMenu.Show();
+        } else {
+            hideStamp = Now;
+        }
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_1") {
+        showDiff[id] = !showDiff[id];
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_2") {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_3") {
+
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
+            exp_needToCheckPersistentVars = True;
+        } else {
+            EXP_widgetLayers[id][gameMode] = "normal";
+            exp_needToCheckPersistentVars = True;
+        }
+
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}
+
+/*if (MouseLeftButton) {
+    if (id == "LocalRecords Panel") {
+        log("MouseLeftButton: " ^ showStamp);
+    }
+    
+    if (showMenu[id] && showStamp == 0) {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}*/
+
+if (hideStamp != 0) {
+    if ((Now - hideStamp) > 600) {
+        hideStamp = 0;
+        MicroMenu.Hide();
+    }
+    declare delay = 340;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - hideStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time -delay) * 1., 1., -1., 350.);
+        delay -= 40;
+    }
+}
+
+if (showStamp != 0) {
+    if ((Now - showStamp) > 600) {
+        showStamp = 0;
+    }
+    declare delay = 0;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - showStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 0.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 1., 350.);
+        delay += 40;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if (isStart) {
+    declare delay = 100;
+    for (i, 1, nbFields ) {
+        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        declare time = (Now - animStart - delay);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        timeLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        nickLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        rank.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        delay += 100;
+    }
+}
+
+if (isZoom) {
+    if (zoomId != -1) {
+        declare rank = (Page.GetFirstChild("RecRank_"^zoomId) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^zoomId) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^zoomId) as CMlLabel);
+        declare time = (Now - animStart);
+        timeLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        nickLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        rank.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+    }
+}
+
+if (isStart && animStart + 2000 <= Now ) {
+    isStart = False;
+
+    // added for debug
+    isZoom = True;
+    animStart = Now;
+
+    // just a failsafe to force visibility, if animation fails for some reason
+    for (i, 1, nbFields ) {
+        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        timeLabel.Opacity = 1.;
+        nickLabel.Opacity = 1.;
+        rank.Opacity = 1.;
+    }
+}
+
+if (isZoom && animStart + 2000 <= Now ) {
+    isZoom = False;
+}
+
+if (showDiff[id] != old_showDiff) {
+    old_showDiff = showDiff[id];
     needUpdate = True;
 }
 
@@ -28,6 +212,7 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
     declare showed = False;
 
     declare myRank = -1;
+    declare myScore = -1;
     declare start = -1;
     declare end = -1;
     declare recCount = -1;
@@ -44,6 +229,7 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
         if (LocalUser != Null) {
             if (Login == LocalUser.Login) {
                 myRank = i;
+                myScore = Score;
                 break;
             }
         }
@@ -87,12 +273,18 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
 
             if (nickLabel != Null) {
                 declare outScore = Score;
-                if (edge_showDiff) {
-                    if (i > 1) {
+                if (showDiff[id]) {
+                    if (myRank > -1 && Login != LocalUser.Login) {
+                        if (Score > myScore) {
+                            outScore = Score - myScore;
+                        } else {
+                            outScore = myScore - Score;
+                        }
+                    } else if (i > 1 && Login != LocalUser.Login) {
                         outScore = Score - scoreFirst;
                     }
                 }
-                putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login);
+                putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login, showDiff[id], myRank);
                 if (highliteQuad != Null) {
                     if (playersOnServer.existskey(Login) && i != myRank) {
                         highliteQuad.Show();
@@ -103,22 +295,15 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
                 if (Login == LocalUser.Login) {
                     showed = True;
                     zoomId = i;
+                    if (lastZoomId != zoomId) {
+                        isZoom = True;
+                        animStart = Now;
+                        lastZoomId = zoomId;
+                    }
                 }
             }
             i += 1;
         }
         nbRec += 1;
-    }
-}
-
-foreach (Event in PendingEvents) {
-    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "setLayer") {
-        if (EXP_widgetLayers[id][gameMode] == "normal") {
-            EXP_widgetLayers[id][gameMode] = "scorestable";
-            exp_needToCheckPersistentVars = True;
-        } else {
-            EXP_widgetLayers[id][gameMode] = "normal";
-            exp_needToCheckPersistentVars = True;
-        }
     }
 }

@@ -1,3 +1,151 @@
+if (EXP_widgetLastPosRel.existskey(id) && EXP_widgetLastPosRel[id].existskey(gameMode)) {
+    declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
+    declare MenuIcon = (Page.GetFirstChild("toggleMicroMenu") as CMlQuad);
+    declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+
+    if (p.X > 0) {
+        MenuIcon.PosnX = 0.0;
+        MicroMenu.PosnX = -31.0;
+    } else {
+        MenuIcon.PosnX = 49.0;
+        MicroMenu.PosnX = 43.0;
+    }
+	MicroMenu.PosnY = -3.0;
+
+	declare i = 1;
+
+	if (maxCp > 0) {
+		foreach (Score in playerTimes[maxCp -1]) {
+			declare labelInfo1 = (Page.GetFirstChild("RecInfo1_"^i) as CMlLabel);
+			declare labelInfo2 = (Page.GetFirstChild("RecInfo2_"^i) as CMlLabel);
+			declare labelCp1 = (Page.GetFirstChild("RecCp1_"^i) as CMlLabel);
+			declare labelCp2 = (Page.GetFirstChild("RecCp2_"^i) as CMlLabel);
+	
+			if (p.X > 0) {
+				labelCp1.Show();
+				labelCp2.Hide();
+				labelInfo1.Show();
+				labelInfo2.Hide();
+			} else {
+				MenuIcon.PosnX = 49.0;
+				labelCp1.Hide();
+				labelCp2.Show();
+				labelInfo1.Hide();
+				labelInfo2.Show();
+			}
+		}
+	}
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "toggleMicroMenu") {
+        showMenu[id] = !showMenu[id];
+
+        if (showMenu[id]) {
+            showStamp = Now;
+            MicroMenu.Show();
+        } else {
+            hideStamp = Now;
+        }
+    }
+
+	if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_1") {
+
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
+            exp_needToCheckPersistentVars = True;
+        } else {
+            EXP_widgetLayers[id][gameMode] = "normal";
+            exp_needToCheckPersistentVars = True;
+        }
+
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_2") {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}
+
+/*if (MouseLeftButton) {
+    if (id == "LocalRecords Panel") {
+        log("MouseLeftButton: " ^ showStamp);
+    }
+    
+    if (showMenu[id] && showStamp == 0) {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}*/
+
+if (hideStamp != 0) {
+    if ((Now - hideStamp) > 600) {
+        hideStamp = 0;
+        MicroMenu.Hide();
+    }
+    declare delay = 340;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - hideStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time -delay) * 1., 1., -1., 350.);
+        delay -= 40;
+    }
+}
+
+if (showStamp != 0) {
+    if ((Now - showStamp) > 600) {
+        showStamp = 0;
+    }
+    declare delay = 0;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - showStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 0.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 1., 350.);
+        delay += 40;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 foreach (Player in Players) {
 

@@ -106,9 +106,9 @@ class ExpSetting extends Control
                     $var->getName(),
                     35,
                     $var->getUseFullHex(),
-                    $var->getUsePrefix()
+                    $var->getUsePrefix(),
+                    $var->getRawValue()
                 );
-                $this->input->setColor($var->getRawValue());
                 $this->input->setPosY(-2);
                 $this->input->setPosX(7);
                 $this->addComponent($this->input);

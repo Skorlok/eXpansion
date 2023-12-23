@@ -21,21 +21,10 @@ use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
 
 class PlainPanel extends Widget
 {
-    /** @var Frame */
-    protected $frame;
-
     /**
      * @var Control[]
      */
     protected $items = array();
-
-    /**
-     * @var Quad
-     */
-    public $bgborder;
-    public $bg;
-    public $bgTitle;
-    public $bgFirst;
 
     /**
      * @var Button
@@ -48,54 +37,13 @@ class PlainPanel extends Widget
     protected $nbFields;
     protected $firstNbFields;
     public $trayWidget;
-    public $edgeWidget;
 
     protected function eXpOnBeginConstruct()
     {
-        $sizeX = 46;
-        $sizeY = 95;
         $this->setScriptEvents();
         $this->storage = Storage::getInstance();
         $this->setName("LocalRecords Panel");
         $this->registerScript($this->getScript());
-
-        $this->storage = Storage::getInstance();
-
-        $this->_windowFrame = new Frame();
-        $this->_windowFrame->setAlign("left", "top");
-        $this->_windowFrame->setId("Frame");
-        $this->_windowFrame->setScriptEvents(true);
-        $this->addComponent($this->_windowFrame);
-
-        $this->bg = new WidgetBackGround($sizeX, $sizeY);
-        $this->bg->setAction(\ManiaLivePlugins\eXpansion\LocalRecords\LocalBase::$openRecordsAction);
-        $this->_windowFrame->addComponent($this->bg);
-
-        $this->bgTitle = new WidgetTitle($sizeX, $sizeY);
-        $this->bgTitle->setId("minimizeButton");
-        $this->_windowFrame->addComponent($this->bgTitle);
-
-        $this->bgFirst = new Quad($sizeX, $sizeY);
-        $this->bgFirst->setBgcolor("aaa5");
-        $this->bgFirst->setAlign("center", "top");
-        $this->_windowFrame->addComponent($this->bgFirst);
-
-        $this->frame = new Frame();
-        $this->frame->setAlign("left", "top");
-        $this->frame->setLayout(new Column(-1));
-        $this->_windowFrame->addComponent($this->frame);
-
-        $this->layer = new myButton(5, 5);
-        $this->layer->setIcon("UIConstruction_Buttons", "Down");
-        $this->layer->setId("setLayer");
-        $this->layer->setDescription("Switch from Race view to Score View(Visible on Tab)", 75);
-        $this->addComponent($this->layer);
-
-        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
-            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
-            $this->registerScript($this->edgeWidget);
-        }
-
         parent::eXpOnBeginConstruct();
     }
 
@@ -115,17 +63,6 @@ class PlainPanel extends Widget
         return $script;
     }
 
-    public function setDirection($dir)
-    {
-        $this->setDisableAxis("x");
-        if ($this->edgeWidget) {
-            $this->unregisterScript($this->edgeWidget);
-        }
-        $this->trayWidget = new Script("Gui/Scripts/NewTray");
-        $this->registerScript($this->trayWidget);
-        $this->bgTitle->setDirection($dir);
-    }
-
     protected function autoSetPositions()
     {
         parent::autoSetPositions();
@@ -141,49 +78,92 @@ class PlainPanel extends Widget
     {
         $this->timeScript->setParam("nbFields", $nb);
         $this->nbFields = $nb;
-        $this->setSizeY(3 + $nb * 4);
     }
 
     public function setNbFirstFields($nb)
     {
         $this->timeScript->setParam("nbFirstFields", $nb);
         $this->firstNbFields = $nb;
-        $this->bgFirst->setSize($this->sizeX / 1.5, 0.3);
-        $this->bgFirst->setPosY((-4 * $nb) - 3);
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-        parent::onResize($oldX, $oldY);
-        $this->_windowFrame->setSize($this->sizeX, $this->sizeY);
-
-        $this->bgFirst->setPosX(($this->sizeX / 2) + 1);
-
-        $this->bg->setSize($this->sizeX, $this->sizeY + 1.5);
-
-        $this->bgTitle->setSize($this->sizeX, $this->sizeY);
-
-        $this->frame->setPosition(($this->sizeX / 2) + 1, -5.5);
-        $this->layer->setPosition($this->sizeX - 6, -2);
     }
 
     public function update()
     {
-        foreach ($this->items as $item) {
-            $item->destroy();
-        }
-        $this->items = array();
-        $this->frame->clearComponents();
+        $sizeX = 42;
+        $sizeY = 51;
+
+        $windowFrame = new Frame();
+        $windowFrame->setAlign("left", "top");
+        $windowFrame->setId("Frame");
+        $windowFrame->setScriptEvents(true);
+        $windowFrame->setSize($sizeX, $sizeY);
+        $this->addComponent($windowFrame);
+
+        $bg = new WidgetBackGround($sizeX, (3 + $this->nbFields * 4) + 1.5, \ManiaLivePlugins\eXpansion\LocalRecords\LocalBase::$openRecordsAction);
+        $windowFrame->addComponent($bg);
+
+        $bgTitle = new WidgetTitle($sizeX, 3 + $this->nbFields * 4, eXpGetMessage('Local Records'), "minimizeButton");
+        $windowFrame->addComponent($bgTitle);
+
+        $bgFirst = new Quad($sizeX, $sizeY);
+        $bgFirst->setBgcolor("aaa5");
+        $bgFirst->setAlign("center", "top");
+        $bgFirst->setPosX(($sizeX / 2) + 1);
+        $bgFirst->setPosY((-4 * $this->firstNbFields) - 3);
+        $bgFirst->setSize($this->sizeX / 1.5, 0.3);
+        $windowFrame->addComponent($bgFirst);
+
+        $frame = new Frame();
+        $frame->setAlign("left", "top");
+        $frame->setLayout(new Column(-1));
+        $frame->setPosition(($sizeX / 2) + 1, -5.5);
+        $windowFrame->addComponent($frame);
+
+        $this->layer = new myButton(5, 5);
+        $this->layer->setIcon("UIConstruction_Buttons", "Down");
+        $this->layer->setId("toggleMicroMenu");
+        $this->layer->setPosY(-1.7);
+        $this->addComponent($this->layer);
+
+        $this->trayWidget = new Script("Gui/Scripts/NewTray");
+        $this->registerScript($this->trayWidget);
+        $this->trayWidget->setParam("sizeX", $sizeX);
+        $this->trayWidget->setParam("sizeY", 3 + $this->nbFields * 4);
+
+        $this->setSizeX($sizeX);
+        $this->setSizeY(3 + $this->nbFields * 4);
+
+
+        $guiConfig = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+        $menu = new \ManiaLive\Gui\Elements\Xml();
+        $menu->setContent('<frame id="MicroMenu">
+            <frame scriptevents="1">
+                <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                <label id="item_1" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Show Differences"/>
+            </frame>
+        
+            <frame posn="0 -5 2.0E-5" scriptevents="1">
+                <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                <label id="item_2" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Rectract Widget"/>
+            </frame>
+        
+            <frame posn="0 -10 4.0E-5" scriptevents="1">
+                <quad id="mQuad_3" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                <label id="item_3" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Put On TAB View"/>
+            </frame>
+        </frame>');
+        $this->addComponent($menu);
+
+
+        
 
         $index = 1;
-        $this->bgTitle->setText(eXpGetMessage('Local Records'));
 
         $recsData = "";
         $nickData = "";
 
         for ($index = 1; $index <= $this->nbFields; $index++) {
             $this->items[$index - 1] = new Recorditem($index, false);
-            $this->frame->addComponent($this->items[$index - 1]);
+            $frame->addComponent($this->items[$index - 1]);
         }
 
         $index = 1;
@@ -207,19 +187,5 @@ class PlainPanel extends Widget
 
         $this->timeScript->setParam("playerTimes", $recsData);
         $this->timeScript->setParam("playerNicks", $nickData);
-    }
-
-    public function destroy()
-    {
-        foreach ($this->items as $item) {
-            $item->destroy();
-        }
-
-        $this->items = array();
-
-        $this->frame->clearComponents();
-        $this->frame->destroy();
-        $this->destroyComponents();
-        parent::destroy();
     }
 }

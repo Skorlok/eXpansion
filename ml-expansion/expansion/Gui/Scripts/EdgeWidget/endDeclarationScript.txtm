@@ -1,18 +1,13 @@
 declare Boolean edge_isMinimized for UI = False;
 declare Boolean edge_isAnimated for UI = False;
-declare persistent Boolean edge_isLockedVisible2 = True;
 
-declare Boolean[Text] edge_animatedId for UI = Boolean[Text];
-declare Integer eXp_lastClockUpdate2 = Now;
+declare Boolean is_edge_animated for UI = False;
 declare Vec3 p2 = EXP_widgetLastPosRel[id][gameMode];
-declare Boolean lastValue = edge_isMinimized;
 
 declare Integer edgeStart = Now;
 declare Boolean animActive = False;
 
-if (!edge_animatedId.existskey(id) ) {
-    edge_animatedId[id] = edge_isMinimized;
-}
+declare Real value = 0.;
 
 declare Real edgeR = -200.;
 if (p2.X > 1) {
@@ -22,4 +17,3 @@ if (p2.X > 1) {
 if (edge_isMinimized) {
     Window.RelativePosition.X = edgeR;
 }
-

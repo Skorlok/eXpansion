@@ -16,9 +16,6 @@ class CurrentMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnBeginConstruct()
     {
-        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(90, 15);
-        $this->addComponent($this->bg);
-
         $column = new \ManiaLib\Gui\Layouts\Column();
 
         $this->leftFrame = new \ManiaLive\Gui\Controls\Frame(4, -1);
@@ -56,7 +53,6 @@ class CurrentMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
         $this->country = new \ManiaLib\Gui\Elements\Quad(14, 9);
         $this->country->setId("authorZone");
-        $this->country->setImage("", true);
         $this->country->setImage("http://reaby.kapsi.fi/ml/flags/Other%20Countries.dds", true);
         $this->country->setAlign("left", "top");
         $this->leftFrame->addComponent($this->country);
@@ -111,6 +107,7 @@ class CurrentMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     public function setAction($action)
     {
-        $this->bg->setAction($action);
+        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(90, 14.5, $action);
+        $this->addComponent($this->bg);
     }
 }

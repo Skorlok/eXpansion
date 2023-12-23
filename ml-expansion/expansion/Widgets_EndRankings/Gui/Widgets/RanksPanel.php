@@ -21,8 +21,7 @@ class RanksPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(38, 95);
         $this->addComponent($this->bg);
 
-        $this->bgTitle = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle($sizeX, $sizeY);
-        $this->bgTitle->setText(eXpGetMessage("Server Ranks"));
+        $this->bgTitle = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle($sizeX, $sizeY, eXpGetMessage("Server Ranks"));
         $this->addComponent($this->bgTitle);
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame(4, -5);

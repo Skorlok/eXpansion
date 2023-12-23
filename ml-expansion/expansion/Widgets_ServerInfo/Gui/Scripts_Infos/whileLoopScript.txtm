@@ -1,14 +1,12 @@
 
-if( (Now - eXp_lastClockUpdate) >= 1000 ){
+if ( (Now - eXp_lastClockUpdate) >= 1000 ) {
     declare nbSpec = 0;
     declare nbPlayer = 0;
     foreach (Player in Players) {
-        if(Player.Login != CurrentServerLogin){
-            if(!Player.RequestsSpectate){
-                //log(Player.Login^"Is Player");
+        if (Player.Login != CurrentServerLogin) {
+            if (!Player.RequestsSpectate) {
                 nbPlayer += 1;
-            }else{
-                //log(Player.Login^"Is Spec");
+            } else {
                 nbSpec += 1;
             }
         }

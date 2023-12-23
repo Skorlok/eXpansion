@@ -10,9 +10,7 @@ use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\Console;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Widgets\MxWidget;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxInfos;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 use oliverde8\AsynchronousJobs\Job\Curl;
@@ -99,10 +97,7 @@ class ManiaExchange extends ExpPlugin
 
         $this->enableDedicatedEvents();
 
-        ManiaExchange::$openInfosAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showMxInfos'));
-
-        $widget = Gui\Widgets\MxWidget::Create();
-        $widget->show();
+        ManiaExchange::$openInfosAction = array($this, 'showMxInfos');
 
         $this->onBeginMap(null, null, null);
     }
@@ -206,7 +201,6 @@ class ManiaExchange extends ExpPlugin
     public function onPlayerDisconnect($login, $reason = null)
     {
         Gui\Windows\MxSearch::Erase($login);
-        Gui\Widgets\MxWidget::Erase($login);
     }
 
     public function showMxInfos($login)
@@ -872,7 +866,6 @@ class ManiaExchange extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        MxWidget::EraseAll();
         MxSearch::EraseAll();
         AdminGroups::removeAdminCommand($this->cmd_add);
         AdminGroups::removeAdminCommand($this->cmd_update);

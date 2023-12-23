@@ -144,6 +144,19 @@ class Menu extends ExpPlugin implements Listener
             $menu->addItem("Help", "!help", $this);
         }
 
+        // Donations
+        if ($this->pluginLoaded("Donate")) {
+            $donGroup = $menu->addGroup("Donations");
+
+            $donGroup->addItem("Donate 20 planets", "!don20", $this);
+            $donGroup->addItem("Donate 50 planets", "!don50", $this);
+            $donGroup->addItem("Donate 100 planets", "!don100", $this);
+            $donGroup->addItem("Donate 250 planets", "!don250", $this);
+            $donGroup->addItem("Donate 500 planets", "!don500", $this);
+            $donGroup->addItem("Donate 1000 planets", "!don1000", $this);
+            $donGroup->addItem("Donate 2000 planets", "!don2000", $this);
+        }
+
         if ($this->pluginLoaded("Players")) {
             $menu->addItem("Players", "!players", $this);
         }
@@ -186,6 +199,11 @@ class Menu extends ExpPlugin implements Listener
         // statistics
         if ($this->pluginLoaded("Statistics")) {
             $menu->addItem("Statistics", "!stats", $this);
+        }
+
+        // ServerNeighborhood
+        if ($this->pluginLoaded("ServerNeighborhood")) {
+            $menu->addItem("Server Neighborhood", "!sn", $this);
         }
 
         // Vote
@@ -281,6 +299,30 @@ class Menu extends ExpPlugin implements Listener
         $adminGrp = AdminGroups::getInstance();
         try {
             switch ($action) {
+                case "!don20":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 20, null);
+                    break;
+                case "!don50":  
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 50, null);
+                    break;
+                case "!don100":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 100, null);
+                    break;
+                case "!don250":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 250, null);
+                    break;
+                case "!don500":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 500, null);
+                    break;
+                case "!don1000":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 1000, null);
+                    break;
+                case "!don2000":
+                    $this->callPublicMethod($this->getPluginClass("Donate"), "donate", $login, 2000, null);
+                    break;
+                case "!sn":
+                    $this->callPublicMethod($this->getPluginClass("ServerNeighborhood"), "showServerList", $login, null);
+                    break;
                 case "!maplist":
                     $this->callPublicMethod($this->getPluginClass("Maps"), "showMapList_menu", $login);
                     break;

@@ -16,15 +16,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public static $raceOn = true;
     public static $roundPoints;
 
-    /** @var Config */
-    private $config;
-    private $panelSizeX = 42;
-
-    public function eXpOnLoad()
-    {
-        $this->config = Config::getInstance();
-    }
-
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
@@ -60,15 +51,20 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
         Gui\Widgets\LivePanel::$connection = $this->connection;
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+
+        if ($login != null) {
+            Gui\Widgets\LivePanel::Erase($login);
+            Gui\Widgets\LivePanel2::Erase($login);
+        } else {
+            Gui\Widgets\LivePanel::EraseAll();
+            Gui\Widgets\LivePanel2::EraseAll();
+        }
+
         $localRecs = LivePanel::GetAll();
 
         if ($login == null) {
             $panelMain = Gui\Widgets\LivePanel::Create($login);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-            $panelMain->setSizeX($this->panelSizeX);
-            if (!$this->config->isHorizontal) {
-                $panelMain->setDirection("left");
-            }
             $this->widgetIds["LivePanel"] = $panelMain;
             $this->widgetIds["LivePanel"]->update();
             $this->widgetIds["LivePanel"]->show();
@@ -85,7 +81,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $panelScore = Gui\Widgets\LivePanel2::Create($login);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
-                $panelScore->setSizeX($this->panelSizeX);
                 $this->widgetIds["LivePanel2"] = $panelScore;
                 $this->widgetIds["LivePanel2"]->update();
                 $this->widgetIds["LivePanel2"]->show();

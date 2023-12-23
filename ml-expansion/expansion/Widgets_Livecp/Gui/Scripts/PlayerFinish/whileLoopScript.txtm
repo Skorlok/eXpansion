@@ -1,0 +1,345 @@
+if (EXP_widgetLastPosRel.existskey(id) && EXP_widgetLastPosRel[id].existskey(gameMode)) {
+    declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
+    declare MenuIcon = (Page.GetFirstChild("toggleMicroMenu") as CMlQuad);
+    declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+
+    if (p.X > 0) {
+        MenuIcon.PosnX = 0.0;
+        MicroMenu.PosnX = -31.0;
+    } else {
+        MenuIcon.PosnX = 49.0;
+        MicroMenu.PosnX = 43.0;
+    }
+    MicroMenu.PosnY = -3.0;
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "toggleMicroMenu") {
+        showMenu[id] = !showMenu[id];
+
+        if (showMenu[id]) {
+            showStamp = Now;
+            MicroMenu.Show();
+        } else {
+            hideStamp = Now;
+        }
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_1") {
+
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
+            exp_needToCheckPersistentVars = True;
+        } else {
+            EXP_widgetLayers[id][gameMode] = "normal";
+            exp_needToCheckPersistentVars = True;
+        }
+
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_2") {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}
+
+/*if (MouseLeftButton) {
+    if (id == "LocalRecords Panel") {
+        log("MouseLeftButton: " ^ showStamp);
+    }
+    
+    if (showMenu[id] && showStamp == 0) {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}*/
+
+if (hideStamp != 0) {
+    if ((Now - hideStamp) > 600) {
+        hideStamp = 0;
+        MicroMenu.Hide();
+    }
+    declare delay = 340;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - hideStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time -delay) * 1., 1., -1., 350.);
+        delay -= 40;
+    }
+}
+
+if (showStamp != 0) {
+    if ((Now - showStamp) > 600) {
+        showStamp = 0;
+    }
+    declare delay = 0;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - showStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 0.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 1., 350.);
+        delay += 40;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if (isStart) {
+    declare delay = 100;
+    for (i, 1, nbFields ) {
+        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^i) as CMlLabel);
+        declare ratioLabel = (Page.GetFirstChild("RecRatio_"^i) as CMlGauge);
+        declare time = (Now - animStart - delay);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        timeLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        nickLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        rank.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        cpLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        //ratioLabel.Opacity = AL::Ease("LinearOut", time * 1., 0., 1., 500.);
+        delay += 100;
+    }
+}
+
+if (isZoom) {
+    if (zoomId != -1) {
+        declare rank = (Page.GetFirstChild("RecRank_"^zoomId) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^zoomId) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^zoomId) as CMlLabel);
+        declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^zoomId) as CMlLabel);
+        declare ratioLabel = (Page.GetFirstChild("RecRatio_"^zoomId) as CMlGauge);
+        declare time = (Now - animStart);
+        timeLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        nickLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        rank.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        cpLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+        //ratioLabel.RelativeScale = 2. - AL::Ease("LinearInOut", time * 1., 0., 1., 500.);
+    }
+}
+
+if (isStart && animStart + 2000 <= Now ) {
+    isStart = False;
+
+    // added for debug
+    isZoom = True;
+    animStart = Now;
+
+    // just a failsafe to force visibility, if animation fails for some reason
+    for (i, 1, nbFields ) {
+        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^i) as CMlLabel);
+        declare ratioLabel = (Page.GetFirstChild("RecRatio_"^i) as CMlGauge);
+        timeLabel.Opacity = 1.;
+        nickLabel.Opacity = 1.;
+        rank.Opacity = 1.;
+        cpLabel.Opacity = 1.;
+        //ratioLabel.Opacity = 1.;
+    }
+}
+
+if (isZoom && animStart + 2000 <= Now ) {
+    isZoom = False;
+}
+
+playerNickName.clear();
+foreach (Player in Players) {
+
+    if (!Player.RequestsSpectate) {
+        playerNickName[Player.Login] = Player.Name;
+        if (!playerTimes.existskey(Player.Login)) {
+            playerTimes[Player.Login] = 0;
+            needUpdate = True;
+        }
+        if (!playerCPs.existskey(Player.Login)) {
+            playerCPs[Player.Login] = 0;
+            needUpdate = True;
+        }
+        if (!playerLastCP.existskey(Player.Login)) {
+            playerLastCP[Player.Login] = -1;
+            needUpdate = True;
+        }
+
+        if (playerLastCP[Player.Login] != Player.CurRace.Checkpoints.count) {
+            //Update the current checkpoint of this user
+            playerLastCP[Player.Login] = Player.CurRace.Checkpoints.count;
+
+            if (Player.CurRace.Checkpoints.count > 0) {
+
+                playerCPs[Player.Login] = Player.CurRace.Checkpoints.count % totalCps;
+                if (playerCPs[Player.Login] == 0) {
+                    playerCPs[Player.Login] = totalCps;
+                }
+                
+                declare Integer lastLapTime = 0;
+                if (Player.CurRace.Checkpoints.count > totalCps) {
+                    lastLapTime = Player.CurRace.Checkpoints[(((Player.CurRace.Checkpoints.count - playerCPs[Player.Login]) / totalCps) * totalCps) - 1];
+                }
+                playerTimes[Player.Login] = Player.CurRace.Checkpoints[Player.CurRace.Checkpoints.count - 1] - lastLapTime;
+
+                needUpdate = True;
+            } else {
+                if (playerCPs[Player.Login] != totalCps) {
+                    playerCPs[Player.Login] = 0;
+                    playerTimes[Player.Login] = 0;
+                    needUpdate = True;
+                }
+            }
+
+            //Work around for 0 CP tracks
+            if (playerLastCP[Player.Login] == 1 && totalCps == 1) {
+                playerLastCP[Player.Login] = -1;
+            }
+        }
+    }
+}
+foreach (Login => Useless in playerTimes) {
+    if (!playerNickName.existskey(Login)) {
+        playerTimes.removekey(Login);
+        playerCPs.removekey(Login);
+        playerLastCP.removekey(Login);
+        needUpdate = True;
+    }
+}
+
+if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+    needUpdate = False;
+
+    declare Text[] playerRank = getSortedRank(playerTimes, playerCPs, totalCps);
+    declare i = 1;
+    declare nbRec = 1;
+    declare showed = False;
+
+    declare myRank = -1;
+    declare start2 = -1;
+    declare end = -1;
+    declare recCount = -1;
+
+    if (playerTimes.count > nbShow) {
+        recCount = nbShow;
+    } else {
+        recCount = playerTimes.count;
+    }
+
+    i = 1;
+
+    foreach (Login in playerRank) {
+        if (LocalUser != Null) {
+            if (Login == LocalUser.Login) {
+                myRank = i;
+                break;
+            }
+        }
+        i += 1;
+    }
+
+    if (myRank != -1) {
+        start2 = myRank - ((nbFields - nbFirstFields) / 2);
+
+        if (start2 <= nbFirstFields) {
+            start2 = nbFirstFields;
+            end = start2 + (nbFields - nbFirstFields);
+        } else {
+            end = start2 + (nbFields - nbFirstFields);
+            if (end > recCount) {
+                end = recCount;
+                start2 = end - (nbFields - nbFirstFields);
+            }
+        }
+    } else {
+        start2 = recCount  - (nbFields - nbFirstFields);
+        end = start2 + (nbFields - nbFirstFields);
+    }
+
+    i = 1;
+    nbRec = 1;
+    zoomId = -1;
+
+    foreach (Login in playerRank) {
+
+        if ((nbRec <= nbFirstFields || (nbRec > start2 && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
+
+            declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+            declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+
+            if (nickLabel != Null) {
+                putRecordTo(i, nbRec, playerTimes[Login], Login, playerCPs[Login], playerNickName[Login], Login == LocalUser.Login, totalCps);
+                if (Login == LocalUser.Login) {
+                    showed = True;
+                    zoomId = i;
+                    if (lastZoomId != zoomId) {
+                        isZoom = True;
+                        animStart = Now;
+                        lastZoomId = zoomId;
+                    }
+                }
+            }
+            i += 1;
+        }
+        nbRec += 1;
+    }
+    while (i <= nbFields) {
+        declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+        declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^i) as CMlLabel);
+        declare ratioLabel = (Page.GetFirstChild("RecRatio_"^i) as CMlGauge);
+        declare bg = (Page.GetFirstChild("RecBgBlink_"^i) as CMlQuad);
+
+        rank.SetText("");
+        nickLabel.Value = "";
+        timeLabel.Value = "";
+        cpLabel.Value = "";
+        ratioLabel.Color = TextLib::ToColor("3AF");
+        ratioLabel.Hide();
+        bg.Hide();
+        i += 1;
+    }
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "setLayer") {
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
+            exp_needToCheckPersistentVars = True;
+        } else {
+            EXP_widgetLayers[id][gameMode] = "normal";
+            exp_needToCheckPersistentVars = True;
+        }
+    }
+}

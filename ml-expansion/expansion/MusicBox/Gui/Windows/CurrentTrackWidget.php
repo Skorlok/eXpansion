@@ -4,77 +4,24 @@ namespace ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows;
 
 class CurrentTrackWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
-    /** @var $frame \ManiaLive\Gui\Controls\Frame */
-    protected $frame;
-    protected $quad;
-    protected $label;
     public static $musicBoxPlugin;
-    protected $background;
-    protected $action = null;
 
     public function onConstruct()
     {
         $this->setName("Music Widget");
-
-        $this->action = $this->createAction(array(self::$musicBoxPlugin, "musicList"), $this->getRecipient());
-        $this->setAlign("center");
-
-        $this->background = new \ManiaLib\Gui\Elements\Quad(100, 8);
-        $this->background->setAlign("center", "top");
-        $this->background->setStyle("UiSMSpectatorScoreBig");
-        $this->background->setSubStyle("PlayerSlotCenter");
-        $this->background->setColorize('ff0');
-        $this->background->setAction($this->action);
-        $this->addComponent($this->background);
-
-        $this->frame = new \ManiaLive\Gui\Controls\Frame(0, -3.5);
-        $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line(100, 8));
-        $this->frame->setAlign("center", "top");
-        $this->frame->setSizeX(90);
-
-
-        /* $this->quad = new \ManiaLib\Gui\Elements\Quad();
-            $this->quad->setStyle("Icons128x32_1");
-            $this->quad->setSubStyle("Sound");
-            $this->quad->setAlign("left", "center");
-            $this->quad->setSize(8, 8);
-            $this->frame->addComponent($this->quad); */
-        $label = new \ManiaLib\Gui\Elements\Label(16, 8);
-        $label->setAlign("left", "center");
-        $label->setTextColor('fff');
-        $label->setText("Now Playing: ");
-        $label->setStyle('TextCardSmallScores2');
-        $label->setTextSize(1);
-        $this->frame->addComponent($label);
-
-        $this->label = new \ManiaLib\Gui\Elements\Label(80, 8);
-        $this->label->setAlign("left", "center");
-        $this->label->setTextColor('fff');
-        $this->label->setStyle('TextCardSmallScores2');
-        $this->label->setTextSize(1);
-        $this->frame->addComponent($this->label);
-
-
-        $this->addComponent($this->frame);
-
-        //$this->label->enableAutonewline();
         parent::onConstruct();
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-
     }
 
     public function setSong(\ManiaLivePlugins\eXpansion\MusicBox\Structures\Song $song)
     {
-        $this->label->setText($song->artist . " - " . $song->title);
-    }
-
-    public function destroy()
-    {
-        $this->frame->clearComponents();
-        $this->frame->destroy();
-        parent::destroy();
+        $widget = new \ManiaLive\Gui\Elements\Xml();
+        $widget->setContent('<frame><quad sizen="100 8" halign="center" valign="top" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" action="' . $this->createAction(array(self::$musicBoxPlugin, "musicList")) . '" colorize="ff0"/>
+            <frame posn="-45 -3.5 1.0E-5">
+            <frame>
+            <label sizen="16 8" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="Now Playing: "/>
+            <label posn="16 0 1.0E-5" sizen="80 8" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . $song->artist . " - " . $song->title . '"/>
+            </frame>
+            </frame></frame>');
+        $this->addComponent($widget);
     }
 }

@@ -28,11 +28,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(GameInfos::GAMEMODE_CUP);
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
-
-        $config = Config::getInstance();
-        $var = new Boolean("isHorizontal", "Use horizontal (old) widget style", $config, false, false);
-        $var->setDefaultValue(false);
-        $this->registerVariable($var);
     }
 
 
@@ -40,15 +35,10 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     {
         $errors = parent::checkOtherCompatibility();
 
-        $dedi1 = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
-        $dedi2 = '\ManiaLivePlugins\\eXpansion\\Dedimania_Script\\Dedimania_Script';
-
         /** @var PluginHandler $phandler */
         $phandler = PluginHandler::getInstance();
 
-        if ($phandler->isLoaded($dedi1)) {
-            return $errors;
-        } elseif ($phandler->isLoaded($dedi2)) {
+        if ($phandler->isLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             return $errors;
         }
 

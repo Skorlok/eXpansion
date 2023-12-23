@@ -48,7 +48,7 @@ class CommunicationWidget extends Widget
     {
         $this->setName("Messaging Widget");
 
-        $bg = new WidgetBackGround(10, 6);
+        $bg = new WidgetBackGround(10, 5.5);
         $bg->setPosition(115, -0.25);
         $this->addComponent($bg);
 

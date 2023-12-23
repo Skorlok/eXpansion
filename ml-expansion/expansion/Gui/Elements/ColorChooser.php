@@ -2,44 +2,25 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLib\Gui\Elements\Quad;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Config;
 
 class ColorChooser extends Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
 {
-
-    protected $inputbox;
-    protected $preview;
-    protected $openButton;
-    protected $frame;
-    protected $bg;
-    protected $ok;
-    protected $cancel;
-
-    protected $settings;
-
-    /** @var int */
-    protected $buttonId;
-
     /** @var int */
     protected static $counter = 0;
 
     /** @var \ManiaLivePlugins\eXpansion\Gui\Structures\Script */
     protected static $script = null;
 
-    protected $digits = 3;
-
-    protected $prefix = 1;
-
     /**
      *
      * @param string $inputboxName
      * @param int $sizeX
-     * @param int $output
+     * @param int $digits
      * @param bool $hasPrefix
      */
-    public function __construct($inputboxName, $sizeX = 35, $output = 3, $hasPrefix = true)
+    public function __construct($inputboxName, $sizeX = 35, $digits = 3, $hasPrefix = true, $color = null)
     {
         $config = Config::getInstance();
 
@@ -47,161 +28,45 @@ class ColorChooser extends Control implements \ManiaLivePlugins\eXpansion\Gui\St
             self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ColorScript();
         }
 
-        $this->buttonId = self::$counter++;
-
+        $buttonId = self::$counter++;
         if (self::$counter > 100000) {
             self::$counter = 0;
         }
 
-        $this->digits = $output;
-        $this->prefix = $hasPrefix ? 1 : 0;
+        $openButtonColor = ($color != null) ? (ltrim($color, '$')) : ('000');
+        $openButton = new \ManiaLive\Gui\Elements\Xml();
+        $openButton->setContent('<quad id="preview_' . $buttonId . '" posn="0 0 5" sizen="4 4" halign="left" valign="center" bgcolor="' . $openButtonColor . '" scriptevents="1" class="colorchooser"/>');
+        $this->addComponent($openButton);
 
-        $this->openButton = new Quad(4, 4);
-        $this->openButton->setAlign("left", "center");
-        $this->openButton->setBgcolor("000");
-        $this->openButton->setId("preview_" . $this->buttonId);
-        $this->openButton->setAttribute("class", "colorchooser");
-        $this->openButton->setPosZ(5);
-        $this->openButton->setScriptEvents();
-        $this->addComponent($this->openButton);
+        $inputbox = new Inputbox($inputboxName, $sizeX - 4, true);
+        $inputbox->setPosition(4, 0);
+        $inputbox->setId("output_" . $buttonId);
+        $inputbox->setClass("color_input");
+        if ($color != null) {
+            $inputbox->setText($color);
+        }
+        $this->addComponent($inputbox);
 
-
-        $this->inputbox = new Inputbox($inputboxName, $sizeX - 4, true);
-        $this->inputbox->setPosition(4, 0);
-        $this->inputbox->setId("output_" . $this->buttonId);
-        $this->inputbox->setClass("color_input");
-        $this->addComponent($this->inputbox);
-
-
-        $this->frame = new \ManiaLive\Gui\Controls\Frame(6, 4);
-        $this->frame->setPosZ(10);
-        $this->addComponent($this->frame);
-
-        $this->bg = new Quad(64, 42);
-        $this->bg->setPosition(-2, 2);
-        $this->bg->setId("bg_" . $this->buttonId);
-        $this->bg->setHidden(true);
-        $this->bg->setAttribute("class", "colorSelection");
-        $this->bg->setBgcolor("222");
-        $this->frame->addComponent($this->bg);
-
-
-        $this->preview = new Quad(32, 32);
-        $this->preview->setAlign("left", "top");
-        $this->preview->setId("chooser_" . $this->buttonId);
-        $this->preview->setHidden(true);
-        $this->preview->setAttribute("class", "colorSelection");
-        $this->preview->setImage($config->colorPreview, true);
-        $this->preview->setScriptEvents();
-        $this->frame->addComponent($this->preview);
-
-        $this->color = new Quad(4, 32);
-        $this->color->setAlign("left", "top");
-        $this->color->setId("hue_" . $this->buttonId);
-        $this->color->setPosition(36, 0);
-        $this->color->setHidden(true);
-        $this->color->setAttribute("class", "colorSelection");
-        $this->color->setImage($config->colorHue, true);
-        $this->color->setScriptEvents();
-        $this->frame->addComponent($this->color);
-
-
-        $select = new Quad(2, 2);
-        $select->setAlign("center", "center");
-        $select->setStyle("Bgs1InRace");
-        $select->setSubStyle("BgColorContour");
-        $select->setColorize("000");
-        $select->setId("selectionBox_" . $this->buttonId);
-        $select->setScriptEvents();
-        $select->setHidden(true);
-        $select->setAttribute("class", "colorSelection");
-        $this->frame->addComponent($select);
-
-        $hue = new Quad(8, 3);
-        $hue->setPosition(36, 0);
-        $hue->setAlign("left", "center");
-        $hue->setStyle("Bgs1InRace");
-        $hue->setSubStyle("BgColorContour");
-        $hue->setScale(0.5);
-        $hue->setColorize("fff");
-        $hue->setId("selectionBoxHue_" . $this->buttonId);
-        $hue->setScriptEvents();
-        $hue->setHidden(true);
-        $hue->setAttribute("class", "colorSelection");
-        $this->frame->addComponent($hue);
-
-
-        $layout = new \ManiaLib\Gui\Layouts\Column();
-        $layout->setMargin(0, 1);
-
-        $helper = new \ManiaLive\Gui\Controls\Frame(48, 0);
-        $helper->setLayout($layout);
-
-        $h = new \ManiaLib\Gui\Elements\Entry(8, 6);
-        $h->setHidden(true);
-        $h->setId("h_" . $this->buttonId);
-        $h->setDefault("h");
-        $h->setAttribute("class", "colorSelection");
-        $h->setScriptEvents();
-        $helper->addComponent($h);
-
-        $s = new \ManiaLib\Gui\Elements\Entry(8, 6);
-        $s->setId("s_" . $this->buttonId);
-        $s->setAttribute("class", "colorSelection");
-        $s->setHidden(true);
-        $s->setDefault("s");
-        $s->setScriptEvents();
-        $helper->addComponent($s);
-
-        $v = new \ManiaLib\Gui\Elements\Entry(8, 6);
-        $v->setId("v_" . $this->buttonId);
-        $v->setHidden(true);
-        $v->setDefault("v");
-        $v->setScriptEvents();
-        $v->setAttribute("class", "colorSelection");
-        $helper->addComponent($v);
-
-
-        $ok = new Quad(8, 8);
-        $ok->setStyle("Icons64x64_1");
-        $ok->setSubStyle("Save");
-        $ok->setId("ok_" . $this->buttonId);
-        $ok->setScriptEvents();
-        $ok->setHidden(true);
-        $ok->setAttribute("class", "colorSelection");
-        $helper->addComponent($ok);
-
-        $cancel = new Quad(8, 8);
-        $cancel->setStyle("Icons64x64_1");
-        $cancel->setSubStyle("Refresh");
-        $cancel->setId("cancel_" . $this->buttonId);
-        $cancel->setScriptEvents();
-        $cancel->setHidden(true);
-
-        $cancel->setAttribute("class", "colorSelection");
-        $helper->addComponent($cancel);
-
-        $v = new \ManiaLib\Gui\Elements\Entry(8, 6);
-        $v->setId("v_" . $this->buttonId);
-        $v->setHidden(true);
-        $v->setDefault("v");
-        $v->setAttribute("class", "colorSelection");
-        $helper->addComponent($v);
-
-        $this->settings = new \ManiaLib\Gui\Elements\Entry(8, 6);
-        $this->settings->setId("settings_" . $this->buttonId);
-        $this->settings->setHidden(true);
-        $this->settings->setDefault($this->prefix . "," . $this->digits);
-        $this->settings->setAttribute("class", "colorSelection");
-        $helper->addComponent($this->settings);
-
-        $this->frame->addComponent($helper);
-    }
-
-    public function setColor($value)
-    {
-        $this->inputbox->setText($value);
-        $this->openButton->setBgcolor(ltrim($value, '$'));
+        $frame = new \ManiaLive\Gui\Elements\Xml();
+        $frame->setContent('<frame posn="6 4 10">
+            <quad id="bg_' . $buttonId . '" posn="-2 2 0" sizen="64 42" bgcolor="222" hidden="1" class="colorSelection"/>
+            <quad id="chooser_' . $buttonId . '" posn="0 0 1.0E-5" sizen="32 32" halign="left" valign="top" image="' . $config->colorPreview . '" scriptevents="1" hidden="1" class="colorSelection"/>
+            <quad id="hue_' . $buttonId . '" posn="36 0 2.0E-5" sizen="4 32" halign="left" valign="top" image="' . $config->colorHue . '" scriptevents="1" hidden="1" class="colorSelection"/>
+            <quad id="selectionBox_' . $buttonId . '" posn="0 0 3.0E-5" sizen="2 2" halign="center" valign="center" style="Bgs1InRace" substyle="BgColorContour" scriptevents="1" hidden="1" class="colorSelection" colorize="000"/>
+            <quad id="selectionBoxHue_' . $buttonId . '" posn="36 0 4.0E-5" sizen="8 3" scale="0.5" halign="left" valign="center" style="Bgs1InRace" substyle="BgColorContour" scriptevents="1" hidden="1" class="colorSelection" colorize="fff"/>
+            <frame posn="48 0 5.0E-5">
+                <frame>
+                    <entry id="h_' . $buttonId . '" sizen="8 6" style="" scriptevents="1" hidden="1" class="colorSelection" default="h"/>
+                    <entry id="s_' . $buttonId . '" posn="0 -7 1.0E-5" sizen="8 6" style="" scriptevents="1" hidden="1" class="colorSelection" default="s"/>
+                    <entry id="v_' . $buttonId . '" posn="0 -14 2.0E-5" sizen="8 6" style="" scriptevents="1" hidden="1" class="colorSelection" default="v"/>
+                    <quad id="ok_' . $buttonId . '" posn="0 -21 3.0E-5" sizen="8 8" style="Icons64x64_1" substyle="Save" scriptevents="1" hidden="1" class="colorSelection"/>
+                    <quad id="cancel_' . $buttonId . '" posn="0 -30 4.0E-5" sizen="8 8" style="Icons64x64_1" substyle="Refresh" scriptevents="1" hidden="1" class="colorSelection"/>
+                    <entry id="v_' . $buttonId . '" posn="0 -39 5.0E-5" sizen="8 6" style="" hidden="1" class="colorSelection" default="v"/>
+                    <entry id="settings_' . $buttonId . '" posn="0 -46 6.0E-5" sizen="8 6" style="" hidden="1" class="colorSelection" default="' . ($hasPrefix ? 1 : 0) . "," . $digits . '"/>
+                </frame>
+            </frame>
+        </frame>');
+        $this->addComponent($frame);
     }
 
     public function getScript()

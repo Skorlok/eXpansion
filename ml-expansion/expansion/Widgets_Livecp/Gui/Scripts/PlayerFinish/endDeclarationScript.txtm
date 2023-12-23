@@ -1,0 +1,182 @@
+declare Integer nbShow = <?php echo $this->nbRecord ?>;
+declare Integer nbFields =  <?php echo $this->nbFields ?>;
+declare Integer nbFirstFields =  <?php echo $this->nbFirstFields ?>;
+
+//Ranks of the players
+declare Text[Text] playerNickName = Text[Text];
+declare Integer[Text] playerTimes = Integer[Text];
+declare Integer[Text] playerCPs = Integer[Text];
+declare Integer[Text] playerLastCP = Integer[Text];
+
+declare Integer totalCps = <?php echo $this->totalCp ?>;
+
+declare Boolean needUpdate = True;
+
+declare Integer animStart = Now;
+declare Boolean isStart = True;
+declare Boolean isZoom = True;
+declare Integer zoomId = -1;
+declare Integer lastZoomId = -2;
+
+for (i, 1, nbFields ) {
+    declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+    declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+    declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+    declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^i) as CMlLabel);
+    declare ratioLabel = (Page.GetFirstChild("RecRatio_"^i) as CMlGauge);
+    rank.Opacity = 0.;
+    timeLabel.Opacity = 0.;
+    nickLabel.Opacity = 0.;
+    cpLabel.Opacity = 0.;
+    //ratioLabel.Opacity = 0.;
+}
+
+
+
+foreach (Player in Players) {
+    playerNickName[Player.Login] = Player.Name;
+    if (!Player.RequestsSpectate) {
+        if (Player.CurRace.Checkpoints.count > 0) {
+
+            playerCPs[Player.Login] = Player.CurRace.Checkpoints.count % totalCps;
+            if (playerCPs[Player.Login] == 0) {
+                playerCPs[Player.Login] = totalCps;
+            }
+
+            declare Integer lastLapTime = 0;
+            if (Player.CurRace.Checkpoints.count > totalCps) {
+                lastLapTime = Player.CurRace.Checkpoints[(((Player.CurRace.Checkpoints.count - playerCPs[Player.Login]) / totalCps) * totalCps) - 1];
+            }
+
+            playerTimes[Player.Login] = Player.CurRace.Checkpoints[Player.CurRace.Checkpoints.count - 1] - lastLapTime;
+            playerLastCP[Player.Login] = Player.CurRace.Checkpoints.count;
+        } else {
+            playerCPs[Player.Login] = 0;
+            playerTimes[Player.Login] = 0;
+            playerLastCP[Player.Login] = -1;
+        }
+    }
+}
+
+
+
+
+declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+MicroMenu.RelativePosition.Z = 30.0;
+declare Integer itemCount = 2;
+
+declare persistent Boolean[Text] showMenu = Boolean[Text];
+declare hideStamp = 0;
+declare showStamp = 0;
+
+if (!showMenu.existskey(id)) {
+	showMenu[id] = False;
+}
+
+if (showMenu[id]) {
+
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+
+        quad.Opacity = 0.75;
+        item.Opacity = 1.0;
+    }
+
+    MicroMenu.Show();
+
+} else {
+    
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+
+        quad.Opacity = 0.0;
+        item.Opacity = 0.0;
+    }
+
+    MicroMenu.Hide();
+
+}
+
+
+
+
+
+// Reduce flickering because the while loop starts with "yield;"
+
+needUpdate = False;
+
+declare Text[] playerRank = getSortedRank(playerTimes, playerCPs, totalCps);
+declare i = 1;
+declare nbRec = 1;
+declare showed = False;
+
+declare myRank = -1;
+declare start2 = -1;
+declare end = -1;
+declare recCount = -1;
+
+if (playerTimes.count > nbShow) {
+    recCount = nbShow;
+} else {
+    recCount = playerTimes.count;
+}
+
+i = 1;
+
+foreach (Login in playerRank) {
+    if (LocalUser != Null) {
+        if (Login == LocalUser.Login) {
+            myRank = i;
+            break;
+        }
+    }
+    i += 1;
+}
+
+if (myRank != -1) {
+    start2 = myRank - ((nbFields - nbFirstFields) / 2);
+
+    if (start2 <= nbFirstFields) {
+        start2 = nbFirstFields;
+        end = start2 + (nbFields - nbFirstFields);
+    } else {
+        end = start2 + (nbFields - nbFirstFields);
+        if (end > recCount) {
+            end = recCount;
+            start2 = end - (nbFields - nbFirstFields);
+        }
+    }
+} else {
+    start2 = recCount  - (nbFields - nbFirstFields);
+    end = start2 + (nbFields - nbFirstFields);
+}
+
+i = 1;
+nbRec = 1;
+zoomId = -1;
+
+foreach (Login in playerRank) {
+
+    if ((nbRec <= nbFirstFields || (nbRec > start2 && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
+
+        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+
+        if (nickLabel != Null) {
+            putRecordTo(i, nbRec, playerTimes[Login], Login, playerCPs[Login], playerNickName[Login], Login == LocalUser.Login, totalCps);
+            if (Login == LocalUser.Login) {
+                showed = True;
+                zoomId = i;
+                if (lastZoomId != zoomId) {
+                    isZoom = True;
+                    animStart = Now;
+                    lastZoomId = zoomId;
+                }
+            }
+        }
+        i += 1;
+    }
+    nbRec += 1;
+}

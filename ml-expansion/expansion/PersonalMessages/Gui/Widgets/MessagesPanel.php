@@ -50,10 +50,11 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
         $this->_windowFrame = new \ManiaLive\Gui\Controls\Frame();
         $this->_windowFrame->setAlign("left", "top");
+        $this->_windowFrame->setPositionZ(50);
         $this->_windowFrame->setId("Frame");
         $this->_windowFrame->setScriptEvents(true);
 
-        $this->_mainWindow = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(100, 10);
+        $this->_mainWindow = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(102, 5.75);
         $this->_mainWindow->setId("MainWindow");
         $this->_mainWindow->setScriptEvents();
         $this->_windowFrame->addComponent($this->_mainWindow);

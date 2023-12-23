@@ -112,6 +112,7 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
         $rankTotal = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords', 'getTotalRanked');
 
+        PBPanel::Erase($login);
         $info = PBPanel::Create($login);
         $info->setRecord($record, $rank, $rankTotal);
         $info->setSize(30, 13);

@@ -114,11 +114,13 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $info = TimePanel::Create($login);
         $info->setSize(30, 6);
         $info->setPosition(-16, 46);
+
         if (!$this->expStorage->isRelay) {
             $info->setTarget($spectatorTarget);
         } else {
             $info->setTarget("");
         }
+        
         if (array_key_exists($login, $this->references)) {
             $info->setReference($this->references[$login]);
         }

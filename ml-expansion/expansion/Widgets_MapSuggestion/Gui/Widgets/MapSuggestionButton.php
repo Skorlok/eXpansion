@@ -22,7 +22,7 @@ class MapSuggestionButton extends Widget
         $line->setLayout(new \ManiaLib\Gui\Layouts\Line());
 
         $this->btn_wish = new WidgetButton(10, 10);
-        $this->btn_wish->setPositionZ(-1);
+        $this->btn_wish->setPositionZ(50);
         $this->btn_wish->setText(array('$sWish', '$sfor', '$sMap'));
         $line->addComponent($this->btn_wish);
 

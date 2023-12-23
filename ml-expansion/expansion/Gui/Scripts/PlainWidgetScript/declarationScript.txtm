@@ -9,32 +9,14 @@
 #Include "TextLib" as TL
 #Include "AnimLib" as AL
 
-//Function definitions
 <?php echo $this->scriptLib ?>
 
 main () {
+    <?php echo $this->dDeclares ?>
 
-     // external declares
-     <?php echo $this->dDeclares ?>
-
-     // external declares ends
-     while(True) {
+    while(True) {
         yield;
-
-
-
-
-     foreach (Event in PendingEvents) {
-           // @todo on F8 hide manialinks
-           if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 44) {
-
-                }
-           }
-
-
-       // external loop stuff
         <?php echo  $this->wLoop ?>
     }
 }
 --></script>
-

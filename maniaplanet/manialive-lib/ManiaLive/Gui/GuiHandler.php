@@ -21,7 +21,6 @@ use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
 use ManiaLive\DedicatedApi\Callback\Listener as ServerListener;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Gui\Windows\Info;
-use ManiaLive\Gui\Windows\Shortkey;
 use ManiaLive\Gui\Windows\Thumbnail;
 use ManiaLive\Utilities\Console;
 use Maniaplanet\DedicatedServer\Connection;
@@ -64,6 +63,7 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
 
     protected function __construct()
     {
+        unlink("./WINDOWS.xml");
         $this->modalBg = new Bgs1(340, 200);
         $this->modalBg->setSubStyle(Bgs1::BgDialogBlur);
         $this->modalBg->setAlign('center', 'center');
@@ -91,7 +91,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
             $this->connection->chatSendServerMessage('ManiaLive interface has been deactivated, press F8 to enable...', (string)$login, true);
             $this->connection->sendHideManialinkPage((string)$login, true);
             Manialinks::load();
-            $this->drawWindow(Shortkey::Create((string)$login));
             CustomUI::Create((string)$login)->saveToDefault();
             try {
                 $this->connection->sendDisplayManialinkPage((string)$login, Manialinks::getXml(), 0, false, true);
@@ -125,7 +124,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
                 $this->drawModal($this->modalShown[$login]);
             }
 
-            $this->drawWindow(Shortkey::Create($login));
             CustomUI::Create($login)->save();
             try {
                 $this->connection->sendDisplayManialinkPage((string)$login, Manialinks::getXml(), 0, false);
@@ -579,13 +577,10 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
 
         $grouped = $this->prepareWindows($stackByPlayer);
 
-        if (count($grouped) > 1) {
-            echo "\n Multiple Groups to send windows : " . count($grouped) . "\n";
-        }
-
         foreach ($grouped as $groupNum => $groupData) {
 
             foreach ($groupData as $login => $toDraw) {
+                file_put_contents("./WINDOWS.xml", \str_replace('><', ">\n<", $toDraw), FILE_APPEND);
                 $this->connection->sendDisplayManialinkPage(strval($login), '<manialinks>' . $toDraw . '</manialinks>', 0, false, true);
             }
 
@@ -709,12 +704,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
         $this->modalShown[$login] = null;
         $this->managedWindow[$login] = null;
         $this->thumbnails[$login] = array();
-
-        $sk = Shortkey::Create($login);
-        if (\ManiaLive\Config\Config::getInstance()->enableToggleGUI) {
-            $sk->addCallback(Shortkey::F8, array($this, 'toggleGui'));
-        }
-        $sk->show();
 
         $this->groupAll->add(strval($login), true);
         if ($isSpectator) {

@@ -22,9 +22,7 @@ class NextMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected function eXpOnBeginConstruct()
     {
         $this->setName("Next Map");
-        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(60, 15);
-        $this->addComponent($this->bg);
-
+        
         $column = new \ManiaLib\Gui\Layouts\Column();
 
         $this->leftFrame = new \ManiaLive\Gui\Controls\Frame(4, -1);
@@ -83,7 +81,8 @@ class NextMapWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     public function setAction($action)
     {
-        $this->bg->setAction($action);
+        $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(60, 14.5, $action);
+        $this->addComponent($this->bg);
     }
 
     public function setMap($map)

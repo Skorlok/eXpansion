@@ -2,12 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_TM_Obstacle\Gui\Widgets;
 
-use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Layouts\Column;
-use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Data\Storage;
 use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Gauge;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 
@@ -18,6 +15,7 @@ class CpProgress extends Widget
 
     /** @var Storage; */
     protected $storage;
+    protected $edgeWidget;
 
     protected function eXpOnBeginConstruct()
     {
@@ -28,34 +26,19 @@ class CpProgress extends Widget
         $this->frame->setLayout(new Column());
         $this->addComponent($this->frame);
 
+        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
+            $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
+            $this->registerScript($this->edgeWidget);
+        }
+
         for ($x = 0; $x < 10; $x++) {
-            $line = new Frame();
-            $line->setLayout(new Line());
-            $line->setSize(70, 6);
-            $line->setAlign("left", "top");
-
-
-            $label = new Label(30, 9);
-            $label->setPosX(30);
-            $label->setAlign("right", "top");
-            $label->setId("player_" . $x);
-            $label->setText("player_" . $x);
-            $line->addComponent($label);
-
-            $gauge = new Gauge(30, 9);
-            $gauge->setPosY(-2);
-            $gauge->setAlign("left", "center2");
-            $gauge->setId("gauge_" . $x);
-            $gauge->setColorize("2f2");
-            $line->addComponent($gauge);
-
-            $label = new Label(10, 9);
-            $label->setAlign("left", "top");
-            $label->setId("cp_" . $x);
-            $label->setText("1");
-            $line->addComponent($label);
-
-            $this->frame->addComponent($line);
+            $part = new \ManiaLive\Gui\Elements\Xml();
+            $part->setContent('<frame posn="0 ' . $x*-6 . ' 0">
+                <label id="player_' . $x . '" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+                <gauge id="gauge_' . $x . '" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+                <label id="cp_' . $x . '" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+                </frame>');
+            $this->frame->addComponent($part);
         }
 
         $script = new Script("Widgets_TM_Obstacle\Gui\Scripts_Infos");

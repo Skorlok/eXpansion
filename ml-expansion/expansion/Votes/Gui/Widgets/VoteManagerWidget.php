@@ -6,7 +6,6 @@ use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Gauge;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
@@ -26,22 +25,15 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $bg = new WidgetBackGround(90, 20);
         $this->addComponent($bg);
 
-        $title = new WidgetTitle(90, 8);
-        $title->setText(eXpGetMessage('Current vote'));
+        $title = new WidgetTitle(90, 8, eXpGetMessage('Current vote'));
         $this->addComponent($title);
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setAlign("left", "top");
         $this->addComponent($this->frame);
 
-        $this->gauge = new Gauge(90, 6);
-        $this->gauge->setPosition(0, -14);
-        $this->gauge->setGrading(1);
-        $this->gauge->setStyle(Gauge::ProgressBarSmall);
-        $this->gauge->setId("CountdownBar");
-        $this->gauge->setDrawBg(true);
-        $this->gauge->setDrawBlockBg(true);
-        $this->gauge->setColorize("3D5");
+        $this->gauge = new \ManiaLive\Gui\Elements\Xml();
+        $this->gauge->setContent('<gauge id="CountdownBar" sizen="90 6" drawblockbg="1" style="ProgressBarSmall" color="3D5" drawbg="1" rotation="0" posn="0 -14" grading="1" centered="0" />');
         $this->frame->addComponent($this->gauge);
 
         $this->timeLeft = new Label();
@@ -164,17 +156,10 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->blabel->setHidden(1);
         $this->addComponent($this->blabel);
 
-        if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {
-            $this->script = new Script("Votes/Gui/ScriptTM");
-            $this->script->setParam("actionYes", $actionYes);
-            $this->script->setParam("actionNo", $actionNo);
-            $this->registerScript($this->script);
-        } else {
-            $this->script = new Script("Votes/Gui/ScriptSM");
-            $this->script->setParam("actionYes", $actionYes);
-            $this->script->setParam("actionNo", $actionNo);
-            $this->registerScript($this->script);
-        }
+        $this->script = new Script("Votes/Gui/Script");
+        $this->script->setParam("actionYes", $actionYes);
+        $this->script->setParam("actionNo", $actionNo);
+        $this->registerScript($this->script);
     }
 
     public function onResize($oldX, $oldY)

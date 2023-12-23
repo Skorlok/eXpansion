@@ -2,33 +2,86 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_LiveRankings\Gui\Widgets;
 
-use Exception;
-use ManiaLib\Utils\Formatting;
-use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLib\Gui\Elements\Quad;
+use ManiaLib\Gui\Layouts\Column;
+use ManiaLive\Data\Storage;
+use ManiaLive\Gui\Controls\Frame;
+use ManiaLivePlugins\eXpansion\Gui\Control;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
+use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
+use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
+use ManiaLivePlugins\eXpansion\LocalRecords\Config;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Controls\Recorditem;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Scripts\PlayerFinish;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
+
+use ManiaLib\Utils\Formatting;
 use ManiaLivePlugins\eXpansion\Gui\Script_libraries\TextExt;
-use ManiaLivePlugins\eXpansion\Helpers\Storage;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Widgets_LiveRankings\Gui\Scripts\CpPositions;
 use ManiaLivePlugins\eXpansion\Widgets_LiveRankings\Widgets_LiveRankings;
-use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Controls\Recorditem;
-use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Controls\TeamItem;
-use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\PlainPanel;
-use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
-use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
-class PlainLivePanel extends PlainPanel
+class PlainLivePanel extends Widget
 {
-
     public static $connection;
+    /**
+     * @var Control[]
+     */
+    protected $items = array();
 
-    public function eXpOnBeginConstruct()
+    /**
+     * @var Button
+     */
+    protected $layer;
+
+    /** @var Storage */
+    public $storage;
+    public $timeScript;
+    protected $nbFields;
+    protected $firstNbFields;
+    public $trayWidget;
+
+    protected function eXpOnBeginConstruct()
     {
-        parent::eXpOnBeginConstruct();
+        $this->setScriptEvents();
+        $this->storage = Storage::getInstance();
         $this->setName("Live Rankings Panel");
+        $this->registerScript($this->getScript());
         $this->registerScript(new TextExt());
-        $this->timeScript->setParam('varName', 'LiveTime1');
-        $this->timeScript->setParam('getCurrentTimes', 'True');
-        $this->bg->setAction(null);
+        parent::eXpOnBeginConstruct();
+    }
+
+    protected function autoSetPositions()
+    {
+        parent::autoSetPositions();
+        $nbFields = $this->getParameter('nbFields');
+        $nbFieldsFirst = $this->getParameter('nbFirstFields');
+        if ($nbFields != null && $nbFieldsFirst != null) {
+            $this->setNbFields($nbFields);
+            $this->setNbFirstFields($nbFieldsFirst);
+        }
+    }
+
+    public function setNbFields($nb)
+    {
+        if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $this->timeScript->setParam("nbFields", $nb-1);
+            $this->nbFields = $nb-1;
+        } else {
+            $this->timeScript->setParam("nbFields", $nb);
+            $this->nbFields = $nb;
+        }
+    }
+
+    public function setNbFirstFields($nb)
+    {
+        $this->timeScript->setParam("nbFirstFields", $nb);
+        $this->firstNbFields = $nb;
     }
 
     protected function getScript()
@@ -58,56 +111,32 @@ class PlainLivePanel extends PlainPanel
 
 
             $teamMaxPoint = 10;
-            if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                $ScriptSettings = self::$connection->getModeScriptSettings();
-                if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
-                    if ($ScriptSettings['S_ForceLapsNb'] != -1) {
-                        $nbLaps = $ScriptSettings['S_ForceLapsNb'];
-                    } else {
-                        $nbLaps = $this->storage->currentMap->nbLaps;
-                    }
+            $ScriptSettings = self::$connection->getModeScriptSettings();
+            if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
+                if ($ScriptSettings['S_ForceLapsNb'] != -1) {
+                    $nbLaps = $ScriptSettings['S_ForceLapsNb'];
+                } else {
+                    $nbLaps = $this->storage->currentMap->nbLaps;
                 }
-                if (isset($ScriptSettings['S_MaxPointsPerRound'])) {
-                    $teamMaxPoint = $ScriptSettings['S_MaxPointsPerRound'];
-                }
-            } else {
-                $teamMaxPoint = $this->storage->gameInfos->teamPointsLimit;
+            }
+            if (isset($ScriptSettings['S_MaxPointsPerRound'])) {
+                $teamMaxPoint = $ScriptSettings['S_MaxPointsPerRound'];
             }
 
             $this->timeScript->setParam("maxPoint", $teamMaxPoint);
 
             if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
                 $this->timeScript->setParam("isLaps", "True");
-
-                if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                    $this->timeScript->setParam("nbLaps", $nbLaps);
-                } else {
-                    $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->lapsNbLaps);
-                }
+                $this->timeScript->setParam("nbLaps", $nbLaps);
             } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
-
-                if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                    $this->timeScript->setParam("nbLaps", $nbLaps);
-                } else {
-                    $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->roundsForcedLaps);
-                }
+                $this->timeScript->setParam("nbLaps", $nbLaps);
             } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
-
-                if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                    $this->timeScript->setParam("nbLaps", $nbLaps);
-                } else {
-                    $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->roundsForcedLaps);
-                }
+                $this->timeScript->setParam("nbLaps", $nbLaps);
             } elseif (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP && $this->storage->currentMap->nbLaps > 1) {
                 $this->timeScript->setParam("isLaps", "True");
-
-                if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                    $this->timeScript->setParam("nbLaps", $nbLaps);
-                } else {
-                    $this->timeScript->setParam("nbLaps", $this->storage->gameInfos->roundsForcedLaps);
-                }
+                $this->timeScript->setParam("nbLaps", $nbLaps);
             }
 
             if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
@@ -134,37 +163,72 @@ class PlainLivePanel extends PlainPanel
 
             return $script;
         } else {
-            return parent::getScript();
-        }
-    }
+            $script = new PlayerFinish();
 
-    public function setNbFields($nb)
-    {
-        if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
-            parent::setNbFields($nb - 1);
-        } else {
-            parent::setNbFields($nb);
+            $recCount = Config::getInstance()->recordsCount;
+            $this->timeScript = $script;
+            $this->timeScript->setParam("playerTimes", "[]");
+            $this->timeScript->setParam("nbRecord", $recCount);
+            $this->timeScript->setParam("nbFields", 20);
+            $this->timeScript->setParam("nbFirstFields", 5);
+            $this->timeScript->setParam('varName', 'LocalTime1');
+            $this->timeScript->setParam('getCurrentTimes', Widgets_LocalRecords::$secondMap ? "True" : "False");
+
+            return $script;
         }
     }
 
     public function update()
     {
+        $sizeX = 42;
+        $sizeY = 51;
 
-        $login = $this->getRecipient();
-        foreach ($this->items as $item) {
-            $item->destroy();
-        }
+        $windowFrame = new Frame();
+        $windowFrame->setAlign("left", "top");
+        $windowFrame->setId("Frame");
+        $windowFrame->setScriptEvents(true);
+        $windowFrame->setSize($sizeX, $sizeY);
+        $this->addComponent($windowFrame);
 
-        $this->items = array();
-        $this->frame->clearComponents();
+        $bg = new WidgetBackGround($sizeX, (3 + $this->nbFields * 4) + 1.5);
+        $windowFrame->addComponent($bg);
+
+        $bgTitle = new WidgetTitle($sizeX, $sizeY, eXpGetMessage("Live Rankings"), "minimizeButton");
+        $windowFrame->addComponent($bgTitle);
+
+        $bgFirst = new Quad($sizeX, $sizeY);
+        $bgFirst->setBgcolor("aaa5");
+        $bgFirst->setAlign("center", "top");
+        $bgFirst->setPosX(($sizeX / 2) + 1);
+        $bgFirst->setPosY((-4 * $this->firstNbFields) - 3);
+        $bgFirst->setSize($this->sizeX / 1.5, 0.3);
+        $windowFrame->addComponent($bgFirst);
+
+        $frame = new Frame();
+        $frame->setAlign("left", "top");
+        $frame->setLayout(new Column(-1));
+        $frame->setPosition(($sizeX / 2) + 1, -5.5);
+        $windowFrame->addComponent($frame);
+
+        $this->layer = new myButton(5, 5);
+        $this->layer->setIcon("UIConstruction_Buttons", "Down");
+        $this->layer->setId("toggleMicroMenu");
+        $this->layer->setDescription("Switch from Race view to Score View(Visible on Tab)", 75);
+        $this->layer->setPosY(-1.7);
+        $this->addComponent($this->layer);
+
+        $this->trayWidget = new Script("Gui/Scripts/NewTray");
+        $this->registerScript($this->trayWidget);
+        $this->trayWidget->setParam("sizeX", $sizeX);
+        $this->trayWidget->setParam("sizeY", 3 + $this->nbFields * 4);
+
+        $this->setSizeX($sizeX);
+        $this->setSizeY(3 + $this->nbFields * 4);
+
+
+
 
         $index = 1;
-
-        $this->bgTitle->setText(eXpGetMessage("Live Rankings"));
-
-
-        $recsData = "";
-        $nickData = "";
 
         $gm = Widgets_LiveRankings::eXpGetCurrentCompatibilityGameMode();
         $short = false;
@@ -174,17 +238,80 @@ class PlainLivePanel extends PlainPanel
 
         for ($index = 1; $index <= $this->nbFields; $index++) {
             $this->items[$index - 1] = new Recorditem($index, false, $short);
-            $this->frame->addComponent($this->items[$index - 1]);
+            $frame->addComponent($this->items[$index - 1]);
         }
 
         if ($gm == GameInfos::GAMEMODE_TEAM) {
-            $this->items[$index - 1] = new TeamItem();
-            $this->frame->addComponent($this->items[$index - 1]);
+            $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+            if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                $team1Name = $var["team1Name"] . ' : ';
+                $team1Color = $var["team1Color"];
+            } else {
+                $team1Name = '$wBlue Team : ';
+                $team1Color = '00f';
+            }
+    
+            if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                $team2Name = $var["team2Name"] . ' : ';
+                $team2Color = $var["team2Color"];
+            } else {
+                $team2Name = '$wRed Team : ';
+                $team2Color = 'f00';
+            }
+
+            $item = new \ManiaLive\Gui\Elements\Xml();
+            $item->setContent('<frame posn="-20 -84 0.00189">
+                <label posn="12 0 0" sizen="12 4" halign="right" valign="center" style="TextRaceChat" textsize="1" textcolor="' . $team1Color . '" text="' . $team1Name . '"/>
+                <label id="bluePoints" posn="17 0 1.0E-5" sizen="4 4" halign="right" valign="center" style="TextRaceChat" scriptevents="1" textsize="1" textcolor="fff"/>
+                <label posn="32 0 2.0E-5" sizen="12 4" halign="right" valign="center" style="TextRaceChat" textsize="1" textcolor="' . $team2Color . '" text="' . $team2Name . '"/>
+                <label id="redPoints" posn="36 0 3.0E-5" sizen="4 4" halign="right" valign="center" style="TextRaceChat" scriptevents="1" textsize="1" textcolor="fff"/>
+                </frame>');
+
+            $this->items[$index - 1] = $item;
+            $frame->addComponent($this->items[$index - 1]);
         }
 
         if ($gm == GameInfos::GAMEMODE_ROUNDS || $gm == GameInfos::GAMEMODE_CUP || $gm == GameInfos::GAMEMODE_TEAM || $gm == GameInfos::GAMEMODE_LAPS) {
+
+            $guiConfig = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+            $menu = new \ManiaLive\Gui\Elements\Xml();
+            $menu->setContent('<frame id="MicroMenu">
+                <frame scriptevents="1">
+                    <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                    <label id="item_1" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Put On TAB View"/>
+                </frame>
+            
+                <frame posn="0 -5 2.0E-5" scriptevents="1">
+                    <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                    <label id="item_2" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Rectract Widget"/>
+                </frame>
+            </frame>');
+            $this->addComponent($menu);
+
             $this->cpUpdate();
         } else {
+
+            $guiConfig = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+            $menu = new \ManiaLive\Gui\Elements\Xml();
+            $menu->setContent('<frame id="MicroMenu">
+                <frame scriptevents="1">
+                    <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                    <label id="item_1" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Show Differences"/>
+                </frame>
+
+                <frame posn="0 -5 2.0E-5" scriptevents="1">
+                    <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                    <label id="item_2" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Rectract Widget"/>
+                </frame>
+            
+                <frame posn="0 -10 4.0E-5" scriptevents="1">
+                    <quad id="mQuad_3" sizen="30 5" halign="left" valign="center" bgcolor="' . $guiConfig->style_widget_bgColorize . '" bgcolorfocus="' . $guiConfig->style_widget_title_bgColorize . '" scriptevents="1"/>
+                    <label id="item_3" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Put On TAB View"/>
+                </frame>
+            </frame>');
+            $this->addComponent($menu);
+
             $this->taUpdate();
         }
     }

@@ -32,7 +32,6 @@ class Endurance extends ExpPlugin
     private $auto_reset = null;
     private $roundsdone = 0;
     private $mapsdone = 0;
-	private $panelSizeX = 42;
 	private $isHorizontal = false;
 
 	public function eXpOnReady()
@@ -339,14 +338,18 @@ class Endurance extends ExpPlugin
 		}
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
+		if ($login != null) {
+            Gui\Widgets\EnduroPanel::Erase($login);
+            Gui\Widgets\EnduroPanel2::Erase($login);
+        } else {
+            Gui\Widgets\EnduroPanel::EraseAll();
+            Gui\Widgets\EnduroPanel2::EraseAll();
+        }
+
         $localRecs = self::$enduro_total_points;
         if ($login == null) {
             $panelMain = Gui\Widgets\EnduroPanel::Create($login);
-            $panelMain->setSizeX($this->panelSizeX);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-            if (!$this->isHorizontal) {
-                $panelMain->setDirection("right");
-            }
             $this->widgetIds["EnduroPanel"] = $panelMain;
             $this->widgetIds["EnduroPanel"]->update();
             $this->widgetIds["EnduroPanel"]->show();
@@ -359,7 +362,6 @@ class Endurance extends ExpPlugin
             $localRecs = EnduroPanel2::GetAll();
             if ($login == null) {
                 $panelScore = Gui\Widgets\EnduroPanel2::Create($login);
-                $panelScore->setSizeX($this->panelSizeX);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
                 $this->widgetIds["EnduroPanel2"] = $panelScore;

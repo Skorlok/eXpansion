@@ -7,7 +7,6 @@ use ManiaLive\PluginHandler\Dependency;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel2;
-use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -17,10 +16,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     private $widgetIds = array();
     public static $raceOn;
     public static $roundPoints;
-
-    /** @var Config */
-    private $config;
-    private $panelSizeX = 42;
 
     public function eXpOnInit()
     {
@@ -33,7 +28,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
-        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -53,27 +47,18 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
+            if ($login != null) {
+                Gui\Widgets\LocalPanel::Erase($login);
+                Gui\Widgets\LocalPanel2::Erase($login);
+            } else {
+                Gui\Widgets\LocalPanel::EraseAll();
+                Gui\Widgets\LocalPanel2::EraseAll();
+            }
             /** @var LocalPanel $localRecs */
             $localRecs = LocalPanel::GetAll();
             if ($login == null) {
                 $panelMain = Gui\Widgets\LocalPanel::Create($login);
-                $panelMain->setSizeX($this->panelSizeX);
                 $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-                if (!$this->config->isHorizontal) {
-                    if ($this->config->defaultPositionLeft) {
-                        if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM || $this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
-                            $panelMain->setDirection("right");
-                        } else {
-                            $panelMain->setDirection("left");
-                        }
-                    } else {
-                        if ($this->eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TIMEATTACK) {
-                            $panelMain->setDirection("right");
-                        } else {
-                            $panelMain->setDirection("left");
-                        }
-                    }
-                }
                 $this->widgetIds["LocalPanel"] = $panelMain;
                 $this->widgetIds["LocalPanel"]->update();
                 $this->widgetIds["LocalPanel"]->show();
@@ -86,7 +71,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $localRecs = LocalPanel2::GetAll();
                 if ($login == null) {
                     $panelScore = Gui\Widgets\LocalPanel2::Create($login);
-                    $panelScore->setSizeX($this->panelSizeX);
                     $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                     $panelScore->setVisibleLayer("scorestable");
                     $this->widgetIds["LocalPanel2"] = $panelScore;

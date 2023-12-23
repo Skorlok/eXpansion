@@ -46,12 +46,10 @@ class QueueList extends Widget
     {
         $this->setName("Queue List");
         $login = $this->getRecipient();
-        $this->bg = new WidgetBackGround(62, 40);
-        $this->bg->setAction($this->createAction(array($this, "enterQueue")));
+        $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
         $this->addComponent($this->bg);
 
-        $header = new WidgetTitle(62, 40);
-        $header->setText(eXpGetMessage("Waiting Queue"));
+        $header = new WidgetTitle(62, 40, eXpGetMessage("Waiting Queue"));
         $this->addComponent($header);
 
         $this->frame = new Frame(1, -2);

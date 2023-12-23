@@ -21,8 +21,6 @@ class Widget extends PlainWidget
 
     private $move;
     private $_coord;
-    private $_input;
-    private $_save;
 
     private $axisDisabled = "";
     private $script;
@@ -52,6 +50,7 @@ class Widget extends PlainWidget
         $this->move->setSubStyle("ShareBlink");
         $this->move->setScriptEvents();
         $this->move->setId("enableMove");
+        $this->move->setPositionZ(100);
         $this->addComponent($this->move);
         $this->storage = \ManiaLive\Data\Storage::getInstance();
         $this->xml = new \ManiaLive\Gui\Elements\Xml();
@@ -62,34 +61,8 @@ class Widget extends PlainWidget
         $this->_coord->setAttribute('hidden', "true");
         $this->addComponent($this->_coord);
 
-        $this->_input = new Inputbox("_widgetPosition");
-        $this->_input->setPosition(900, 900);
-        $this->addComponent($this->_input);
-
-        $this->_save = new Label();
-        $this->_save->setStyle('CardButtonSmallXS');
-        $this->_save->setText("Save");
-        $this->_save->setAlign("center", "center");
-        $this->_save->setId("coordButton");
-        $this->_save->setAttribute('hidden', "true");
-        $this->_save->setAction($this->createAction(array($this, "_save")));
-        $this->_save->setScale(0.7);
-        $this->addComponent($this->_save);
-
         $this->eXpOnEndConstruct();
         $this->eXpLoadSettings();
-    }
-
-    public function _save($login, $entries)
-    {
-        if (AdminGroups::hasPermission($login, Permission::GUI_SET_WIDGET_POSITION)) {
-            $var = MetaData::getInstance()->getVariable('allWidgetPositions');
-            $positions = $var->getRawValue();
-            $positions[str_replace(" ", "", $this->getName())] = str_replace('–', '-', $entries['_widgetPosition']);
-            $var->setRawValue($positions);
-            ConfigManager::getInstance()->check();
-            $this->autoSetPositions();
-        }
     }
 
 
@@ -183,21 +156,12 @@ class Widget extends PlainWidget
 
     protected function onDraw()
     {
-
         $this->script->setParam("name", $this->getName());
         $this->script->setParam("axisDisabled", $this->axisDisabled);
-
-        if ($this->storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
-            $this->script->setParam("gameMode", Gui::fixString($this->storage->gameInfos->scriptName));
-        } else {
-            $this->script->setParam("gameMode", $this->storage->gameInfos->gameMode);
-        }
-
+        $this->script->setParam("gameMode", Gui::fixString($this->storage->gameInfos->scriptName));
         $this->script->setParam("visibleLayerInit", $this->visibleLayerInit);
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
-
         parent::onDraw();
-
     }
 
     public function onResize($oldX, $oldY)
@@ -205,7 +169,6 @@ class Widget extends PlainWidget
         parent::onResize($oldX, $oldY);
         $this->move->setSize($this->getSizeX(), $this->getSizeY());
         $this->_coord->setPosition($this->getSizeX() / 2, -$this->getSizeY() / 2);
-        $this->_save->setPosition($this->getSizeX() / 2, -($this->getSizeY() / 2) - 5);
     }
 
     protected function autoSetPositions()

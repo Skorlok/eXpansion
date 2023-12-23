@@ -45,10 +45,10 @@ if (!disablePersonalHud) {
 		}
 
 
-		if (EXP_widgetVisible[id][gameMode] == True && EXP_widgetLayers[id][gameMode] == visibleLayerInit && exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode]) {
+		if (EXP_widgetVisible[id][gameMode] == True && EXP_widgetLayers[id][gameMode] == visibleLayerInit && exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode] && exp_isWidgetsHidden == False) {
 			Window.Show();
 			exp_widgetCurrentVisible = True;
-		} else if (exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer) {
+		} else if (exp_widgetCurrentVisible != EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer || exp_isWidgetsHidden == True) {
 			Window.Hide();
 			exp_widgetCurrentVisible = False;
 			yield;
@@ -58,14 +58,10 @@ if (!disablePersonalHud) {
 		if (exp_enableHudMove == True) {
 			quad.Show();
 			coordLabel.Show();
-			coordButton.Show();
 			coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ " x " ^ roundFloat(Window.RelativePosition.Y);
-			coordInput.Value = coordLabel.Value;
 		} else {
 			quad.Hide();
-			coordInput.Hide();
 			coordLabel.Hide();
-			coordButton.Hide();
 		}
 
 		exp_widgetLayersBuffered = EXP_widgetLayers[id][gameMode];
@@ -106,7 +102,6 @@ if (!disablePersonalHud) {
         EXP_widgetLastPosRel[id][gameMode] = Window.RelativePosition;
 
 		coordLabel.Value = roundFloat(Window.RelativePosition.X) ^ " x " ^ roundFloat(Window.RelativePosition.Y);
-		coordInput.Value = coordLabel.Value;
 
 		lastMouseX = MouseX;
 	    lastMouseY = MouseY;

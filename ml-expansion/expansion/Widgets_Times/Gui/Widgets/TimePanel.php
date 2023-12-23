@@ -4,23 +4,15 @@ namespace ManiaLivePlugins\eXpansion\Widgets_Times\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 
 class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
-    protected $checkpoint;
-    protected $time;
-    protected $audio;
-    protected $frame;
     protected $position;
     protected $top1;
     protected $totalCp = 0;
     protected $lapRace = false;
-    protected $nScript;
     protected $target = "";
     protected $reference = 1;
-
 
     public static $localrecords = array();
     public static $dedirecords = array();
@@ -29,57 +21,6 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function eXpOnBeginConstruct()
     {
-        $login = $this->getRecipient();
-
-        $frame = new \ManiaLive\Gui\Controls\Frame();
-        $frame->setPosition(20, -6);
-        $this->addComponent($frame);
-
-        $this->setAlign("center", "center");
-        $this->frame = new \ManiaLive\Gui\Controls\Frame();
-        $this->frame->setAlign("center", "center");
-        $this->frame->setSize(80, 7);
-        $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
-        $frame->addComponent($this->frame);
-
-        $this->checkpoint = new \ManiaLib\Gui\Elements\Label(22, 4);
-        $this->checkpoint->setTextColor("fff");
-        $this->checkpoint->setAlign("right", "center");
-        $this->checkpoint->setText('');
-        $this->checkpoint->setId("Cp");
-        $this->checkpoint->setPosX(20);
-        $this->checkpoint->setScriptEvents();
-        $this->frame->addComponent($this->checkpoint);
-
-        $this->time = new \ManiaLib\Gui\Elements\Label(50, 4);
-        $this->time->setAlign("left", "center");
-        $this->time->setStyle("TextRaceChrono");
-        $this->time->setText('');
-        $this->time->setId("Label");
-        $this->time->setScriptEvents();
-        $this->time->setTextSize(4);
-        $this->frame->addComponent($this->time);
-
-        $this->position = new \ManiaLib\Gui\Elements\Label(9, 4);
-        $this->position->setId("CpTop1");
-        $this->position->setAlign("left", "center");
-        $this->frame->addComponent($this->position);
-
-        $this->top1 = new \ManiaLib\Gui\Elements\Label(30, 4);
-        $this->top1->setId("DediLabel");
-        $this->top1->setStyle("TextRaceChrono");
-        $this->top1->setTextSize(4);
-        $this->top1->setText('');
-        $this->top1->setAlign("left", "center");
-        $this->frame->addComponent($this->top1);
-
-        $this->audio = new \ManiaLib\Gui\Elements\Audio();
-        $this->audio->setPosY(260);
-        $frame->addComponent($this->audio);
-
-        $this->nScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script('Widgets_Times/Gui/Scripts_Time');
-        $this->registerScript($this->nScript);
-
         $this->setName("Player Time Panel");
     }
 
@@ -134,6 +75,24 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     protected function onDraw()
     {
+        $widget = new \ManiaLive\Gui\Elements\Xml();
+        $widget->setContent('<frame posn="20 -6 0">
+            <frame posn="-40 3.5 0">
+                <frame>
+                    <label id="Cp" posn="20 0 0" sizen="22 4" halign="right" valign="center" style="TextStaticSmall" scriptevents="1" textcolor="fff" text=""/>
+                    <label id="Label" posn="22 0 1.0E-5" sizen="50 4" halign="left" valign="center" style="TextRaceChrono" scriptevents="1" textsize="4" text=""/>
+                    <label id="CpTop1" posn="72 0 2.0E-5" sizen="9 4" halign="left" valign="center" style="TextStaticSmall"/>
+                    <label id="DediLabel" posn="81 0 3.0E-5" sizen="30 4" halign="left" valign="center" style="TextRaceChrono" textsize="4" text=""/>
+                </frame>
+            </frame>
+            <audio posn="0 260 4.0E-5" looping="0"/>
+        </frame>');
+        $this->addComponent($widget);
+
+        $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script('Widgets_Times/Gui/Scripts_Time');
+        $this->registerScript($script);
+
+
         $playerRecord = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue(self::$localrecords, "login", $this->target);
         $drecord = array_search($this->target, array_column(self::$dedirecords, 'Login'));
 
@@ -244,13 +203,13 @@ class TimePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
             $dediTime .= ']';
         }
 
-        $this->nScript->setParam('checkpoints', $checkpoints);
-        $this->nScript->setParam('deditimes', $dediTime);
-        $this->nScript->setParam('totalCp', $this->totalCp);
-        $this->nScript->setParam('target', Gui::fixString($this->target));
-        $this->nScript->setParam('lapRace', $this->lapRace);
-        $this->nScript->setParam("playSound", 'True');
-        $this->nScript->setParam("reference", $reference);
+        $script->setParam('checkpoints', $checkpoints);
+        $script->setParam('deditimes', $dediTime);
+        $script->setParam('totalCp', $this->totalCp);
+        $script->setParam('target', Gui::fixString($this->target));
+        $script->setParam('lapRace', $this->lapRace);
+        $script->setParam("playSound", 'True');
+        $script->setParam("reference", $reference);
 
         parent::onDraw();
     }

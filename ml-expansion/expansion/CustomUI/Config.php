@@ -78,7 +78,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $warmup_z = 0.0;
 
     public $multilap_info_x = 140.0;
-    public $multilap_info_y = 61.0;
+    public $multilap_info_y = -35.0;
     public $multilap_info_z = 5.0;
 
     public $spectator_info_x = 0.0;

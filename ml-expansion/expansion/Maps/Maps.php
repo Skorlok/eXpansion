@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Maps;
 
 use Exception;
-use ManiaLib\Gui\Elements\Icons128x128_1;
 use ManiaLib\Utils\Formatting;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Gui\Window;
@@ -12,7 +11,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\DonatePanel\Config as DonateConfig;
+use ManiaLivePlugins\eXpansion\Donate\Config as Donate;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Widgets\CurrentMapWidget;
@@ -85,7 +84,7 @@ class Maps extends ExpPlugin
         $this->messages = new \StdClass();
 
         $this->config = Config::getInstance();
-        $this->donateConfig = DonateConfig::getInstance();
+        $this->donateConfig = Donate::getInstance();
 
         $this->setPublicMethod("queueMap");
         $this->setPublicMethod("queueMxMap");
@@ -292,9 +291,10 @@ class Maps extends ExpPlugin
     {
         if ($this->config->showCurrentMapWidget) {
             $info = CurrentMapWidget::Create(null, true);
+            $info->setAction($this->actionShowMapList);
             $info->setMap($this->storage->currentMap);
             $info->setLayer(Window::LAYER_SCORES_TABLE);
-            $info->setAction($this->actionShowMapList);
+            $info->setVisibleLayer(Window::LAYER_SCORES_TABLE);
             $info->show();
         }
     }
@@ -303,8 +303,9 @@ class Maps extends ExpPlugin
     {
         if ($this->config->showNextMapWidget) {
             $info = NextMapWidget::Create(null, true);
-            $info->setLayer(Window::LAYER_SCORES_TABLE);
             $info->setAction($this->actionShowJukeList);
+            $info->setLayer(Window::LAYER_SCORES_TABLE);
+            $info->setVisibleLayer(Window::LAYER_SCORES_TABLE);
             if (count($this->queue) > 0) {
                 reset($this->queue);
                 $queue = current($this->queue);

@@ -4,92 +4,9 @@ namespace ManiaLivePlugins\eXpansion\Widgets_PersonalBest\Gui\Widgets;
 
 class PBPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
-
-    protected $record;
-    protected $pb;
-    protected $avg;
-    protected $wins;
-    protected $finish;
-    protected $rank;
-    protected $rankLoading;
-
-    protected function onConstruct()
-    {
-        parent::onConstruct();
-        $login = $this->getRecipient();
-
-        $frame = new \ManiaLive\Gui\Controls\Frame();
-        $frame->setPosX(20);
-        $this->addComponent($frame);
-
-        $label = new \ManiaLib\Gui\Elements\Label(32);
-        $label->setText('$ddd' . __('Personal Best', $login));
-        $label->setAlign("right", "top");
-        $label->setScale(0.7);
-        $frame->addComponent($label);
-
-        $this->pb = new \ManiaLib\Gui\Elements\Label(16, 4);
-        $this->pb->setScale(0.7);
-        $this->pb->setAlign("left", "top");
-        $this->pb->setPosX(1);
-        $frame->addComponent($this->pb);
-
-        $label = new \ManiaLib\Gui\Elements\Label(32);
-        $label->setText('$ddd' . __('Average', $login));
-        $label->setAlign("right", "top");
-        $label->setScale(0.7);
-        $label->setPosY(-3);
-        $frame->addComponent($label);
-
-        $this->avg = new \ManiaLib\Gui\Elements\Label(16, 4);
-        $this->avg->setScale(0.7);
-        $this->avg->setAlign("left", "top");
-        $this->avg->setPosX(1);
-        $this->avg->setPosY(-3);
-        $frame->addComponent($this->avg);
-
-        $label = new \ManiaLib\Gui\Elements\Label(32);
-        $label->setText('$ddd' . __('Finishes', $login));
-        $label->setAlign("right", "top");
-        $label->setScale(0.7);
-        $label->setPosY(-6);
-        $frame->addComponent($label);
-
-        $this->finish = new \ManiaLib\Gui\Elements\Label(16, 4);
-        $this->finish->setScale(0.7);
-        $this->finish->setAlign("left", "top");
-        $this->finish->setPosX(1);
-        $this->finish->setPosY(-6);
-        $frame->addComponent($this->finish);
-
-        $label = new \ManiaLib\Gui\Elements\Label(32);
-        $label->setText('$ddd' . __('Server Rank', $login));
-        $label->setAlign("right", "top");
-        $label->setScale(0.7);
-        $label->setPosY(-9);
-        $frame->addComponent($label);
-
-        $this->rank = new \ManiaLib\Gui\Elements\Label(16, 4);
-        $this->rank->setScale(0.7);
-        $this->rank->setAlign("left", "top");
-        $this->rank->setPosX(1);
-        $this->rank->setPosY(-9);
-        $frame->addComponent($this->rank);
-
-        $this->rankLoading = new \ManiaLib\Gui\Elements\Quad(6, 6);
-        $this->rankLoading->setScale(0.7);
-        $this->rankLoading->setPosX(-.8);
-        $this->rankLoading->setPosY(-8);
-        $this->rankLoading->setStyle('Icons128x128_Blink');
-        $this->rankLoading->setSubStyle('Default');
-        $frame->addComponent($this->rankLoading);
-
-        $this->setName("Personal Best Widget");
-    }
-
     public function setRecord($record, $rank, $rankTotal)
     {
-        $this->record = $record;
+        $this->setName("Personal Best Widget");
         if ($record == null) {
             $pbTime = '--';
             $avgTime = $pbTime;
@@ -106,17 +23,19 @@ class PBPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
             $nbFinish = $record->nbFinish;
         }
 
-        $this->pb->setText('$ddd' . $pbTime);
-        $this->avg->setText('$ddd' . $avgTime);
-        $this->finish->setText('$ddd' . $nbFinish);
-        $this->rank->setText('$ddd' . $rank . '$n $m/$n $m' . $rankTotal);
-        if ($rank == -2) {
-            $this->rankLoading->setVisibility(true);
-            $this->rank->setPosX(3);
-        } else {
-            $this->rankLoading->setVisibility(false);
-            $this->rank->setPosX(1);
-        }
+        $login = $this->getRecipient();
+
+        $widget = new \ManiaLive\Gui\Elements\Xml();
+        $widget->setContent('<frame posn="20 0 2.0E-5">
+        <label sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd' . __('Personal Best', $login) . '"/>
+        <label posn="1 0 1.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd' . $pbTime . '"/>
+        <label posn="0 -3 2.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd' . __('Average', $login) . '"/>
+        <label posn="1 -3 3.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd' . $avgTime . '"/>
+        <label posn="0 -6 4.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd' . __('Finishes', $login) . '"/>
+        <label posn="1 -6 5.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd' . $nbFinish . '"/>
+        <label posn="0 -9 6.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd' . __('Server Rank', $login) . '"/>
+        <label posn="1 -9 7.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd' . $rank . '$n $m/$n $m' . $rankTotal . '"/></frame>');
+        $this->addComponent($widget);
     }
 
     public function destroy()

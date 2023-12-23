@@ -13,7 +13,6 @@ class ResSkipButtons extends Widget
      */
     protected $btn_res;
     protected $btn_skip;
-    protected $btn_fav;
     protected $edgeWidget;
 
     protected function eXpOnBeginConstruct()
@@ -30,17 +29,6 @@ class ResSkipButtons extends Widget
         $this->btn_res = new WidgetButton(10, 10);
         $this->btn_res->setPositionZ(-1);
         $line->addComponent($this->btn_res);
-
-        $this->btn_fav = new WidgetButton(10, 10);
-        $this->btn_fav->setPositionZ(-1);
-        $this->btn_fav->setText(
-            array(
-                eXpGetMessage('AddToFav:$s$fffAdd'),
-                eXpGetMessage('AddToFav:$s$fffto'),
-                eXpGetMessage('AddToFav:$s$fffFav\'s'),
-            )
-        );
-        $line->addComponent($this->btn_fav);
 
         $this->addComponent($line);
 
@@ -67,9 +55,9 @@ class ResSkipButtons extends Widget
         if (is_numeric($amount)) {
             $this->btn_res->setText(
                 array(
-                    eXpGetMessage('AddToFav:$s$ff0Buy'),
-                    eXpGetMessage('AddToFav:$s$fffRestart'),
-                    '$s$ff0' . $amount . 'p'
+                    eXpGetMessage('$s$fffBuy'),
+                    eXpGetMessage('$s$fffRestart'),
+                    '$s$fff' . $amount . 'p'
                 )
             );
         }
@@ -77,9 +65,9 @@ class ResSkipButtons extends Widget
         if ($amount == "max") {
             $this->btn_res->setText(
                 array(
-                    eXpGetMessage('AddToFav:$s$ff0Max'),
-                    eXpGetMessage('AddToFav:$s$fffrestarts'),
-                    eXpGetMessage('AddToFav:$s$ff0reached'),
+                    eXpGetMessage('$s$fffMax'),
+                    eXpGetMessage('$s$fffrestarts'),
+                    eXpGetMessage('$s$fffreached'),
                 )
             );
             $this->btn_res->setAction(null);
@@ -91,27 +79,21 @@ class ResSkipButtons extends Widget
         if (is_numeric($amount)) {
             $this->btn_skip->setText(
                 array(
-                    eXpGetMessage('AddToFav:$s$ff0Buy'),
-                    eXpGetMessage('AddToFav:$s$fffSkip'),
-                    '$s$ff0' . $amount . 'p')
+                    eXpGetMessage('$s$fffBuy'),
+                    eXpGetMessage('$s$fffSkip'),
+                    '$s$fff' . $amount . 'p')
             );
         }
 
         if ($amount == "max") {
             $this->btn_skip->setText(
                 array(
-                    eXpGetMessage('AddToFav:$s$ff0Max'),
-                    eXpGetMessage('AddToFav:$s$fffskips'),
-                    eXpGetMessage('AddToFav:$s$ff0reached'),
+                    eXpGetMessage('$s$fffMax'),
+                    eXpGetMessage('$s$fffskips'),
+                    eXpGetMessage('$s$fffreached'),
                 )
             );
             $this->btn_skip->setAction(null);
         }
-    }
-
-    public function setServerInfo($login)
-    {
-        $url = 'http://reaby.kapsi.fi/ml/addfavourite.php?login=' . rawurldecode($login);
-        $this->btn_fav->setManialink($url);
     }
 }

@@ -66,6 +66,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     {
         $this->setVersion("1.0");
         $this->config = Config::getInstance();
+        $this->setPublicMethod("showServerList");
     }
 
     public function eXpOnReady()
@@ -193,8 +194,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $window = ServerPanel::Create(null);
             $windows[] = $window;
             $window->setSize(33, 25);
-            $window->setPosZ(50);
-            $window->setPosition(-160, -20);
+            $window->setPosition(-160, 80);
             $window->update($servers);
             $window->show();
         } else {

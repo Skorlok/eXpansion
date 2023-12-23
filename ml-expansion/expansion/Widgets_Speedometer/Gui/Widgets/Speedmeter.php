@@ -31,23 +31,12 @@ class Speedmeter extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     {
         $this->setName("Speed'o'meter");
 
-        $label = new \ManiaLib\Gui\Elements\Label(20, 6);
-        $label->setTextColor("fff");
-        $label->setTextSize(2);
-        $label->setId("speed");
-        $label->setText("");
-        $label->setAlign("center", "top");
-        $label->setPosition(0, -6);
-        $this->addComponent($label);
-
-        $gauge = new \ManiaLivePlugins\eXpansion\Gui\Elements\Gauge(30, 8);
-        $gauge->setStyle(\ManiaLivePlugins\eXpansion\Gui\Elements\Gauge::EnergyBar);
-        $gauge->setGrading(0);
-        $gauge->setId("bar");
-        $gauge->setColorize("3af");
-        $this->addComponent($gauge);
-
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Widgets_Speedometer\Gui\Script");
         $this->registerScript($script);
+
+        $widget = new \ManiaLive\Gui\Elements\Xml();
+        $widget->setContent('<frame><label id="speed" posn="0 -6 0" sizen="20 6" halign="center" valign="top" style="TextStaticSmall" textsize="2" textcolor="fff" text=""/>
+        <gauge id="bar" posn="0 0 1.0E-5" sizen="30 8" style="EnergyBar" color="3af" grading="0" ratio="0" drawbg="0" drawblockbg="1"/></frame>');
+        $this->addComponent($widget);
     }
 }

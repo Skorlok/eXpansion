@@ -57,12 +57,6 @@ class BetWidget extends Widget
         $sX = 42;
         $this->setName("Bet widget");
 
-        $this->bg = new WidgetBackGround($sX, 20);
-        $this->addComponent($this->bg);
-
-        $this->header = new WidgetTitle($sX, 4);
-        $this->addComponent($this->header);
-
         $this->frame = new Frame(1, -8);
         $this->addComponent($this->frame);
 
@@ -82,13 +76,6 @@ class BetWidget extends Widget
         $this->setPosition(20, -65);
     }
 
-    public function onResize($oldX, $oldY)
-    {
-        $this->header->setSize($this->sizeX, 4);
-        $this->bg->setSize($this->sizeX, $this->sizeY);
-        parent::onResize($oldX, $oldY);
-    }
-
     public function onDraw()
     {
         if (Bets::$state == Bets::SET) {
@@ -104,7 +91,13 @@ class BetWidget extends Widget
     public function acceptBets()
     {
         $this->frame->clearComponents();
-        $this->header->setText(eXpGetMessage("Accept Bet"));
+
+        $this->bg = new WidgetBackGround(80, 19.75);
+        $this->addComponent($this->bg);
+
+        $this->header = new WidgetTitle(42, 4, eXpGetMessage("Accept Bet"));
+        $this->addComponent($this->header);
+
         $line = new Frame();
         $line->setLayout(new Flow());
         $line->setSize(80, 12);
@@ -130,7 +123,11 @@ class BetWidget extends Widget
 
         $this->script->setParam("action", self::$action_setAmount);
 
-        $this->header->setText(eXpGetMessage("Start Bet"));
+        $this->bg = new WidgetBackGround($this->sizeX, $this->sizeY);
+        $this->addComponent($this->bg);
+
+        $this->header = new WidgetTitle($this->sizeX, 4, eXpGetMessage("Start Bet"));
+        $this->addComponent($this->header);
 
         $line = new Frame();
         $line->setLayout(new Flow());

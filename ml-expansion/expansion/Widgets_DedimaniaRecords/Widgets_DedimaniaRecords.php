@@ -3,8 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection;
-use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets\DediPanel;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets\DediPanel2;
 
@@ -21,17 +19,11 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     public static $raceOn;
     public static $roundPoints;
 
-    /** @var Config */
-    private $config;
-    private $panelSizeX = 42;
-
     public function eXpOnLoad()
     {
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             Dispatcher::register(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         }
-
-        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -51,15 +43,17 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
         try {
             if (($this->isPluginLoaded($dedi) && $this->callPublicMethod($dedi, 'isRunning'))) {
+                if ($login != null) {
+                    Gui\Widgets\DediPanel::Erase($login);
+                    Gui\Widgets\DediPanel2::Erase($login);
+                } else {
+                    Gui\Widgets\DediPanel::EraseAll();
+                    Gui\Widgets\DediPanel2::EraseAll();
+                }
                 $localRecs = DediPanel::GetAll();
-                if (!isset($localRecs[0])) {
-                    //Gui\Widgets\DediPanel::EraseAll();
+                if ($login == null) {
                     $panelMain = Gui\Widgets\DediPanel::Create($login);
                     $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-                    $panelMain->setSizeX($this->panelSizeX);
-                    if (!$this->config->isHorizontal) {
-                        $panelMain->setDirection("right");
-                    }
                     $this->widgetIds["DediPanel"] = $panelMain;
                     $this->widgetIds["DediPanel"]->update();
                     $this->widgetIds["DediPanel"]->show();
@@ -69,12 +63,10 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                 }
                 if (!$gui->disablePersonalHud) {
                     $localRecs = DediPanel2::GetAll();
-                    if (!isset($localRecs[0])) {
-                        //Gui\Widgets\DediPanel2::EraseAll();
+                    if ($login == null) {
                         $panelScore = Gui\Widgets\DediPanel2::Create($login);
                         $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                         $panelScore->setVisibleLayer("scorestable");
-                        $panelScore->setSizeX($this->panelSizeX);
                         $this->widgetIds["DediPanel2"] = $panelScore;
                         $this->widgetIds["DediPanel2"]->update();
                         $this->widgetIds["DediPanel2"]->show();

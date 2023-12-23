@@ -1,45 +1,23 @@
-if( edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate) >= 500 ) {
-    if (InputPlayer != Null) {
-        declare Real Speed = InputPlayer.Speed*3.6;
-
-        if (Speed < 50.0 || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
-            if (lastValue == True) {
-                edge_isMinimized = False;
-                lastValue = False;
-
-                edge_animatedId[id] = True;
-             }
-        }
-
-
-        if (Speed > 51.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
-            if (lastValue == False) {
-                edge_isMinimized = True;
-                lastValue = True;
-
-                edge_animatedId[id] = True;
-            }
-        }
-    }
-
-    eXp_lastClockUpdate = Now;
-}
-
 foreach (Event in PendingEvents) {
-    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "myWindow" || Event.ControlId == "minimizeButton" )) {
-		if(eXp_lastClockUpdate != Now) {
-                     exp_trayId[id] = !exp_trayId[id];
-                     start = Now;
+    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "minimizeButton" || Event.ControlId == "mQuad_2" )) {
+		if (eXp_lastClockUpdate != Now) {
+            exp_trayId[id] = !exp_trayId[id];
+
+            p2 = EXP_widgetLastPosRel[id][gameMode];
+            if (p2.X > 1) {
+                diff = 160.0 - p2.X;
+            } else {
+                diff = -160.0 - (p2.X + sizeX);
+            }
+
+            trayAnimActive = True;
+            start = Now;
         }
         eXp_lastClockUpdate = Now;
     }
 }
 
-if (!edge_animatedId.existskey(id) ) {
-    edge_animatedId[id] = edge_isMinimized;
-}
-
-if (edge_animatedId[id] == True) {
+if (is_edge_animated == True) {
 
     if (animActive == False) {
         animActive = True;
@@ -47,31 +25,91 @@ if (edge_animatedId[id] == True) {
     }
 
     if (animActive && edgeStart + 1000 <= Now ) {
-        edge_animatedId[id] = False;
+        is_edge_animated = False;
         animActive = False;
     }
 
-        p = EXP_widgetLastPosRel[id][gameMode];
+    if (animActive) {
+        p2 = EXP_widgetLastPosRel[id][gameMode];
+        declare Text pos = "";
+        declare Text scale = "1.";
 
         declare Real edge = -200.;
-        if (p.X > 1) {
+        if (p2.X > 1) {
             edge = 200.;
         }
 
         if (edge_isMinimized) {
-            value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 250.);
+            if (exp_trayId[id]) {
+                value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 200.);
+                Window.RelativePosition.X = p2.X + value + diff;
+            } else {
+                value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 200.);
+                Window.RelativePosition.X = p2.X + value;
+            }
         }
         else {
-            value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 250.);
+            if (exp_trayId[id]) {
+                value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 200.);
+                Window.RelativePosition.X = p2.X + value + diff;
+            } else {
+                value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 200.);
+                Window.RelativePosition.X = p2.X + value;
+            }
         }
     }
+} else {
+    animActive = False;
+}
 
-
- if (exp_trayId[id]) {
+if (!edge_isMinimized) {
+    if (exp_trayId[id]) {
+        if (trayAnimActive) {
             declare Real value2 = value + diff * AL::Ease("EaseInCirc", (Now - start) * 1., 0., 1., 250.);
-            Window.RelativePosition.X = p.X + value2;
+            Window.RelativePosition.X = p2.X + value2;
+            if (Now - start >= 250.0) {
+                trayAnimActive = False;
+            }
         }
-        else {
+
+        if (Window.RelativePosition.X > 0.0) {
+            minimizeButton.Size.X = 4.0;
+            minimizeButton.Size.Y = sizeY;
+            minimizeButton.RelativePosition.X = -2.0;
+            minimizeButton.RelativePosition.Y = -(sizeY / 2.0);
+
+            TitleWidget.Size[1] = sizeY - 2.0;
+            TitleWidget.RelativePosition.X = -2.0;
+            TitleWidget.RelativePosition.Y = -(sizeY / 2.0);
+            TitleWidget.RelativeRotation = -90.0;
+        } else {
+            minimizeButton.Size.X = 4.0;
+            minimizeButton.Size.Y = sizeY;
+            minimizeButton.RelativePosition.X = sizeX + 2.0;
+            minimizeButton.RelativePosition.Y = -(sizeY / 2.0);
+
+            TitleWidget.Size[1] = sizeY - 2.0;
+            TitleWidget.RelativePosition.X = sizeX + 2.0;
+            TitleWidget.RelativePosition.Y = -(sizeY / 2.0);
+            TitleWidget.RelativeRotation = 90.0;
+        }
+    } else {
+        if (trayAnimActive) {
             declare Real value2 = value + diff * AL::Ease("EaseOutCirc", (Now - start) * 1., 1., -1., 250.);
-            Window.RelativePosition.X =  p.X + value2;
+            Window.RelativePosition.X =  p2.X + value2;
+            if (Now - start >= 250.0) {
+                trayAnimActive = False;
+            }
+        }
+
+        minimizeButton.Size.X = sizeX;
+        minimizeButton.Size.Y = 4.0;
+        minimizeButton.RelativePosition.X = sizeX/2.0;
+        minimizeButton.RelativePosition.Y = -1.5;
+
+        TitleWidget.Size[1] = sizeX - 2.0;
+        TitleWidget.RelativePosition.X = sizeX/2.0;
+        TitleWidget.RelativePosition.Y = -1.5;
+        TitleWidget.RelativeRotation = 0.0;
     }
+}
