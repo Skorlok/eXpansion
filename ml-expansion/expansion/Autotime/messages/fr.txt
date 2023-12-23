@@ -1,2 +1,0 @@
-$ff0$iNew time limit: $fff%s $ff0seconds.
-$ff0$iNouvelle limite de temps: $fff%s $ff0secondes.

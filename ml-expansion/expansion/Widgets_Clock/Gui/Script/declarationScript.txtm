@@ -1,2 +1,0 @@
-
-declare LocalTime = (Page.GetFirstChild("Time") as CMlLabel);

@@ -1,8 +1,0 @@
-Queue
-Kø
-
-#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s
-#translate# #variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s
-
-MusicBox error http-code: %s
-#translate# MusicBox error http-code: %s

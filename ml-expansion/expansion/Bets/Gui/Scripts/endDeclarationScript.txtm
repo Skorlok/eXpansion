@@ -1,8 +1,0 @@
-
-declare Text[] playersToHide = <?php echo $this->hideFor; ?>;
-
-foreach (player in playersToHide) {
-    if (player == InputPlayer.Login) {
-        Window.Hide();
-    }
-}

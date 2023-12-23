@@ -1,8 +1,0 @@
-/.idea/
-/cache/
-/docs/
-/src/vendors/
-
-/*.iml
-/composer.lock
-/coverage.xml

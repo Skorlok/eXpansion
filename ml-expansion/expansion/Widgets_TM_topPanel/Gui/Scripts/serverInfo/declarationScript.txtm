@@ -1,2 +1,0 @@
-declare serverName <=> (Page.GetFirstChild("serverName") as CMlLabel);
-declare eXp_lastServerInfoUpdate = 0;

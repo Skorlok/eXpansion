@@ -1,3 +1,0 @@
-declare Text rate_0 = "<?php echo $this->rate_0 ?>";
-declare Text rate_5 = "<?php echo $this->rate_5 ?>";  
-Window.Show();

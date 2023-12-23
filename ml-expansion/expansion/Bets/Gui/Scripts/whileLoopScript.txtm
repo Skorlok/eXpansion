@@ -1,5 +1,0 @@
-foreach (Event in PendingEvents) {
-    if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "closeButton" )) {
-        Window.Hide();
-    }
-}
