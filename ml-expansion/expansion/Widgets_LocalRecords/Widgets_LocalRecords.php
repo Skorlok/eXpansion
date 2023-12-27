@@ -54,32 +54,19 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 Gui\Widgets\LocalPanel::EraseAll();
                 Gui\Widgets\LocalPanel2::EraseAll();
             }
-            /** @var LocalPanel $localRecs */
-            $localRecs = LocalPanel::GetAll();
-            if ($login == null) {
-                $panelMain = Gui\Widgets\LocalPanel::Create($login);
-                $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-                $this->widgetIds["LocalPanel"] = $panelMain;
-                $this->widgetIds["LocalPanel"]->update();
-                $this->widgetIds["LocalPanel"]->show();
-            } elseif (isset($localRecs[0])) {
-                $localRecs[0]->update();
-                $localRecs[0]->show($login);
-            }
+            $panelMain = Gui\Widgets\LocalPanel::Create($login);
+            $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
+            $this->widgetIds["LocalPanel"] = $panelMain;
+            $this->widgetIds["LocalPanel"]->update();
+            $this->widgetIds["LocalPanel"]->show();
 
             if (!$gui->disablePersonalHud) {
-                $localRecs = LocalPanel2::GetAll();
-                if ($login == null) {
-                    $panelScore = Gui\Widgets\LocalPanel2::Create($login);
-                    $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-                    $panelScore->setVisibleLayer("scorestable");
-                    $this->widgetIds["LocalPanel2"] = $panelScore;
-                    $this->widgetIds["LocalPanel2"]->update();
-                    $this->widgetIds["LocalPanel2"]->show();
-                } elseif (isset($localRecs[0])) {
-                    $localRecs[0]->update();
-                    $localRecs[0]->show($login);
-                }
+                $panelScore = Gui\Widgets\LocalPanel2::Create($login);
+                $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
+                $panelScore->setVisibleLayer("scorestable");
+                $this->widgetIds["LocalPanel2"] = $panelScore;
+                $this->widgetIds["LocalPanel2"]->update();
+                $this->widgetIds["LocalPanel2"]->show();
             }
         }
     }
@@ -161,7 +148,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        $this->showLocalPanel($login);
+        //$this->showLocalPanel($login);
     }
 
     public function onNewRecord($data)
