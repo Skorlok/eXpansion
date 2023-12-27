@@ -83,61 +83,9 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
         return $this->averageSendingTimes;
     }
 
-    function toggleGui($login)
-    {
-        $login = strval($login);
-        $this->hidingGui[$login] = !$this->hidingGui[$login];
-        if ($this->hidingGui[$login]) {
-            $this->connection->chatSendServerMessage('ManiaLive interface has been deactivated, press F8 to enable...', (string)$login, true);
-            $this->connection->sendHideManialinkPage((string)$login, true);
-            Manialinks::load();
-            CustomUI::Create((string)$login)->saveToDefault();
-            try {
-                $this->connection->sendDisplayManialinkPage((string)$login, Manialinks::getXml(), 0, false, true);
-                $this->connection->executeMulticall();
-            } catch (UnknownPlayerException $ex) {
-                \ManiaLive\Utilities\Console::println("[ManiaLive]Attempt to send Manialink to $login failed. Login unknown");
-            }
-        } else {
-            $playerWindows = array();
-            foreach ($this->currentWindows as $visibilityByLogin) {
-                if (isset($visibilityByLogin[$login])) {
-                    $playerWindows[] = $visibilityByLogin[$login];
-                }
-            }
-
-            $groups = $this->prepareWindows(array($login => $playerWindows));
-
-            foreach ($groups as $data) {
-                foreach ($data as $toDraw) {
-                    try {
-                        //file_put_contents("test.xml", $toDraw, FILE_APPEND);
-                        $this->connection->sendDisplayManialinkPage(((string)$login), $toDraw, 0, false, false);
-                    } catch (UnknownPlayerException $ex) {
-                        \ManiaLive\Utilities\Console::println("[ManiaLive]Attempt to send Manialink to $login failed. Login unknown");
-                        \ManiaLive\Utilities\Logger::info("[ManiaLive]Attempt to send Manialink to $login failed. Login unknown");
-                    }
-                }
-            }
-
-            if ($this->modalShown[$login]) {
-                $this->drawModal($this->modalShown[$login]);
-            }
-
-            CustomUI::Create($login)->save();
-            try {
-                $this->connection->sendDisplayManialinkPage((string)$login, Manialinks::getXml(), 0, false);
-            } catch (UnknownPlayerException $ex) {
-                \ManiaLive\Utilities\Console::println("[ManiaLive]Attempt to send Manialink to $login failed. Login unknown");
-            }
-        }
-    }
-
     function addToShow(Window $window, $recipients)
     {
         $windowId = $window->getId();
-
-        // echo "addToShow: " . $window->getName() . " to " . $this->parse($recipients) . "\n";
 
         if ($window instanceof ManagedWindow) {
             if ($this->managedWindow[$recipients[0]] && $this->managedWindow[$recipients[0]] !== $window && !$this->sendToTaskbar($recipients[0])) {
@@ -161,8 +109,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
     function addToHide(Window $window, $recipients)
     {
         $windowId = $window->getId();
-
-        // echo "addToHide: " . $window->getName() . " to " . $this->parse($recipients) . "\n";
 
         if ($window instanceof ManagedWindow && $this->managedWindow[$recipients[0]] === $window) {
             $this->managedWindow[$recipients[0]] = null;
@@ -207,9 +153,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
     function addToRedraw(Window $window, $recipients)
     {
         $windowId = $window->getId();
-
-
-        // echo "\nRedraw: \n" . $window->getName() . " to " . $this->parse($recipients) . "\n";
 
         if ($window instanceof ManagedWindow && ($thumbnail = $this->getThumbnail($window))) {
             $thumbnail->enableHighlight();

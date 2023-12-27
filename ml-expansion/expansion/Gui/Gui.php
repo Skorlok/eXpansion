@@ -23,7 +23,6 @@ class Gui extends ExpPlugin
     private $titleId;
     private $msg_params;
     private $msg_disabled;
-    private $resetLogins = array();
     private $counter = 0;
     private $preloader;
     // next 2 is used by contextMenu
@@ -45,7 +44,6 @@ class Gui extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->enableTickerEvent();
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
         $this->setPublicMethod("hudCommands");
@@ -97,31 +95,6 @@ class Gui extends ExpPlugin
                 $widgetName = str_replace(" ", "", $confs[0]);
                 Widget::setParameter($widgetName, $confs[1], $values);
             }
-        }
-    }
-
-    public function onTick()
-    {
-        if (count($this->resetLogins) > 0) {
-            /** @var GuiHandler */
-            $guiHandler = GuiHandler::getInstance();
-            foreach ($this->resetLogins as $login => $value) {
-                ResetHud::Erase($login);
-                $guiHandler->toggleGui($login);
-                $guiHandler->toggleGui($login);
-                unset($this->resetLogins[$login]);
-                $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
-            }
-        }
-        if ($this->counter != 0 && time() - $this->counter > 2) {
-            $this->connection->sendDisplayManialinkPage(
-                null,
-                "<manialinks><manialink id=\"0\"><quad></quad></manialink>
-<custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                0,
-                false
-            );
-            $this->counter = 0;
         }
     }
 
@@ -308,8 +281,8 @@ EOT
             $window = ResetHud::Create($login);
             $window->setTimeout(1);
             $window->show();
-            $this->resetLogins[$login] = 0;
             $this->eXpChatSendServerMessage(eXpGetMessage("Starting hud reset, please wait"), $login);
+            //ResetHud::Erase($login);
         }
     }
 

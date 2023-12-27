@@ -38,10 +38,7 @@ class TitleBackGround extends \ManiaLivePlugins\eXpansion\Gui\Control
     public function onResize($oldX, $oldY)
     {
         $config = $this->config;
-        $this->bg->setSize(
-            $this->getSizeX() + $config->style_title_sizeXOffset,
-            $this->getSizeY() + $config->style_title_sizeYOffset
-        );
+        $this->bg->setSize($this->getSizeX() + $config->style_title_sizeXOffset, $this->getSizeY() + $config->style_title_sizeYOffset);
         $this->bg->setPosX(-2);
     }
 

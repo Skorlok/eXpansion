@@ -95,7 +95,7 @@ class BetWidget extends Widget
         $this->bg = new WidgetBackGround(80, 19.75);
         $this->addComponent($this->bg);
 
-        $this->header = new WidgetTitle(42, 4, eXpGetMessage("Accept Bet"));
+        $this->header = new WidgetTitle($this->sizeX, 4, eXpGetMessage("Accept Bet"));
         $this->addComponent($this->header);
 
         $line = new Frame();

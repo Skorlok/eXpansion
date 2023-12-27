@@ -55,6 +55,8 @@ if (!disablePersonalHud) {
 			continue;
 		}
 
+		Window.RelativePosition = EXP_widgetLastPosRel[id][gameMode];
+
 		if (exp_enableHudMove == True) {
 			quad.Show();
 			coordLabel.Show();
