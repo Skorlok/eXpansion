@@ -281,7 +281,7 @@ EOT
             $window = ResetHud::Create($login);
             $window->setTimeout(1);
             $window->show();
-            $this->eXpChatSendServerMessage(eXpGetMessage("Starting hud reset, please wait"), $login);
+            $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
             //ResetHud::Erase($login);
         }
     }
