@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Adm;
 
 use Exception;
-use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ForceScores;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\GameOptions;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\MatchSettings;
@@ -13,7 +12,6 @@ use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ServerControlMain;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ServerManagement;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ServerOptions;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Events\Event;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -38,10 +36,6 @@ class Adm extends ExpPlugin
         $this->msgDatabasePlugin = eXpGetMessage("Database plugin not loaded!");
 
         $this->setPublicMethod('serverControlMain');
-
-        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups')) {
-            Dispatcher::register(Event::getClass(), $this);
-        }
 
         $cmd = AdminGroups::addAdminCommand('setting expansion', $this, 'showExpSettings', 'expansion_settings');
         $cmd->setHelp('Set up your expansion');
