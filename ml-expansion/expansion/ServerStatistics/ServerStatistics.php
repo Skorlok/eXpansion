@@ -123,7 +123,9 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->nbSpecMax = sizeof($this->spectators);
 
             $this->db->execute($q);
-            $this->db->execute("DELETE FROM `exp_server_stats` WHERE `server_updateDate` < (UNIX_TIMESTAMP()) - 86520");
+
+            $startTime = (time() - (24 * 60 * 60));
+            $this->db->execute("DELETE FROM `exp_server_stats` WHERE `server_updateDate` < $startTime");
         }
 
         $this->ellapsed = ($this->ellapsed + 1) % 120;
@@ -184,6 +186,8 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showPlayers($login)
     {
+        $startTime = (time() - (24 * 60 * 60));
+
         Gui\Windows\PlotterWindow::Erase($login);
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Players", $login));
@@ -192,7 +196,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             "SELECT `server_nbPlayers` as players, server_nbSpec as specs, "
             . " server_updateDate as date "
             . " FROM exp_server_stats "
-            . " WHERE server_updateDate > 86400"
+            . " WHERE server_updateDate > " . $startTime
             . "     AND server_login = " . $this->db->quote($this->storage->serverLogin)
             . " ORDER BY `server_updateDate` ASC"
         )->fetchArrayOfObject();
@@ -204,9 +208,9 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $max = 0;
 
         foreach ($datas as $data) {
-            while (86400 + ($i * 120) - 60 < $data->date) {
-                //$out[0][] = 0;
-                //$out[1][] = 0;
+            while ($startTime + ($i * 120) - 60 < $data->date) {
+                $out[0][] = 0;
+                $out[1][] = 0;
                 $i++;
             }
             $i++;
@@ -221,12 +225,14 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
         $win->setLimit(12 * 60, (((int)($max / 5)) + 1) * 5);
         $win->setDatas($out);
-        $win->setXLabels($this->getXDateLabels(86400));
+        $win->setXLabels($this->getXDateLabels($startTime));
         $win->show($login);
     }
 
     public function showMemory($login)
     {
+        $startTime = (time() - (24 * 60 * 60));
+
         Gui\Windows\PlotterWindow::Erase($login);
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Memory usage", $login));
@@ -237,7 +243,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . "`server_phpRamUsage` as phpram, "
             . "server_updateDate as date "
             . " FROM exp_server_stats "
-            . " WHERE server_updateDate > 86400"
+            . " WHERE server_updateDate > " . $startTime
             . "     AND server_login = " . $this->db->quote($this->storage->serverLogin)
             . " ORDER BY `server_updateDate` ASC"
         )->fetchArrayOfObject();
@@ -262,9 +268,9 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if ($memory_limit == -1) {
                 $memory_limit = $data->total;
             }
-            while (86400 + ($i * 120) - 60 < $data->date) {
-                //$out[0][] = $memory_limit;
-                //$out[1][] = 0;
+            while ($startTime + ($i * 120) - 60 < $data->date) {
+                $out[0][] = $memory_limit;
+                $out[1][] = 0;
                 $i++;
             }
             $i++;
@@ -274,7 +280,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $win->setLimit(12 * 60, $memory_limit);
         $win->setDatas($out);
-        $win->setXLabels($this->getXDateLabels(86400));
+        $win->setXLabels($this->getXDateLabels($startTime));
 
         $labels = array();
         for ($i = 0; $i < 5; $i++) {
@@ -287,6 +293,8 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showCpu($login)
     {
+        $startTime = (time() - (24 * 60 * 60));
+
         Gui\Windows\PlotterWindow::Erase($login);
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Cpu usage", $login));
@@ -294,7 +302,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $datas = $this->db->execute(
             "SELECT `server_load` as cpuload, server_updateDate as date"
             . " FROM exp_server_stats "
-            . " WHERE server_updateDate > 86400"
+            . " WHERE server_updateDate > " . $startTime
             . "     AND server_login = " . $this->db->quote($this->storage->serverLogin)
             . " ORDER BY `server_updateDate` ASC"
         )->fetchArrayOfObject();
@@ -303,8 +311,8 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $win->setLineColor(0, "f00");
         $i = 0;
         foreach ($datas as $data) {
-            while (86400 + ($i * 120) - 60 < $data->date) {
-                //$out[0][] = 0;
+            while ($startTime + ($i * 120) - 60 < $data->date) {
+                $out[0][] = 0;
                 $i++;
             }
             $i++;
@@ -313,7 +321,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $win->setLimit(12 * 60, 100);
         $win->setDatas($out);
-        $win->setXLabels($this->getXDateLabels(86400));
+        $win->setXLabels($this->getXDateLabels($startTime));
 
         $win->show($login);
     }
