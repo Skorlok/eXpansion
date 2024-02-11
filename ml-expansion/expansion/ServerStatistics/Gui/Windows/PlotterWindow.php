@@ -58,16 +58,11 @@ class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         foreach ($datas as $i => $data) {
             foreach ($data as $x => $val) {
-                $this->add($i, $x . ".0", number_format((float)$val, 2, '.', ''));
+                $this->plots[$i][] = array($x . ".0", number_format((float)$val, 2, '.', ''));
             }
         }
 
         $this->registerMainScript($this->getScript());
-    }
-
-    public function add($line = 0, $x = 0, $y = 0)
-    {
-        $this->plots[$line][] = array($x, $y);
     }
 
     public function getScript()
