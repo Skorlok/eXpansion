@@ -30,12 +30,9 @@ class LinePlotter extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->plots = array();
         $this->colors = array();
-        $this->graph = new Graph($sizeX - 8, $sizeY - 4);
-        $this->graph->setScriptEvents();
-        $this->graph->setId("graph");
-        $this->graph->setAlign("left", "top");
-        $this->graph->setPosZ($this->getPosZ() + 10);
-        $this->graph->setPosition(8, 0);
+
+        $this->graph = new \ManiaLive\Gui\Elements\Xml();
+        $this->graph->setContent('<graph id="graph" posn="8 0 ' . $this->getPosZ() + 10 . '" sizen="' . $sizeX - 8 . ' ' . $sizeY - 4 . '" halign="left" valign="top" scriptevents="1"/>');
         $this->addComponent($this->graph);
 
         $this->limits = array(0, 0, $limitX, $limitY);

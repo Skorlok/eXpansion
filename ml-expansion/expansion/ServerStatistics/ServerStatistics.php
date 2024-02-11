@@ -201,8 +201,8 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         foreach ($datas as $data) {
             while (86400 + ($i * 120) - 60 < $data->date) {
-                $out[0][] = 0;
-                $out[1][] = 0;
+                //$out[0][] = 0;
+                //$out[1][] = 0;
                 $i++;
             }
             $i++;
@@ -263,8 +263,8 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $memory_limit = $data->total;
             }
             while (86400 + ($i * 120) - 60 < $data->date) {
-                $out[0][] = $memory_limit;
-                $out[1][] = 0;
+                //$out[0][] = $memory_limit;
+                //$out[1][] = 0;
                 $i++;
             }
             $i++;
@@ -308,7 +308,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $i = 0;
         foreach ($datas as $data) {
             while (86400 + ($i * 120) - 60 < $data->date) {
-                $out[0][] = 0;
+                //$out[0][] = 0;
                 $i++;
             }
             $i++;
