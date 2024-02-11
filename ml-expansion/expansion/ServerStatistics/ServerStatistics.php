@@ -219,27 +219,11 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $max = $data->specs;
             }
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $win->setLimit(12 * 60, (((int)($max / 5)) + 1) * 5);
-        $win->setDatas($out);
-<<<<<<< HEAD
-        $win->setXLabels($this->getXDateLabels(86400));
-=======
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
 
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Players", $login));
         $win->setSize(170, 110);
         $win->setDatas($out, 12 * 60, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "00f", "f00");
-<<<<<<< HEAD
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
-=======
-        $win->setXLabels($this->getXDateLabels($startTime));
->>>>>>> 1861dc8f (Fixed ServerStatistics out of memory)
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $win->show($login);
     }
 
@@ -288,16 +272,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[1][] = $data->phpram;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $win->setLimit(12 * 60, $memory_limit);
-        $win->setDatas($out);
-        $win->setXLabels($this->getXDateLabels($startTime));
-
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $labels = array();
         for ($i = 0; $i < 5; $i++) {
             $labels[] = ((int)(($memory_limit - ($i * ($memory_limit / 5))) / (1024 * 1024))) . "M";
@@ -336,23 +310,10 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[0][] = $data->cpuload;
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        $win->setLimit(12 * 60, 100);
-        $win->setDatas($out);
-        $win->setXLabels($this->getXDateLabels($startTime));
-
-=======
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Cpu usage", $login));
         $win->setSize(170, 110);
         $win->setDatas($out, 12 * 60, 100, $this->getXDateLabels($startTime), null, "f00");
-<<<<<<< HEAD
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
-=======
->>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $win->show($login);
     }
 
