@@ -23,7 +23,7 @@ abstract class Window extends \ManiaLive\Gui\Window
     private $_bottomcenter;
     private $_windowBorder;
     private $_title;
-    private $_titleBar;
+    private $moreScripts = array();
     private $script;
     private $_scripts = array();
     private $dDeclares = "";
@@ -169,10 +169,6 @@ abstract class Window extends \ManiaLive\Gui\Window
                 $this->dicoMessages[$component->getTextid()] = $component->getMessages();
             }
 
-            if ($component instanceof \ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\LinePlotter) {
-                $this->addScriptToMain($component->getScript());
-            }
-
             if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer) {
                 $script = $component->getScript();
 
@@ -209,6 +205,10 @@ abstract class Window extends \ManiaLive\Gui\Window
         $this->calledScripts = array();
 
         $this->detectElements($this->getComponents());
+
+        foreach ($this->moreScripts as $script) {
+            $this->addScriptToMain($script);
+        }
 
         foreach ($this->calledScripts as $script) {
             $this->addScriptToMain($script->getEndScript($this));
@@ -270,6 +270,11 @@ abstract class Window extends \ManiaLive\Gui\Window
     public function addScriptToLib($script)
     {
         $this->scriptLib .= $script;
+    }
+
+    public function registerMainScript($script)
+    {
+        $this->moreScripts[] = $script;
     }
 
     public function destroy()
