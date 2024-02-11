@@ -176,18 +176,16 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $data['upTimeDedi'] = $formatter->format($this->expStorage->getDediUpTime());
 
         $win = Gui\Windows\StatsWindow::Create($login);
-        $win->setData($data, $this->storage);
         $win->setTitle(__('Welcome to : %1$s', $login, \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name)));
         $win->setSize(85, 72);
+        $win->setData($data, $this->storage);
         $win->show($login);
     }
 
     public function showPlayers($login)
     {
         Gui\Windows\PlotterWindow::Erase($login);
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Players", $login));
-        $win->setSize(170, 110);
+
         $datas = $this->db->execute(
             "SELECT `server_nbPlayers` as players, server_nbSpec as specs, "
             . " server_updateDate as date "
@@ -196,8 +194,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . "     AND server_login = " . $this->db->quote($this->storage->serverLogin)
             . " ORDER BY `server_updateDate` ASC"
         )->fetchArrayOfObject();
-        $win->setLineColor(0, "00f");
-        $win->setLineColor(1, "f00");
 
         $i = 0;
         $out = array();
@@ -219,18 +215,24 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $max = $data->specs;
             }
         }
+<<<<<<< HEAD
         $win->setLimit(12 * 60, (((int)($max / 5)) + 1) * 5);
         $win->setDatas($out);
         $win->setXLabels($this->getXDateLabels(86400));
+=======
+
+        $win = Gui\Windows\PlotterWindow::Create($login);
+        $win->setTitle(__("Players", $login));
+        $win->setSize(170, 110);
+        $win->setDatas($out, 12 * 60, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "00f", "f00");
+>>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $win->show($login);
     }
 
     public function showMemory($login)
     {
         Gui\Windows\PlotterWindow::Erase($login);
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Memory usage", $login));
-        $win->setSize(170, 110);
+        
         $datas = $this->db->execute(
             "SELECT `server_ramTotal` as total, "
             . "`server_ramFree` as free, "
@@ -242,8 +244,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . " ORDER BY `server_updateDate` ASC"
         )->fetchArrayOfObject();
 
-        $win->setLineColor(0, "f90");
-        $win->setLineColor(1, "f00");
         $out = array();
         $i = 0;
         $memory_limit = ini_get('memory_limit');
@@ -272,25 +272,29 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[1][] = $data->phpram;
         }
 
+<<<<<<< HEAD
         $win->setLimit(12 * 60, $memory_limit);
         $win->setDatas($out);
         $win->setXLabels($this->getXDateLabels(86400));
 
+=======
+>>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $labels = array();
         for ($i = 0; $i < 5; $i++) {
             $labels[] = ((int)(($memory_limit - ($i * ($memory_limit / 5))) / (1024 * 1024))) . "M";
         }
-        $win->setYLabels($labels);
 
+        $win = Gui\Windows\PlotterWindow::Create($login);
+        $win->setTitle(__("Memory usage", $login));
+        $win->setSize(170, 110);
+        $win->setDatas($out, 12 * 60, $memory_limit, $this->getXDateLabels($startTime), $labels, "f90", "f00");
         $win->show($login);
     }
 
     public function showCpu($login)
     {
         Gui\Windows\PlotterWindow::Erase($login);
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Cpu usage", $login));
-        $win->setSize(170, 110);
+
         $datas = $this->db->execute(
             "SELECT `server_load` as cpuload, server_updateDate as date"
             . " FROM exp_server_stats "
@@ -300,7 +304,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         )->fetchArrayOfObject();
 
         $out = array();
-        $win->setLineColor(0, "f00");
+
         $i = 0;
         foreach ($datas as $data) {
             while (86400 + ($i * 120) - 60 < $data->date) {
@@ -311,10 +315,17 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[0][] = $data->cpuload;
         }
 
+<<<<<<< HEAD
         $win->setLimit(12 * 60, 100);
         $win->setDatas($out);
         $win->setXLabels($this->getXDateLabels(86400));
 
+=======
+        $win = Gui\Windows\PlotterWindow::Create($login);
+        $win->setTitle(__("Cpu usage", $login));
+        $win->setSize(170, 110);
+        $win->setDatas($out, 12 * 60, 100, $this->getXDateLabels($startTime), null, "f00");
+>>>>>>> 5a998f74 (cleaned Windows and Graph in ServerStatistics)
         $win->show($login);
     }
 
