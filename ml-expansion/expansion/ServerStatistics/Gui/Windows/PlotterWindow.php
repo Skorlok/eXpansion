@@ -2,57 +2,31 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Windows;
 
-/**
- * Description of PlotterWindow
- *
- * @author Reaby
- */
+use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\LinePlotter;
+
 class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    protected $ok;
-    protected $cancel;
     protected $plotter;
 
-    protected function onConstruct()
+    public function setDatas($datas, $limitX, $limitY, $labelsX, $labelsY, $color0 = null, $color1 = null)
     {
-        parent::onConstruct();
-        $this->plotter = new \ManiaLivePlugins\eXpansion\Gui\Elements\LinePlotter(160, 100);
-        $this->plotter->setPosY(-5);
-        $this->plotter->setPosX(5);
-        $this->plotter->setLimits(0, 0, 100, 100);
+        $this->plotter = new LinePlotter($limitX, $limitY, $labelsX, $labelsY);
         $this->addComponent($this->plotter);
-        $this->plotter->setTickSize(5);
-    }
 
-    public function setDatas($datas)
-    {
         foreach ($datas as $i => $data) {
             foreach ($data as $x => $val) {
                 $val = $this->getNumber($val);
                 $this->plotter->add($i, $x . ".0", $val);
             }
         }
-    }
 
-    public function setLineColor($line, $color)
-    {
-        $this->plotter->setLineColor($line, $color);
-    }
+        $this->plotter->setLineColor(0, $color0);
+        if ($color1 != null) {
+            $this->plotter->setLineColor(1, $color1);
+        }
 
-    public function setLimit($x, $y)
-    {
-        $this->plotter->setLimits(0, 0, $x, $y);
-    }
-
-    public function setXLabels($labels)
-    {
-        $this->plotter->setXLabels($labels);
-    }
-
-    public function setYLabels($labels)
-    {
-        $this->plotter->setYLabels($labels);
+        //$this->addScriptToMain($this->plotter->getScript());
     }
 
     private function getNumber($number)
