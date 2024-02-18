@@ -48,7 +48,7 @@ foreach (Player in Players) {
                     canVote = False;
                 } else {
                     if (voters == 1) {
-                        <?php if (!$this->isTrackmania) {echo "/*"};?>
+                        <?php if ($this->isTrackmania) {echo "/*"};?>
                         if (Player.Score is CTmScore) {
                             if (Player.Score != Null) {
                                 if (Player.Score.BestRace != Null) {
@@ -68,7 +68,7 @@ foreach (Player in Players) {
                                 canVote = False;
                             }
                         }
-                        <?php if (!$this->isTrackmania) {echo "*/"};?>
+                        <?php if ($this->isTrackmania) {echo "*/"};?>
                         if (Player.Score is CSmScore) {
                             if (Player.Score.Points > 0) {
                                 showVoteButtons();
