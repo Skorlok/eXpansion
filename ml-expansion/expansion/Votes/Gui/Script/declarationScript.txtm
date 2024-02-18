@@ -48,7 +48,7 @@ foreach (Player in Players) {
                 } else {
                     if (voters == 1) {
 
-                        <?php echo $this->isTrackmania ? "" : "/*";?>;
+                        <?php echo ($this->isTrackmania) ? "" : "/*";?>;
 
                         if (Player.Score is CTmScore) {
                             if (Player.Score != Null) {
@@ -70,7 +70,7 @@ foreach (Player in Players) {
                             }
                         }
 
-                        <?php echo $this->isTrackmania ? "" : "*/";?>;
+                        <?php echo ($this->isTrackmania) ? "" : "*/";?>;
 
                         if (Player.Score is CSmScore) {
                             if (Player.Score.Points > 0) {
