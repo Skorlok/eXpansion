@@ -1,5 +1,4 @@
 
-declare Boolean isTrackMania = <?php echo $this->isTrackmania;?>;
 declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";
 
@@ -48,10 +47,11 @@ foreach (Player in Players) {
                     canVote = False;
                 } else {
                     if (voters == 1) {
-                        if (isTrackMania) {
-                            if (Player.Score != Null) {
-                                if (Player.Score.BestRace != Null) {
-                                    if (Player.Score.BestRace.Time > 0) {
+                        if (Player.Score is CTmScore) {
+                            declare Score <=> (Player.Score as CTmScore);
+                            if (Score != Null) {
+                                if (Score.BestRace != Null) {
+                                    if (Score.BestRace.Time > 0) {
                                         showVoteButtons();
                                         canVote = True;
                                     } else {
@@ -66,8 +66,10 @@ foreach (Player in Players) {
                                 hideVoteButtons();
                                 canVote = False;
                             }
-                        } else {
-                            if (Player.Score.Points > 0) {
+                        }
+                        if (Player.Score is CSmScore) {
+                            declare Score <=> (Player.Score as CSmScore);
+                            if (Score.Points > 0) {
                                 showVoteButtons();
                                 canVote = True;
                             } else {
