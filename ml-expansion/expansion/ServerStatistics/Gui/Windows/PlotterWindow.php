@@ -37,7 +37,7 @@ class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $plots = array();
         foreach ($datas as $i => $data) {
             foreach ($data as $x => $val) {
-                $plots[$i][] = array($x . ".0", number_format((float)$val, 2, '.', ''));
+                $plots[$i][] = array($x, $val);
             }
         }
 
@@ -73,11 +73,5 @@ class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $plotterData .= '</graph>';
         $plotter->setContent($plotterData);
         $this->addComponent($plotter);
-    }
-
-    public function destroy()
-    {
-        $this->destroyComponents();
-        parent::destroy();
     }
 }
