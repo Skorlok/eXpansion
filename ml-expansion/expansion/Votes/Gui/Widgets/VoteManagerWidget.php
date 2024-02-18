@@ -201,6 +201,6 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->script->setParam("ratio", sprintf("%0.1f", ($vote->voteRatio * 58) + 16));
         $this->script->setParam("voteText", $vote->voteText);
         $this->script->setParam("voters", $vote->voters);
-        $this->script->setParam("isTrackmania", (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") ? "True" : "False");
+        $this->script->setParam("isTrackmania", (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM"));
     }
 }
