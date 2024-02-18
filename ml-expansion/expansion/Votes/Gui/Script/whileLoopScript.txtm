@@ -54,7 +54,7 @@ if ((Now - lastUpdateTime) >= 100) {
                         canVote = False;
                     } else {
                         if (voters == 1) {
-                            if (Player.Score is CTmScore) {
+                            if (isTrackMania) {
                                 if (Player.Score != Null) {
                                     if (Player.Score.BestRace != Null) {
                                         if (Player.Score.BestRace.Time > 0) {
@@ -72,8 +72,7 @@ if ((Now - lastUpdateTime) >= 100) {
                                     hideVoteButtons();
                                     canVote = False;
                                 }
-                            }
-                            if (Player.Score is CSmScore) {
+                            } else {
                                 if (Player.Score.Points > 0) {
                                     showVoteButtons();
                                     canVote = True;
