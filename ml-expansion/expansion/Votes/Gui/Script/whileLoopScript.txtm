@@ -54,8 +54,9 @@ if ((Now - lastUpdateTime) >= 100) {
                         canVote = False;
                     } else {
                         if (voters == 1) {
-                            <?php if ($this->isTrackmania) {
-                                echo 'if (Player.Score != Null) {
+                            <?php if (!$this->isTrackmania) {echo "/*"};?>
+                            if (Player.Score is CTmScore) {
+                                if (Player.Score != Null) {
                                     if (Player.Score.BestRace != Null) {
                                         if (Player.Score.BestRace.Time > 0) {
                                             showVoteButtons();
@@ -71,16 +72,18 @@ if ((Now - lastUpdateTime) >= 100) {
                                 } else {
                                     hideVoteButtons();
                                     canVote = False;
-                                }';
-                            } else {
-                                echo 'if (Player.Score.Points > 0) {
+                                }
+                            }
+                            <?php if (!$this->isTrackmania) {echo "*/"};?>
+                            if (Player.Score is CSmScore) {
+                                if (Player.Score.Points > 0) {
                                     showVoteButtons();
                                     canVote = True;
                                 } else {
                                     hideVoteButtons();
                                     canVote = False;
-                                }';
-                            };?>
+                                }
+                            }
                         } else {
                             showVoteButtons();
                             canVote = True;
