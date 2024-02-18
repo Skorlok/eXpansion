@@ -54,7 +54,9 @@ if ((Now - lastUpdateTime) >= 100) {
                         canVote = False;
                     } else {
                         if (voters == 1) {
-                            <?php ($this->isTrackmania) ? echo "/*" : echo "";?>;
+
+                            <?php (!$this->isTrackmania) ? echo "/*" : echo "";?>;
+
                             if (Player.Score is CTmScore) {
                                 if (Player.Score != Null) {
                                     if (Player.Score.BestRace != Null) {
@@ -74,7 +76,9 @@ if ((Now - lastUpdateTime) >= 100) {
                                     canVote = False;
                                 }
                             }
-                            <?php ($this->isTrackmania) ? echo "*/" : echo "";?>;
+
+                            <?php (!$this->isTrackmania) ? echo "*/" : echo "";?>;
+
                             if (Player.Score is CSmScore) {
                                 if (Player.Score.Points > 0) {
                                     showVoteButtons();
