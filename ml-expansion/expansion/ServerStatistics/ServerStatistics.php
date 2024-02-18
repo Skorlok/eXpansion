@@ -223,7 +223,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Players", $login));
         $win->setSize(170, 110);
-        $win->setDatas($out, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "<0.00, 0.00, 1.00>", "<1.00, 0.00, 0.00>");
+        $win->setDatas($out, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "00f", "f00");
         $win->show($login);
     }
 
@@ -280,7 +280,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Memory usage", $login));
         $win->setSize(170, 110);
-        $win->setDatas($out, $memory_limit, $this->getXDateLabels($startTime), $labels, "<1.00, 0.60, 0.00>", "<1.00, 0.00, 0.00>");
+        $win->setDatas($out, $memory_limit, $this->getXDateLabels($startTime), $labels, "f90", "f00");
         $win->show($login);
     }
 
@@ -313,7 +313,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $win = Gui\Windows\PlotterWindow::Create($login);
         $win->setTitle(__("Cpu usage", $login));
         $win->setSize(170, 110);
-        $win->setDatas($out, 100, $this->getXDateLabels($startTime), null, "<1.00, 0.00, 0.00>");
+        $win->setDatas($out, 100, $this->getXDateLabels($startTime), null, "f00");
         $win->show($login);
     }
 
