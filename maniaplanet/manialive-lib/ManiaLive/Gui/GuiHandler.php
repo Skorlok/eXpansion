@@ -63,7 +63,7 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
 
     protected function __construct()
     {
-        unlink("./WINDOWS.xml");
+        file_put_contents("./WINDOWS.xml", "");
         $this->modalBg = new Bgs1(340, 200);
         $this->modalBg->setSubStyle(Bgs1::BgDialogBlur);
         $this->modalBg->setAlign('center', 'center');
