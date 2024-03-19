@@ -38,10 +38,6 @@ class PlainWidget extends \ManiaLive\Gui\Window
                 $this->dicoMessages[$component->getTextid()] = $component->getMessages();
             }
 
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\LinePlotter) {
-                $this->addScriptToMain($component->getScript());
-            }
-
             if ($component instanceof \ManiaLive\Gui\Container) {
                 $this->detectElements($component->getComponents(), $component);
             }

@@ -8,7 +8,6 @@ use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Configuration;
@@ -24,7 +23,6 @@ class Gui extends ExpPlugin
     private $msg_params;
     private $msg_disabled;
     private $counter = 0;
-    private $preloader;
     // next 2 is used by contextMenu
     public static $items = array();
     public static $callbacks = array();
@@ -52,9 +50,6 @@ class Gui extends ExpPlugin
 
         $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset, config");
         $this->msg_disabled = eXpGetMessage("#error#Server Admin has disabled personal huds. Sorry!");
-
-        $this->preloader = Preloader::Create(null);
-        $this->preloader->show();
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -383,32 +378,6 @@ EOT
         }
         $window->setMessage($message);
         $window->show($login);
-    }
-
-    /**
-     * Preload image
-     *
-     * @param string $url
-     */
-    public static function preloadImage($url)
-    {
-        Preloader::add($url);
-    }
-
-    /**
-     * Preload image
-     *
-     * @param type $url
-     */
-    public static function preloadRemove($url)
-    {
-        Preloader::remove($url);
-    }
-
-    public static function preloadUpdate()
-    {
-        $preloader = Preloader::Create(null);
-        $preloader->show();
     }
 
     /**
