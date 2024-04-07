@@ -10,7 +10,6 @@ namespace ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows;
 use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Data\Storage;
-use ManiaLivePlugins\eXpansion\Gui\Elements\TextEdit;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 /**
@@ -20,7 +19,7 @@ use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
  */
 class DediReport extends Window
 {
-    protected $textedit;
+    protected $report;
     protected $infolabel;
     protected $frame;
 
@@ -39,10 +38,11 @@ class DediReport extends Window
         );
         $this->frame->addComponent($info);
 
-        $this->textedit = new TextEdit("", 100, 40);
-        $this->frame->addComponent($this->textedit);
+        $this->report = new \ManiaLive\Gui\Elements\Xml();
+        $this->frame->addComponent($this->report);
 
         $info = new Label(100, 32);
+        $info->setPosY(-50);
         $info->setTextSize(2);
         $info->setText(
             '$fffThen go click following link:$3af' . "\n" . '$lhttp://dedimania.net/SITE/forum/viewtopic.php?id=384$l '
@@ -53,10 +53,10 @@ class DediReport extends Window
 
     public function setLogin($login)
     {
-        $text = "Login to check: " . $login . "\n";
-        $text .= "Map: " . Storage::getInstance()->currentMap->uId . "\n";
-        $text .= "Reason: *edit your reason here*" . "\n";
-        $text .= "Reportee: " . $this->getRecipient() . "\n";
-        $this->textedit->setText($text);
+        $text = "Login to check: " . $login . "&#10;";
+        $text .= "Map: " . Storage::getInstance()->currentMap->uId . "&#10;";
+        $text .= "Reason: *edit your reason here*" . "&#10;";
+        $text .= "Reportee: " . $this->getRecipient() . "&#10;";
+        $this->report->setContent('<textedit posn="0 -16 1.0E-5" sizen="100 40" default="' . $text . '" textformat="default" name="" showlinenumbers="0" autonewline="0"/>');
     }
 }

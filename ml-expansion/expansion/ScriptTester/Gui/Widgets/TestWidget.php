@@ -22,8 +22,7 @@ class TestWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         parent::eXpOnBeginConstruct();
         $this->setName('Test widget');
 
-        $this->title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(100, 4);
-        $this->title->setText("Preview of widget");
+        $this->title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(100, 4, "Preview of widget");
         $this->addComponent($this->title);
 
         $this->frame = new \ManiaLib\Gui\Elements\Quad(100, 100);
@@ -32,8 +31,7 @@ class TestWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->frame->setColorize("f00");
         $this->addComponent($this->frame);
 
-        $this->xmlData = new \ManiaLivePlugins\eXpansion\Gui\Elements\Xml();
-        $this->xmlData->setErrorLogin($this->getRecipient());
+        $this->xmlData = new \ManiaLive\Gui\Elements\Xml();
         $this->addComponent($this->xmlData);
 
         $this->closeButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();

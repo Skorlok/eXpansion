@@ -46,15 +46,6 @@ class PlainWidget extends \ManiaLive\Gui\Window
                 $script = $component->getScript();
                 $this->applyScript($script, $component);
             }
-
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Structures\MultipleScriptedContainer) {
-                $scripts = $component->getScripts();
-                if (!empty($scripts)) {
-                    foreach ($scripts as $script) {
-                        $this->applyScript($script, $component);
-                    }
-                }
-            }
         }
     }
 

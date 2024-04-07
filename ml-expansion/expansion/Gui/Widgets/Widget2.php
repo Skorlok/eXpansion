@@ -8,6 +8,8 @@ class Widget2
     private $relPath = "";
     private $name = "";
     private $layer = "";
+    private $position = array(0, 0, 0);
+    private $size = array(0, 0);
 
     /**
      * construct a widget

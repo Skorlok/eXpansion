@@ -46,8 +46,7 @@ class QuizImageWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround(24, 22);
         $this->addComponent($this->bg);
 
-        $this->title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(24, 4);
-        $this->title->setText(eXpGetMessage("Question"));
+        $this->title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(24, 4, "Question");
         $this->addComponent($this->title);
 
         $this->frame = new Frame(2, -4);
