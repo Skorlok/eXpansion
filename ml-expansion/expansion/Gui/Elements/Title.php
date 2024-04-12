@@ -15,9 +15,6 @@ class Title extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function __construct($sizeX, $sizeY)
     {
-        $config = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
-        $this->config = $config;
-
         $this->bg = new TitleBackGround($sizeX, $sizeY);
         $this->bg->setPosY(-2);
 
@@ -34,11 +31,6 @@ class Title extends \ManiaLivePlugins\eXpansion\Gui\Control
     {
         $this->bg->setSize($this->getSizeX(), $this->getSizeY());
         $this->label->setSize($this->getSizeX(), $this->getSizeY());
-    }
-
-    public function destroy()
-    {
-        $this->config = null;
     }
 
     public function setText($text)

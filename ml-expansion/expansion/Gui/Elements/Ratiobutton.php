@@ -18,7 +18,6 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
     {
         $this->textWidth = $textWidth;
         $this->action = $this->createAction(array($this, 'toggleActive'));
-        $config = Config::getInstance();
 
         $this->button = new \ManiaLib\Gui\Elements\Quad(12, 6);
         $this->button->setAlign('center', 'center');
@@ -31,7 +30,6 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label = new \ManiaLib\Gui\Elements\Label($textWidth, 4);
         $this->label->setAlign('left', 'center');
         $this->label->setTextSize(1);
-        //$this->label->setStyle("TextCardInfoSmall");
         $this->addComponent($this->label);
         $this->setSize(10 + $textWidth, 5);
     }

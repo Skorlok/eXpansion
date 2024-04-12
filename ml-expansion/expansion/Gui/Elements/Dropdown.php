@@ -13,6 +13,7 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
     protected $xml;
     protected $values;
     protected $name;
+    protected $selectedIndex;
 
     /** @var \ManiaLivePlugins\eXpansion\Gui\Structures\Script */
     private $script = null;

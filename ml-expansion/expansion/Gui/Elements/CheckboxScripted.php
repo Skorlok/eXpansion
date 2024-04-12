@@ -23,6 +23,7 @@ class CheckboxScripted extends \ManiaLivePlugins\eXpansion\Gui\Control implement
     protected $textWidth;
     protected $skin = "checkbox";
     protected $skinWidth = 5;
+    protected $toToggle;
 
     public function __construct($sizeX = 4, $sizeY = 4, $textWidth = 25, $name = null)
     {

@@ -12,6 +12,7 @@ class Inputbox extends \ManiaLivePlugins\eXpansion\Gui\Control
     protected $bgleft;
     protected $bgcenter;
     protected $bgright;
+    protected $bg;
 
     public function __construct($name, $sizeX = 35, $editable = true)
     {

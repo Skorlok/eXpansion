@@ -22,6 +22,7 @@ class ColorChooser extends Control implements \ManiaLivePlugins\eXpansion\Gui\St
      */
     public function __construct($inputboxName, $sizeX = 35, $digits = 3, $hasPrefix = true, $color = null)
     {
+        /** @var Config $config */
         $config = Config::getInstance();
 
         if (self::$script == null) {

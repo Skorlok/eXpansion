@@ -2,7 +2,7 @@
 <dico>
 <!--LANGUAGE STRINGS GO HERE-->
 </dico>
-<frame posn="-80 61 -60" id="00000000000009f10000000000000000">
+<frame posn="-80 61 -60" id="<?php echo $this->getName() ?>">
 
 	<!-- USER WIDGET GOES HERE-->
 

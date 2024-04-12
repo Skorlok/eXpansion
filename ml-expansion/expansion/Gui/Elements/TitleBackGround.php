@@ -16,6 +16,7 @@ class TitleBackGround extends \ManiaLivePlugins\eXpansion\Gui\Control
     public function __construct($sizeX, $sizeY)
     {
         $config = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+        /** @var Config $config */
         $this->config = $config;
 
         $this->bg = new \ManiaLib\Gui\Elements\Quad($sizeX, $sizeY);
