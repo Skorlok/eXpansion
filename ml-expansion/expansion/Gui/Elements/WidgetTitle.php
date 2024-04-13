@@ -11,19 +11,8 @@ class WidgetTitle extends \ManiaLivePlugins\eXpansion\Gui\Control
         /** @var Config $config */
         $config = Config::getInstance();
 
-        $bg = new \ManiaLib\Gui\Elements\Quad();
-        $bg->setColorize($config->style_widget_title_bgColorize);
-        $bg->setOpacity($config->style_widget_title_bgOpacity);
-        $bg->setPosition($config->style_widget_title_bgXOffset, $config->style_widget_title_bgYOffset);
-        $bg->setStyle('Bgs1InRace');
-        $bg->setSubStyle('BgWindow4');
-        $bg->setAlign("center", "center");
-        $bg->setSize($sizeX, 4);
-        $bg->setPosition(($sizeX / 2), -1.5);
-        if ($id !== null) {
-            $bg->setId($id);
-            $bg->setScriptEvents();
-        }
+        $bg = new \ManiaLive\Gui\Elements\Xml();
+        $bg->setContent('<quad ' . ($id ? 'id="' . $id . '" scriptevents="1" ' : '') . 'posn="' . ($sizeX / 2) . ' -1.5 0" sizen="' . $sizeX . ' 4" halign="center" valign="center" style="Bgs1InRace" substyle="BgWindow4" opacity="' . $config->style_widget_title_bgOpacity . '" colorize="' . $config->style_widget_title_bgColorize . '"/>');
         $this->addComponent($bg);
 
         $lbl_title = new DicoLabel($sizeX, $sizeY);

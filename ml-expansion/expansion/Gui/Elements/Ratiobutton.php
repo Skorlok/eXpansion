@@ -48,8 +48,6 @@ class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     protected function onDraw()
     {
-        $config = Config::getInstance();
-
         if ($this->active) {
             $this->button->setColorize("0f0");
         } else {
