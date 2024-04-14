@@ -96,7 +96,7 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $x++;
 
         $this->script->setParam("values", $this->values);
-
+        
     }
 
     public function getValueByIndex($index)
