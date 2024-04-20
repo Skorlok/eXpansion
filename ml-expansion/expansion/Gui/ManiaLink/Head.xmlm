@@ -1,8 +1,8 @@
-<manialink id="<?php echo $this->simpleHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->getName() ?>">
+<manialink id="<?php echo $this->simpleHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->name() ?>">
 <dico>
-<!--LANGUAGE STRINGS GO HERE-->
+<?php echo $this->getLanguages() ?>
 </dico>
-<frame posn="-80 61 -60" id="<?php echo $this->getName() ?>">
+<frame posn="<?php echo $this->getPosition() ?>" id="<?php echo $this->name() ?>">
 
 	<!-- USER WIDGET GOES HERE-->
 
@@ -11,7 +11,7 @@
 
 	<script>
 	<!--
-	SCRIPT GOES HERE
+	<?php echo $this->getMlScripts() ?>
 	-->
 	</script>
 </frame>

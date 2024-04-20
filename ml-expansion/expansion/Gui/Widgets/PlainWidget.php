@@ -17,6 +17,7 @@ class PlainWidget extends \ManiaLive\Gui\Window
     private $_script;
     private $_scripts = array();
     private $dicoMessages = array();
+    private $calledScripts = array();
 
     protected function onConstruct()
     {
@@ -28,8 +29,6 @@ class PlainWidget extends \ManiaLive\Gui\Window
 
         $this->xml = new \ManiaLive\Gui\Elements\Xml();
     }
-
-    private $calledScripts = array();
 
     private function detectElements($components)
     {
