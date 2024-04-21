@@ -23,4 +23,14 @@ class Widget2 extends ManiaLink
     {
         $this->$name = $value;
     }
+
+    protected function getMlScripts()
+    {
+        return null;
+    }
+
+    protected function getLanguages()
+    {
+        return null;
+    }
 }

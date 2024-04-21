@@ -6,7 +6,7 @@ use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 
-class ManiaLink extends Singletons
+abstract class ManiaLink extends Singletons
 {
 
     protected $relPath = "";
@@ -100,25 +100,34 @@ class ManiaLink extends Singletons
 
     // For XML
 
-    protected function getPosition()
+    protected function getPosX()
     {
-        return $this->position[0] . " " . $this->position[1] . " " . $this->position[2];
+        return $this->position[0];
     }
 
-    protected function getSize()
+    protected function getPosY()
     {
-        return $this->size[0] . " " . $this->size[1];
+        return $this->position[1];
     }
 
-    protected function getMlScripts()
+    protected function getPosZ()
     {
-        return null;
+        return $this->position[2];
     }
 
-    protected function getLanguages()
+    protected function getSizeX()
     {
-        return null;
+        return $this->size[0];
     }
+
+    protected function getSizeY()
+    {
+        return $this->size[1];
+    }
+
+    abstract protected function getMlScripts();
+
+    abstract protected function getLanguages();
 
     protected function getLayer()
     {
