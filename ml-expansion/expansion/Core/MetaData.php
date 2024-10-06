@@ -8,6 +8,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\ConfigFile;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\SortedList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -212,6 +213,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new Boolean('debug', 'Enable Debug-mode', $config, false, true);
         $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("netStats_PosX", "Position of NetStats Widget X", $config, false, false);
+        $var->setDefaultValue(42);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("netStats_PosY", "Position of NetStats Widget Y", $config, false, false);
+        $var->setDefaultValue(0);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

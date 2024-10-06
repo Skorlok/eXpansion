@@ -73,4 +73,9 @@ class Config extends \ManiaLib\Utils\Singleton
         "ExtendTime" => 1,
         "EndRound" => 1,
         "AutoTeamBalance" => 1);
+
+    public $voteWidget_PosX = 4;
+    public $voteWidget_PosY = 64;
+    public $voteWidget_PosX_Shootmania = 17;
+    public $voteWidget_PosY_Shootmania = 79;
 }

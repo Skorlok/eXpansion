@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\ExtendTime;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
@@ -37,6 +38,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new TypeInt("limit_votes", "Limit voting for a player on map", $config, false, false);
         $var->setDescription("-1 to disable, othervice number of vote start");
         $var->setDefaultValue(1);
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("extendWidget_PosX", "Position of Extend Widget X", $config, false, false);
+        $var->setDefaultValue(120);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("extendWidget_PosY", "Position of Extend Widget Y", $config, false, false);
+        $var->setDefaultValue(88);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

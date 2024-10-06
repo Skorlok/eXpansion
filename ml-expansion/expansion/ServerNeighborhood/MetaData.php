@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 
 /**
@@ -57,6 +58,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new BasicList('servers', "Path to each server information", $config, Variable::SCOPE_SERVER, false);
         $var->setType($type);
         $var->setDefaultValue(array());
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("serverPanel_PosX", "Position of ServerPanel Widget X", $config, false, false);
+        $var->setDefaultValue(-160);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("serverPanel_PosY", "Position of ServerPanel Widget Y", $config, false, false);
+        $var->setDefaultValue(80);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
 
     }

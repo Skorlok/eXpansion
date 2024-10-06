@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_PersonalBest;
 
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
+
 /**
  * Description of MetaData
  *
@@ -28,5 +30,17 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
             'TeamAttack.Script.txt'
         );
+
+        $config = Config::getInstance();
+
+        $var = new TypeFloat("personalBestWidget_PosX", "Position of PersonalBest Widget X", $config, false, false);
+        $var->setDefaultValue(112);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("personalBestWidget_PosY", "Position of PersonalBest Widget Y", $config, false, false);
+        $var->setDefaultValue(-76);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
     }
 }

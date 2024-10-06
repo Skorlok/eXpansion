@@ -95,7 +95,7 @@ foreach (Player in Players) {
 
 
 declare textLabel = (Page.GetFirstChild("textLabel") as CMlLabel);
-textLabel.Value = "<?php echo $this->voteText;?>";
+textLabel.Value = "<?php echo str_replace('"', '\\"', $this->voteText);?>";
 textLabel.Show();
 
 declare bgRatio = (Page.GetFirstChild("bgRatio") as CMlQuad);

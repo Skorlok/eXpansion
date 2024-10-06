@@ -48,4 +48,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $scriptRoundsPoints = array('10', '8', '7', '6', '5', '4', '3', '2', '1');
     public $quitDialogManialink = "";
     public $useWhitelist = false;
+
+    public $netStats_PosX = 42;
+    public $netStats_PosY = 0;
 }
