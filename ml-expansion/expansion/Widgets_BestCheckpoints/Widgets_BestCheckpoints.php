@@ -10,10 +10,12 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
 {
     public $bestCps = array();
     public $finishTimes = array();
+    private $config;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->bestCps = array();
         $this->finishTimes = array();
     }
@@ -27,6 +29,7 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
     {
         $info = BestCpPanel::Create(null, true);
         $info->populateList($checkpoints);
+        $info->setPosition($this->config->bestCpWidget_PosX, $this->config->bestCpWidget_PosY);
         $info->setSize(190, 7);
         $info->show();
     }

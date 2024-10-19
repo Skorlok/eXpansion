@@ -23,7 +23,6 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnLoad()
     {
-
         $this->config = Config::getInstance();
     }
 
@@ -56,6 +55,7 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $localRecs = Gui\Widgets\AroundMe::GetAll();
         if ($login == null) {
             $panelMain = Gui\Widgets\AroundMe::Create($login);
+            $panelMain->setPosition($this->config->aroundmeWidget_PosX, $this->config->aroundmeWidget_PosY);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
             $panelMain->setSizeX(40);
             $this->widgetIds["AroundMe"] = $panelMain;

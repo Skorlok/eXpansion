@@ -7,7 +7,6 @@ use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
@@ -62,8 +61,6 @@ class Gui extends ExpPlugin
         foreach ($this->storage->spectators as $player) {
             $this->onPlayerConnect($player->login, true);
         }
-
-        $this->loadWidgetConfigs();
     }
 
     public static function getScaledSize($sizes, $totalSize)
@@ -82,20 +79,6 @@ class Gui extends ExpPlugin
         }
 
         return $nsize;
-    }
-
-    public function loadWidgetConfigs()
-    {
-        $config = WConfig::getInstance();
-        foreach ($config as $confName => $values) {
-
-            $confs = explode('_', $confName);
-            if (sizeof($confs) > 1) {
-
-                $widgetName = str_replace(" ", "", $confs[0]);
-                Widget::setParameter($widgetName, $confs[1], $values);
-            }
-        }
     }
 
     public function onPlayerConnect($login, $isSpectator)

@@ -7,6 +7,7 @@ use ManiaLive\PluginHandler\Dependency;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel;
 use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Widgets\LocalPanel2;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -16,6 +17,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     private $widgetIds = array();
     public static $raceOn;
     public static $roundPoints;
+    private $config;
 
     public function eXpOnInit()
     {
@@ -28,6 +30,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
+        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -46,6 +49,34 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
+        //gamemode specific settings
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $posX = $this->config->localRecordsPanel_PosX_Laps;
+            $posY = $this->config->localRecordsPanel_PosY_Laps;
+            $nbF = $this->config->localRecordsPanel_nbFields_Laps;
+            $nbFF = $this->config->localRecordsPanel_nbFirstFields_Laps;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS) {
+            $posX = $this->config->localRecordsPanel_PosX_Rounds;
+            $posY = $this->config->localRecordsPanel_PosY_Rounds;
+            $nbF = $this->config->localRecordsPanel_nbFields_Rounds;
+            $nbFF = $this->config->localRecordsPanel_nbFirstFields_Rounds;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $posX = $this->config->localRecordsPanel_PosX_Team;
+            $posY = $this->config->localRecordsPanel_PosY_Team;
+            $nbF = $this->config->localRecordsPanel_nbFields_Team;
+            $nbFF = $this->config->localRecordsPanel_nbFirstFields_Team;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP) {
+            $posX = $this->config->localRecordsPanel_PosX_Cup;
+            $posY = $this->config->localRecordsPanel_PosY_Cup;
+            $nbF = $this->config->localRecordsPanel_nbFields_Cup;
+            $nbFF = $this->config->localRecordsPanel_nbFirstFields_Cup;
+        } else {
+            $posX = $this->config->localRecordsPanel_PosX_Default;
+            $posY = $this->config->localRecordsPanel_PosY_Default;
+            $nbF = $this->config->localRecordsPanel_nbFields_Default;
+            $nbFF = $this->config->localRecordsPanel_nbFirstFields_Default;
+        }
+
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
             if ($login != null) {
                 Gui\Widgets\LocalPanel::Erase($login);
@@ -56,6 +87,9 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             }
             $panelMain = Gui\Widgets\LocalPanel::Create($login);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
+            $panelMain->setPosition($posX, $posY);
+            $panelMain->setNbFields($nbF);
+            $panelMain->setNbFirstFields($nbFF);
             $this->widgetIds["LocalPanel"] = $panelMain;
             $this->widgetIds["LocalPanel"]->update();
             $this->widgetIds["LocalPanel"]->show();
@@ -64,6 +98,9 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $panelScore = Gui\Widgets\LocalPanel2::Create($login);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
+                $panelMain->setPosition($posX, $posY);
+                $panelMain->setNbFields($nbF);
+                $panelMain->setNbFirstFields($nbFF);
                 $this->widgetIds["LocalPanel2"] = $panelScore;
                 $this->widgetIds["LocalPanel2"]->update();
                 $this->widgetIds["LocalPanel2"]->show();
@@ -74,6 +111,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         if ($var->getConfigInstance() instanceof Config) {
+            $this->config = Config::getInstance();
             Gui\Widgets\LocalPanel::EraseAll();
             $this->updateLocalPanel();
         }

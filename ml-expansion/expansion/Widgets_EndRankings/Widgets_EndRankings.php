@@ -6,6 +6,8 @@ use ManiaLive\PluginHandler\Dependency;
 
 class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
+    private $config;
+    
     public function eXpOnInit()
     {
         $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords'));
@@ -15,6 +17,7 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
     {
         $this->enableDedicatedEvents();
         $this->enableDatabase();
+        $this->config = Config::getInstance();
     }
 
     /**
@@ -25,26 +28,24 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
     public function displayWidget($login = null)
     {
         $info = Gui\Widgets\RanksPanel::Create(null);
+        $info->setPosition($this->config->rankPanel_PosX, $this->config->rankPanel_PosY);
         $info->setSize(38, 95);
-        $info->setData(
-            $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks")
-        );
-        $info->setPosition(-160, 60);
+        $info->setData($this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks"));
         $info->show();
 
         $play = Gui\Widgets\TopPlayTime::Create(null);
         $play->setTitle(eXpGetMessage("Top Playtime"));
+        $play->setPosition($this->config->playtimePanel_PosX, $this->config->playtimePanel_PosY);
         $play->setLines(15);
         $play->setData($this->getTopPlaytime());
-        $play->setPosition(120, 60);
         $play->show();
 
 
         $don = Gui\Widgets\Donators::Create(null);
         $don->setTitle(eXpGetMessage("Top Donators"));
+        $don->setPosition($this->config->donatorPanel_PosX, $this->config->donatorPanel_PosY);
         $don->setLines(15);
         $don->setData($this->getTopDonators());
-        $don->setPosition(120, 0);
         $don->show();
     }
 

@@ -66,7 +66,6 @@ class QuizImageWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     protected function eXpOnEndConstruct()
     {
         $this->setSize(24, 24);
-        $this->setPosition(-152, 80);
     }
 
     public function setImage($url)

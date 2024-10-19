@@ -296,6 +296,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             VoteManagerWidget::EraseAll();
             $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+            } else {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+            }
             $this->currentVoteWidget->setSize(90, 20);
             $this->currentVoteWidget->setDatas($this->currentVote);
             $this->currentVoteWidget->show();
@@ -362,6 +367,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             VoteManagerWidget::EraseAll();
             $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+            } else {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+            }
             $this->currentVoteWidget->setSize(90, 20);
             $this->currentVoteWidget->setDatas($this->currentVote);
             $this->currentVoteWidget->show();
@@ -430,6 +440,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    if ($this->expStorage->simpleEnviTitle == "SM") {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+                    } else {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+                    }
                     $this->currentVoteWidget->setSize(90, 20);
                     $this->currentVoteWidget->setDatas($this->currentVote);
                     $this->currentVoteWidget->show();
@@ -452,6 +467,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    if ($this->expStorage->simpleEnviTitle == "SM") {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+                    } else {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+                    }
                     $this->currentVoteWidget->setSize(90, 20);
                     $this->currentVoteWidget->setDatas($this->currentVote);
                     $this->currentVoteWidget->show();
@@ -535,6 +555,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    if ($this->expStorage->simpleEnviTitle == "SM") {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+                    } else {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+                    }
                     $this->currentVoteWidget->setSize(90, 20);
                     $this->currentVoteWidget->setDatas($this->currentVote);
                     $this->currentVoteWidget->show();
@@ -557,6 +582,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     VoteManagerWidget::EraseAll();
                     $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                    if ($this->expStorage->simpleEnviTitle == "SM") {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+                    } else {
+                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+                    }
                     $this->currentVoteWidget->setSize(90, 20);
                     $this->currentVoteWidget->setDatas($this->currentVote);
                     $this->currentVoteWidget->show();
@@ -629,6 +659,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                 VoteManagerWidget::EraseAll();
                 $this->currentVoteWidget = VoteManagerWidget::Create(null);
+                if ($this->expStorage->simpleEnviTitle == "SM") {
+                    $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+                } else {
+                    $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+                }
                 $this->currentVoteWidget->setSize(90, 20);
                 $this->currentVoteWidget->setDatas($this->currentVote);
                 $this->currentVoteWidget->show();
@@ -698,6 +733,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             VoteManagerWidget::EraseAll();
             $this->currentVoteWidget = VoteManagerWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
+            } else {
+                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
+            }
             $this->currentVoteWidget->setSize(90, 20);
             $this->currentVoteWidget->setDatas($this->currentVote);
             $this->currentVoteWidget->show();

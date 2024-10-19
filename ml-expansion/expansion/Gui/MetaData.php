@@ -134,14 +134,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(1);
         $this->registerVariable($var);
 
-        $var = new HashList("allWidgetPositions", "WidgetPositions (do not edit)", $config);
-        $var->setKeyType(new TypeString(""));
-        $var->setType(new TypeString(""));
-        $var->setDefaultValue(array());
-        $var->setGroup("GUI");
-        $var->setDescription('Automatically generated from widgets');
-        $this->registerVariable($var);
-
         $var = new HashList("teamParams", "Parameters for team color and name (do not edit)", $config, false, true);
         $var->setKeyType(new TypeString(""));
         $var->setDefaultValue(array());

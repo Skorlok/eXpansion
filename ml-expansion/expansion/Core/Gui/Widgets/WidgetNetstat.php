@@ -31,7 +31,6 @@ class WidgetNetstat extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
 
         $label = new \ManiaLib\Gui\Elements\Label(60);
         $label->setAlign("left", "top");
-        $label->setPosX(42);
         $label->setText('$fffNetwork Status');
 
         $this->addComponent($label);

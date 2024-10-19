@@ -28,12 +28,14 @@ class Widgets_Speedometer extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
 {
 
     private $widget;
+    private $config;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->widget = Gui\Widgets\Speedmeter::Create(null);
-        $this->widget->setPosition(-14, -74);
+        $this->widget->setPosition($this->config->speedometerWidget_PosX, $this->config->speedometerWidget_PosY);
         $this->widget->show();
     }
 

@@ -260,9 +260,9 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         CurrentTrackWidget::EraseAll();
         $window = CurrentTrackWidget::Create(null);
+        $window->setPosition($this->config->musicWidget_PosX, $this->config->musicWidget_PosY);
         $window->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
         $window->setVisibleLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-        $window->setPosition(0, 80);
         $window->setSong($outsong);
         $window->show();
     }

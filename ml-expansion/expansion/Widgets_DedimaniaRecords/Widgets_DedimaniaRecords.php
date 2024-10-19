@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets\DediPanel;
 use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets\DediPanel2;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -18,12 +19,14 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     private $widgetIds = array();
     public static $raceOn;
     public static $roundPoints;
+    private $config;
 
     public function eXpOnLoad()
     {
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             Dispatcher::register(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         }
+        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -41,6 +44,34 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
         $dedi = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
+        //gamemode specific settings
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Laps;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Laps;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Laps;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Laps;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Rounds;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Rounds;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Rounds;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Rounds;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Team;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Team;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Team;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Team;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Cup;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Cup;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Cup;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Cup;
+        } else {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Default;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Default;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Default;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Default;
+        }
+
         try {
             if (($this->isPluginLoaded($dedi) && $this->callPublicMethod($dedi, 'isRunning'))) {
                 if ($login != null) {
@@ -54,6 +85,9 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                 if ($login == null) {
                     $panelMain = Gui\Widgets\DediPanel::Create($login);
                     $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
+                    $panelMain->setPosition($posX, $posY);
+                    $panelMain->setNbFields($nbF);
+			        $panelMain->setNbFirstFields($nbFF);
                     $this->widgetIds["DediPanel"] = $panelMain;
                     $this->widgetIds["DediPanel"]->update();
                     $this->widgetIds["DediPanel"]->show();
@@ -67,6 +101,9 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                         $panelScore = Gui\Widgets\DediPanel2::Create($login);
                         $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                         $panelScore->setVisibleLayer("scorestable");
+                        $panelMain->setPosition($posX, $posY);
+                        $panelMain->setNbFields($nbF);
+                        $panelMain->setNbFirstFields($nbFF);
                         $this->widgetIds["DediPanel2"] = $panelScore;
                         $this->widgetIds["DediPanel2"]->update();
                         $this->widgetIds["DediPanel2"]->show();
@@ -84,6 +121,7 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         if ($var->getConfigInstance() instanceof Config) {
+            $this->config = Config::getInstance();
             Gui\Widgets\DediPanel::EraseAll();
             $this->updateDediPanel();
         }

@@ -18,10 +18,13 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     private $nbDisplay = 1;
 
+    private $config;
+
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
         $this->enableStorageEvents();
+        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -83,8 +86,8 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function displayWidget($login = null)
     {
         $info = BestRunPanel::Create($login);
+        $info->setPosition($this->config->bestRunsWidget_PosX, $this->config->bestRunsWidget_PosY);
         $info->setSize(220, 20);
-        $info->setPosition(0, 86);
         $info->setAlign("center", "top");
         $info->show();
     }

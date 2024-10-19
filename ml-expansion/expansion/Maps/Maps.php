@@ -291,6 +291,7 @@ class Maps extends ExpPlugin
     {
         if ($this->config->showCurrentMapWidget) {
             $info = CurrentMapWidget::Create(null, true);
+            $info->setPosition($this->config->currentMapWidget_PosX, $this->config->currentMapWidget_PosY);
             $info->setAction($this->actionShowMapList);
             $info->setMap($this->storage->currentMap);
             $info->setLayer(Window::LAYER_SCORES_TABLE);
@@ -303,6 +304,7 @@ class Maps extends ExpPlugin
     {
         if ($this->config->showNextMapWidget) {
             $info = NextMapWidget::Create(null, true);
+            $info->setPosition($this->config->nextMapWidget_PosX, $this->config->nextMapWidget_PosY);
             $info->setAction($this->actionShowJukeList);
             $info->setLayer(Window::LAYER_SCORES_TABLE);
             $info->setVisibleLayer(Window::LAYER_SCORES_TABLE);

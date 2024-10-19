@@ -41,12 +41,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("extendWidget_PosX", "Position of Extend Widget X", $config, false, false);
-        $var->setDefaultValue(120);
+        $var->setDefaultValue(-45);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
 
         $var = new TypeFloat("extendWidget_PosY", "Position of Extend Widget Y", $config, false, false);
-        $var->setDefaultValue(88);
+        $var->setDefaultValue(-42);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
     }

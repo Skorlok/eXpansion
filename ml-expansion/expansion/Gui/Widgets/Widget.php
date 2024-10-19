@@ -53,7 +53,6 @@ class Widget extends PlainWidget
         $this->move->setPositionZ(100);
         $this->addComponent($this->move);
         $this->storage = \ManiaLive\Data\Storage::getInstance();
-        $this->xml = new \ManiaLive\Gui\Elements\Xml();
 
         $this->_coord = new Label();
         $this->_coord->setAlign("center", "center");
@@ -62,7 +61,6 @@ class Widget extends PlainWidget
         $this->addComponent($this->_coord);
 
         $this->eXpOnEndConstruct();
-        $this->eXpLoadSettings();
     }
 
 
@@ -80,80 +78,6 @@ class Widget extends PlainWidget
     {
     }
 
-    /**
-     * When the settings of the widget has been loaded.
-     */
-    protected function eXpOnSettingsLoaded()
-    {
-    }
-
-    private function eXpLoadSettings()
-    {
-        $widgetName = str_replace(" ", "", $this->getName());
-
-        if (isset(self::$config[$widgetName])) {
-
-            //Getting exact game mode
-            $gameMode = $this->storage->gameInfos->gameMode;
-            if ($gameMode == 0) {
-                $gameMode = $this->storage->gameInfos->scriptName;
-            }
-
-            //Getting compatibility Game mode
-            $compoMode = Gui::eXpGetCurrentCompatibilityGameMode();
-
-            /**
-             * @var \ManiaLivePlugins\eXpansion\Helpers\Storage $storage
-             */
-            $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-
-            //Getting full title id
-            $titleid = $storage->version->titleId;
-
-            //Getting environnment based simple title id
-            $enviTitle = $storage->simpleEnviTitle;
-
-
-            $this->currentSettings = array();
-            foreach (self::$config[$widgetName] as $name => $values) {
-                if (isset($values[$gameMode])) {
-                    $this->currentSettings[$name] = $values[$gameMode];
-                } else {
-                    if (isset($values[$compoMode])) {
-                        $this->currentSettings[$name] = $values[$compoMode];
-                    } else {
-                        if (isset($values[$titleid])) {
-                            $this->currentSettings[$name] = $values[$titleid];
-                        } else {
-                            if (isset($values[$enviTitle])) {
-                                $this->currentSettings[$name] = $values[$enviTitle];
-                            } else {
-                                if (isset($values[WConfig::config_default])) {
-                                    $this->currentSettings[$name] = $values[WConfig::config_default];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // override defaults!
-        $positions = Config::getInstance()->allWidgetPositions;
-        $name = str_replace(" ", "", $this->getName());
-        if (array_key_exists($name, $positions)) {
-            $pos = str_replace('–', '-', $positions[$name]);
-            $pos = explode("x", $pos);
-
-
-            $this->currentSettings['posX'] = floatval(Maniascript::getReal(trim($pos[0])));
-            $this->currentSettings['posY'] = floatval(Maniascript::getReal(trim($pos[1])));
-
-        }
-
-        $this->autoSetPositions();
-        $this->eXpOnSettingsLoaded();
-    }
-
     protected function onDraw()
     {
         $this->script->setParam("name", $this->getName());
@@ -169,16 +93,6 @@ class Widget extends PlainWidget
         parent::onResize($oldX, $oldY);
         $this->move->setSize($this->getSizeX(), $this->getSizeY());
         $this->_coord->setPosition($this->getSizeX() / 2, -$this->getSizeY() / 2);
-    }
-
-    protected function autoSetPositions()
-    {
-        $posX = $this->getParameter("posX");
-        $posY = $this->getParameter("posY");
-
-        if ($posX != null && $posY != null) {
-            $this->setPosition($posX, $posY);
-        }
     }
 
     public function closeWindow()
@@ -204,18 +118,6 @@ class Widget extends PlainWidget
         $this->axisDisabled = $axis;
     }
 
-    /**
-     * set a custom position for a gamemode
-     *
-     * @param string $gameMode
-     * @param float $posX
-     * @param float $posY
-     */
-    public function setPositionForGamemode($gameMode, $posX, $posY)
-    {
-        $this->positions[$gameMode] = array($posX, $posY);
-    }
-
     public function getWidgetVisible()
     {
         if (isset($this->widgetVisible[$this->storage->gameInfos->gameMode])) {
@@ -225,17 +127,6 @@ class Widget extends PlainWidget
         }
 
         return "True";
-    }
-
-    /**
-     * Sets visibility of the widget according to gamemode
-     *
-     * @param string $gameMode
-     * @param bool $value
-     */
-    public function setVisibilityForGamemode($gameMode, $value)
-    {
-        $this->widgetVisible[$gameMode] = $value;
     }
 
     public function setVisibleLayer($string)
@@ -259,19 +150,5 @@ class Widget extends PlainWidget
         }
 
         return $this->posY;
-    }
-
-    public static function setParameter($widgetName, $name, $value)
-    {
-        if (!isset(self::$config[$widgetName])) {
-            self::$config[$widgetName] = array();
-        }
-
-        self::$config[$widgetName][$name] = $value;
-    }
-
-    protected function getParameter($name)
-    {
-        return isset($this->currentSettings[$name]) ? $this->currentSettings[$name] : null;
     }
 }

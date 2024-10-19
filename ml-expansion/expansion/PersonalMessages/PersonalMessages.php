@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
+use ManiaLivePlugins\eXpansion\PersonalMessages\Config as PersonalMessagesConfig;
 use ManiaLivePlugins\eXpansion\PersonalMessages\Gui\Widgets\MessagesPanel;
 
 class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -16,6 +17,7 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     /** @var \ManiaLivePlugins\eXpansion\Core\Config */
     private $config;
+    private $pConfig;
 
     /** @var \ManiaLivePlugins\eXpansion\Core\I18n\Message */
     private $msg_noLogin;
@@ -48,6 +50,7 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->cmd_chat = $cmd;
 
         $this->config = Config::getInstance();
+        $this->pConfig = PersonalMessagesConfig::getInstance();
 
         foreach ($this->storage->players as $login => $player) {
             $this->onPlayerConnect($player->login, false);
@@ -60,6 +63,7 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function onPlayerConnect($login, $isSpectator)
     {
         $info = Gui\Widgets\MessagesPanel::Create($login);
+        $info->setPosition($this->pConfig->messagingWidget_PosX, $this->pConfig->messagingWidget_PosY);
         $info->setSize(100, 6);
         $info->setDisableAxis("x");
         $info->show();

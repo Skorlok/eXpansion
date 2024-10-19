@@ -35,6 +35,7 @@ class Communication extends ExpPlugin
 {
 
     private $lastCheck = 0;
+    private $config;
 
     /** @var \Maniaplanet\DedicatedServer\Structures\Player */
     private $cachedIgnoreList = array();
@@ -43,10 +44,13 @@ class Communication extends ExpPlugin
     {
         $this->enableDedicatedEvents();
 
+        $this->config = Config::getInstance();
+
         CommunicationWidget::$action = ActionHandler::getInstance()->createAction(array($this, "guiSendMessage"));
         CommunicationWidget::$selectPlayer = ActionHandler::getInstance()->createAction(array($this, "selectPlayer"));
 
         $widget = CommunicationWidget::Create();
+        $widget->setPosition($this->config->messaging_PosX, $this->config->messaging_PosY);
         $widget->show();
 
         $this->registerChatCommand("send", "sendPmChat", -1, true);

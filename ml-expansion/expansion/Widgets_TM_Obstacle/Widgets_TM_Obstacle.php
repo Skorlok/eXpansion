@@ -27,9 +27,12 @@ namespace ManiaLivePlugins\eXpansion\Widgets_TM_Obstacle;
 class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
+    private $config;
+
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->displayWidget();
     }
 
@@ -37,8 +40,8 @@ class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
     {
         Gui\Widgets\CpProgress::EraseAll();
         $info = Gui\Widgets\CpProgress::Create(null);
+        $info->setPosition($this->config->obstaclePanel_PosX, $this->config->obstaclePanel_PosY);
         $info->setSize(70, 60);
-        $info->setPosition(55, 0);
         $info->show();
     }
 

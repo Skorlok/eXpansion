@@ -36,9 +36,12 @@ class AutoQueue extends ExpPlugin
     private $queue;
     public static $enterAction;
     public static $leaveAction;
+    private $config;
 
     public function eXpOnReady()
     {
+        $this->config = Config::getInstance();
+
         $this->enableDedicatedEvents();
         $this->queue = new Queue();
 
@@ -201,6 +204,7 @@ class AutoQueue extends ExpPlugin
 
         foreach ($this->storage->spectators as $login => $player) {
             $widget = QueueList::Create($login);
+            $widget->setPosition($this->config->queueList_PosX, $this->config->queueList_PosY);
             $widget->setPlayers($this->queue->getQueuedPlayers(), $this);
             $widget->show();
         }
@@ -209,6 +213,7 @@ class AutoQueue extends ExpPlugin
     public function showEnterQueue($login)
     {
         $widget = EnterQueueWidget::Create($login);
+        $widget->setPosition($this->config->enterQueueList_PosX, $this->config->enterQueueList_PosY);
         $widget->show($login);
     }
 }

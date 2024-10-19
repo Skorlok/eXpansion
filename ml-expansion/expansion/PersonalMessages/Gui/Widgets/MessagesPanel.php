@@ -104,13 +104,11 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->_windowFrame->addComponent($this->_minButton);
 
         $this->addComponent($this->_windowFrame);
-    }
 
-    protected function eXpOnSettingsLoaded()
-    {
+
         $this->widgetScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\TrayWidget");
         $this->widgetScript->setParam('isMinimized', $this->status);
-        $this->widgetScript->setParam('autoCloseTimeout', $this->getParameter('autoCloseTimeout'));
+        $this->widgetScript->setParam('autoCloseTimeout', 0); //TODO: add config
         $this->widgetScript->setParam('posXMin', -92);
         $this->widgetScript->setParam('posX', -92);
         $this->widgetScript->setParam('posXMax', -4);
@@ -124,8 +122,6 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
             $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
             $this->registerScript($this->edgeWidget);
         }
-
-        parent::eXpOnSettingsLoaded();
     }
 
     public function onResize($oldX, $oldY)

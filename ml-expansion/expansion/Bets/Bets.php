@@ -46,13 +46,14 @@ class Bets extends ExpPlugin
     private $msg_payFail;
     public static $state = self::OFF;
     public static $betAmount = 0;
-    private $wasWarmup = false;
 
     /** @var BetCounter[] */
     private $counters = array();
 
     /** @var Player[] */
     private $players = array();
+
+    private $config;
 
     public function eXpOnLoad()
     {
@@ -76,6 +77,8 @@ class Bets extends ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
+
+        $this->config = Config::getInstance();
 
         $ah = ActionHandler::getInstance();
         BetWidget::$action_setAmount = $ah->createAction(array($this, "setBetAmount"), null);
@@ -262,6 +265,7 @@ class Bets extends ExpPlugin
     public function updateBetWidget()
     {
         $widget = BetWidget::Create(null, true);
+        $widget->setPosition($this->config->betWidget_PosX, $this->config->betWidget_PosY);
         $widget->setSize(80, 20);
         $widget->setToHide(array_keys($this->players));
         $widget->show();

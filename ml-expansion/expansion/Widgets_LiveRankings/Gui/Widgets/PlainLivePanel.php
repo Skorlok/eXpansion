@@ -56,17 +56,6 @@ class PlainLivePanel extends Widget
         parent::eXpOnBeginConstruct();
     }
 
-    protected function autoSetPositions()
-    {
-        parent::autoSetPositions();
-        $nbFields = $this->getParameter('nbFields');
-        $nbFieldsFirst = $this->getParameter('nbFirstFields');
-        if ($nbFields != null && $nbFieldsFirst != null) {
-            $this->setNbFields($nbFields);
-            $this->setNbFirstFields($nbFieldsFirst);
-        }
-    }
-
     public function setNbFields($nb)
     {
         if (Widgets_LocalRecords::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {

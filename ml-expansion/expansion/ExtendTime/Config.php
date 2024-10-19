@@ -8,6 +8,6 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $limit_votes = 1;
 
-    public $extendWidget_PosX = 120;
-    public $extendWidget_PosY = 88;
+    public $extendWidget_PosX = -45;
+    public $extendWidget_PosY = -42;
 }

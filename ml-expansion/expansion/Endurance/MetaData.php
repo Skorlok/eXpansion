@@ -63,10 +63,6 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(false);
         $this->registerVariable($var);
 
-        $var = new Boolean("isHorizontal", "Use horizontal (old) widget style", $config, false, false);
-        $var->setDefaultValue(false);
-        $this->registerVariable($var);
-
         $var = new TypeFloat("enduroPointPanel_PosX", "Position of EnduroPoints Panel X", $config, false, false);
         $var->setDefaultValue(-160);
         $var->setGroup("Widgets");

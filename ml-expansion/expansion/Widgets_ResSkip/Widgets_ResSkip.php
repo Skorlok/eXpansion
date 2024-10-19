@@ -81,6 +81,12 @@ class Widgets_ResSkip extends ExpPlugin
 
 
         $widget = ResSkipButtons::Create(null, true);
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania);
+        } else {
+            $widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY);
+        }
+        
         $widget->setActions($this->actions['res'], $this->actions['skip']);
         $widget->setSize(32.0, 10.0);
 

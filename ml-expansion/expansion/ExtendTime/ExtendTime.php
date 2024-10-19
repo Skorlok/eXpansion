@@ -72,6 +72,7 @@ class ExtendTime extends ExpPlugin
     {
         TimeExtendVote::EraseAll();
         $widget = TimeExtendVote::Create(null);
+        $widget->setPosition($this->config->extendWidget_PosX, $this->config->extendWidget_PosY);
         $widget->show();
     }
 

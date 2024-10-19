@@ -75,7 +75,6 @@ class EnterQueueWidget extends Widget
     protected function eXpOnEndConstruct()
     {
         $this->setSize(80, 18);
-        $this->setPosition(-30, 60);
     }
 
     public function onDraw()

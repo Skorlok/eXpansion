@@ -76,9 +76,6 @@ class EndMapRatings extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->b5 = new RateButton2(5);
         $this->frame->addComponent($this->b5);
 
-
-        $this->setPosition(-45, -42);
-
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("MapRatings\Gui\Script");
         $action = $this->createAction(array(self::$parentPlugin, "saveRating"), 0);
         $this->script->setParam("rate_" . 0, $action);

@@ -58,7 +58,6 @@ class QueueList extends Widget
 
     protected function eXpOnEndConstruct()
     {
-        $this->setPosition(80, -30);
         $this->setSize(62, 40);
     }
 

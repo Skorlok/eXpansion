@@ -11,6 +11,8 @@ use ManiaLivePlugins\eXpansion\Widgets_PersonalBest\Gui\Widgets\PBPanel;
 class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
+    private $config;
+
     public function eXpOnInit()
     {
         $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords'));
@@ -18,6 +20,7 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function eXpOnLoad()
     {
+        $this->config = Config::getInstance();
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_PERSONAL_BEST);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
@@ -115,8 +118,8 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         PBPanel::Erase($login);
         $info = PBPanel::Create($login);
         $info->setRecord($record, $rank, $rankTotal);
+        $info->setPosition($this->config->personalBestWidget_PosX, $this->config->personalBestWidget_PosY);
         $info->setSize(30, 13);
-        $info->setPosition(112, -76);
         $info->show();
     }
 

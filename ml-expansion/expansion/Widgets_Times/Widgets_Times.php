@@ -9,10 +9,12 @@ use ManiaLivePlugins\eXpansion\Widgets_Times\Gui\Widgets\TimePanel;
 class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     protected $references = array();
+    private $config;
 
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
@@ -112,8 +114,8 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         TimePanel::Erase($login);
         $info = TimePanel::Create($login);
+        $info->setPosition($this->config->timePanel_PosX, $this->config->timePanel_PosY);
         $info->setSize(30, 6);
-        $info->setPosition(-16, 46);
 
         if (!$this->expStorage->isRelay) {
             $info->setTarget($spectatorTarget);

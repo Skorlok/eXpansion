@@ -1325,6 +1325,7 @@ EOT;
             Gui\Windows\NetStat::Erase($login);
             $win = Gui\Windows\NetStat::Create($login);
             $win->setTitle("Network Status");
+            $win->setPosition($this->config->netStats_PosX, $this->config->netStats_PosY);
             $win->setSize(140, 100);
             $win->show();
         }

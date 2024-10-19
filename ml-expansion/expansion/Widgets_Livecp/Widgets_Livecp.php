@@ -7,9 +7,12 @@ use ManiaLivePlugins\eXpansion\Widgets_Livecp\Gui\Widgets\LiveCP2;
 
 class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
+    private $config;
+
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         if (strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
             $this->displayWidget();
         }
@@ -23,18 +26,30 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         LiveCP2::EraseAll();
 
         $info = LiveCP::Create(null, true);
-        $info->update($this->eXpGetCurrentCompatibilityGameMode(), $this->storage->currentMap, $this->connection->getModeScriptSettings());
         $info->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-        $info->setPosition(120, -1);
+        $info->setPosition($this->config->livecpPanel_PosX, $this->config->livecpPanel_PosY);
+        $info->setNbFields($this->config->livecpPanel_nbFields);
+        $info->setNbFirstFields($this->config->livecpPanel_nbFirstFields);
+        $info->update($this->eXpGetCurrentCompatibilityGameMode(), $this->storage->currentMap, $this->connection->getModeScriptSettings());
         $info->show();
 
         if (!$gui->disablePersonalHud) {
             $info2 = LiveCP2::Create(null, true);
-            $info2->update($this->eXpGetCurrentCompatibilityGameMode(), $this->storage->currentMap, $this->connection->getModeScriptSettings());
             $info2->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
             $info2->setVisibleLayer("scorestable");
-            $info2->setPosition(120, -1);
+            $info2->setPosition($this->config->livecpPanel_PosX, $this->config->livecpPanel_PosY);
+            $info2->setNbFields($this->config->livecpPanel_nbFields);
+            $info2->setNbFirstFields($this->config->livecpPanel_nbFirstFields);
+            $info2->update($this->eXpGetCurrentCompatibilityGameMode(), $this->storage->currentMap, $this->connection->getModeScriptSettings());
             $info2->show();
+        }
+    }
+
+    public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
+    {
+        if ($var->getConfigInstance() instanceof Config) {
+            $this->config = Config::getInstance();
+            $this->displayWidget();
         }
     }
 

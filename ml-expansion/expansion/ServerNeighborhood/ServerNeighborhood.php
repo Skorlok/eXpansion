@@ -193,8 +193,8 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         if (empty($windows)) {
             $window = ServerPanel::Create(null);
             $windows[] = $window;
+            $window->setPosition($this->config->serverPanel_PosX, $this->config->serverPanel_PosY);
             $window->setSize(33, 25);
-            $window->setPosition(-160, 80);
             $window->update($servers);
             $window->show();
         } else {

@@ -15,9 +15,11 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     private $widgetIds = array();
     public static $raceOn = true;
     public static $roundPoints;
+    private $config;
 
     public function eXpOnReady()
     {
+        $this->config = Config::getInstance();
         $this->enableDedicatedEvents();
         $this->updateLivePanel();
         self::$me = $this;
@@ -39,6 +41,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         if ($var->getConfigInstance() instanceof Config) {
+            $this->config = Config::getInstance();
             Gui\Widgets\LivePanel::EraseAll();
             $this->updateLivePanel();
         }
@@ -51,6 +54,34 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
         Gui\Widgets\LivePanel::$connection = $this->connection;
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+
+        //gamemode specific settings
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $posX = $this->config->liveRankingPanel_PosX_Laps;
+            $posY = $this->config->liveRankingPanel_PosY_Laps;
+            $nbF = $this->config->liveRankingPanel_nbFields_Laps;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Laps;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS) {
+            $posX = $this->config->liveRankingPanel_PosX_Rounds;
+            $posY = $this->config->liveRankingPanel_PosY_Rounds;
+            $nbF = $this->config->liveRankingPanel_nbFields_Rounds;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Rounds;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $posX = $this->config->liveRankingPanel_PosX_Team;
+            $posY = $this->config->liveRankingPanel_PosY_Team;
+            $nbF = $this->config->liveRankingPanel_nbFields_Team;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Team;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP) {
+            $posX = $this->config->liveRankingPanel_PosX_Cup;
+            $posY = $this->config->liveRankingPanel_PosY_Cup;
+            $nbF = $this->config->liveRankingPanel_nbFields_Cup;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Cup;
+        } else {
+            $posX = $this->config->liveRankingPanel_PosX_Default;
+            $posY = $this->config->liveRankingPanel_PosY_Default;
+            $nbF = $this->config->liveRankingPanel_nbFields_Default;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Default;
+        }
 
         if ($login != null) {
             Gui\Widgets\LivePanel::Erase($login);
@@ -65,6 +96,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         if ($login == null) {
             $panelMain = Gui\Widgets\LivePanel::Create($login);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
+            $panelMain->setPosition($posX, $posY);
+            $panelMain->setNbFields($nbF);
+            $panelMain->setNbFirstFields($nbFF);
             $this->widgetIds["LivePanel"] = $panelMain;
             $this->widgetIds["LivePanel"]->update();
             $this->widgetIds["LivePanel"]->show();
@@ -81,6 +115,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $panelScore = Gui\Widgets\LivePanel2::Create($login);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
+                $panelMain->setPosition($posX, $posY);
+                $panelMain->setNbFields($nbF);
+                $panelMain->setNbFirstFields($nbFF);
                 $this->widgetIds["LivePanel2"] = $panelScore;
                 $this->widgetIds["LivePanel2"]->update();
                 $this->widgetIds["LivePanel2"]->show();

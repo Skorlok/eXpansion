@@ -71,11 +71,6 @@ class BetWidget extends Widget
         $this->addComponent($this->closeButton);
     }
 
-    protected function eXpOnEndConstruct()
-    {
-        $this->setPosition(20, -65);
-    }
-
     public function onDraw()
     {
         if (Bets::$state == Bets::SET) {

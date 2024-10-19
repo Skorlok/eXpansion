@@ -52,7 +52,6 @@ class ScoreSetup extends Window
         $scores->setData($data);
         $scores->setName("ScoreWidget");
         $scores->setScale(0.8);
-        $scores->setPosition(-56, 80);
         $scores->show();
     }
 }

@@ -15,6 +15,7 @@ use ManiaLivePlugins\eXpansion\Endurance\Gui\Widgets\EnduroPanel2;
 
 class Endurance extends ExpPlugin
 {
+
     public static $enduro = false;
 	public static $last_round = false;
 	public static $openScoresAction = -1;
@@ -32,7 +33,10 @@ class Endurance extends ExpPlugin
     private $auto_reset = null;
     private $roundsdone = 0;
     private $mapsdone = 0;
-	private $isHorizontal = false;
+	private $widgetPosX;
+	private $widgetPosY;
+	private $widgetNbFields;
+	private $widgetNbFirstFields;
 
 	public function eXpOnReady()
     {
@@ -48,7 +52,10 @@ class Endurance extends ExpPlugin
 		$this->save_csv = $config->save_csv;
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
-		$this->isHorizontal = $config->isHorizontal;
+		$this->widgetPosX = $config->enduroPointPanel_PosX;
+		$this->widgetPosY = $config->enduroPointPanel_PosY;
+		$this->widgetNbFields = $config->enduroPointPanel_nbFields;
+		$this->widgetNbFirstFields = $config->enduroPointPanel_nbFirstFields;
 
 		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
 		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
@@ -106,7 +113,10 @@ class Endurance extends ExpPlugin
 		$this->save_csv = $config->save_csv;
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
-		$this->isHorizontal = $config->isHorizontal;
+		$this->widgetPosX = $config->enduroPointPanel_PosX;
+		$this->widgetPosY = $config->enduroPointPanel_PosY;
+		$this->widgetNbFields = $config->enduroPointPanel_nbFields;
+		$this->widgetNbFirstFields = $config->enduroPointPanel_nbFirstFields;
 
 		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
 		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
@@ -350,6 +360,9 @@ class Endurance extends ExpPlugin
         if ($login == null) {
             $panelMain = Gui\Widgets\EnduroPanel::Create($login);
             $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
+			$panelMain->setPosition($this->widgetPosX, $this->widgetPosY);
+			$panelMain->setNbFields($this->widgetNbFields);
+			$panelMain->setNbFirstFields($this->widgetNbFirstFields);
             $this->widgetIds["EnduroPanel"] = $panelMain;
             $this->widgetIds["EnduroPanel"]->update();
             $this->widgetIds["EnduroPanel"]->show();
@@ -364,6 +377,9 @@ class Endurance extends ExpPlugin
                 $panelScore = Gui\Widgets\EnduroPanel2::Create($login);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
+				$panelMain->setPosition($this->widgetPosX, $this->widgetPosY);
+				$panelMain->setNbFields($this->widgetNbFields);
+				$panelMain->setNbFirstFields($this->widgetNbFirstFields);
                 $this->widgetIds["EnduroPanel2"] = $panelScore;
                 $this->widgetIds["EnduroPanel2"]->update();
                 $this->widgetIds["EnduroPanel2"]->show();

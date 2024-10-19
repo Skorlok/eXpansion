@@ -72,6 +72,5 @@ class TimeExtendVote extends Widget
     public function eXpOnEndConstruct()
     {
         $this->setSize(36, 12);
-        $this->setPosition(120, 88);
     }
 }

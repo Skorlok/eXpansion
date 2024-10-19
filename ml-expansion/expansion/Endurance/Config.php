@@ -14,7 +14,6 @@ class Config extends \ManiaLib\Utils\Singleton
     public $wustart = 23;
     public $save_csv = "enduro_results.csv";
     public $save_total_points = false;
-    public $isHorizontal = false;
 
     public $enduroPointPanel_PosX = -160;
     public $enduroPointPanel_PosY = 67;

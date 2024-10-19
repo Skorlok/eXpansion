@@ -720,7 +720,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                 } elseif (strpos($compatibility, 'TEAM') !== false) {
                     $compatibility = GameInfos::GAMEMODE_TEAM;
                 } elseif (strpos($compatibility, 'CUP') !== false) {
-                    $compatibility = GameInfos::GAMEMODE_ROUNDS;
+                    $compatibility = GameInfos::GAMEMODE_CUP;
                 } elseif (strpos($compatibility, 'LAPS') !== false) {
                     $compatibility = GameInfos::GAMEMODE_LAPS;
                 } else {
