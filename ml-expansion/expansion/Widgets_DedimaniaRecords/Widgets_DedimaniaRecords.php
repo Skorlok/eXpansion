@@ -101,9 +101,9 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                         $panelScore = Gui\Widgets\DediPanel2::Create($login);
                         $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                         $panelScore->setVisibleLayer("scorestable");
-                        $panelMain->setPosition($posX, $posY);
-                        $panelMain->setNbFields($nbF);
-                        $panelMain->setNbFirstFields($nbFF);
+                        $panelScore->setPosition($posX, $posY);
+                        $panelScore->setNbFields($nbF);
+                        $panelScore->setNbFirstFields($nbFF);
                         $this->widgetIds["DediPanel2"] = $panelScore;
                         $this->widgetIds["DediPanel2"]->update();
                         $this->widgetIds["DediPanel2"]->show();

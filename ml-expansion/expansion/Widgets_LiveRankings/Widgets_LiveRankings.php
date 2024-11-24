@@ -115,9 +115,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $panelScore = Gui\Widgets\LivePanel2::Create($login);
                 $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
                 $panelScore->setVisibleLayer("scorestable");
-                $panelMain->setPosition($posX, $posY);
-                $panelMain->setNbFields($nbF);
-                $panelMain->setNbFirstFields($nbFF);
+                $panelScore->setPosition($posX, $posY);
+                $panelScore->setNbFields($nbF);
+                $panelScore->setNbFirstFields($nbFF);
                 $this->widgetIds["LivePanel2"] = $panelScore;
                 $this->widgetIds["LivePanel2"]->update();
                 $this->widgetIds["LivePanel2"]->show();

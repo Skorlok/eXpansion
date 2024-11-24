@@ -1,3 +1,5 @@
+#Include "TimeLib" as TimeLib // TimeLib doesn't support MP3, we don't use it in main class to avoid crashing the entire UI
+
 Void hideVoteButtons() {
     declare button_yes = Page.GetFirstChild("button_yes");
     declare button_no = Page.GetFirstChild("button_no");

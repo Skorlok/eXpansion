@@ -1,4 +1,3 @@
-<script><!--
 #Include "TextLib" as TextLib
 #Include "MathLib" as MathLib
 #Include "AnimLib" as AnimLib
@@ -18,4 +17,3 @@ main () {
         <?php echo  $this->wLoop ?>
     }
 }
---></script>

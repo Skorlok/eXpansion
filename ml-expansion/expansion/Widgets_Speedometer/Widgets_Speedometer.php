@@ -2,29 +2,12 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_Speedometer;
 
-    /*
-     * Copyright (C) 2014 Reaby
-     *
-     * This program is free software: you can redistribute it and/or modify
-     * it under the terms of the GNU General Public License as published by
-     * the Free Software Foundation, either version 3 of the License, or
-     * (at your option) any later version.
-     *
-     * This program is distributed in the hope that it will be useful,
-     * but WITHOUT ANY WARRANTY; without even the implied warranty of
-     * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     * GNU General Public License for more details.
-     *
-     * You should have received a copy of the GNU General Public License
-     * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-     */
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 
-/**
- * Description of Widgets_Speedometer
- *
- * @author Reaby
- */
-class Widgets_Speedometer extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
+class Widgets_Speedometer extends ExpPlugin
 {
 
     private $widget;
@@ -34,32 +17,41 @@ class Widgets_Speedometer extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
-        $this->widget = Gui\Widgets\Speedmeter::Create(null);
-        $this->widget->setPosition($this->config->speedometerWidget_PosX, $this->config->speedometerWidget_PosY);
-        $this->widget->show();
+        $this->showWidget();
+    }
+
+    public function showWidget()
+    {
+        $this->widget = new Widget("Widgets_Speedometer\Gui\Widgets\Speedmeter.xml");
+        $this->widget->setName("Speed'o'meter");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition($this->config->speedometerWidget_PosX, $this->config->speedometerWidget_PosY, 0);
+        $this->widget->setSize(45, 7);
+        $this->widget->registerScript(new Script("Widgets_Speedometer\Gui\Script"));
+        $this->widget->show(null, true);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if (Endurance::$enduro && Endurance::$last_round == false) {
             return;
         }
-        $this->widget->hide();
+        $this->widget->erase();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        $this->widget->show();
+        $this->widget->show(null, true);
     }
 
     public function onBeginMatch()
     {
-        $this->widget->show();
+        $this->widget->show(null, true);
     }
 
     public function eXpOnUnload()
     {
+        $this->widget->erase();
         $this->widget = null;
-        Gui\Widgets\Speedmeter::EraseAll();
     }
 }

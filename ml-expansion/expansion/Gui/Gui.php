@@ -28,6 +28,9 @@ class Gui extends ExpPlugin
     public static $items = array();
     public static $callbacks = array();
 
+    // used to sent widgets to players when they join, it's more efficient than sending statics widgets with callbacks in plugins
+    public static $persistentWidgets = array();
+
     public $playersWidgets = array();
 
     public function eXpOnInit()
@@ -84,17 +87,10 @@ class Gui extends ExpPlugin
     public function onPlayerConnect($login, $isSpectator)
     {
         try {
-
             if ($this->expStorage->simpleEnviTitle == "SM") {
                 $this->counter = time();
                 $this->connection->TriggerModeScriptEvent("LibXmlRpc_DisableAltMenu", $login);
-                $this->connection->sendDisplayManialinkPage(
-                    $login,
-                    "<manialinks><manialink id=\"0\"><quad></quad></manialink
-><custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                    0,
-                    false
-                );
+                $this->connection->sendDisplayManialinkPage($login, '<manialinks><manialink id="0"><quad></quad></manialink><custom_ui><altmenu_scores visible="false" /></custom_ui></manialinks>', 0, false);
             }
         } catch (Exception $e) {
             $this->console("Error while disabling alt menu : " . $e->getMessage());
@@ -102,7 +98,8 @@ class Gui extends ExpPlugin
 
         $this->connection->sendDisplayManialinkPage(null,
 <<<EOT
-<manialink id="GuiChecker" version="2" layer="normal" name="GuiChecker"><dico></dico><script><!--
+<manialink id="GuiChecker" version="2" layer="normal" name="GuiChecker">
+<script><!--
 main () {
     declare persistent Boolean exp_isWidgetsHidden = False;
     declare Boolean exp_needToCheckPersistentVars for UI = False;
@@ -168,9 +165,20 @@ main () {
         }
     }
 }
---></script></manialink>
+--></script>
+</manialink>
 EOT
-            , 0, false);
+        , 0, false);
+
+        
+        $widgetsToSend = "";
+        foreach (self::$persistentWidgets as $widget) {
+            $widgetsToSend .= $widget;
+        }
+
+        if ($widgetsToSend != "") {
+            $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, true);
+        }
     }
 
     public function onPlayerDisconnect($login, $reason = null)
