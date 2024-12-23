@@ -297,7 +297,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
         
         if (array_key_exists($login, $this->references)) {
-            $reference($this->references[$login]);
+            $reference = $this->references[$login];
         }
 
         $widget = new Widget("Widgets_Times\Gui\Widgets\TimePanel.xml");
