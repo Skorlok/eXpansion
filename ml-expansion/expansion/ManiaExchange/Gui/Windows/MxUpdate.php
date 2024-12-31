@@ -21,7 +21,7 @@ use Maniaplanet\DedicatedServer\Structures\Map;
 
 class MxUpdate extends Window
 {
-    const chunkSize = 50;
+    const chunkSize = 3;
 
     protected $connection;
     protected $frame;
@@ -81,16 +81,14 @@ class MxUpdate extends Window
     public function queryMaps($uids)
     {
         $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-        $title = "tm";
-        if ($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) {
-            $title = "sm";
-        }
+        
         $key = "";
         $config = Config::getInstance();
         if ($config->key) {
             $key = "&key=" . $config->key;
         }
-        $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $uids . $key;
+
+        $query = 'https://' . strtolower($storage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $uids . $key;
 
         $access = DataAccess::getInstance();
         $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));

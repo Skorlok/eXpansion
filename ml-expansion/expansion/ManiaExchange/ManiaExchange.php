@@ -139,11 +139,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = array();
         self::$mxReplays = array();
 
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $query = "https://sm.mania.exchange/api/maps/get_map_info/multi/" . $this->storage->currentMap->uId;
-        } else {
-            $query = "http://api.mania-exchange.com/TM/tracks/" . $this->storage->currentMap->uId;
-        }
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $this->storage->currentMap->uId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xGetMapInfo"), null, $options);
@@ -167,6 +163,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = $json[0];
 
         if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
+            //$query = "https://tm.mania.exchange/api/replays/?count=25&mapId=" .$json[0]->TrackID;
             $query = "https://tm.mania.exchange/api/replays/get_replays/" .$json[0]->TrackID;
 
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
@@ -238,14 +235,9 @@ class ManiaExchange extends ExpPlugin
             return false;
         }
 
-        $title = "tm";
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $title = "sm";
-        }
-
         $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($packId));
 
-        $query = 'https://' . $title . '.mania-exchange.com/api/mappack/get_mappack_tracks/' . $packId;
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/mappack/get_mappack_tracks/' . $packId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xAddMxPackAdmin"), array("login" => $login), $options);
@@ -275,7 +267,7 @@ class ManiaExchange extends ExpPlugin
             return;
         }
 
-        foreach($json as $map) {
+        foreach($json->results as $map) {
             $this->addMap($login, $map->TrackID);
         }
     }
@@ -289,31 +281,9 @@ class ManiaExchange extends ExpPlugin
 
         $storage = Storage::getInstance();
         $titlePack = $storage->version->titleId;
-
         $pack = explode("@", $titlePack);
 
-        $out = "";
-        switch ($pack) {
-            case "TMCanyon":
-                $out .= "&tpack=TMCanyon,Canyon";
-                break;
-            case "TMStadium":
-                $out .= "&tpack=TMStadium,Stadium";
-                break;
-            case "TMValley":
-                $out .= "&tpack=TMValley,Valley";
-                break;
-            default:
-                $out .= "&tpack=" . $pack[0];
-                break;
-        }
-
-        $title = "tm";
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $title = "sm";
-        }
-
-        $query = 'https://' . $title . '.mania-exchange.com/tracksearch2/search?api=on&format=json&random=1' . $out . '&mtype=All&priord=2&limit=1';
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId&random=1&count=1&titlepack=' . $pack[0];
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xAddRandomMapAdmin"), array("login" => $login), $options);
@@ -334,12 +304,12 @@ class ManiaExchange extends ExpPlugin
         }
 
         $json = json_decode($data);
-        if (!$json) {
+        if (!$json || $json->Results == 0) {
             $this->eXpChatSendServerMessage("#error#No maps found !", $login);
             return;
         }
 
-        $this->addMap($login, $json->results[0]->TrackID);
+        $this->addMap($login, $json->Results[0]->MapId);
     }
 
     public function mxUpdate($login)
@@ -406,15 +376,7 @@ class ManiaExchange extends ExpPlugin
             return false;
         }
 
-        $query = "";
-        switch ($this->expStorage->simpleEnviTitle) {
-            case "SM":
-                $query = 'https://sm.mania-exchange.com/tracks/download/' . $mxId;
-                break;
-            case "TM":
-                $query = 'https://tm.mania-exchange.com/tracks/download/' . $mxId;
-                break;
-        }
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/mapgbx/' . $mxId;
 
         $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($mxId));
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
@@ -456,12 +418,7 @@ class ManiaExchange extends ExpPlugin
             $gbxReader->processData($data);
 
 
-            $title = "tm";
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $title = "sm";
-            }
-
-            $query = "http://" . $title . ".mania-exchange.com/api/maps/get_map_info/id/" . $mxId;
+            $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/id/' . $mxId;
 
             $ch = curl_init($query);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
@@ -479,7 +436,7 @@ class ManiaExchange extends ExpPlugin
 
             $json = json_decode($mapData);
 
-            $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $json->TrackUID);
+            $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $json[0]->TrackUID);
             if ($mapFileName){
                 $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use /mx update", $login);
                 return;
@@ -651,14 +608,7 @@ class ManiaExchange extends ExpPlugin
 
     private function updateMxInfo($mapUid)
     {
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-
-        $title = "tm";
-        if ($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) {
-            $title = "sm";
-        }
-
-        $query = 'http://api.mania-exchange.com/' . $title . '/maps?ids=' . $mapUid . $this->getKey(true);
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $mapUid . $this->getKey(true);
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
         $this->dataAccess->httpCurl($query, array($this, "xUpdateInfo"), null, $options);
@@ -721,12 +671,6 @@ class ManiaExchange extends ExpPlugin
                      `mx_laps`=" . $db->quote($map->laps) . ",
                      `mx_difficultyName`=" . $db->quote($map->difficultyName) . ",
                      `mx_replayTypeName`=" . $db->quote($map->replayTypeName) . ",
-                     `mx_replayWRID`=" . $db->quote($map->replayWRID) . ",
-                     `mx_replayWRTime`=" . $db->quote(intval($map->replayWRTime)) . ",
-                     `mx_replayWRUserID`=" . $db->quote(intval($map->replayWRUserID)) . ",
-                     `mx_replayWRUsername`=" . $db->quote($map->replayWRUsername) . ",
-                     `mx_ratingVoteCount`=" . $db->quote($map->ratingVoteCount) . ",
-                     `mx_ratingVoteAverage`=" . $db->quote($map->ratingVoteAverage) . ",
                      `mx_replayCount`=" . $db->quote($map->replayCount) . ",
                      `mx_trackValue`=" . $db->quote($map->trackValue) . ",
                      `mx_comments`=" . $db->quote($map->comments) . ",
@@ -737,7 +681,7 @@ class ManiaExchange extends ExpPlugin
                     WHERE `challenge_uid`=" . $db->quote($map->trackUID) . ";";
             $db->execute($sql);
         } catch (\Exception $ex) {
-            $this->console("Error: " . $ex->getMessage(), "Database", Console::b_red);
+            Console::out_error("Error: " . $ex->getMessage(), Console::b_red);
         }
     }
 
@@ -765,15 +709,7 @@ class ManiaExchange extends ExpPlugin
         }
 
 
-        $query = "";
-        switch ($this->expStorage->simpleEnviTitle) {
-            case "SM":
-                $query = 'http://sm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
-                break;
-            case "TM":
-                $query = 'http://tm.mania-exchange.com/api/tracks/get_track_info/id/' . $mxId;
-                break;
-        }
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/tracks/get_track_info/id/' . $mxId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xVote"), array("login" => $login, "mxId" => $mxId), $options);
