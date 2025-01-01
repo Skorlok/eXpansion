@@ -1,0 +1,10 @@
+<frame posn="20 0 2.0E-5">
+    <label sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('Personal_Best') ?>"/>
+    <label posn="1 0 1.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('pbTime') ?>"/>
+    <label posn="0 -3 2.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('Average') ?>"/>
+    <label posn="1 -3 3.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('avgTime') ?>"/>
+    <label posn="0 -6 4.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('Finishes') ?>"/>
+    <label posn="1 -6 5.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('nbFinish') ?>"/>
+    <label posn="0 -9 6.0E-5" sizen="32 7" scale="0.7" halign="right" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('Server Rank') ?>"/>
+    <label posn="1 -9 7.0E-5" sizen="16 4" scale="0.7" halign="left" valign="top" style="TextStaticSmall" text="$ddd<?php echo $this->getParam('rank') ?>$n $m/$n $m<?php echo $this->getParam('rankTotal') ?>"/>
+</frame>

@@ -63,7 +63,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
 
     protected function __construct()
     {
-        file_put_contents("./WINDOWS.xml", "");
         $this->modalBg = new Bgs1(340, 200);
         $this->modalBg->setSubStyle(Bgs1::BgDialogBlur);
         $this->modalBg->setAlign('center', 'center');
@@ -523,7 +522,6 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
         foreach ($grouped as $groupNum => $groupData) {
 
             foreach ($groupData as $login => $toDraw) {
-                file_put_contents("./WINDOWS.xml", \str_replace('><', ">\n<", $toDraw), FILE_APPEND);
                 $this->connection->sendDisplayManialinkPage(strval($login), '<manialinks>' . $toDraw . '</manialinks>', 0, false, true);
             }
 

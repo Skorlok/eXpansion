@@ -26,6 +26,8 @@ class ManiaLink extends Singletons
     protected $storage;
     protected $eXpStorage;
 
+    protected $parameters;
+
     public function __construct($path)
     {
         $path = str_replace("\\", DIRECTORY_SEPARATOR, $path);
@@ -114,6 +116,20 @@ class ManiaLink extends Singletons
     public function setScripts($scripts)
     {
         $this->scripts = $scripts;
+    }
+
+    public function getParam($key)
+    {
+        if (isset($this->parameters[$key])) {
+            return $this->parameters[$key];
+        }
+
+        return null;
+    }
+
+    public function setParam($key, $value)
+    {
+        $this->parameters[$key] = $value;
     }
 
     // Others
