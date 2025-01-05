@@ -165,7 +165,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function search($login, $trackname = "", $author = "", $style = null, $length = null, $filter = false)
     {
-        return; // TODO: fix this
         foreach ($this->items as $item) {
             $item->erase();
         }
@@ -189,9 +188,9 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $mapType = $storage->baseMapType;
             $parts = explode('@', $titlePack);
 
-            $query = 'https://sm.mania.exchange/tracksearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
+            $query = 'https://sm.mania.exchange/mapsearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
         } else {
-            $query = 'https://tm.mania.exchange/tracksearch2/search?api=on&format=json';
+            $query = 'https://tm.mania.exchange/mapsearch2/search?api=on&format=json';
             
             $out = "";
             if ($style != null) {
