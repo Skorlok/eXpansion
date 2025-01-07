@@ -417,26 +417,7 @@ class ManiaExchange extends ExpPlugin
             $gbxReader = new GBXChallMapFetcher(true, false, false);
             $gbxReader->processData($data);
 
-
-            $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/id/' . $mxId;
-
-            $ch = curl_init($query);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-            curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MXapi [getter] ver 0.1");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $mapData = curl_exec($ch);
-            $status = curl_getinfo($ch);
-            curl_close($ch);
-
-            if ($mapData === false || $status["http_code"] !== 200) {
-                $this->eXpChatSendServerMessage("#admin_error#MX returned error code $code", $login);
-                return;
-            }
-
-            $json = json_decode($mapData);
-
-            $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $json[0]->TrackUID);
+            $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $gbxReader->uid);
             if ($mapFileName){
                 $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use /mx update", $login);
                 return;
