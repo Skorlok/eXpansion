@@ -8,10 +8,8 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
-use ManiaLivePlugins\eXpansion\Helpers\Console;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 use oliverde8\AsynchronousJobs\Job\Curl;
 use ManiaLive\Utilities\Time;
@@ -491,7 +489,6 @@ class ManiaExchange extends ExpPlugin
                     if ($this->config->juke_newmaps) {
                         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
-                    $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                     $this->storage->resetMapInfos();
@@ -527,7 +524,6 @@ class ManiaExchange extends ExpPlugin
                     if ($this->config->juke_newmaps) {
                         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
-                    $this->updateMxInfo($map->uId);
                 } catch (\Exception $e) {
                     $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                     $this->storage->resetMapInfos();
@@ -578,85 +574,6 @@ class ManiaExchange extends ExpPlugin
                 return;
             }
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\\Maps\\Maps', 'queueMxMap', $login, $file);
-        }
-    }
-
-    private function updateMxInfo($mapUid)
-    {
-        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $mapUid . $this->getKey(true);
-
-        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
-        $this->dataAccess->httpCurl($query, array($this, "xUpdateInfo"), null, $options);
-    }
-
-    public function xUpdateInfo($job, $jobData)
-    {
-        $info = $job->getCurlInfo();
-        $code = $info['http_code'];
-        $data = $job->getResponse();
-
-        if ($code !== 200) {
-            $this->console("mx returned http code: " . $code);
-            return;
-        }
-
-        $json = json_decode($data, true);
-
-        if ($json == false || !isset($json[0])) {
-            $this->console("Error when parsing mx json.");
-            return;
-        }
-
-        self::addMxInfo($json[0]);
-    }
-
-    /**
-     * @param MxMap $map
-     */
-    public static function addMxInfo($map)
-    {
-        if (is_array($map)) {
-            $map = MxMap::fromArray($map);
-        }
-
-        $config = \ManiaLive\Database\Config::getInstance();
-        $db = \ManiaLive\Database\Connection::getConnection($config->host, $config->username, $config->password, $config->database, $config->type, $config->port);
-
-        try {
-            $sql = "UPDATE `exp_maps` SET 
-                    `mx_trackID`=" . $db->quote($map->trackID) . ",
-                     `mx_userID`=" . $db->quote($map->userID) . ",
-                     `mx_username`=" . $db->quote($map->username) . ",
-                     `mx_uploadedAt`=" . $db->quote($map->uploadedAt) . ",
-                     `mx_updatedAt`=" . $db->quote($map->updatedAt) . ",
-                     `mx_typeName`=" . $db->quote($map->typeName) . ",
-                     `mx_mapType`=" . $db->quote($map->mapType) . ",
-                     `mx_titlePack`=" . $db->quote($map->titlePack) . ",
-                     `mx_styleName`=" . $db->quote($map->styleName) . ",
-                     `mx_displayCost`=" . $db->quote($map->displayCost) . ",
-                     `mx_modName`=" . $db->quote($map->modName) . ",
-                     `mx_lightMap`=" . $db->quote($map->lightmap) . ",
-                     `mx_exeVersion`=" . $db->quote($map->exeVersion) . ",
-                     `mx_exeBuild`=" . $db->quote($map->exeBuild) . ",
-                     `mx_environmentName`=" . $db->quote($map->environmentName) . ",
-                     `mx_vehicleName`=" . $db->quote($map->vehicleName) . ",
-                     `mx_unlimiterRequired`=" . (empty($map->unlimiterRequired) ? 0 : $db->quote($map->unlimiterRequired)) . ",
-                     `mx_routeName`=" . $db->quote($map->routeName) . ",
-                     `mx_lengthName`=" . $db->quote($map->lengthName) . ",
-                     `mx_laps`=" . $db->quote($map->laps) . ",
-                     `mx_difficultyName`=" . $db->quote($map->difficultyName) . ",
-                     `mx_replayTypeName`=" . $db->quote($map->replayTypeName) . ",
-                     `mx_replayCount`=" . $db->quote($map->replayCount) . ",
-                     `mx_trackValue`=" . $db->quote($map->trackValue) . ",
-                     `mx_comments`=" . $db->quote($map->comments) . ",
-                     `mx_commentsCount`=" . $db->quote($map->commentCount) . ",
-                     `mx_awardCount`=" . $db->quote($map->awardCount) . ",
-                     `mx_hasScreenshot`=" . $db->quote(intval($map->hasScreenshot)) . ",
-                     `mx_hasThumbnail`=" . $db->quote(intval($map->hasThumbnail)) . "                   
-                    WHERE `challenge_uid`=" . $db->quote($map->trackUID) . ";";
-            $db->execute($sql);
-        } catch (\Exception $ex) {
-            Console::out_error("Error: " . $ex->getMessage(), Console::b_red);
         }
     }
 

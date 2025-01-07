@@ -14,14 +14,13 @@ use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Config;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxInfo;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxMap as MxMapItem;
-use ManiaLivePlugins\eXpansion\ManiaExchange\ManiaExchange;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\HookData;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use Maniaplanet\DedicatedServer\Structures\Map;
 
 class MxUpdate extends Window
 {
-    const chunkSize = 3;
+    const chunkSize = 50;
 
     protected $connection;
     protected $frame;
@@ -40,6 +39,7 @@ class MxUpdate extends Window
     protected $mapsToProcess = array();
     protected $processedCounter = 0;
     protected $mxPlugin = null;
+    public $fields = "fields=MapUid,MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name,UpdatedAt";
 
     protected function onConstruct()
     {
@@ -88,7 +88,7 @@ class MxUpdate extends Window
             $key = "&key=" . $config->key;
         }
 
-        $query = 'https://' . strtolower($storage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $uids . $key;
+        $query = 'https://' . strtolower($storage->simpleEnviTitle) . '.mania.exchange/api/maps?' . $this->fields . "&uid=" . $uids . $key;
 
         $access = DataAccess::getInstance();
         $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
@@ -132,16 +132,15 @@ class MxUpdate extends Window
 
         $json = json_decode($data, true);
 
-        if (!$json) {
+        if (!$json || !isset($json["Results"])) {
             $this->pager->addItem(new MxInfo(0, "Error while processing json data from MX.", $this->sizeX - 6));
             $this->redraw();
             return;
         }
 
-        foreach ($json as $map) {
+        foreach ($json["Results"] as $map) {
             $map = MxMap::fromArray($map);
             $this->maps[] = $map;
-            ManiaExchange::addMxInfo($map);
         }
 
         $this->processedCounter += 1;
@@ -173,9 +172,9 @@ class MxUpdate extends Window
         $mapdir = $connection->getMapsDirectory();
 
         foreach ($this->maps as $map) {
-            if (array_key_exists($map->trackUID, $this->mapsByUID)) {
+            if (array_key_exists($map->mapUid, $this->mapsByUID)) {
 
-                $fileCreated = filectime($mapdir . DIRECTORY_SEPARATOR . $this->mapsByUID[$map->trackUID]->fileName);
+                $fileCreated = filectime($mapdir . DIRECTORY_SEPARATOR . $this->mapsByUID[$map->mapUid]->fileName);
                 $mapUpdated = strtotime($map->updatedAt);
 
                 if ($fileCreated < $mapUpdated) {
