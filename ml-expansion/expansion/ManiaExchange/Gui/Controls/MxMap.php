@@ -38,19 +38,10 @@ class MxMap extends Control
     ) {
         $sizeY = 12;
 
-        $id = "";
-
-        if (property_exists($map, "trackID")) {
-            $id = $map->trackID;
-        }
-        if (property_exists($map, "mapID")) {
-            $id = $map->mapID;
-        }
-
         $this->bg = new ListBackGround($indexNumber, $sizeX, $sizeY);
         $this->addComponent($this->bg);
 
-        $this->actionSearch = $this->createAction(array($controller, 'search'), "", $map->username, null, null);
+        $this->actionSearch = $this->createAction(array($controller, 'search'), "", $map->getUploader(), null, null);
 
         $this->line1 = new Frame(0, 3);
         $this->line1->setAlign("left", "top");
@@ -65,8 +56,8 @@ class MxMap extends Control
         $label = new Label(36, 6);
         $label->setAlign('left', 'center');
         $pack = str_replace("TM", "", $map->titlePack);
-        if (empty($pack) || $pack == "Trackmania_2") {
-            $pack = $map->environmentName;
+        if (empty($pack) || $pack == "TMAll") {
+            $pack = $map->getEnvironment();
         }
         $label->setText($pack);
         $this->line1->addComponent($label);
@@ -92,7 +83,7 @@ class MxMap extends Control
 
         $info = new Label(80, 6);
         $info->setAlign('left', 'center');
-        $info->setText('$fff' . Gui::fixString($map->username));
+        $info->setText('$fff' . Gui::fixString($map->getUploader()));
         $info->setAction($this->actionSearch);
         $info->setStyle("TextCardSmallScores2");
 
@@ -102,23 +93,23 @@ class MxMap extends Control
 
         $info = new Label(24, 4);
         $info->setAlign('left', 'center');
-        $info->setText($map->difficultyName);
+        $info->setText($map->getDifficulty());
         $this->line1->addComponent($info);
 
         $info = new Label(24, 4);
         $info->setAlign('left', 'center');
-        $info->setText($map->mood);
+        $info->setText($map->moodFull);
         $this->line2->addComponent($info);
 
         $info = new Label(18, 4);
         $info->setAlign('left', 'center');
-        $info->setText($map->styleName);
+        $info->setText($map->getStyle());
         $this->line1->addComponent($info);
 
 
         $info = new Label(18, 4);
         $info->setAlign('left', 'center');
-        $info->setText($map->lengthName);
+        $info->setText($map->getLength());
         $this->line2->addComponent($info);
 
 
@@ -127,7 +118,7 @@ class MxMap extends Control
                 $newButton = new myButton(24, 5);
                 $newButton->setText(__($button->label));
                 $newButton->colorize($button->buttonColorize);
-                $newButton->setAction($this->createAction($button->callback, $id));
+                $newButton->setAction($this->createAction($button->callback, $map->mapId));
 
                 $this->line1->addComponent($newButton);
                 $this->buttons[] = $newButton;

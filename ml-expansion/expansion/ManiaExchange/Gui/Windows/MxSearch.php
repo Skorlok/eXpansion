@@ -48,6 +48,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $currentPage;
 
     public $mxPlugin;
+    public $fields = "fields=MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name";
 
     protected function onConstruct()
     {
@@ -88,7 +89,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->searchframe->addComponent($spacer);
 
-        $items = array("All", "15sec", "30sec", "45sec", "1min");
+        $items = array("All", "0-15sec", "15-30sec", "30-45sec", "45-1min", "1min+");
         $this->lenght = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("length", $items);
         $this->searchframe->addComponent($this->lenght);
 
@@ -182,28 +183,59 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $storage = Storage::getInstance();
 
         if ($storage->simpleEnviTitle == Storage::TITLE_SIMPLE_SM) {
-            /** @var Storage $storage */
-            $storage = Storage::getInstance();
-            $titlePack = $storage->version->titleId;
-            $mapType = $storage->baseMapType;
-            $parts = explode('@', $titlePack);
-
-            $query = 'https://sm.mania.exchange/mapsearch2/search?mode=0&vm=0&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . '&mtype=' . rawurlencode($mapType) . '&priord=2&limit=100&page=' . rawurlencode($this->currentPage) . '&environments=1&tracksearch&api=on&format=json'.$filter;
-        } else {
-            $query = 'https://tm.mania.exchange/mapsearch2/search?api=on&format=json';
-            
             $out = "";
-            if ($style != null) {
-                $out .= "&style=" . $style;
+            if ($trackname != null) {
+                $out .= "&name=" . rawurlencode($trackname);
             }
-            if ($length != null) {
-                $out .= "&length=" . $length . "&lengthop=0";
+            if ($author != null) {
+                $out .= "&author=" . rawurlencode($author);
+            }
+            if ($style != null) {
+                $out .= "&tag=" . $style;
             }
             if (!$filter) {
                 $pack = explode("@", $info->titleId);
-                $out .= "&tpack=" . $pack[0];
+                $out .= "&titlepack=" . $pack[0];
             }
-            $query .= '&trackname=' . rawurlencode($trackname) . '&author=' . rawurlencode($author) . $out . '&mtype=All&priord=2&limit=100&page=' . rawurlencode($this->currentPage);
+
+            $query = 'https://sm.mania.exchange/api/maps?' . $this->fields . "&" . $out . '&order1=0&count=100';
+        } else {
+            $out = "";
+            if ($trackname != null) {
+                $out .= "&name=" . rawurlencode($trackname);
+            }
+            if ($author != null) {
+                $out .= "&author=" . rawurlencode($author);
+            }
+            if ($style != null) {
+                $out .= "&tag=" . $style;
+            }
+            if ($length != null) {
+                switch ($length) {
+                    case 0:
+                        $out .= "&lengthmin=0&lengthmax=15000";
+                        break;
+                    case 1:
+                        $out .= "&lengthmin=15000&lengthmax=30000";
+                        break;
+                    case 2:
+                        $out .= "&lengthmin=30000&lengthmax=45000";
+                        break;
+                    case 3:
+                        $out .= "&lengthmin=45000&lengthmax=60000";
+                        break;
+                    case 4:
+                        $out .= "&lengthmin=60000";
+                        break;
+                }
+            }
+            if (!$filter) {
+                $pack = explode("@", $info->titleId);
+                $out .= "&titlepack=" . $pack[0];
+            }
+
+
+            $query = "https://tm.mania.exchange/api/maps?" . $this->fields . "&" . $out . '&order1=0&count=100';//&page=' . rawurlencode($this->currentPage);
         }
 
         $access = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
@@ -264,8 +296,8 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
             $json = json_decode($data, true);
 
-            if (isset($json[0]) && !isset($json['results'])) {
-                $newArray['results'] = $json;
+            if (isset($json[0]) && !isset($json['Results'])) {
+                $newArray['Results'] = $json;
                 $json = $newArray;
             }
 
@@ -274,13 +306,13 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->redraw();
                 return;
             }
-            if (!array_key_exists("results", $json)) {
+            if (!array_key_exists("Results", $json)) {
                 $this->pager->addItem(new \ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxInfo(0, "Error: MX returned no results.", $this->sizeX - 6));
                 $this->redraw();
                 return;
             }
 
-            $this->maps = Map::fromArrayOfArray($json['results']);
+            $this->maps = Map::fromArrayOfArray($json['Results']);
 
 
             $login = $this->getRecipient();
