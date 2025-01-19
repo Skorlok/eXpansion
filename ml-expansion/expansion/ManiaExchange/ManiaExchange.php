@@ -189,6 +189,8 @@ class ManiaExchange extends ExpPlugin
             $replay->Username = $replay->User->Name;
         }
 
+        ArrayOfObj::sortAsc(self::$mxReplays, "ReplayTime");
+
         if ($this->config->announceMxRecord) {
             $this->eXpChatSendServerMessage($this->msg_worldRec, null, array(Time::fromTM(self::$mxReplays[0]->ReplayTime), self::$mxReplays[0]->Username));
         }
