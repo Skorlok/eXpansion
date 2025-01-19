@@ -27,6 +27,9 @@ class CurrentTrackWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     private function handleSpecialChars($string)
     {
+        if ($string == null) {
+            return "";
+        }
         return str_replace(
 			array(
 				'&',
