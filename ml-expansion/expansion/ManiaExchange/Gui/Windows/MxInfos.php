@@ -18,6 +18,27 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $pager;
     protected $gbxInfo;
 
+    private function handleSpecialChars($string)
+    {
+        return str_replace(
+			array(
+				'&',
+				'"',
+				"'",
+				'>',
+				'<'
+			),
+			array(
+				'&amp;',
+				'&quot;',
+				'&apos;',
+				'&gt;',
+				'&lt;'
+			),
+			$string
+	    );
+    }
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -81,7 +102,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($descr == "Uploaded:" || $descr == "Updated:") {
                 $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . substr(str_replace('T', " ", ManiaExchange::$mxInfo->{$field}), 0, 16) . '"/>');
             } else {
-                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . ManiaExchange::$mxInfo->{$field} . '"/>');
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->{$field}) . '"/>');
             }
             $this->mainFrame->addComponent($lbl);
 
@@ -90,7 +111,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
 
 
-        $text = ManiaExchange::$mxInfo->Comments;
+        $text = $this->handleSpecialChars(ManiaExchange::$mxInfo->Comments);
 
         $text = preg_replace('#\[url=#i', '$L[', $text);
         $text = preg_replace('#\[/url\]#i', '$L', $text);
@@ -165,7 +186,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->mainFrame->addComponent($lbl);
 
                 $lbl = new \ManiaLive\Gui\Elements\Xml();
-                $lbl->setContent('<label posn="80 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $map->{$field} . '"/>');
+                $lbl->setContent('<label posn="80 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars($map->{$field}) . '"/>');
                 $this->mainFrame->addComponent($lbl);
 
                 $y -= 5;
@@ -220,7 +241,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $this->mainFrame->addComponent($lbl);
 
                 $lbl = new \ManiaLive\Gui\Elements\Xml();
-                $lbl->setContent('<label posn="152 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . strval($map->{$field}) . '"/>');
+                $lbl->setContent('<label posn="152 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(strval($map->{$field})) . '"/>');
                 $this->mainFrame->addComponent($lbl);
 
                 $y -= 5;
