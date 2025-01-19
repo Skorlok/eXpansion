@@ -161,8 +161,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = $json[0];
 
         if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
-            //$query = "https://tm.mania.exchange/api/replays/?count=25&mapId=" .$json[0]->TrackID;
-            $query = "https://tm.mania.exchange/api/replays/get_replays/" .$json[0]->TrackID;
+            $query = "https://tm.mania.exchange/api/replays/?count=25&mapId=" .$json[0]->TrackID;
 
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
             $this->dataAccess->httpCurl($query, array($this, "xGetReplaysInfo"), null, $options);
@@ -180,14 +179,18 @@ class ManiaExchange extends ExpPlugin
         }
 
         $jsonReplay = json_decode($data);
-        if ($jsonReplay === false || sizeof($jsonReplay) == 0) {
+        if ($jsonReplay === false || !isset($jsonReplay->Results)) {
             return;
         }
 
-        self::$mxReplays = $jsonReplay;
+        self::$mxReplays = $jsonReplay->Results;
+
+        foreach (self::$mxReplays as $replay) {
+            $replay->Username = $replay->User->Name;
+        }
 
         if ($this->config->announceMxRecord) {
-            $this->eXpChatSendServerMessage($this->msg_worldRec, null, array(Time::fromTM($jsonReplay[0]->ReplayTime), $jsonReplay[0]->Username));
+            $this->eXpChatSendServerMessage($this->msg_worldRec, null, array(Time::fromTM(self::$mxReplays[0]->ReplayTime), self::$mxReplays[0]->Username));
         }
     }
 
@@ -417,7 +420,7 @@ class ManiaExchange extends ExpPlugin
 
             $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $gbxReader->uid);
             if ($mapFileName){
-                $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use /mx update", $login);
+                $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use //mxupdate", $login);
                 return;
             }
 
