@@ -7,7 +7,6 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
-use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
@@ -232,12 +231,16 @@ class ManiaExchange extends ExpPlugin
             return false;
         }
 
-        $this->eXpChatSendServerMessage("#mx#Download starting for: %s", $login, array($packId));
+        $this->eXpChatSendServerMessage("#mx#Download starting for map pack: %s", $login, array($packId));
+        $this->mxDownloadPack($login, $packId);
+    }
 
-        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/mappack/get_mappack_tracks/' . $packId;
+    public function mxDownloadPack($login, $packId, $startAfter = null)
+    {
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId&mappackid=' . $packId . '&count=50' . ($startAfter ? '&after=' . $startAfter : '');
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
-        $this->dataAccess->httpCurl($query, array($this, "xAddMxPackAdmin"), array("login" => $login), $options);
+        $this->dataAccess->httpCurl($query, array($this, "xAddMxPackAdmin"), array("login" => $login, "packId" => $packId, "firstLoop" => $startAfter == null), $options);
     }
 
     public function xAddMxPackAdmin($job, $jobData)
@@ -248,6 +251,8 @@ class ManiaExchange extends ExpPlugin
         $additionalData = $job->__additionalData;
 
         $login = $additionalData['login'];
+        $packId = $additionalData['packId'];
+        $firstLoop = $additionalData['firstLoop'];
 
         if ($data === false || $code !== 200) {
             $this->eXpChatSendServerMessage("#error#MX returned error code $code", $login);
@@ -256,16 +261,30 @@ class ManiaExchange extends ExpPlugin
 
         $json = json_decode($data);
         if (!$json) {
-            $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+            if ($firstLoop) {
+                $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+            } else {
+                $this->eXpChatSendServerMessage("#mx#Map pack added succesfully", $login);
+            }
             return;
         }
-        if (isset($json->Message) && $json->Message == "Specified mappack does not exist.") {
-            $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+        if (count($json->Results) <= 0) {
+            if ($firstLoop) {
+                $this->eXpChatSendServerMessage("#error#No maps found in mappack !", $login);
+            } else {
+                $this->eXpChatSendServerMessage("#mx#Map pack added succesfully", $login);
+            }
             return;
         }
 
-        foreach($json->results as $map) {
-            $this->addMap($login, $map->TrackID);
+        foreach ($json->Results as $map) {
+            $this->addMap($login, $map->MapId);
+        }
+
+        if (count($json->Results) == 50) {
+            $this->mxDownloadPack($login, $packId, $json->Results[count($json->Results) - 1]->MapId);
+        } else {
+            $this->eXpChatSendServerMessage("#mx#Map pack added succesfully", $login);
         }
     }
 
@@ -276,8 +295,7 @@ class ManiaExchange extends ExpPlugin
             return;
         }
 
-        $storage = Storage::getInstance();
-        $titlePack = $storage->version->titleId;
+        $titlePack = $this->expStorage->titleId;
         $pack = explode("@", $titlePack);
 
         $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId&random=1&count=1&titlepack=' . $pack[0];
