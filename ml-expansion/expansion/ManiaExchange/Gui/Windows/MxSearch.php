@@ -43,10 +43,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     /** @var  CheckboxScripted */
     protected $filter;
 
-    protected $prevButton;
-    protected $nextButton;
-    protected $currentPage;
-
     public $mxPlugin;
     public $fields = "fields=MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name";
 
@@ -58,8 +54,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
         $this->storage = \ManiaLive\Data\Storage::getInstance();
 
-        $this->currentPage = 1;
-        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
+        $this->setTitle("ManiaExchange");
 
         $this->searchframe = new \ManiaLive\Gui\Controls\Frame();
         $this->searchframe->setLayout(new \ManiaLib\Gui\Layouts\Line());
@@ -102,16 +97,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->searchframe->addComponent($spacer);
 
-        $this->prevButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->prevButton->setIcon("Icons64x64_1", "ArrowPrev");
-        $this->prevButton->setAction($this->createAction(array($this, "prevPage")));
-        $this->searchframe->addComponent($this->prevButton);
-
-        $this->nextButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->nextButton->setIcon("Icons64x64_1", "ArrowNext");
-        $this->nextButton->setAction($this->createAction(array($this, "nextPage")));
-        $this->searchframe->addComponent($this->nextButton);
-
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
         $this->buttonSearch = new OkButton(24, 6);
@@ -131,23 +116,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager->addItem(new \ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Controls\MxInfo(0, "Click Search with empty terms to get the most recent maps", $this->sizeX - 6));
 
         $this->mainFrame->addComponent($this->frame);
-    }
-
-    public function nextPage($login, $args)
-    {
-        $this->currentPage++;
-        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
-        $this->actionOk($login, $args);
-    }
-
-    public function prevPage($login, $args)
-    {
-        $this->currentPage--;
-        if ($this->currentPage < 1) {
-            $this->currentPage = 1;
-        }
-        $this->setTitle("ManiaExchange ", "(Page: " . $this->currentPage . ")");
-        $this->actionOk($login, $args);
     }
 
     public function onResize($oldX, $oldY)
@@ -235,7 +203,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
 
 
-            $query = "https://tm.mania.exchange/api/maps?" . $this->fields . "&" . $out . '&order1=0&count=100';//&page=' . rawurlencode($this->currentPage);
+            $query = "https://tm.mania.exchange/api/maps?" . $this->fields . "&" . $out . '&order1=0&count=100';
         }
 
         $access = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
