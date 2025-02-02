@@ -9,4 +9,6 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $queueList_PosX = 80;
     public $queueList_PosY = -30;
+
+    public $rotateCount = 2;
 }

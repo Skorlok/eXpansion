@@ -107,4 +107,9 @@ class Queue
     {
         return array_keys($this->getQueuedPlayers());
     }
+
+    public function getNbPlayers()
+    {
+        return $this->queue->count();
+    }
 }
