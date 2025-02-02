@@ -272,15 +272,6 @@ class KnockOut extends ExpPlugin
         }
     }
 
-    public function sortAsc(&$array)
-    {
-        if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TIMEATTACK) {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($array, "best_race_time");
-        } else {
-            \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($array, "round_points");
-        }
-    }
-
     public function sortDesc(&$array)
     {
         if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TIMEATTACK) {
@@ -308,7 +299,6 @@ class KnockOut extends ExpPlugin
         }
 
         $ranking = Core::$rankings;
-        $this->sortAsc($ranking);
 
         if (count($this->players) == 1) {
             reset($this->players);
