@@ -152,7 +152,7 @@ class AutoQueue extends ExpPlugin
 
     public function queueReleaseNext()
     {
-        if (count($this->storage->players) <= $this->storage->server->currentMaxPlayers) {
+        if (count($this->storage->players) < $this->storage->server->currentMaxPlayers) {
             $player = $this->queue->getNextPlayer();
             if ($player) {
                 $this->connection->forceSpectator($player->login, 2);
