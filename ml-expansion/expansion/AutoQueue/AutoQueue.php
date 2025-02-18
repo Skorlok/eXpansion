@@ -212,15 +212,13 @@ class AutoQueue extends ExpPlugin
             return;
         }
 
-        $nbToKick = $this->config->rotateCount > $this->queue->getNbPlayers() ? $this->queue->getNbPlayers() : $this->config->rotateCount;
-
         $ranking = Core::$rankings;
         $this->sortDesc($ranking);
 
         $players = array();
         $i = 0;
         foreach ($ranking as $player) {
-            if ($i >= $nbToKick) {
+            if ($i >= $this->config->rotateCount || $this->queue->getNbPlayers() == count($players)) {
                 break;
             }
             if (isset($this->fullMatchPlayers[$player->login])) {
