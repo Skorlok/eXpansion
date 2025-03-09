@@ -207,7 +207,7 @@ class AutoQueue extends ExpPlugin
         $this->config = Config::getInstance();
 
         if ($this->config->rotateCount <= 0 || $this->storage->server->currentMaxPlayers > count($this->storage->players)) {
-            if (isset($this->storage->players['skorlok'])) {
+            if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
                 $this->eXpChatSendServerMessage('Server not full, no need to rotate players', 'skorlok');
             }
             return;
@@ -218,18 +218,18 @@ class AutoQueue extends ExpPlugin
 
         $players = array();
         $i = 0;
-        if (isset($this->storage->players['skorlok'])) {
+        if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
             $this->eXpChatSendServerMessage('number of players in queue: ' . $this->queue->getNbPlayers(), 'skorlok');
         }
         foreach ($ranking as $player) {
             if ($i >= $this->config->rotateCount || $this->queue->getNbPlayers() == count($players)) {
                 break;
             }
-            if (isset($this->storage->players['skorlok'])) {
+            if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
                 $this->eXpChatSendServerMessage('Checking if login: ' . $player->login . ' is rotatable', 'skorlok');
             }
             if (isset($this->fullMatchPlayers[$player->login])) {
-                if (isset($this->storage->players['skorlok'])) {
+                if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
                     $this->eXpChatSendServerMessage($player->login . ' is rotatable, adding to list', 'skorlok');
                 }
                 $players[] = $player->login;
