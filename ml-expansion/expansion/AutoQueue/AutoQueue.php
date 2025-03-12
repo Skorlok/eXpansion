@@ -214,6 +214,7 @@ class AutoQueue extends ExpPlugin
         }
 
         $ranking = Core::$rankings;
+        $ranking = $this->removeSpecs($ranking);
         $this->sortDesc($ranking);
 
         $players = array();
@@ -255,6 +256,17 @@ class AutoQueue extends ExpPlugin
         } else {
             ArrayOfObj::asortAsc($array, "map_points");
         }
+    }
+
+    public function removeSpecs($array)
+    {
+        $arr = array();
+        foreach ($array as $player) {
+            if (isset($this->storage->players[$player->login])) {
+                $arr[] = $player;
+            }
+        }
+        return $arr;
     }
 
     public function eXpOnUnload()
