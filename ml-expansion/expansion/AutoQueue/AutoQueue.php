@@ -216,7 +216,6 @@ class AutoQueue extends ExpPlugin
         }
 
         $ranking = Core::$rankings;
-        $ranking = $this->removeSpecs($ranking);
         $this->sortDesc($ranking);
 
         $players = array();
@@ -225,6 +224,9 @@ class AutoQueue extends ExpPlugin
             $this->eXpChatSendServerMessage('number of players in queue: ' . $this->queue->getNbPlayers(), 'skorlok');
         }
         foreach ($ranking as $player) {
+            if (!isset($this->storage->player[$player->login]) && !isset($this->fullMatchPlayers[$player->login])) {
+                continue;
+            }
             if ($i >= $this->config->rotateCount || $this->queue->getNbPlayers() == count($players)) {
                 break;
             }
@@ -258,17 +260,6 @@ class AutoQueue extends ExpPlugin
         } else {
             ArrayOfObj::asortAsc($array, "map_points");
         }
-    }
-
-    public function removeSpecs($array)
-    {
-        $arr = array();
-        foreach ($array as $player) {
-            if (isset($this->storage->players[$player->login])) {
-                $arr[] = $player;
-            }
-        }
-        return $arr;
     }
 
     public function eXpOnUnload()
