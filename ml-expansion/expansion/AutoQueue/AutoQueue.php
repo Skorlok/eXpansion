@@ -222,7 +222,7 @@ class AutoQueue extends ExpPlugin
             $this->eXpChatSendServerMessage('number of players in queue: ' . $this->queue->getNbPlayers(), 'skorlok');
         }
         foreach ($ranking as $player) {
-            if (!isset($this->storage->player[$player->login]) && !isset($this->fullMatchPlayers[$player->login]) && !$player->bestTime > 0) {
+            if (!isset($this->storage->player[$player->login]) && !isset($this->fullMatchPlayers[$player->login]) && $player->bestTime <= 0) {
                 continue;
             }
             if ($i >= $this->config->rotateCount || $this->queue->getNbPlayers() == count($players)) {
