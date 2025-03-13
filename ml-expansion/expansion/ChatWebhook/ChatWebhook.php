@@ -77,10 +77,11 @@ class ChatWebhook extends ExpPlugin
             return;
         }
 
-        $json = json_decode($data);
+        $json = json_decode($data, true);
         if ($json == false || !isset($json[0])) {
             return;
         }
+        $this->console(print_r($json, true));
     }
 
     public function setJoinTime($login)
