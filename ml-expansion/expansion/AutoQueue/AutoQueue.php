@@ -218,6 +218,13 @@ class AutoQueue extends ExpPlugin
         $ranking = Core::$rankings;
         $this->sortDesc($ranking);
 
+        if ($ranking[0]->bestTime <= 0) {
+            if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
+                $this->eXpChatSendServerMessage('First player has no time, no need to rotate players', 'skorlok');
+            }
+            return;
+        }
+
         $players = array();
         $i = 0;
         if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
