@@ -1,0 +1,2 @@
+#!/bin/bash
+php bootstrapper.php 2>&1
