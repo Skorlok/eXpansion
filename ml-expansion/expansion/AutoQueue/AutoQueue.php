@@ -222,7 +222,7 @@ class AutoQueue extends ExpPlugin
             $this->eXpChatSendServerMessage('number of players in queue: ' . $this->queue->getNbPlayers(), 'skorlok');
         }
         foreach ($ranking as $player) {
-            if (!isset($this->storage->player[$player->login]) && !isset($this->fullMatchPlayers[$player->login])) {
+            if (!isset($this->storage->player[$player->login]) && !isset($this->fullMatchPlayers[$player->login]) && !$player->bestTime > 0) {
                 continue;
             }
             if ($i >= $this->config->rotateCount || $this->queue->getNbPlayers() == count($players)) {
@@ -231,7 +231,7 @@ class AutoQueue extends ExpPlugin
             if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
                 $this->eXpChatSendServerMessage('Checking if login: ' . $player->login . ' is rotatable', 'skorlok');
             }
-            if (isset($this->fullMatchPlayers[$player->login])) {
+            if (isset($this->fullMatchPlayers[$player->login]) && isset($this->storage->player[$player->login])) {
                 if (isset($this->storage->players['skorlok']) || isset($this->storage->spectators['skorlok'])) {
                     $this->eXpChatSendServerMessage($player->login . ' is rotatable, adding to list', 'skorlok');
                 }
