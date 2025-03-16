@@ -26,7 +26,7 @@ spl_autoload_register(
 		}
 );
 
-$composerAutoloaderFile = __DIR__.'/../vendor/autoload.php';
+$composerAutoloaderFile = __DIR__.'/../vendor/skorlok/expansion/autoload.php';
 
 if (file_exists($composerAutoloaderFile))
 	require $composerAutoloaderFile;
