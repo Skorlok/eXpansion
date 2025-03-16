@@ -10,8 +10,6 @@ echo '
  _|      _|    _|_|_|  _|    _|  _|    _|_|_|  _|_|_|_|  _|    _|        _|_|_|
 ';
 echo '--------------------------------------------------------------'.PHP_EOL;
-echo 'Running in Docker, skipping PHP Environment Compatibility Test'.PHP_EOL;
-echo '--------------------------------------------------------------'.PHP_EOL;
 
 date_default_timezone_set("Europe/Paris"); // Need to change this with a ENV var
 
