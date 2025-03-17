@@ -1,0 +1,24 @@
+<frame posn="4 -1 5">
+    <frame>
+        <quad id="authorZone" sizen="14 9" halign="left" valign="top" image="<?php echo $this->getParam('country') ?>"/>
+        <label id="authorName" posn="0 -9 1.0E-5" sizen="40 4" halign="left" valign="top" style="TextRankingsBig" textsize="2"/>
+    </frame>
+</frame>
+<frame posn="45 -2 2.0E-5">
+    <frame>
+        <label id="environment" sizen="45 4" halign="center" valign="center" style="TextRaceMessage" textsize="2" textemboss="1" text="<?php echo $this->getParam('environment') ?>"/>
+        <label id="mapName" posn="0 -5 1.0E-5" sizen="45 4" halign="center" valign="center" style="TextRankingsBig" textsize="2"/>
+    </frame>
+</frame>
+<frame posn="88 -2 4.0E-5">
+    <frame>
+        <label sizen="45 4" halign="center" valign="center" style="TextRaceMessage" textsize="2" textemboss="1"/>
+        <label posn="0 -4 1.0E-5" sizen="45 4" halign="center" valign="center" style="TextRaceMessage" textsize="2" textemboss="1"/>
+        <label id="authorTime" posn="0 -8 2.0E-5" sizen="45 4" halign="right" style="TextRaceMessage" textsize="2" textemboss="1"/>
+    </frame>
+</frame>
+
+<label posn="45 3 7.0E-5" sizen="45 4" halign="center" valign="center" style="TextRankingsBig" textsize="2" textid="<?php echo $this->addLang("Now Playing") ?>"/>
+<frame posn="0 0 0">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(90, 14.5, $this->getParam('action')); ?>
+</frame>

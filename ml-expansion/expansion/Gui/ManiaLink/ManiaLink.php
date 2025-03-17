@@ -132,6 +132,12 @@ class ManiaLink extends Singletons
         $this->parameters[$key] = $value;
     }
 
+    public function addLang($lang)
+    {
+        $this->dicoMessages[$lang] = eXpGetMessage($lang);
+        return "l" . $this->simpleHashName($lang);
+    }
+
     // Others
 
     public function simpleHashName($name)
@@ -198,13 +204,26 @@ class ManiaLink extends Singletons
     }
 
     protected function getLanguages() {
-        $dico = "";
+        $dico = array();
         foreach ($this->dicoMessages as $key => $value) {
-            $dico .= "<language id=" . $key . ">";
-            $dico .= "  <testTODO>" . $value . "</testTODO>";
-            $dico .= "</language>";
+            $lang = $value->getMultiLangArray();
+            foreach ($lang as $l) {
+                $dico[$l['Lang']]["l" . $this->simpleHashName($key)] = $l['Text'];
+            }
         }
-        return $dico;
+
+        $dicoXml = "";
+        foreach ($dico as $lang => $values) {
+            $dicoXml .= "<language id=\"" . $lang . "\">" . PHP_EOL;
+            foreach ($values as $key => $value) {
+                $dicoXml .= "<" . $key . ">" . $value . "</" . $key . ">" . PHP_EOL;
+            }
+            $dicoXml .= "</language>" . PHP_EOL;
+        }
+        
+        if ($dicoXml) {
+            return "<dico>" . $dicoXml . "</dico>";
+        }
     }
 
     public function show($login = null, $persistant = false)

@@ -3,7 +3,7 @@ if (EXP_widgetLastPosRel.existskey(id) && EXP_widgetLastPosRel[id].existskey(gam
     declare MenuIcon = (Page.GetFirstChild("toggleMicroMenu") as CMlQuad);
     declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
 
-    if (p.X > 0) {
+    if (Window.RelativePosition.X > 0) {
         MenuIcon.PosnX = 0.0;
         MicroMenu.PosnX = -31.0;
     } else {

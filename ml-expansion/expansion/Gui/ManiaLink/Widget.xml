@@ -1,7 +1,5 @@
 <manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->getWidgetName() ?>">
-<dico>
 <?php echo $this->getLanguages() ?>
-</dico>
 <frame posn="<?php echo $this->getPosX() . " " . $this->getPosY() . " " . $this->getPosZ() ?>" id="<?php echo $this->getWidgetName() ?>">
 
 <?php echo $this->getXML() ?>

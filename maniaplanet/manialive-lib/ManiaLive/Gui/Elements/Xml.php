@@ -32,6 +32,11 @@ class Xml extends \ManiaLive\Gui\Element
 	{
 		$this->xml = $xml;
 	}
+
+	function getContent()
+	{
+		return $this->xml;
+	}
 	
 	function save()
 	{
