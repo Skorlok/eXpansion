@@ -51,7 +51,16 @@
   },
   "autoload": {
     "psr-4": {
-      "ManiaLivePlugins\\eXpansion\\": "."
+      "ManiaLivePlugins\\eXpansion\\": ".",
+      "oliverde8\\AsynchronousJobs\\": "oliverde8/asynchronous-jobs/src/AsynchronousJobs",
+      "ManiaLive\\": "maniaplanet/manialive-lib/ManiaLive/",
+      "Maniaplanet\\": "maniaplanet/dedicated-server-api/libraries/Maniaplanet"
+    },
+    "classmap": ["maniaplanet/manialib/libraries/ManiaLib"]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "oliverde8\\AsynchronousJobsTests\\": "test/AsynchronousJobsTests"
     }
   }
 }
