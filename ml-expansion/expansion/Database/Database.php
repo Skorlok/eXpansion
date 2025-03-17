@@ -173,7 +173,7 @@ class Database extends ExpPlugin
         $query = $this->db->execute($g);
 
 
-        while ($data = $query->fetchStdObject()) {
+        while ($data = $query->fetchObject()) {
             if (isset($mapsByUid[$data->challenge_uid])) {
                 $mapsByUid[$data->challenge_uid]->addTime = $data->challenge_addtime;
                 unset($mapsByUid[$data->challenge_uid]);
@@ -361,7 +361,7 @@ class Database extends ExpPlugin
         if ($query->recordCount() == 0) {
             return null;
         } else {
-            $player = $query->fetchStdObject();
+            $player = $query->fetchObject();
 
             return $player;
         }
@@ -375,7 +375,7 @@ class Database extends ExpPlugin
             $q = "SELECT `player_wins` FROM `exp_players` WHERE `player_login` = " . $this->db->quote($player->login) . ";";
             $query = $this->db->execute($q);
 
-            $data = $query->fetchStdObject();
+            $data = $query->fetchObject();
             $w = $data->player_wins;
 
             $msg_pub = eXpGetMessage('#rank#Congratulations to #variable#%1$s#rank# for their #variable#%2$s#rank# win!');

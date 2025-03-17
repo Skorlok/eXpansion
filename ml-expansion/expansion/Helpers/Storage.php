@@ -119,12 +119,6 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
     /** @var string Just php version without compilation formation */
     public $cleanPhpVersion = '';
 
-    /** @var string Just mysql version. */
-    public $cleanMysqlVersion = '';
-
-    /** @var string Os of the server */
-    public $serverOs = '';
-
     /** @var Player[] */
     public $players = array();
 
@@ -188,19 +182,6 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
 
         $version = explode('-', phpversion());
         $this->cleanPhpVersion = $version[0];
-
-        $version = $this->getDatabase()->execute('SHOW VARIABLES LIKE "version"')->fetchArray();
-        $this->cleanMysqlVersion = $version['Value'];
-
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            $this->serverOs = "Windows";
-        } else {
-            if (strtoupper(substr(PHP_OS, 0, 3)) === 'MAC') {
-                $this->serverOs = "Mac";
-            } else {
-                $this->serverOs = "Linux";
-            }
-        }
 
         foreach ($this->storage->players as $player) {
             if ($player->isConnected) {

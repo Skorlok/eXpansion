@@ -825,7 +825,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $i = 1;
         $records = array();
         $players = array();
-        while ($data = $dbData->fetchStdObject()) {
+        while ($data = $dbData->fetchObject()) {
             $record = new Record();
             $this->currentChallengePlayerRecords[$data->record_playerlogin] = $record;
 
@@ -928,7 +928,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $i = 1;
         $records = array();
 
-        while ($data = $dbData->fetchStdObject()) {
+        while ($data = $dbData->fetchObject()) {
 
             $record = new Record();
 
@@ -972,7 +972,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         if ($dbData->recordCount() > 0) {
 
             $record = new Record();
-            $data = $dbData->fetchStdObject();
+            $data = $dbData->fetchObject();
 
             $record->place = $this->config->recordsCount + 1;
             $record->login = $data->record_playerlogin;
@@ -1271,7 +1271,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             if ($data->recordCount() == 0) {
                 $this->total_ranks = -1;
             } else {
-                $vals = $data->fetchStdObject();
+                $vals = $data->fetchObject();
                 $this->total_ranks = $data->recordCount();
             }
         }
@@ -1307,7 +1307,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $this->player_ranks[$login] = -1;
                 return -1;
             } else {
-                $vals = $data->fetchStdObject();
+                $vals = $data->fetchObject();
                 $points = $vals->points;
 
                 if (empty($points) || $vals->nbFinish <= 5) {
@@ -1366,7 +1366,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $loginlist = array();
             $i = 1;
 
-            while ($data = $dbData->fetchStdObject()) {
+            while ($data = $dbData->fetchObject()) {
                 $tempranks[$data->login] = $data;
                 $loginlist[] = $data->login;
                 $this->player_ranks[$data->login] = $i++;
@@ -1378,7 +1378,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
             $dbData = $this->db->execute($q);
 
-            while ($data = $dbData->fetchStdObject()) {
+            while ($data = $dbData->fetchObject()) {
                 $tempranks[$data->login] = (object)array_merge((array)$tempranks[$data->login], (array)$data);
             }
 
@@ -1386,7 +1386,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $q = 'SELECT player_login as login, player_nickname, player_updated, player_wins, player_timeplayed, player_nation FROM exp_players WHERE player_login IN (' . $this->getLoginSqlString($loginlist) . ') LIMIT 0,100;';
 
             $dbData = $this->db->execute($q);
-            while ($data = $dbData->fetchStdObject()) {
+            while ($data = $dbData->fetchObject()) {
                 $tempranks[$data->login] = (object)array_merge((array)$tempranks[$data->login], (array)$data);
             }
 
