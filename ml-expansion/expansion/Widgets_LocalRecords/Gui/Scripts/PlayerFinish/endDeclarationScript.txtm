@@ -1,7 +1,6 @@
 declare Integer nbShow = <?php echo $this->nbRecord ?>;
 declare Integer nbFields =  <?php echo $this->nbFields ?>;
 declare Integer nbFirstFields =  <?php echo $this->nbFirstFields ?>;
-declare Boolean getCurrentTimes = <?php echo $this->getCurrentTimes ?>;
 declare persistent Boolean[Text] showDiff = Boolean[Text];
 if (!showDiff.existskey(id)) {
     showDiff[id] = False;

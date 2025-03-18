@@ -458,6 +458,7 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
                 }
 
                 $xml = Manialinks::getXml();
+                /*echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);*/
                 $size = strlen($xml);
 
                 if ($size > $limit) {

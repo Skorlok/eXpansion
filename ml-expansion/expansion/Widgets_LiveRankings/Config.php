@@ -26,6 +26,6 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $liveRankingPanel_PosX_Team = 120;
     public $liveRankingPanel_PosY_Team = 64;
-    public $liveRankingPanel_nbFields_Team = 22;
+    public $liveRankingPanel_nbFields_Team = 21;
     public $liveRankingPanel_nbFirstFields_Team = 10;
 }

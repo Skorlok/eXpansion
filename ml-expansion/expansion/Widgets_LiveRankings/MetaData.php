@@ -130,7 +130,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeInt("liveRankingPanel_nbFields_Team", "Number of fields in liveRanking Panel (Team)", $config, false, false);
-        $var->setDefaultValue(22);
+        $var->setDefaultValue(21);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
 

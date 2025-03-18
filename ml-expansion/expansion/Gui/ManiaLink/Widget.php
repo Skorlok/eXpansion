@@ -53,6 +53,7 @@ class Widget extends ManiaLink
         $this->eXpWidgetScript->setParam("name", $this->getWidgetName());
         $this->eXpWidgetScript->setParam("axisDisabled", $this->axisDisabled);
         $this->eXpWidgetScript->setParam("gameMode", Gui::fixString($this->storage->gameInfos->scriptName));
+        $this->eXpWidgetScript->setParam("activeLayer", $this->getLayer());
         $this->eXpWidgetScript->setParam("visibleLayerInit", $this->getLayer());
         $this->eXpWidgetScript->setParam("forceReset", $this->getBoolean(DEBUG));
 

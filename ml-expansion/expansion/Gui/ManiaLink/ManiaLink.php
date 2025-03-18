@@ -54,7 +54,7 @@ class ManiaLink extends Singletons
 
     public function getWidgetHashName()
     {
-        return $this->simpleHashName($this->name);
+        return $this->simpleHashName($this->name . $this->getLayer());
     }
 
     public function getPosX()
@@ -134,6 +134,9 @@ class ManiaLink extends Singletons
 
     public function addLang($lang)
     {
+        if ($lang == "") {
+            return "";
+        }
         $this->dicoMessages[$lang] = eXpGetMessage($lang);
         return "l" . $this->simpleHashName($lang);
     }
@@ -142,6 +145,9 @@ class ManiaLink extends Singletons
 
     public function simpleHashName($name)
     {
+        if ($name == "") {
+            return "";
+        }
         $hash = "";
         for ($i = 0; $i < strlen($name); $i++) {
             $hash .= ord($name[$i]);
@@ -230,7 +236,7 @@ class ManiaLink extends Singletons
     {
         $this->getUserXML();
         $xml = $this->getWidget();
-        //echo $xml;
+        /*echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);*/
         if ($login !== null) {
             $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, true);
         } else {

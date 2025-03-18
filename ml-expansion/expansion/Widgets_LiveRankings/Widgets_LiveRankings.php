@@ -2,27 +2,29 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_LiveRankings;
 
-use ManiaLivePlugins\eXpansion\Widgets_LiveRankings\Gui\Widgets\LivePanel;
-use ManiaLivePlugins\eXpansion\Widgets_LiveRankings\Gui\Widgets\LivePanel2;
+use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    public static $me = null;
-    public static $secondMap = false;
-    private $forceUpdate = false;
-    private $needUpdate = false;
-    private $widgetIds = array();
     public static $raceOn = true;
-    public static $roundPoints;
+    private $roundPoints;
     private $config;
+
+    private $widget;
+    private $widget2;
 
     public function eXpOnReady()
     {
         $this->config = Config::getInstance();
         $this->enableDedicatedEvents();
         $this->updateLivePanel();
-        self::$me = $this;
 
         $this->getRoundsPoints();
     
@@ -42,7 +44,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         if ($var->getConfigInstance() instanceof Config) {
             $this->config = Config::getInstance();
-            Gui\Widgets\LivePanel::EraseAll();
             $this->updateLivePanel();
         }
     }
@@ -52,7 +53,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
             return;
         }
-        Gui\Widgets\LivePanel::$connection = $this->connection;
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
         //gamemode specific settings
@@ -83,73 +83,367 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Default;
         }
 
-        if ($login != null) {
-            Gui\Widgets\LivePanel::Erase($login);
-            Gui\Widgets\LivePanel2::Erase($login);
-        } else {
-            Gui\Widgets\LivePanel::EraseAll();
-            Gui\Widgets\LivePanel2::EraseAll();
-        }
-
-        $localRecs = LivePanel::GetAll();
-
-        if ($login == null) {
-            $panelMain = Gui\Widgets\LivePanel::Create($login);
-            $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-            $panelMain->setPosition($posX, $posY);
-            $panelMain->setNbFields($nbF);
-            $panelMain->setNbFirstFields($nbFF);
-            $this->widgetIds["LivePanel"] = $panelMain;
-            $this->widgetIds["LivePanel"]->update();
-            $this->widgetIds["LivePanel"]->show();
-        } else {
-            if (isset($localRecs[0])) {
-                $localRecs[0]->update();
-                $localRecs[0]->show($login);
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            if ($this->widget2 instanceof Widget) {
+                $this->widget2->erase();
             }
         }
 
+        $sizeX = 42;
+        $sizeY = 3 + $nbF * 4;
+        
+        $trayScript = $this->getTrayScript($sizeX, $nbF);
+        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+            $widgetScript = $this->getWidgetCpScript($nbF, $nbFF, "normal");
+            $widgetScriptScore = $this->getWidgetCpScript($nbF, $nbFF, "scorestable");
+        } else {
+            $widgetScript = $this->getWidgetScript($nbF, $nbFF);
+        }
+
+        $team1Name = '$wBlue Team : ';
+        $team1Color = '00f';
+        $team2Name = '$wRed Team : ';
+        $team2Color = 'f00';
+
+        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+            $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+            if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                $team1Name = $var["team1Name"] . ' : ';
+                $team1Color = $var["team1Color"];
+            }
+            if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                $team2Name = $var["team2Name"] . ' : ';
+                $team2Color = $var["team2Color"];
+            }
+        }
+
+        
+        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+            $this->widget = new Widget("Widgets_LiveRankings\Gui\Widgets\LiveRanking.xml");
+        } else {
+            $this->widget = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
+        }
+        $this->widget->setName("Live Rankings");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition($posX, $posY, 0);
+        $this->widget->setSize($sizeX, $sizeY);
+        $this->widget->setParam("sizeX", $sizeX);
+        $this->widget->setParam("nbFields", $nbF);
+        $this->widget->setParam("title", "Live Rankings");
+        $this->widget->setParam("action", null);
+        $this->widget->setParam("guiConfig", guiConfig::getInstance());
+        $this->widget->setParam("colorParser", ColorParser::getInstance());
+        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+            $this->widget->setParam("team1Name", $team1Name);
+            $this->widget->setParam("team1Color", $team1Color);
+            $this->widget->setParam("team2Name", $team2Name);
+            $this->widget->setParam("team2Color", $team2Color);
+        }
+        $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
+        $this->widget->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
+        $this->widget->registerScript($widgetScript);
+        $this->widget->registerScript($trayScript);
+        if ($login != null) {
+            $this->widget->show($login, false);
+        } else {
+            $this->widget->show(null, true);
+        }
+
+        /** @var ManiaLivePlugins\eXpansion\Gui\Gui $gui */
         if (!$gui->disablePersonalHud) {
-            $localRecs = LivePanel2::GetAll();
-            if ($login == null) {
-                $panelScore = Gui\Widgets\LivePanel2::Create($login);
-                $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-                $panelScore->setVisibleLayer("scorestable");
-                $panelScore->setPosition($posX, $posY);
-                $panelScore->setNbFields($nbF);
-                $panelScore->setNbFirstFields($nbFF);
-                $this->widgetIds["LivePanel2"] = $panelScore;
-                $this->widgetIds["LivePanel2"]->update();
-                $this->widgetIds["LivePanel2"]->show();
+            if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+                $this->widget2 = new Widget("Widgets_LiveRankings\Gui\Widgets\LiveRanking.xml");
+                $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
+                $this->widget2->registerScript($widgetScriptScore);
             } else {
-                if (isset($localRecs[0])) {
-                    $localRecs[0]->update();
-                    $localRecs[0]->show($login);
+                $this->widget2 = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
+                $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
+                $this->widget2->registerScript($widgetScript);
+            }
+            $this->widget2->setName("Live Rankings");
+            $this->widget2->setLayer("scorestable");
+            $this->widget2->setPosition($posX, $posY, 0);
+            $this->widget2->setSize($sizeX, $sizeY);
+            $this->widget2->setParam("sizeX", $sizeX);
+            $this->widget2->setParam("nbFields", $nbF);
+            $this->widget2->setParam("title", "Live Rankings");
+            $this->widget2->setParam("action", null);
+            $this->widget2->setParam("guiConfig", guiConfig::getInstance());
+            $this->widget2->setParam("colorParser", ColorParser::getInstance());
+            if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+                $this->widget2->setParam("team1Name", $team1Name);
+                $this->widget2->setParam("team1Color", $team1Color);
+                $this->widget2->setParam("team2Name", $team2Name);
+                $this->widget2->setParam("team2Color", $team2Color);
+            }
+            $this->widget2->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
+            $this->widget2->registerScript($trayScript);
+            if ($login != null) {
+                $this->widget2->show($login, false);
+            } else {
+                $this->widget2->show(null, true);
+            }
+        }
+    }
+
+    public function getWidgetCpScript($nbField, $nbFirstField, $layer = "normal")
+    {
+        $script = new Script("Widgets_LiveRankings/Gui/Scripts/CpPositions");
+        $script->setParam("nbFields", $nbField);
+        $script->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
+        $script->setParam("nbFirstFields", $nbFirstField);
+        $script->setParam('varName', 'LiveTime1');
+        if ($layer == "scorestable") {
+            $script->setParam('varName', 'LiveTime2');
+        }
+        $script->setParam("playerTimes", 'Integer[Text][Integer]');
+        $script->setParam("nickNames", 'Text[Text]');
+        $script->setParam("bestCps", 'Integer[Integer]');
+        $script->setParam("maxCp", -1);
+
+        $script->setParam("givePoints", "True");
+        $script->setParam("points", "Integer[Integer]");
+        $script->setParam("nbLaps", 1);
+        $script->setParam("isLaps", "False");
+        $script->setParam("isTeam", "False");
+        $script->setParam("team1Color", '$3AF');
+        $script->setParam("team2Color", '$D00');
+        $script->setParam("playerTeams", "Integer[Text]");
+
+
+        $teamMaxPoint = 10;
+        $ScriptSettings = $this->connection->getModeScriptSettings();
+        if (array_key_exists("S_ForceLapsNb", $ScriptSettings)) {
+            if ($ScriptSettings['S_ForceLapsNb'] != -1) {
+                $nbLaps = $ScriptSettings['S_ForceLapsNb'];
+            } else {
+                $nbLaps = $this->storage->currentMap->nbLaps;
+            }
+        }
+        if (isset($ScriptSettings['S_MaxPointsPerRound'])) {
+            $teamMaxPoint = $ScriptSettings['S_MaxPointsPerRound'];
+        }
+
+        $script->setParam("maxPoint", $teamMaxPoint);
+
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $script->setParam("isLaps", "True");
+            $script->setParam("nbLaps", $nbLaps);
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $this->storage->currentMap->nbLaps > 1) {
+            $script->setParam("isLaps", "True");
+            $script->setParam("nbLaps", $nbLaps);
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM && $this->storage->currentMap->nbLaps > 1) {
+            $script->setParam("isLaps", "True");
+            $script->setParam("nbLaps", $nbLaps);
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP && $this->storage->currentMap->nbLaps > 1) {
+            $script->setParam("isLaps", "True");
+            $script->setParam("nbLaps", $nbLaps);
+        }
+
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $script->setParam("givePoints", "False");
+        }
+
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $script->setParam("isTeam", "True");
+
+            $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+            if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+                $script->setParam("team1Color", '$' . $var["team1Color"]);
+                $script->setParam("team2Color", '$' . $var["team2Color"]);
+            } else {
+                $script->setParam("team1Color", '$3AF');
+                $script->setParam("team2Color", '$D00');
+            }
+        }
+
+        if (!empty($this->roundPoints)) {
+            $script->setParam("points", "[" . implode(",", $this->roundPoints) . "]");
+        }
+
+
+
+
+        if (!self::$raceOn) {
+            return $script;
+        }
+
+
+        $nbCheckpoints = array();
+        $playerCps = array();
+        $playerNickNames = array();
+        $bestCps = array();
+        $biggestCp = -1;
+
+        foreach (Core::$playerInfo as $login => $player) {
+            $lastCpIndex = count($player->checkpoints) - 1;
+            $playerNickNames[$player->login] = $player->nickName;
+
+            if ($player->isPlaying && $lastCpIndex >= 0 && isset($player->checkpoints[$lastCpIndex]) && $player->checkpoints[$lastCpIndex] > 0) {
+
+                if ($lastCpIndex > $biggestCp) {
+                    $biggestCp = $lastCpIndex;
+                }
+
+                $lastCpTime = $player->checkpoints[$lastCpIndex];
+                $player = $this->storage->getPlayerObject($login);
+                $playerCps[$lastCpIndex][$login] = $lastCpTime;
+                $playerTeams[$login] = $player->teamId;
+            }
+        }
+
+        $newPlayerCps = array();
+        foreach ($playerCps as $coIndex => $cpsTimes) {
+            arsort($cpsTimes);
+            $newPlayerCps[$coIndex] = $cpsTimes;
+        }
+
+        $playerTimes = "[";
+        $NickNames = "[";
+        $teams = "[";
+
+        $index = 1;
+        foreach ($playerNickNames as $login => $nickname) {
+            if ($index > 1) {
+                $NickNames .= ', ';
+            }
+            $NickNames .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString(Formatting::stripLinks($nickname)) . '"';
+            $index++;
+        }
+        $NickNames .= "]";
+
+        $cpCount = 0;
+        $teamCont = 0;
+        foreach ($newPlayerCps as $cpIndex => $cpTimes) {
+            if ($cpCount != 0) {
+                $playerTimes .= ", ";
+            }
+            $playerTimes .= $cpIndex . "=>[";
+
+            $cCount = 0;
+            $nbCheckpoints[$cpIndex] = 0;
+            foreach ($cpTimes as $login => $score) {
+                if ($cCount != 0) {
+                    $playerTimes .= ", ";
+                }
+                if ($teamCont != 0) {
+                    $teams .= ", ";
+                }
+                $playerTimes .= '"' . $login . "\"=>" . $score;
+                $teams .= '"' . $login . "\"=>" . ($playerTeams[$login] == 1 ? 0 : 1);
+                $nbCheckpoints[$cpIndex]++;
+                $cCount++;
+                $teamCont++;
+
+                if (!isset($bestCps[$cpIndex]) || $score < $bestCps[$cpIndex]) {
+                    $bestCps[$cpIndex] = $score;
                 }
             }
+
+            $playerTimes .= "]";
+            $cpCount++;
+
+        }
+        $playerTimes .= "]";
+        $teams .= "]";
+
+        $bestCpsText = '';
+        foreach ($bestCps as $cpIndex => $time) {
+            if ($bestCpsText != "") {
+                $bestCpsText .= ', ';
+            }
+            $bestCpsText .= $cpIndex . '=>' . $time;
         }
 
-        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
-            if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
-                $this->connection->triggerModeScriptEvent("UI_DisplaySmallScoresTable", "False");
-            } else {
-                \ManiaLive\Gui\CustomUI::HideForAll(\ManiaLive\Gui\CustomUI::ROUND_SCORES);
+        $bestCps = '[' . $bestCpsText . ']';
+
+
+        if ($teamCont == 0) {
+            $script->setParam("playerTeams", "Integer[Text]");
+        } else {
+            $script->setParam("playerTeams", $teams);
+        }
+
+        if (!empty($newPlayerCps)) {
+            $script->setParam("playerTimes", $playerTimes);
+            $script->setParam("nickNames", $NickNames);
+            $script->setParam("maxCp", $biggestCp + 1);
+            $script->setParam("bestCps", $bestCps);
+        } else {
+            $script->setParam("playerTimes", 'Integer[Text][Integer]');
+            $script->setParam("nickNames", 'Text[Text]');
+            $script->setParam("maxCp", -1);
+        }
+
+        return $script;
+    }
+
+    public function getWidgetScript($nbField, $nbFirstField)
+    {
+        $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
+        $script->setParam("nbRecord", 255);
+        $script->setParam("nbFields", $nbField);
+        $script->setParam("nbFirstFields", $nbFirstField);
+
+        $recsData = "";
+        $nickData = "";
+
+        $index = 1;
+        foreach (Core::$rankings as $player) {
+            if (!empty($player->bestTime) && $player->bestTime > 0) {
+                if ($index > 1) {
+                    $recsData .= ', ';
+                    $nickData .= ', ';
+                }
+                $recsData .= '"' . Gui::fixString($player->login) . '"=>' . $player->bestTime;
+                $nickData .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString(Formatting::stripLinks($player->nickName)) . '"';
+                $index++;
             }
         }
+
+        if (empty($recsData)) {
+            $recsData = 'Integer[Text]';
+            $nickData = 'Text[Text]';
+        } else {
+            $recsData = '[' . $recsData . ']';
+            $nickData = '[' . $nickData . ']';
+        }
+
+        $script->setParam("playerTimes", $recsData);
+        $script->setParam("playerNicks", $nickData);
+
+        return $script;
+    }
+
+    public function getTrayScript($sizeX, $nbField)
+    {
+        $script = new Script("Gui/Scripts/NewTray");
+        $script->setParam("sizeX", $sizeX);
+        $script->setParam("sizeY", 3 + $nbField * 4);
+        return $script;
     }
 
     public function showLivePanel($login)
     {
-        $this->updateLivePanel($login);
+        if ($this->widget instanceof Widget) {
+            $this->widget->show($login);
+            if ($this->widget2 instanceof Widget) {
+                $this->widget2->show($login);
+            }
+        }
     }
 
     public function hideLivePanel()
     {
-        Gui\Widgets\LivePanel::EraseAll();
-        Gui\Widgets\LivePanel2::EraseAll();
-        $this->widgetIds = array();
-
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            if ($this->widget2 instanceof Widget) {
+                $this->widget2->erase();
+            }
+        }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -162,9 +456,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         if ($wasWarmUp) {
             self::$raceOn = false;
-            $this->forceUpdate = true;
             $this->updateLivePanel();
-            self::$secondMap = true;
             self::$raceOn = true;
         } else {
             $this->hideLivePanel();
@@ -187,9 +479,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         $points = $this->connection->getRoundCustomPoints();
         if (empty($points)) {
-            self::$roundPoints = array(10, 6, 4, 3, 2, 1);
+            $this->roundPoints = array(10, 6, 4, 3, 2, 1);
         } else {
-            self::$roundPoints = $points;
+            $this->roundPoints = $points;
         }
     }
 
@@ -201,10 +493,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
         $this->getRoundsPoints();
         self::$raceOn = false;
-        $this->forceUpdate = true;
-        $this->hideLivePanel();
         $this->updateLivePanel();
-        self::$secondMap = true;
         self::$raceOn = true;
     }
 
@@ -215,16 +504,8 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
 
         self::$raceOn = false;
-        $this->forceUpdate = true;
-        $this->hideLivePanel();
         $this->updateLivePanel();
-        self::$secondMap = true;
         self::$raceOn = true;
-    }
-
-    public function onEndRound()
-    {
-
     }
 
     public function onBeginRound()
@@ -232,7 +513,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         //We need to reset the panel for next Round
         self::$raceOn = false;
         $this->getRoundsPoints();
-        $this->hideLivePanel();
         $this->updateLivePanel();
         self::$raceOn = true;
     }
@@ -242,15 +522,13 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->showLivePanel($login);
     }
 
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        Gui\Widgets\LivePanel::Erase($login);
-        Gui\Widgets\LivePanel2::Erase($login);
-    }
-
     public function eXpOnUnload()
     {
-        Gui\Widgets\LivePanel::EraseAll();
-        Gui\Widgets\LivePanel2::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            if ($this->widget2 instanceof Widget) {
+                $this->widget2->erase();
+            }
+        }
     }
 }

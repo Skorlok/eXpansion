@@ -187,6 +187,7 @@ class Maps extends ExpPlugin
         } else {
             $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
             $widget->setName("Current Map Widget");
+            $widget->setLayer("scorestable");
             $widget->erase();
         }
 
@@ -195,6 +196,7 @@ class Maps extends ExpPlugin
         } else {
             $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
             $widget->setName("Next Map");
+            $widget->setLayer("scorestable");
             $widget->erase();
         }
     }
@@ -397,10 +399,12 @@ class Maps extends ExpPlugin
 
         $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
         $widget->setName("Current Map Widget");
+        $widget->setLayer("scorestable");
         $widget->erase();
 
         $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
         $widget->setName("Next Map");
+        $widget->setLayer("scorestable");
         $widget->erase();
 
         if (count($this->queue) > 0) {
@@ -857,10 +861,12 @@ class Maps extends ExpPlugin
 
             $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
             $widget->setName("Current Map Widget");
+            $widget->setLayer("scorestable");
             $widget->erase();
 
             $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
             $widget->setName("Next Map");
+            $widget->setLayer("scorestable");
             $widget->erase();
 
             if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName)) {
@@ -1348,10 +1354,12 @@ class Maps extends ExpPlugin
     {
         $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
         $widget->setName("Current Map Widget");
+        $widget->setLayer("scorestable");
         $widget->erase();
 
         $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
         $widget->setName("Next Map");
+        $widget->setLayer("scorestable");
         $widget->erase();
 
         Maplist::EraseAll();
