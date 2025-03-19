@@ -77,7 +77,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && Endurance::$last_round == false) {
             return;
         }
         $this->dedirecords = array();
@@ -103,7 +103,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $gamemode = $this->eXpGetCurrentCompatibilityGameMode();
         $scriptSettings = $this->connection->getModeScriptSettings();
 
-        if (Endurance::$enduro) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
             $gamemode = GameInfos::GAMEMODE_LAPS;
         }
         if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {

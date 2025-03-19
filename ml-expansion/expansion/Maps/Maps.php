@@ -386,7 +386,7 @@ class Maps extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap, $enduroSkipMap = false)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false && $enduroSkipMap != true) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false && $enduroSkipMap != true) {
             return;
         }
 
@@ -1345,7 +1345,7 @@ class Maps extends ExpPlugin
 
     public function onMapSkip()
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
             $this->onEndMatch(array(),array(), true);
         }
     }

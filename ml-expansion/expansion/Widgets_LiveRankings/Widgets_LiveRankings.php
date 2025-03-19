@@ -3,8 +3,10 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_LiveRankings;
 
 use ManiaLib\Utils\Formatting;
+use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\ColorParser;
+use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
@@ -23,6 +25,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function eXpOnReady()
     {
         $this->config = Config::getInstance();
+
+        Dispatcher::register(\ManiaLivePlugins\eXpansion\Endurance\Events\Event::getClass(), $this);
+
         $this->enableDedicatedEvents();
         $this->updateLivePanel();
 
@@ -50,28 +55,32 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function updateLivePanel($login = null)
     {
-        if (strtolower($this->connection->getScriptName()['CurrentValue']) == "endurocup.script.txt") {
-            return;
-        }
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+
         //gamemode specific settings
-        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
+            $posX = $this->config->liveRankingPanel_PosX_Endurance;
+            $posY = $this->config->liveRankingPanel_PosY_Endurance;
+            $nbF = $this->config->liveRankingPanel_nbFields_Endurance;
+            $nbFF = $this->config->liveRankingPanel_nbFirstFields_Endurance;
+        } elseif ($gamemode == GameInfos::GAMEMODE_LAPS) {
             $posX = $this->config->liveRankingPanel_PosX_Laps;
             $posY = $this->config->liveRankingPanel_PosY_Laps;
             $nbF = $this->config->liveRankingPanel_nbFields_Laps;
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Laps;
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_ROUNDS) {
             $posX = $this->config->liveRankingPanel_PosX_Rounds;
             $posY = $this->config->liveRankingPanel_PosY_Rounds;
             $nbF = $this->config->liveRankingPanel_nbFields_Rounds;
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Rounds;
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_TEAM) {
             $posX = $this->config->liveRankingPanel_PosX_Team;
             $posY = $this->config->liveRankingPanel_PosY_Team;
             $nbF = $this->config->liveRankingPanel_nbFields_Team;
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Team;
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_CUP) {
             $posX = $this->config->liveRankingPanel_PosX_Cup;
             $posY = $this->config->liveRankingPanel_PosY_Cup;
             $nbF = $this->config->liveRankingPanel_nbFields_Cup;
@@ -83,7 +92,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Default;
         }
 
-        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
             if ($this->widget2 instanceof Widget) {
@@ -95,11 +103,15 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $sizeY = 3 + $nbF * 4;
         
         $trayScript = $this->getTrayScript($sizeX, $nbF);
-        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+        if (($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) && $this->storage->getCleanGamemodeName() != "endurocup") {
             $widgetScript = $this->getWidgetCpScript($nbF, $nbFF, "normal");
-            $widgetScriptScore = $this->getWidgetCpScript($nbF, $nbFF, "scorestable");
+            $widgetScriptScore = $this->getWidgetCpScript($nbF, $nbFF, "scorestable"); // workaround when we have 2 layers
         } else {
-            $widgetScript = $this->getWidgetScript($nbF, $nbFF);
+            if ($this->storage->getCleanGamemodeName() == "endurocup") {
+                $widgetScript = $this->getWidgetScriptEndurance($nbF, $nbFF);
+            } else {
+                $widgetScript = $this->getWidgetScript($nbF, $nbFF);
+            }
         }
 
         $team1Name = '$wBlue Team : ';
@@ -120,12 +132,12 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
 
         
-        if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+        if (($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) && $this->storage->getCleanGamemodeName() != "endurocup") {
             $this->widget = new Widget("Widgets_LiveRankings\Gui\Widgets\LiveRanking.xml");
         } else {
             $this->widget = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
         }
-        $this->widget->setName("Live Rankings");
+        $this->widget->setName("Live Rankings Panel");
         $this->widget->setLayer("normal");
         $this->widget->setPosition($posX, $posY, 0);
         $this->widget->setSize($sizeX, $sizeY);
@@ -133,6 +145,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->widget->setParam("nbFields", $nbF);
         $this->widget->setParam("title", "Live Rankings");
         $this->widget->setParam("action", null);
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
+            $this->widget->setParam("action", Endurance::$openScoresAction);
+        }
         $this->widget->setParam("guiConfig", guiConfig::getInstance());
         $this->widget->setParam("colorParser", ColorParser::getInstance());
         if ($gamemode == GameInfos::GAMEMODE_TEAM) {
@@ -153,16 +168,16 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
         /** @var ManiaLivePlugins\eXpansion\Gui\Gui $gui */
         if (!$gui->disablePersonalHud) {
-            if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) {
+            if (($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) && $this->storage->getCleanGamemodeName() != "endurocup") {
                 $this->widget2 = new Widget("Widgets_LiveRankings\Gui\Widgets\LiveRanking.xml");
-                $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
+                $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText')); // this script is a dependency for the $widgetScriptScore, we need to load it first
                 $this->widget2->registerScript($widgetScriptScore);
             } else {
                 $this->widget2 = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
                 $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                 $this->widget2->registerScript($widgetScript);
             }
-            $this->widget2->setName("Live Rankings");
+            $this->widget2->setName("Live Rankings Panel");
             $this->widget2->setLayer("scorestable");
             $this->widget2->setPosition($posX, $posY, 0);
             $this->widget2->setSize($sizeX, $sizeY);
@@ -170,6 +185,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $this->widget2->setParam("nbFields", $nbF);
             $this->widget2->setParam("title", "Live Rankings");
             $this->widget2->setParam("action", null);
+            if ($this->storage->getCleanGamemodeName() == "endurocup") {
+                $this->widget2->setParam("action", Endurance::$openScoresAction);
+            }
             $this->widget2->setParam("guiConfig", guiConfig::getInstance());
             $this->widget2->setParam("colorParser", ColorParser::getInstance());
             if ($gamemode == GameInfos::GAMEMODE_TEAM) {
@@ -228,25 +246,26 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
         $script->setParam("maxPoint", $teamMaxPoint);
 
-        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+        if ($gamemode == GameInfos::GAMEMODE_LAPS) {
             $script->setParam("isLaps", "True");
             $script->setParam("nbLaps", $nbLaps);
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS && $this->storage->currentMap->nbLaps > 1) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_ROUNDS && $this->storage->currentMap->nbLaps > 1) {
             $script->setParam("isLaps", "True");
             $script->setParam("nbLaps", $nbLaps);
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM && $this->storage->currentMap->nbLaps > 1) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_TEAM && $this->storage->currentMap->nbLaps > 1) {
             $script->setParam("isLaps", "True");
             $script->setParam("nbLaps", $nbLaps);
-        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP && $this->storage->currentMap->nbLaps > 1) {
+        } elseif ($gamemode == GameInfos::GAMEMODE_CUP && $this->storage->currentMap->nbLaps > 1) {
             $script->setParam("isLaps", "True");
             $script->setParam("nbLaps", $nbLaps);
         }
 
-        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+        if ($gamemode == GameInfos::GAMEMODE_LAPS) {
             $script->setParam("givePoints", "False");
         }
 
-        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
             $script->setParam("isTeam", "True");
 
             $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
@@ -381,6 +400,41 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         return $script;
     }
 
+    public function getWidgetScriptEndurance($nbField, $nbFirstField)
+    {
+        $script = new Script("Endurance/Gui/Scripts/PlayerFinish");
+        $script->setParam("nbScores", 500);
+        $script->setParam("nbFields", $nbField);
+        $script->setParam("nbFirstFields", $nbFirstField);
+
+        $recsData = "";
+        $nickData = "";
+
+        $index = 1;
+        foreach (Endurance::$enduro_total_points as $player_login => $record) {
+            if ($index > 1) {
+                $recsData .= ', ';
+                $nickData .= ', ';
+            }
+            $recsData .= '"' . Gui::fixString($player_login) . '"=>' . $record['points'];
+            $nickData .= '"' . Gui::fixString($player_login) . '"=>"' . Gui::fixString($record['name']) . '"';
+            $index++;
+        }
+
+        if (empty($recsData)) {
+            $recsData = 'Integer[Text]';
+            $nickData = 'Text[Text]';
+        } else {
+            $recsData = '[' . $recsData . ']';
+            $nickData = '[' . $nickData . ']';
+        }
+
+        $script->setParam("playerScores", $recsData);
+        $script->setParam("playerNicks", $nickData);
+
+        return $script;
+    }
+
     public function getWidgetScript($nbField, $nbFirstField)
     {
         $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
@@ -449,7 +503,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
         self::$raceOn = false;
-        $this->hideLivePanel();
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+            $this->hideLivePanel();
+        }
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
@@ -493,7 +549,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
         $this->getRoundsPoints();
         self::$raceOn = false;
-        $this->updateLivePanel();
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+            $this->updateLivePanel();
+        }
         self::$raceOn = true;
     }
 
@@ -504,7 +562,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
 
         self::$raceOn = false;
-        $this->updateLivePanel();
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+            $this->updateLivePanel();
+        }
         self::$raceOn = true;
     }
 
@@ -513,22 +573,32 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         //We need to reset the panel for next Round
         self::$raceOn = false;
         $this->getRoundsPoints();
-        $this->updateLivePanel();
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+            $this->updateLivePanel();
+        }
         self::$raceOn = true;
     }
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        $this->showLivePanel($login);
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+            $this->showLivePanel($login);
+        }
+    }
+
+    public function onEnduranceScoresUpdated()
+    {
+        $this->updateLivePanel();
+    }
+
+    public function onEndurancePanelHide()
+    {
+        $this->hideLivePanel();
     }
 
     public function eXpOnUnload()
     {
-        if ($this->widget instanceof Widget) {
-            $this->widget->erase();
-            if ($this->widget2 instanceof Widget) {
-                $this->widget2->erase();
-            }
-        }
+        $this->hideLivePanel();
+        Dispatcher::unregister(\ManiaLivePlugins\eXpansion\Endurance\Events\Event::getClass(), $this);
     }
 }

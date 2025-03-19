@@ -27,7 +27,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS);
         $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'TeamAttack.Script.txt');
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'teamattack');
 
         $config = Config::getInstance();
 
@@ -136,6 +136,28 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new TypeInt("liveRankingPanel_nbFirstFields_Team", "Number of first fields in liveRanking Panel (Team)", $config, false, false);
         $var->setDefaultValue(10);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        
+
+        $var = new TypeFloat("liveRankingPanel_PosX_Endurance", "Position of EnduroPoints Panel X", $config, false, false);
+        $var->setDefaultValue(-160);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("liveRankingPanel_PosY_Endurance", "Position of EnduroPoints Panel Y", $config, false, false);
+        $var->setDefaultValue(67);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeInt("liveRankingPanel_nbFields_Endurance", "Number of fields in EnduroPoints Panel", $config, false, false);
+        $var->setDefaultValue(13);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeInt("liveRankingPanel_nbFirstFields_Endurance", "Number of first fields in EnduroPoints Panel", $config, false, false);
+        $var->setDefaultValue(3);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
     }

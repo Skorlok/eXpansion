@@ -571,6 +571,23 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 
 		return $logins;
 	}
+
+	public function getCleanGamemodeName() {
+		$gm = $this->gameInfos->scriptName;
+        $lastSlashPos = strrpos($gm, '/');
+        
+        if ($lastSlashPos !== false) {
+            $gm = substr($gm, $lastSlashPos + 1);
+        }
+    
+        $dotPos = strpos($gm, '.');
+        
+        if ($dotPos !== false) {
+            return strtolower(substr($gm, 0, $dotPos));
+        }
+    
+        return strtolower($gm);
+    }
 }
 
 ?>

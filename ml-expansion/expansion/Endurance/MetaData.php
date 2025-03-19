@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Endurance;
 
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
@@ -18,13 +19,15 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
 
+        $this->addGameModeCompability(GameInfos::GAMEMODE_SCRIPT, "endurocup");
+
         $this->setDescription("Provides integration for EnduroCup gamemode");
         $this->setGroups(array('Tools'));
 
         $config = Config::getInstance();
 
         $var = new TypeInt("rounds", "Rounds per matchs", $config, false, false);
-        $var->setDefaultValue(3);
+        $var->setDefaultValue(2);
         $this->registerVariable($var);
 
         $var = new TypeInt("maps", "maps per matchs", $config, false, false);
@@ -36,7 +39,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new Boolean("auto_reset", "Auto reset total points ?", $config, false, false);
-        $var->setDefaultValue(false);
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
 
         $var = new TypeString("points", "Rounds points array", $config, false, false);
@@ -52,7 +55,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeInt("wustart", "Warmup time on new map", $config, false, false);
-        $var->setDefaultValue(23);
+        $var->setDefaultValue(180);
         $this->registerVariable($var);
 
         $var = new TypeString("save_csv", "CSV file to store the final points when using //savepoints", $config, false, false);
@@ -60,27 +63,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new Boolean("save_total_points", "If true, //savepoints will save the total points as final points. If false, //savepoints will save the final points according to the rounds points based on the total points", $config, false, false);
-        $var->setDefaultValue(false);
-        $this->registerVariable($var);
-
-        $var = new TypeFloat("enduroPointPanel_PosX", "Position of EnduroPoints Panel X", $config, false, false);
-        $var->setDefaultValue(-160);
-        $var->setGroup("Widgets");
-        $this->registerVariable($var);
-
-        $var = new TypeFloat("enduroPointPanel_PosY", "Position of EnduroPoints Panel Y", $config, false, false);
-        $var->setDefaultValue(67);
-        $var->setGroup("Widgets");
-        $this->registerVariable($var);
-
-        $var = new TypeInt("enduroPointPanel_nbFields", "Number of fields in EnduroPoints Panel", $config, false, false);
-        $var->setDefaultValue(13);
-        $var->setGroup("Widgets");
-        $this->registerVariable($var);
-
-        $var = new TypeInt("enduroPointPanel_nbFirstFields", "Number of first fields in EnduroPoints Panel", $config, false, false);
-        $var->setDefaultValue(3);
-        $var->setGroup("Widgets");
+        $var->setDefaultValue(true);
         $this->registerVariable($var);
     }
 }

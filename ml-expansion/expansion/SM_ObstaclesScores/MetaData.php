@@ -45,10 +45,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\LocalRecords\MetaData
         $this->addTitleSupport("SM");
 
         $this->setRelaySupport(false);
-        $this->addGameModeCompability(
-            \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,
-            'Obstacle.Script.txt'
-        );
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'obstacle');
         $this->setScriptCompatibilityMode(false);
 
         $this->setEnviAsTitle(false);

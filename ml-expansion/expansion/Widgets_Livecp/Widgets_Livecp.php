@@ -67,7 +67,7 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onBeginMatch()
     {
-        if (!\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+        if ($this->storage->getCleanGamemodeName() != "endurocup") {
             $this->displayWidget();
         }
     }

@@ -3,20 +3,20 @@
 namespace ManiaLivePlugins\eXpansion\Endurance;
 
 use ManiaLib\Utils\Formatting;
+use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Time;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Endurance\Events\Event as EnduroEvents;
+use ManiaLivePlugins\eXpansion\Endurance\Events\Listener as EnduroListener;
 use ManiaLivePlugins\eXpansion\Endurance\Gui\Windows\EnduroScores;
-use ManiaLivePlugins\eXpansion\Endurance\Gui\Widgets\EnduroPanel;
-use ManiaLivePlugins\eXpansion\Endurance\Gui\Widgets\EnduroPanel2;
 
-class Endurance extends ExpPlugin
+class Endurance extends ExpPlugin implements EnduroListener
 {
 
-    public static $enduro = false;
 	public static $last_round = false;
 	public static $openScoresAction = -1;
 	public static $enduro_total_points = array();
@@ -33,16 +33,15 @@ class Endurance extends ExpPlugin
     private $auto_reset = null;
     private $roundsdone = 0;
     private $mapsdone = 0;
-	private $widgetPosX;
-	private $widgetPosY;
-	private $widgetNbFields;
-	private $widgetNbFirstFields;
 
 	public function eXpOnReady()
     {
         $this->enableDatabase();
         $this->enableDedicatedEvents();
 
+		Dispatcher::register(EnduroEvents::getClass(), $this);
+
+		/** @var Config $config */
         $config = Config::getInstance();
         $this->rounds = $config->rounds;
         $this->maps = $config->maps;
@@ -52,10 +51,6 @@ class Endurance extends ExpPlugin
 		$this->save_csv = $config->save_csv;
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
-		$this->widgetPosX = $config->enduroPointPanel_PosX;
-		$this->widgetPosY = $config->enduroPointPanel_PosY;
-		$this->widgetNbFields = $config->enduroPointPanel_nbFields;
-		$this->widgetNbFirstFields = $config->enduroPointPanel_nbFirstFields;
 
 		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
 		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
@@ -104,6 +99,7 @@ class Endurance extends ExpPlugin
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
+		/** @var Config $config */
         $config = Config::getInstance();
         $this->rounds = $config->rounds;
         $this->maps = $config->maps;
@@ -113,114 +109,102 @@ class Endurance extends ExpPlugin
 		$this->save_csv = $config->save_csv;
 		$this->save_total_points = $config->save_total_points;
         $this->auto_reset = $config->auto_reset;
-		$this->widgetPosX = $config->enduroPointPanel_PosX;
-		$this->widgetPosY = $config->enduroPointPanel_PosY;
-		$this->widgetNbFields = $config->enduroPointPanel_nbFields;
-		$this->widgetNbFirstFields = $config->enduroPointPanel_nbFirstFields;
 
 		$this->connection->setModeScriptVariables(array('WarmupTime' => $config->wu*1000));
 		$this->connection->setModeScriptVariables(array('WarmupTimeNewMap' => $config->wustart*1000));
         unset($config);
-
-		EnduroPanel::EraseAll();
-		$this->updateEnduroPanel();
     }
 
     public function onBeginRound()
     {
         $this->finishtime = array();
 	    $this->lastcptime = array_fill_keys(array_keys($this->lastcptime), 0);
-	    if (self::$enduro) {
-		    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound $FFF' . ($this->roundsdone+1) . '$z/' . $this->rounds . ' on map '  . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
-		    if ($this->roundsdone+1 >= $this->rounds) {
-			    $this->connection->setModeScriptVariables(array('last_round' => true));
-				self::$last_round = true;
-		    } else {
-			    $this->connection->setModeScriptVariables(array('last_round' => false));
-				self::$last_round = false;
-		    }
-		    $this->connection->setModeScriptVariables(array('decreaser' => floatval($this->decreaser)));
-	    }
+
+	    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound $FFF' . ($this->roundsdone+1) . '$z/' . $this->rounds . ' on map '  . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
+		if ($this->roundsdone+1 >= $this->rounds) {
+			$this->connection->setModeScriptVariables(array('last_round' => true));
+			self::$last_round = true;
+		} else {
+			$this->connection->setModeScriptVariables(array('last_round' => false));
+			self::$last_round = false;
+		}
+		$this->connection->setModeScriptVariables(array('decreaser' => floatval($this->decreaser)));
     }
 
     public function onEndRound()
 	{
-		if (self::$enduro) {
-			$this->roundsdone++;
-			$enduro_points = explode(",", $this->points);
+		$this->roundsdone++;
+		$enduro_points = explode(",", $this->points);
 
-			$vars = $this->connection->getModeScriptVariables();
-			$scores = array_filter(explode(",", $vars["enduro_scores"]));
+		$vars = $this->connection->getModeScriptVariables();
+		$scores = array_filter(explode(",", $vars["enduro_scores"]));
 
-			$winner_time = 0;
-			$pos = 0;
-			$cp_pos = 0;
-			$cp_r = -1;
-			foreach ($scores as &$score) {
-				$cpscore = explode(":",$score);
-				$player_login = $cpscore[0];
-				$cp = intval($cpscore[1]/1000);
+		$winner_time = 0;
+		$pos = 0;
+		$cp_pos = 0;
+		$cp_r = -1;
+		foreach ($scores as &$score) {
+			$cpscore = explode(":",$score);
+			$player_login = $cpscore[0];
+			$cp = intval($cpscore[1]/1000);
 
-				if (!isset($this->lastcptime[$player_login]) || $this->lastcptime[$player_login] == 0) {
-					if (substr($player_login, 0, 11) == "*fakeplayer") {
-						$this->lastcptime[$player_login] = 0;
-					} else {
-						$this->console('[plugin.records_eyepiece_enduro.php] Ignoring player login '.$player_login.' for invalid CPs! (no CP time registered)');
-						$nick = $this->db->execute('SELECT player_nickname FROM exp_players WHERE player_login = "' . $player_login . '";')->fetchArrayOfObject();
-						$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iIgnoring player $z'. $nick[0]->player_nickname .'$z$i$f00$i for invalid CPs! (no CP time registered)', null);
-						continue;
-					}
-				}
-
-				$pos++;
-				if ($cp_r == $cp) {
-					$cp_pos++;
+			if (!isset($this->lastcptime[$player_login]) || $this->lastcptime[$player_login] == 0) {
+				if (substr($player_login, 0, 11) == "*fakeplayer") {
+					$this->lastcptime[$player_login] = 0;
 				} else {
-					$cp_r = $cp;
-					$cp_pos = 1;
-				}
-
-				if ($winner_time == 0) $winner_time = $this->lastcptime[$player_login];
-
-				if (isset($enduro_points[$pos-1])) {
-					$points = intval($enduro_points[$pos-1]);
-				} else {
-					if (intval($this->points_last) == 0) {
-						break;
-					} else {
-						$points = intval($this->points_last);
-					}
-				}
-
-				$this->addPoints($player_login, $points);
-
-				if (isset($this->storage->players[$player_login]) || isset($this->storage->spectators[$player_login])) {
-					$this->eXpChatSendServerMessage('$z$s$FF0> [$F00INFO$FF0] $zEliminated at $FFF'. $this->ordinal($pos) .'$z place. CP: $FFF' . $cp . '$z ('. $this->ordinal($cp_pos) .').', $player_login);
-					$this->eXpChatSendServerMessage('$z$s$FF0> [$F00INFO$FF0] $zYou gained $FFF' . $points . '$z points.', $player_login);
+					$this->console('[plugin.records_eyepiece_enduro.php] Ignoring player login '.$player_login.' for invalid CPs! (no CP time registered)');
+					$nick = $this->db->execute('SELECT player_nickname FROM exp_players WHERE player_login = "' . $player_login . '";')->fetchArrayOfObject();
+					$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iIgnoring player $z'. $nick[0]->player_nickname .'$z$i$f00$i for invalid CPs! (no CP time registered)', null);
+					continue;
 				}
 			}
 
-			if ($winner_time != 0) {
-				$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound ended after $FFF' . Time::fromTM($winner_time) . '$z.', null);
+			$pos++;
+			if ($cp_r == $cp) {
+				$cp_pos++;
 			} else {
-				$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound ended.', null);
+				$cp_r = $cp;
+				$cp_pos = 1;
 			}
 
-			$this->getPoints();
-			$this->updateEnduroPanel();
+			if ($winner_time == 0) $winner_time = $this->lastcptime[$player_login];
 
-			if ($this->roundsdone >= $this->rounds) {
-				$this->mapsdone++;
-				if ($this->mapsdone >= $this->maps) {
-					$this->mapsdone = 0;
-					$this->showEnduroWindow(null);
-					EnduroPanel::EraseAll();
-					EnduroPanel2::EraseAll();
+			if (isset($enduro_points[$pos-1])) {
+				$points = intval($enduro_points[$pos-1]);
+			} else {
+				if (intval($this->points_last) == 0) {
+					break;
 				} else {
-					$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zNext: map ' . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
-					EnduroPanel::EraseAll();
-					EnduroPanel2::EraseAll();
+					$points = intval($this->points_last);
 				}
+			}
+
+			$this->addPoints($player_login, $points);
+
+			if (isset($this->storage->players[$player_login]) || isset($this->storage->spectators[$player_login])) {
+				$this->eXpChatSendServerMessage('$z$s$FF0> [$F00INFO$FF0] $zEliminated at $FFF'. $this->ordinal($pos) .'$z place. CP: $FFF' . $cp . '$z ('. $this->ordinal($cp_pos) .').', $player_login);
+				$this->eXpChatSendServerMessage('$z$s$FF0> [$F00INFO$FF0] $zYou gained $FFF' . $points . '$z points.', $player_login);
+			}
+		}
+
+		if ($winner_time != 0) {
+			$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound ended after $FFF' . Time::fromTM($winner_time) . '$z.', null);
+		} else {
+			$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zRound ended.', null);
+		}
+
+		$this->getPoints();
+		Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
+
+		if ($this->roundsdone >= $this->rounds) {
+			$this->mapsdone++;
+			if ($this->mapsdone >= $this->maps) {
+				$this->mapsdone = 0;
+				$this->showEnduroWindow(null);
+				Dispatcher::dispatch(new EnduroEvents(EnduroEvents::HIDE_PANEL));
+			} else {
+				$this->eXpChatSendServerMessage('$z$s$FF0>> [$F00INFO$FF0] $zNext: map ' . ($this->mapsdone+1) . '/' . $this->maps . '.', null);
+				Dispatcher::dispatch(new EnduroEvents(EnduroEvents::HIDE_PANEL));
 			}
 		}
 	}
@@ -260,7 +244,7 @@ class Endurance extends ExpPlugin
 			    unset($this->lastcptime[$player_login]);
 		    }
 	    }
-	    $this->updateEnduroPanel();
+	    Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
     }
 
     public function ordinal($number)
@@ -277,40 +261,19 @@ class Endurance extends ExpPlugin
 	{
 		EnduroScores::EraseAll();
 
-		self::$enduro = false;
 		self::$last_round = false;
 	
 		if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
 
-			$scriptNameArr = $this->connection->getScriptName();
-            $scriptName = $scriptNameArr['CurrentValue'];
-
-            // Workaround for a 'bug' in setModeScriptText.
-            if ($scriptName === '<in-development>') {
-                $scriptName = $scriptNameArr['NextValue'];
-            }
-
-
-			$scriptName = mb_strtolower(substr(basename($scriptName), 0, -11));
-			if ($scriptName == 'endurocup') {
-				self::$enduro = true;
-			} else {
-				EnduroPanel::EraseAll();
-				EnduroPanel2::EraseAll();
-                return;
-            }
-
             $version_check = substr($this->enduro_version, 0, 4);
 		    $verror = false;
 	
-		    if (self::$enduro) {
-			    $this->roundsdone = 0;
-			    $vars = $this->connection->getModeScriptVariables();
+		    $this->roundsdone = 0;
+			$vars = $this->connection->getModeScriptVariables();
 
-			    $verror = substr($vars["version"], 0, 4) != $version_check;
-			    if ($this->auto_reset && $this->mapsdone == 0)
-				    $this->resetPoints();
-		    }
+			$verror = substr($vars["version"], 0, 4) != $version_check;
+			if ($this->auto_reset && $this->mapsdone == 0)
+				$this->resetPoints();
 	
 		    if ($verror) {
 			    $this->console('[plugin.records_eyepiece_enduro.php] Version not compatible! (Plugin: "' . $this->enduro_version . '" Script: "' .  $vars["version"] . '")');
@@ -319,76 +282,24 @@ class Endurance extends ExpPlugin
 			    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iScript: ' . $vars["version"], null);
 		    }
 		    $this->getPoints();
-			$this->updateEnduroPanel();
+			Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
 		}
 	}
 
     public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
 	{
-		if (self::$enduro) {
+		$player = $this->storage->getPlayerObject($login);
+		$this->lastcptime[$login] = $timeOrScore;
 
-			$player = $this->storage->getPlayerObject($login);
-			$this->lastcptime[$login] = $timeOrScore;
-
-			if (($checkpointIndex+1) % $this->storage->currentMap->nbCheckpoints == 0) {
-				if (($checkpointIndex+1) == $this->storage->currentMap->nbCheckpoints) {
-					$this->finishtime[$player->playerId] = 0;
-				} else if (!isset($this->finishtime[$player->playerId])) {
-					$this->finishtime[$player->playerId] = $timeOrScore;
-					return; // Missing previous finishtime data to calculate round time
-				}
+		if (($checkpointIndex+1) % $this->storage->currentMap->nbCheckpoints == 0) {
+			if (($checkpointIndex+1) == $this->storage->currentMap->nbCheckpoints) {
+				$this->finishtime[$player->playerId] = 0;
+			} else if (!isset($this->finishtime[$player->playerId])) {
+				$this->finishtime[$player->playerId] = $timeOrScore;
+				return; // Missing previous finishtime data to calculate round time
 			}
 		}
 	}
-
-	public function updateEnduroPanel($login = null)
-    {
-		if (!self::$enduro) {
-			return;
-		}
-        $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
-
-		if ($login != null) {
-            Gui\Widgets\EnduroPanel::Erase($login);
-            Gui\Widgets\EnduroPanel2::Erase($login);
-        } else {
-            Gui\Widgets\EnduroPanel::EraseAll();
-            Gui\Widgets\EnduroPanel2::EraseAll();
-        }
-
-        $localRecs = self::$enduro_total_points;
-        if ($login == null) {
-            $panelMain = Gui\Widgets\EnduroPanel::Create($login);
-            $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-			$panelMain->setPosition($this->widgetPosX, $this->widgetPosY);
-			$panelMain->setNbFields($this->widgetNbFields);
-			$panelMain->setNbFirstFields($this->widgetNbFirstFields);
-            $this->widgetIds["EnduroPanel"] = $panelMain;
-            $this->widgetIds["EnduroPanel"]->update();
-            $this->widgetIds["EnduroPanel"]->show();
-        } elseif (count($localRecs) > 0) {
-            $localRecs[0]->update();
-            $localRecs[0]->show($login);
-        }
-
-        if (!$gui->disablePersonalHud) {
-            $localRecs = EnduroPanel2::GetAll();
-            if ($login == null) {
-                $panelScore = Gui\Widgets\EnduroPanel2::Create($login);
-                $panelScore->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-                $panelScore->setVisibleLayer("scorestable");
-				$panelMain->setPosition($this->widgetPosX, $this->widgetPosY);
-				$panelMain->setNbFields($this->widgetNbFields);
-				$panelMain->setNbFirstFields($this->widgetNbFirstFields);
-                $this->widgetIds["EnduroPanel2"] = $panelScore;
-                $this->widgetIds["EnduroPanel2"]->update();
-                $this->widgetIds["EnduroPanel2"]->show();
-            } elseif (isset($localRecs[0])) {
-                $localRecs[0]->update();
-                $localRecs[0]->show($login);
-            }
-        }
-    }
 
 	public function showEnduroWindow($login)
 	{
@@ -698,12 +609,20 @@ class Endurance extends ExpPlugin
 		}
 		$data[] = $best_points;
 	}
+	
+	public function onEnduranceScoresUpdated()
+	{
+	}
+
+	public function onEndurancePanelHide()
+	{
+	}
 
 	public function eXpOnUnload()
     {
-		self::$enduro = false;
-        EnduroPanel::EraseAll();
-		EnduroPanel2::EraseAll();
+		self::$last_round = true;
+        Dispatcher::dispatch(new EnduroEvents(EnduroEvents::HIDE_PANEL));
 		EnduroScores::EraseAll();
+		Dispatcher::unregister(EnduroEvents::getClass(), $this);
     }
 }

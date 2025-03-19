@@ -33,7 +33,7 @@ class Widgets_Speedometer extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (Endurance::$enduro && Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && Endurance::$last_round == false) {
             return;
         }
         $this->widget->erase();

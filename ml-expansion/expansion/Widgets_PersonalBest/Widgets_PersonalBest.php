@@ -56,7 +56,7 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        if (Endurance::$enduro && Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && Endurance::$last_round == false) {
             return;
         }
         $widget = new Widget("Widgets_PersonalBest\Gui\Widgets\PBPanel.xml");
