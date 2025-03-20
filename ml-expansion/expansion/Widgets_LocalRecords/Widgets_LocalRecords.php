@@ -17,7 +17,7 @@ use Maniaplanet\DedicatedServer\Structures\GameInfos;
 class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     public static $localrecords = array();
-    public static $raceOn;
+    public static $raceOn = true;
     private $config;
 
     private $widget;
@@ -47,9 +47,20 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->updateLocalPanel();
     }
 
-    public function updateLocalPanel($login = null)
+    public function updateLocalPanel($login = null, $update = false)
     {
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
+
+            if ($update) {
+                $xml = '<manialink id="localrecords_updater" version="2" name="localrecords_updater">';
+                $xml .= '<script><!--';
+                $xml .= $this->getWidgetScript(null, null, true);
+                $xml .= '--></script>';
+                $xml .= '</manialink>';
+                $this->connection->sendDisplayManialinkPage($login, $xml);
+                return;
+            }
+
             $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
             //gamemode specific settings
@@ -81,9 +92,9 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             }
             
             if ($this->widget instanceof Widget) {
-                $this->widget->erase();
+                $this->widget->erase($login);
                 if ($this->widget2 instanceof Widget) {
-                    $this->widget2->erase();
+                    $this->widget2->erase($login);
                 }
             }
 
@@ -106,11 +117,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
             $this->widget->registerScript($widgetScript);
             $this->widget->registerScript($trayScript);
-            if ($login != null) {
-                $this->widget->show($login, false);
-            } else {
-                $this->widget->show(null, true);
-            }
+            $this->widget->show($login);
 
             /** @var ManiaLivePlugins\eXpansion\Gui\Gui $gui */
             if (!$gui->disablePersonalHud) {
@@ -128,23 +135,21 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                 $this->widget2->registerScript($widgetScript);
                 $this->widget2->registerScript($trayScript);
-                if ($login != null) {
-                    $this->widget2->show($login, false);
-                } else {
-                    $this->widget2->show(null, true);
-                }
+                $this->widget2->show($login);
             }
         }
     }
 
-    public function getWidgetScript($nbField, $nbFirstField)
+    public function getWidgetScript($nbField, $nbFirstField, $update = false)
     {
-        $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
-        $script->setParam("playerTimes", "[]");
-        $script->setParam("nbRecord", LocalRecordsConfig::getInstance()->recordsCount);
-        $script->setParam("nbFields", $nbField);
-        $script->setParam("nbFirstFields", $nbFirstField);
-        $script->setParam('varName', 'LocalTime1');
+        if (!$update) {
+            $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
+            $script->setParam("playerTimes", "[]");
+            $script->setParam("nbRecord", LocalRecordsConfig::getInstance()->recordsCount);
+            $script->setParam("nbFields", $nbField);
+            $script->setParam("nbFirstFields", $nbFirstField);
+            $script->setParam('varName', 'LocalRecords');
+        }
 
         $recsData = "";
         $nickData = "";
@@ -168,8 +173,23 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nickData = '[' . $nickData . ']';
         }
 
-        $script->setParam("playerTimes", $recsData);
-        $script->setParam("playerNicks", $nickData);
+        if (!$update) {
+            $script->setParam("playerTimes", $recsData);
+            $script->setParam("playerNicks", $nickData);
+        } else {
+            return "main () {
+                declare Integer[Text] playerTimesLocalRecords for UI = Integer[Text];
+                playerTimesLocalRecords.clear();
+                playerTimesLocalRecords = $recsData;
+
+                declare Text[Text] playerNickNameLocalRecords for UI = Text[Text];
+                playerNickNameLocalRecords.clear();
+                playerNickNameLocalRecords = $nickData;
+
+                declare Boolean needUpdateLocalRecords for UI = True;
+                needUpdateLocalRecords = True;
+            }";
+        }
 
         return $script;
     }
@@ -188,11 +208,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $this->config = Config::getInstance();
             $this->updateLocalPanel();
         }
-    }
-
-    public function showLocalPanel($login)
-    {
-        $this->updateLocalPanel($login);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -252,19 +267,26 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function onNewRecord($data)
     {
         self::$localrecords = $data;
-        $this->updateLocalPanel();
+        $this->updateLocalPanel(null, true);
     }
 
     public function onUpdateRecords($data)
     {
         self::$localrecords = $data;
-        $this->updateLocalPanel();
+        $this->updateLocalPanel(null, true);
     }
 
     public function onRecordDeleted($removedRecord, $records)
     {
         self::$localrecords = $records;
-        $this->updateLocalPanel();
+        $this->updateLocalPanel(null, true);
+    }
+
+    public function onPlayerConnect($login, $isSpectator)
+    {
+        if (self::$raceOn == true) {
+            $this->updateLocalPanel($login);
+        }
     }
 
     public function eXpOnUnload()

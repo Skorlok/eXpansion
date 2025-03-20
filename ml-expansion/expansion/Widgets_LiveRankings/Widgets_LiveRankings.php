@@ -53,8 +53,22 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
     }
 
-    public function updateLivePanel($login = null)
+    public function updateLivePanel($login = null, $update = false)
     {
+        if ($update) {
+            $xml = '<manialink id="liveranking_updater" version="2" name="liveranking_updater">';
+            $xml .= '<script><!--';
+            if ($this->storage->getCleanGamemodeName() == "endurocup") {
+                $xml .= $this->getWidgetScriptEndurance(null, null, true);
+            } else {
+                $xml .= $this->getWidgetScript(null, null, true);
+            }
+            $xml .= '--></script>';
+            $xml .= '</manialink>';
+            $this->connection->sendDisplayManialinkPage($login, $xml);
+            return;
+        }
+
         $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
 
         $gamemode = self::eXpGetCurrentCompatibilityGameMode();
@@ -93,9 +107,9 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
 
         if ($this->widget instanceof Widget) {
-            $this->widget->erase();
+            $this->widget->erase($login);
             if ($this->widget2 instanceof Widget) {
-                $this->widget2->erase();
+                $this->widget2->erase($login);
             }
         }
 
@@ -160,11 +174,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->widget->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
         $this->widget->registerScript($widgetScript);
         $this->widget->registerScript($trayScript);
-        if ($login != null) {
-            $this->widget->show($login, false);
-        } else {
-            $this->widget->show(null, true);
-        }
+        $this->widget->show($login);
 
         /** @var ManiaLivePlugins\eXpansion\Gui\Gui $gui */
         if (!$gui->disablePersonalHud) {
@@ -198,11 +208,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             }
             $this->widget2->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
             $this->widget2->registerScript($trayScript);
-            if ($login != null) {
-                $this->widget2->show($login, false);
-            } else {
-                $this->widget2->show(null, true);
-            }
+            $this->widget2->show($login);
         }
     }
 
@@ -400,12 +406,15 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         return $script;
     }
 
-    public function getWidgetScriptEndurance($nbField, $nbFirstField)
+    public function getWidgetScriptEndurance($nbField, $nbFirstField, $update = false)
     {
-        $script = new Script("Endurance/Gui/Scripts/PlayerFinish");
-        $script->setParam("nbScores", 500);
-        $script->setParam("nbFields", $nbField);
-        $script->setParam("nbFirstFields", $nbFirstField);
+        if (!$update) {
+            $script = new Script("Endurance/Gui/Scripts/PlayerFinish");
+            $script->setParam("nbScores", 500);
+            $script->setParam("nbFields", $nbField);
+            $script->setParam("nbFirstFields", $nbFirstField);
+            $script->setParam('varName', 'Liverankings');
+        }
 
         $recsData = "";
         $nickData = "";
@@ -429,18 +438,36 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nickData = '[' . $nickData . ']';
         }
 
-        $script->setParam("playerScores", $recsData);
-        $script->setParam("playerNicks", $nickData);
+        if (!$update) {
+            $script->setParam("playerScores", $recsData);
+            $script->setParam("playerNicks", $nickData);
+        } else {
+            return "main () {
+                declare Integer[Text] playerTimesLiverankings for UI = Integer[Text];
+                playerTimesLiverankings.clear();
+                playerTimesLiverankings = $recsData;
+
+                declare Text[Text] playerNickNameLiverankings for UI = Text[Text];
+                playerNickNameLiverankings.clear();
+                playerNickNameLiverankings = $nickData;
+
+                declare Boolean needUpdateLiverankings for UI = True;
+                needUpdateLiverankings = True;
+            }";
+        }
 
         return $script;
     }
 
-    public function getWidgetScript($nbField, $nbFirstField)
+    public function getWidgetScript($nbField, $nbFirstField, $update = false)
     {
-        $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
-        $script->setParam("nbRecord", 255);
-        $script->setParam("nbFields", $nbField);
-        $script->setParam("nbFirstFields", $nbFirstField);
+        if (!$update) {
+            $script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
+            $script->setParam("nbRecord", 255);
+            $script->setParam("nbFields", $nbField);
+            $script->setParam("nbFirstFields", $nbFirstField);
+            $script->setParam('varName', 'Liverankings');
+        }
 
         $recsData = "";
         $nickData = "";
@@ -466,8 +493,23 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nickData = '[' . $nickData . ']';
         }
 
-        $script->setParam("playerTimes", $recsData);
-        $script->setParam("playerNicks", $nickData);
+        if (!$update) {
+            $script->setParam("playerTimes", $recsData);
+            $script->setParam("playerNicks", $nickData);
+        } else {
+            return "main () {
+                declare Integer[Text] playerTimesLiverankings for UI = Integer[Text];
+                playerTimesLiverankings.clear();
+                playerTimesLiverankings = $recsData;
+
+                declare Text[Text] playerNickNameLiverankings for UI = Text[Text];
+                playerNickNameLiverankings.clear();
+                playerNickNameLiverankings = $nickData;
+
+                declare Boolean needUpdateLiverankings for UI = True;
+                needUpdateLiverankings = True;
+            }";
+        }
 
         return $script;
     }
@@ -527,7 +569,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
 
         if (self::$raceOn == true) {
-            $this->updateLivePanel();
+            $this->updateLivePanel(null, true);
         }
     }
 
@@ -581,14 +623,14 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        if ($this->storage->getCleanGamemodeName() != "endurocup") {
+        if (self::$raceOn == true) {
             $this->showLivePanel($login);
         }
     }
 
-    public function onEnduranceScoresUpdated()
+    public function onEnduranceScoresUpdated($update)
     {
-        $this->updateLivePanel();
+        $this->updateLivePanel(null, $update);
     }
 
     public function onEndurancePanelHide()

@@ -9,15 +9,20 @@ if (!showDiff.existskey(id)) {
 declare Boolean old_showDiff = showDiff[id];
 
 //Ranks of the players
-declare playerTimes = <?php echo $this->playerScores ?>;
+declare Integer[Text] playerTimes<?php echo $this->varName ?> for UI = Integer[Text];
+playerTimes<?php echo $this->varName ?>.clear();
+playerTimes<?php echo $this->varName ?> = <?php echo $this->playerScores ?>;
 
 //The latest chackpoint the player past
-declare playerNickName = <?php echo $this->playerNicks ?>;
+declare Text[Text] playerNickName<?php echo $this->varName ?> for UI = Text[Text];
+playerNickName<?php echo $this->varName ?>.clear();
+playerNickName<?php echo $this->varName ?> = <?php echo $this->playerNicks ?>;
+
 declare playersOnServer = Text[Text];
 declare nbCount = 0;
 
 // test
-declare Boolean needUpdate = True;
+declare Boolean needUpdate<?php echo $this->varName ?> for UI = True;
 declare lastUpdateTime = 0;
 
 declare Integer animStart = Now;
@@ -27,17 +32,17 @@ declare Boolean triggerBegin = True;
 declare Integer zoomId = -1;
 declare Integer lastZoomId = -2;
 
-declare origPlayerTimes = playerTimes;
+declare origPlayerTimes = playerTimes<?php echo $this->varName ?>;
 origPlayerTimes.clear();
 
-foreach (Login => Score in playerTimes) {
+foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
     declare newLogin = TextLib::Replace(Login, "–", "-");
     origPlayerTimes[newLogin] = Score;
-    playerNickName[newLogin] = playerNickName[Login];
+    playerNickName<?php echo $this->varName ?>[newLogin] = playerNickName<?php echo $this->varName ?>[Login];
 }
 
-playerTimes.clear();
-playerTimes = origPlayerTimes;
+playerTimes<?php echo $this->varName ?>.clear();
+playerTimes<?php echo $this->varName ?> = origPlayerTimes;
 
 for (i, 1, nbFields ) {
     declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
@@ -89,123 +94,4 @@ if (showMenu[id]) {
 
     MicroMenu.Hide();
 
-}
-
-
-
-
-
-// Reduce flickering because the while loop starts with "yield;"
-
-foreach (Player in Players) {
-    playersOnServer[Player.Login] = Player.Name;
-
-    if(!playerNickName.existskey(Player.Login)){
-        playerNickName[Player.Login] = Player.Name;
-    }
-    needUpdate = True;
-}
-
-lastUpdateTime = Now;
-
-needUpdate = False;
-
-declare i = 1;
-declare nbRec = 1;
-declare showed = False;
-
-declare myRank = -1;
-declare myScore = -1;
-declare start2 = -1;
-declare end = -1;
-declare recCount = -1;
-
-if (playerTimes.count > nbShow) {
-    recCount = nbShow;
-} else {
-    recCount = playerTimes.count;
-}
-
-i = 1;
-
-foreach (Login => Score in playerTimes) {
-    if (LocalUser != Null) {
-        if (Login == LocalUser.Login) {
-            myRank = i;
-            myScore = Score;
-            break;
-        }
-    }
-    i += 1;
-}
-
-if (myRank != -1) {
-    start2 = myRank - ((nbFields - nbFirstFields) / 2);
-
-    if (start2 <= nbFirstFields) {
-        start2 = nbFirstFields;
-        end = start2 + (nbFields - nbFirstFields);
-    } else {
-        end = start2 + (nbFields - nbFirstFields);
-        if (end > recCount) {
-            end = recCount;
-            start2 = end - (nbFields - nbFirstFields);
-        }
-    }
-} else {
-    start2 = recCount  - (nbFields - nbFirstFields);
-    end = start2 + (nbFields - nbFirstFields);
-}
-
-i = 1;
-nbRec = 1;
-zoomId = -1;
-declare scoreFirst = -1;
-
-foreach (Login => Score in playerTimes) {
-
-    if (scoreFirst == -1) {
-        scoreFirst = Score;
-    }
-
-    if ((nbRec <= nbFirstFields || (nbRec > start2 && nbRec <= end) ) && nbRec <= nbShow && i <= nbFields) {
-
-        declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
-        declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
-        declare highliteQuad = (Page.GetFirstChild("RecBg_"^i) as CMlQuad);
-
-        if (nickLabel != Null) {
-            declare outScore = Score;
-            if (showDiff[id]) {
-                if (myRank > -1 && Login != LocalUser.Login) {
-                    if (Score > myScore) {
-                        outScore = Score - myScore;
-                    } else {
-                        outScore = myScore - Score;
-                    }
-                } else if (i > 1 && Login != LocalUser.Login) {
-                    outScore = Score - scoreFirst;
-                }
-            }
-            putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login, showDiff[id], myRank);
-            if (highliteQuad != Null) {
-                if (playersOnServer.existskey(Login) && i != myRank) {
-                    highliteQuad.Show();
-                } else {
-                    highliteQuad.Hide();
-                }
-            }
-            if (Login == LocalUser.Login) {
-                showed = True;
-                zoomId = i;
-                if (lastZoomId != zoomId) {
-                    isZoom = True;
-                    animStart = Now;
-                    lastZoomId = zoomId;
-                }
-            }
-        }
-        i += 1;
-    }
-    nbRec += 1;
 }

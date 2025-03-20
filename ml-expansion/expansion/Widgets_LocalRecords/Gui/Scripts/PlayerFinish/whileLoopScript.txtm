@@ -184,7 +184,7 @@ if (isZoom && animStart + 2000 <= Now ) {
 
 if (showDiff[id] != old_showDiff) {
     old_showDiff = showDiff[id];
-    needUpdate = True;
+    needUpdate<?php echo $this->varName ?> = True;
 }
 
 if  ((Now - lastUpdateTime) >= 500) {
@@ -193,19 +193,19 @@ if  ((Now - lastUpdateTime) >= 500) {
     foreach (Player in Players) {
         playersOnServer[Player.Login] = Player.Name;
 
-        if(!playerNickName.existskey(Player.Login)){
-            playerNickName[Player.Login] = Player.Name;
+        if(!playerNickName<?php echo $this->varName ?>.existskey(Player.Login)){
+            playerNickName<?php echo $this->varName ?>[Player.Login] = Player.Name;
         }
     }
-    needUpdate = True;
+    needUpdate<?php echo $this->varName ?> = True;
 }
 
-if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate<?php echo $this->varName ?> && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
     lastUpdateTime = Now;
 
-    needUpdate = False;
+    needUpdate<?php echo $this->varName ?> = False;
 
-    playerTimes = playerTimes.sort();
+    playerTimes<?php echo $this->varName ?> = playerTimes<?php echo $this->varName ?>.sort();
 
     declare i = 1;
     declare nbRec = 1;
@@ -217,15 +217,15 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
     declare end = -1;
     declare recCount = -1;
 
-    if (playerTimes.count > nbShow) {
+    if (playerTimes<?php echo $this->varName ?>.count > nbShow) {
 	    recCount = nbShow;
     } else {
-	    recCount = playerTimes.count;
+	    recCount = playerTimes<?php echo $this->varName ?>.count;
     }
 
     i = 1;
 
-    foreach (Login => Score in playerTimes) {
+    foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
         if (LocalUser != Null) {
             if (Login == LocalUser.Login) {
                 myRank = i;
@@ -259,7 +259,7 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
     zoomId = -1;
     declare scoreFirst = -1;
 
-    foreach (Login => Score in playerTimes) {
+    foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
 
         if (scoreFirst == -1) {
             scoreFirst = Score;
@@ -284,7 +284,7 @@ if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == act
                         outScore = Score - scoreFirst;
                     }
                 }
-                putRecordTo(i, nbRec, outScore, Login, playerNickName[Login], Login == LocalUser.Login, showDiff[id], myRank);
+                putRecordTo(i, nbRec, outScore, Login, playerNickName<?php echo $this->varName ?>[Login], Login == LocalUser.Login, showDiff[id], myRank);
                 if (highliteQuad != Null) {
                     if (playersOnServer.existskey(Login) && i != myRank) {
                         highliteQuad.Show();

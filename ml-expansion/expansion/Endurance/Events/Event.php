@@ -24,7 +24,7 @@ class Event extends \ManiaLive\Event\Event
 
         switch ($this->onWhat) {
             case self::ON_SCORE_UPDATED:
-                $listener->onEnduranceScoresUpdated();
+                $listener->onEnduranceScoresUpdated($p[0]);
                 break;
             case self::HIDE_PANEL:
                 $listener->onEndurancePanelHide();

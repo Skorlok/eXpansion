@@ -194,7 +194,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 		}
 
 		$this->getPoints();
-		Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
+		Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED, true));
 
 		if ($this->roundsdone >= $this->rounds) {
 			$this->mapsdone++;
@@ -244,7 +244,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 			    unset($this->lastcptime[$player_login]);
 		    }
 	    }
-	    Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
+	    Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED, false));
     }
 
     public function ordinal($number)
@@ -282,7 +282,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 			    $this->eXpChatSendServerMessage('$z$s$FF0>> [$F00WARNING$FF0] $z$i$f00$iScript: ' . $vars["version"], null);
 		    }
 		    $this->getPoints();
-			Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED));
+			Dispatcher::dispatch(new EnduroEvents(EnduroEvents::ON_SCORE_UPDATED, false));
 		}
 	}
 
@@ -610,7 +610,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 		$data[] = $best_points;
 	}
 	
-	public function onEnduranceScoresUpdated()
+	public function onEnduranceScoresUpdated($update)
 	{
 	}
 

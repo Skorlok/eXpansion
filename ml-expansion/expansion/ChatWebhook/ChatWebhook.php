@@ -55,6 +55,7 @@ class ChatWebhook extends ExpPlugin
         if ($this->config->webhookUrl == "") {
             return;
         }
+        $content = str_replace(array("@everyone", "@here"), array("\@everyone", "\@here"), $content);
         $postData = array("username" => Formatting::stripStyles($this->storage->server->name), "content" => $content);
         if (sizeof($embeds) > 0) {
             $postData["embeds"] = array($embeds);
