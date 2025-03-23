@@ -57,8 +57,8 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $frame->setSize(25, 6);
         $frame->setPosY(-5);
         $frame->setLayout(new \ManiaLib\Gui\Layouts\Column());
-        foreach (ManiaExchange::$mxReplays as $rec_login => $rec) {
-            $frame->addComponent(new RecItem($rec->Position - 1, $rec->Username, $rec->ReplayTime));
+        foreach (ManiaExchange::$mxReplays as $rec_nb => $rec) {
+            $frame->addComponent(new RecItem($rec_nb, $rec->Username, $rec->ReplayTime));
         }
         $this->mainFrame->addComponent($frame);
 
