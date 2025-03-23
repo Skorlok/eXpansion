@@ -54,12 +54,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_record', 'Color code for all localrecord messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$3af');
+        $var->setDefaultValue('$90f');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_record_top', 'Color code for top 5 localrecord messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$2d0');
+        $var->setDefaultValue('$3af');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_dedirecord', 'Color code for dedimania record messages', $config, false, true);
@@ -69,7 +69,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new ColorCode('Colors_rank', 'Color code for rank in records messages', $config, false, true);
         $var->setGroup("Chat Messages");
-        $var->setDefaultValue('$dee');
+        $var->setDefaultValue('$ff0');
         $this->registerVariable($var);
 
         $var = new ColorCode('Colors_time', 'Color code for time in records messages', $config, false, true);

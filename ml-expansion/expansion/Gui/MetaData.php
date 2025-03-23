@@ -104,14 +104,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("GUI");
         $var->setMin(0.0);
         $var->setMax(1.0);
-        $var->setDefaultValue(0.2);
+        $var->setDefaultValue(0.6);
         $this->registerVariable($var);
 
         $var = new ColorCode("style_widget_title_bgColorize", "Widget Titlebar Background color", $config);
         $var->setGroup("GUI");
         $var->setUsePrefix(false);
         $var->setUseFullHex(true);
-        $var->setDefaultValue("8E0CA4");
+        $var->setDefaultValue("912324");
         $this->registerVariable($var);
 
         $var = new ColorCode("style_widget_title_lbColor", "Widget Titlebar Text color", $config);

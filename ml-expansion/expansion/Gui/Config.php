@@ -28,10 +28,10 @@ class Config extends \ManiaLib\Utils\Singleton
     public $style_widget_bgStyle = 'Bgs1InRace';
     public $style_widget_bgSubStyle = 'NavButtonBlink'; // BgList
     public $style_widget_bgColorize = '222'; // BgList
-    public $style_widget_bgOpacity = 0.2;
+    public $style_widget_bgOpacity = 0.6;
     public $style_widget_bgXOffset = 0;
     public $style_widget_bgYOffset = 0;
-    public $style_widget_title_bgColorize = '8E0CA4'; // BgList
+    public $style_widget_title_bgColorize = '912324'; // BgList
     public $style_widget_title_bgOpacity = 0.6;
     public $style_widget_title_bgXOffset = -0.1;
     public $style_widget_title_bgYOffset = 0.25;
