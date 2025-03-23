@@ -19,9 +19,9 @@ class Inputbox extends \ManiaLivePlugins\eXpansion\Gui\Control
         $config = Config::getInstance();
         $this->name = $name;
 
-        $this->bg = new WidgetBackGround(100, 30);
-
         $this->createButton($editable);
+
+        $this->bg = new WidgetBackGround(100, 30);
 
         $this->bgcenter = new \ManiaLib\Gui\Elements\Quad(3, 6);
         $this->bgcenter->setStyle("Bgs1InRace");
@@ -86,7 +86,7 @@ class Inputbox extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->button->setAlign('left', 'center');
         $this->button->setTextColor('fff');
-        $this->button->setPosition(2, -7, 5);
+        $this->button->setPosition(2, -7, 0.05);
         $this->button->setSize($this->getSizeX() - 3, 4);
         $this->addComponent($this->button);
     }
