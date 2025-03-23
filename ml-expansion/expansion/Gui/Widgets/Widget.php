@@ -82,7 +82,7 @@ class Widget extends PlainWidget
     {
         $this->script->setParam("name", $this->getName());
         $this->script->setParam("axisDisabled", $this->axisDisabled);
-        $this->script->setParam("gameMode", Gui::fixString($this->storage->gameInfos->scriptName));
+        $this->script->setParam("gameMode", $this->storage->getCleanGamemodeName());
         $this->script->setParam("visibleLayerInit", $this->visibleLayerInit);
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
         parent::onDraw();
