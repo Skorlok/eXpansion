@@ -109,4 +109,25 @@ if (!disablePersonalHud) {
 	    lastMouseY = MouseY;
     }
 
+} else {
+	if (exp_needToCheckPersistentVars || !eXp_firstPersistentCheckDone) {
+		exp_multipleCheckCount += 1;
+		eXp_firstPersistentCheckDone = True;
+
+		if (exp_multipleCheckCount > 2) {
+			exp_needToCheckPersistentVars = False;
+			exp_multipleCheckCount = 0;
+		}
+
+		if (visibleLayerInit != activeLayer || exp_isWidgetsHidden == False) {
+			Window.Show();
+			exp_widgetCurrentVisible = True;
+		} else {
+			Window.Hide();
+			exp_widgetCurrentVisible = False;
+			exp_widgetVisibleBuffered = False;
+		}
+	} else {
+		exp_multipleCheckCount = 0;
+    }
 }

@@ -108,7 +108,7 @@ if (!disablePersonalHud) {
     exp_widgetLayersBuffered = visibleLayerInit;
     exp_widgetCurrentVisible = True;
     exp_widgetVisibleBuffered = True;
-    if (visibleLayerInit != activeLayer) {
+    if (visibleLayerInit != activeLayer || exp_isWidgetsHidden == True) {
         Window.Hide();
         exp_widgetCurrentVisible = False;
         exp_widgetVisibleBuffered = False;
