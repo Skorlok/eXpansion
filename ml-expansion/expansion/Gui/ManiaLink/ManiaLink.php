@@ -22,9 +22,10 @@ class ManiaLink extends Singletons
     protected $scripts;
     protected $dicoMessages;
 
-    protected $connection;
+    /** @var \ManiaLive\Data\Storage\Storage $storage */
     protected $storage;
     protected $eXpStorage;
+    protected $connection;
 
     protected $parameters;
 

@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Gui\ManiaLink;
 
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 
 class Widget extends ManiaLink

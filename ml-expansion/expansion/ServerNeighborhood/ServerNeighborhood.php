@@ -87,10 +87,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
             if (!$status) {
                 $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                $admins->announceToPermission(
-                    Permission::EXPANSION_PLUGIN_SETTINGS,
-                    "#admin_error#[ServerNeighborhoo]Storage path is wrong. Can't write!!"
-                );
+                $admins->announceToPermission(Permission::EXPANSION_PLUGIN_SETTINGS, "#admin_error#[ServerNeighborhood] Storage path is wrong. Can't write!!");
             }
         }
 
@@ -141,11 +138,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
         }
         if ($tries >= 40) {
-            $this->console(
-                '[server_neighborhood] Could not open file " '
-                . $filename . '" to store the Server Information!'
-            );
-
+            $this->console('Could not open file " ' . $filename . '" to store the Server Information!');
             return false;
         } else {
             fwrite($fh, $data);
@@ -157,33 +150,57 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function getData()
     {
-
-        $i = 0;
         foreach ($this->config->servers as $serverPath) {
-
-            try {
-                $data = file_get_contents($serverPath);
-
-                if (isset($this->servers[$i]) && is_object($this->servers[$i])) {
-                    $server = $this->servers[$i];
-                } else {
-                    $server = new Server();
-                    $this->servers[$i] = $server;
-                }
-                $xml = simplexml_load_string($data);
-
-                if (!$xml) {
-                    \ManiaLive\Utilities\Console::println(
-                        '[server_neighborhood] Error loading : '
-                        . $serverPath . ' invalid XML?'
-                    );
-                } else {
-                    $server->setServer_data($xml);
-                }
-                $i++;
-            } catch (\Exception $ex) {
-                \ManiaLive\Utilities\Console::println('[server_neighborhood] Error loading : ' . $serverPath);
+            if (!file_exists($serverPath) && !is_dir($serverPath)) {
+                $this->console('Error loading : ' . $serverPath . ' file does not exist!');
+                continue;
             }
+            
+            if (substr($serverPath, -15) == '_serverinfo.xml') {
+                $this->buildSrvData($serverPath);
+            } else if (is_dir($serverPath)) {
+                $files = scandir($serverPath);
+                foreach ($files as $file) {
+                    if (substr($file, -15) == '_serverinfo.xml') {
+                        $this->buildSrvData($serverPath . $file);
+                    }
+                }
+            } else {
+                $this->console('Error loading : ' . $serverPath . ' is not valid! (should end with _serverinfo.xml)');
+            }
+        }
+    }
+
+    public function buildSrvData($serverPath)
+    {
+        if (!is_readable($serverPath)) {
+            $this->console('Error loading : ' . $serverPath . ' file is not readable!');
+            return;
+        }
+        if (!is_file($serverPath)) {
+            $this->console('Error loading : ' . $serverPath . ' is not a file!');
+            return;
+        }
+
+        try {
+            $data = file_get_contents($serverPath);
+            $xml = simplexml_load_string($data);
+            if (!$xml) {
+                $this->console("Error loading : ". $serverPath . " invalid XML?");
+            }
+
+            $cleanIndex = preg_replace("/[^a-zA-Z0-9]+/", "", $serverPath);
+
+            if (isset($this->servers[$cleanIndex]) && is_object($this->servers[$cleanIndex])) {
+                $server = $this->servers[$cleanIndex];
+            } else {
+                $server = new Server();
+                $this->servers[$cleanIndex] = $server;
+            }
+
+            $server->setServer_data($xml);
+        } catch (\Exception $ex) {
+            $this->console('Error loading : ' . $serverPath);
         }
     }
 
