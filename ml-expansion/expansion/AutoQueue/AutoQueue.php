@@ -181,6 +181,12 @@ class AutoQueue extends ExpPlugin
 
     public function enterQueue($login)
     {
+        $player = $this->storage->getPlayerObject($login);
+        if ($player->ladderScore < $this->storage->server->ladderServerLimitMin) {
+            $msg = eXpGetMessage('You can not join queue, your ladder score is too low!');
+            $this->eXpChatSendServerMessage($msg, $login);
+            return;
+        }
         $this->queue->add($login);
 
         if ($this->storage->server->currentMaxPlayers > count($this->storage->players)) {
@@ -283,6 +289,10 @@ class AutoQueue extends ExpPlugin
 
     public function showEnterQueue($login)
     {
+        $player = $this->storage->getPlayerObject($login);
+        if ($player && $player->ladderScore < $this->storage->server->ladderServerLimitMin) {
+            return;
+        }
         $widget = EnterQueueWidget::Create($login);
         $widget->setPosition($this->config->enterQueueList_PosX, $this->config->enterQueueList_PosY);
         $widget->show($login);
