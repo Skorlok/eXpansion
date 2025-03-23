@@ -84,11 +84,7 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while loading Core plugins!" . $ex->getMessage());
-            AdminGroups::getInstance()
-                ->announceToPermission(
-                    '[AutoLoad] Error while starting expansion core. See console for more info.',
-                    Permission::SERVER_ADMIN
-                );
+            AdminGroups::getInstance()->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting expansion core. See console for more info.');
         }
 
         // do event to inform autoload is complete;
@@ -134,11 +130,7 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->autoLoadPlugins($this->config->plugins, $pHandler);
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while AutoLoading additional plugins!" . $ex->getMessage());
-            AdminGroups::getInstance()
-                ->announceToPermission(
-                    '[AutoLoad] Error while starting optional plugins. See console for more info.',
-                    Permission::SERVER_ADMIN
-                );
+            AdminGroups::getInstance()->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting optional plugins. See console for more info.');
         }
 
         $this->autoLoadPlugins(array('\\ManiaLivePlugins\\eXpansion\\Menu\\Menu'), $pHandler);
@@ -197,9 +189,10 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     private function cleanPluginsArray(&$plugins, $toRemove)
     {
-        for ($i = 0; $i < count($plugins); $i++) {
-            if (isset($plugins[$i]) && in_array($plugins[$i], $toRemove)) {
-                array_splice($plugins, $i, 1);
+        foreach ($toRemove as $plugin) {
+            $pos = array_search($plugin, $plugins);
+            if ($pos !== false) {
+                unset($plugins[$pos]);
             }
         }
     }
