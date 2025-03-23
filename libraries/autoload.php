@@ -9,7 +9,7 @@
  * @date        $Date$:
  */
 
-define('APP_ROOT', __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
+define('APP_ROOT', substr(__DIR__, 0, -9));
 
 if(!defined('MANIALIB_APP_PATH'))
 {
