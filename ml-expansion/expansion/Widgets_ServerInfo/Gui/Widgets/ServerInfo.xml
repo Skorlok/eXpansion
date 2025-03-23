@@ -1,5 +1,5 @@
 <frame scale = "0.75">
-    <quad sizen="60 10" halign="left" valign="top" bgcolor="0000" action="' . \ManiaLivePlugins\eXpansion\Core\Core::$action_serverInfo . '"/>
+    <quad sizen="60 10" halign="left" valign="top" bgcolor="0000" action="<?php echo \ManiaLivePlugins\eXpansion\Core\Core::$action_serverInfo ?>"/>
     <label id="serverName" posn="2 0 1.0E-5" sizen="60 6" halign="left" valign="top" style="TextRaceMessageBig" textsize="2" textcolor="fff" textprefix="$s"/>
     <frame posn="1 -6.5 2.0E-5">
         <frame>
