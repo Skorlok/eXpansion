@@ -70,6 +70,8 @@ class Chat extends ExpPlugin
 
         Dispatcher::register(Event::getClass(), $this, Event::ON_PLAYER_CHAT, 10);
 
+        $this->config = Config::getInstance();
+
         try {
             $this->connection->chatEnableManualRouting(true);
             $cmd = AdminGroups::addAdminCommand('chat', $this, 'admChat', Permission::GAME_SETTINGS);
@@ -82,8 +84,6 @@ class Chat extends ExpPlugin
         }
 
         $this->initChat();
-
-        $this->config = Config::getInstance();
     }
 
 
@@ -266,6 +266,7 @@ class Chat extends ExpPlugin
     {
         /** @var ChatSelect $widget */
         $widget = ChatSelect::Create($login);
+        $widget->setPosition($this->config->chatSelector_PosX, $this->config->chatSelector_PosY);
         $widget->sync();
         $widget->show();
     }

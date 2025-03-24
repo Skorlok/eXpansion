@@ -23,17 +23,6 @@ class GenericPanel extends Widget
 
     protected function onConstruct()
     {
-
-        $sizeX = 38;
-        $sizeY = 95;
-
-        $this->bg = new WidgetBackGround(38, 95);
-        $this->addComponent($this->bg);
-
-        $this->bgTitle = new WidgetTitle($sizeX, $sizeY);
-        $this->bgTitle->setText(eXpGetMessage("Generic Panel"));
-        $this->addComponent($this->bgTitle);
-
         $this->frame = new Frame(4, -5);
         $this->frame->setLayout(new Column(-1));
         $this->addComponent($this->frame);
@@ -46,7 +35,8 @@ class GenericPanel extends Widget
     public function setTitle(Message $title)
     {
         $this->setName($title->getMessage('en'));
-        $this->bgTitle->setText($title);
+        $this->bgTitle = new WidgetTitle(40, 95, $title);
+        $this->addComponent($this->bgTitle);
     }
 
     public function setLines($value)
@@ -55,11 +45,13 @@ class GenericPanel extends Widget
         $this->sizeX = 40;
         $this->sizeY = ($this->lineHeight * $this->totalLines) + 5;
         $this->setSize($this->sizeX, ($this->lineHeight * $this->totalLines) + 5);
+
+        $this->bg = new WidgetBackGround($this->sizeX, ($this->lineHeight * $this->totalLines) + 5);
+        $this->addComponent($this->bg);
     }
 
     public function onResize($oldX, $oldY)
     {
-        $this->bg->setSize($this->sizeX, ($this->lineHeight * $this->totalLines) + 5);
         $this->bgTitle->setSize($this->sizeX, 4.2);
         parent::onResize($oldX, $oldY);
     }

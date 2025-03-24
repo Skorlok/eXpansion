@@ -24,19 +24,13 @@ class Button extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLi
     protected $isActive = false;
     protected $action = 0;
 
-    /**
-     * Button
-     *
-     * @param int $sizeX = 24
-     * @param intt $sizeY = 6
-     */
     public function __construct($sizeX = 32, $sizeY = 6)
     {
-
         if (self::$script === null) {
             self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ButtonScript();
         }
 
+        /** @var Config $config */
         $config = Config::getInstance();
         $this->buttonId = self::$counter++;
         if (self::$counter > 100000) {
@@ -304,7 +298,6 @@ class Button extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLi
         }
 
     }
-
 
     public function getButtonId()
     {

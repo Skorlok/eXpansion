@@ -17,7 +17,6 @@ use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked;
-use ManiaLivePlugins\eXpansion\Gui\Elements\TextEdit;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use Maniaplanet\DedicatedServer\Connection;
@@ -98,14 +97,13 @@ class ServerOptions extends Window
         $this->frameInputbox->addComponent($this->serverName);
 
 
-        $this->serverCommentE = new TextEdit("serverCommentE", 96, 32);
-        $this->serverCommentE->setId("commentFrom");
-        $this->serverCommentE->setPosition(0, 6);
-        $this->serverCommentE->setText($this->connection->getServerComment());
-        $this->serverCommentE->setShowLineNumbers(false);
-        $this->serverCommentE->setScriptEvents();
-        $this->serverCommentE->setScale(0.75);
+        $this->serverCommentE = new \Manialive\Gui\Elements\Xml();
+        $this->serverCommentE->setContent('<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . $this->connection->getServerComment() . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>');
         $this->frameInputbox->addComponent($this->serverCommentE);
+
+        $spacer = new Quad(3, 26);
+        $spacer->setStyle(Icons64x64_1::EmptyIcon);
+        $this->frameInputbox->addComponent($spacer);
 
         $this->serverComment = new Inputbox("serverComment", 60, 26);
         $this->serverComment->setPosition(900, 900);

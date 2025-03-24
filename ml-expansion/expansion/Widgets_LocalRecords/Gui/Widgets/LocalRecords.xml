@@ -1,0 +1,42 @@
+<frame posn="0 0 2.0E-5" id="Frame">
+    <frame>
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML($this->getParam('sizeX'), (3 + $this->getParam('nbFields') * 4) + 1.5, $this->getParam('action')); ?>
+    </frame>
+
+    <frame posn="0 0 1.0E-5">
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML($this->getParam('sizeX'), (3 + $this->getParam('nbFields') * 4), $this->addLang($this->getParam('title')), "minimizeButton"); ?>
+    </frame>
+
+    <frame posn="<?php echo ($this->getParam('sizeX') / 2) + 1 ?> -5.5 4.0E-5">
+        <frame>
+            <?php for ($index = 1; $index <= $this->getParam('nbFields'); $index++) {
+                echo '<frame posn="-20.5 -' . (($index - 1) * 4) . ' 0">';
+                    echo '<quad id="RecBgBlink_' . $index . '" posn="-1.5 1.5 0" sizen="42 3.5" halign="left" valign="top" bgcolor="0f0" opacity="0.25" hidden="1"/>';
+                    echo '<quad id="RecBg_' . $index . '" posn="-1.5 1.5 1.0E-5" sizen="42 3.5" halign="left" valign="top" bgcolor="000" opacity="0.55" hidden="1"/>';
+                    echo '<label id="RecRank_' . $index . '" posn="3.25 0 2.0E-5" sizen="4 4" halign="right" valign="center" style="TextRaceChat" textsize="1.5" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#rank#")) . '" textemboss="1"/>';
+                    echo '<label id="RecTime_' . $index . '" posn="3.5 0 3.0E-5" sizen="11 5" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#time#")) . '"/>';
+                    echo '<label id="RecNick_' . $index . '" posn="15.5 0 4.0E-5" sizen="24 4" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="fff" textemboss=""/>';
+                echo '</frame>';
+            }?>
+        </frame>
+    </frame>
+</frame>
+
+<frame posn="0 -1.7 0.00081" scale="0.75">
+    <quad id="toggleMicroMenu" sizen="7 7" halign="left" valign="center" style="UIConstruction_Buttons" substyle="Down" scriptevents="1"/>
+</frame>
+
+<frame id="MicroMenu">
+    <frame scriptevents="1">
+        <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="<?php echo $this->getParam('guiConfig')->style_widget_bgColorize ?>" bgcolorfocus="<?php echo $this->getParam('guiConfig')->style_widget_title_bgColorize ?>" scriptevents="1"/>
+        <label id="item_1" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Show Differences"/>
+    </frame>
+    <frame posn="0 -5 2.0E-5" scriptevents="1">
+        <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="<?php echo $this->getParam('guiConfig')->style_widget_bgColorize ?>" bgcolorfocus="<?php echo $this->getParam('guiConfig')->style_widget_title_bgColorize ?>" scriptevents="1"/>
+        <label id="item_2" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Rectract Widget"/>
+    </frame>
+    <frame posn="0 -10 4.0E-5" scriptevents="1">
+        <quad id="mQuad_3" sizen="30 5" halign="left" valign="center" bgcolor="<?php echo $this->getParam('guiConfig')->style_widget_bgColorize ?>" bgcolorfocus="<?php echo $this->getParam('guiConfig')->style_widget_title_bgColorize ?>" scriptevents="1"/>
+        <label id="item_3" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Put On TAB View"/>
+    </frame>
+</frame>

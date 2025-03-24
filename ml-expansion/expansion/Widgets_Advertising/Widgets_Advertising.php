@@ -73,6 +73,7 @@ class Widgets_Advertising extends ExpPlugin
                 );
                 $widget->setPositionX($this->config->$varX);
                 $widget->setPositionY($this->config->$varY);
+                $widget->setPositionZ(50);
                 $widget->setNoAds($this->config->noAdUsers);
                 $widget->show();
             }

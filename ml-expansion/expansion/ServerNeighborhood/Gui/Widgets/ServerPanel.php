@@ -66,18 +66,12 @@ class ServerPanel extends Widget
     {
 
         $this->_mainWindow = new Frame();
-        $this->_mainWindow->setPosZ(30);
         $this->_mainWindow->setAlign("left", "center");
         $this->_mainWindow->setId("Frame");
         $this->_mainWindow->setScriptEvents(true);
         $this->addComponent($this->_mainWindow);
 
-        $this->bg = new WidgetBackGround(30, 30);
-        $this->bg->setAlign("left", "top");
-        $this->_mainWindow->addComponent($this->bg);
-
-        $this->bg_title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(50, 5);
-        $this->bg_title->setPosition(0, 0);
+        $this->bg_title = new \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle(37, 5);
         $this->_mainWindow->addComponent($this->bg_title);
 
 
@@ -150,7 +144,7 @@ class ServerPanel extends Widget
         if ($this->config->snwidget_isDockable) {
             $script = new Script("Gui/Scripts/TrayWidget");
             $script->setParam('isMinimized', 'True');
-            $script->setParam('autoCloseTimeout', '72000000');
+            $script->setParam('autoCloseTimeout', Config::getInstance()->refresh_interval * 1000);
             $script->setParam('posXMin', -33);
             $script->setParam('posX', -33);
             $script->setParam('posXMax', -3);
@@ -207,13 +201,16 @@ class ServerPanel extends Widget
             $i++;
             $nbShown++;
         }
+
+        $this->bg = new WidgetBackGround($this->getSizeX(), $this->getSizeY());
+        $this->bg->setAlign("left", "top");
+        $this->_mainWindow->addComponent($this->bg);
     }
 
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-        $this->bg->setSize($this->getSizeX(), $this->getSizeY());
-        $this->bg_title->setSizeX($this->getSizeX() + 4);
+
         $this->label_title->setSizeX($this->getSizeX());
         $this->icon_title->setPosX($this->getSizeX());
 

@@ -19,9 +19,12 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
 
     private $group;
 
+    private $config;
+
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->updateGroup();
     }
 
@@ -86,8 +89,8 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
         }
 
         $info = Netlost::Create($recepient);
+        $info->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY);
         $info->setSize(200, 12);
-        $info->setPosition(-115, -50);
         $info->show();
     }
 

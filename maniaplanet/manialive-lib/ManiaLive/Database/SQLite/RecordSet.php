@@ -47,42 +47,20 @@ class RecordSet extends \ManiaLive\Database\RecordSet
 	
 	function fetchObject($className='\\stdClass', array $params=array())
 	{
-		$properties = $this->fetchAssoc();
-
-		if(is_null($className))
-		{
-			$object = new stdClass();
+		$row = $this->result->fetchArray(self::FETCH_ASSOC);
+		if ($row) {
+			return (object) $row;
 		}
-		else
-		{
-			// call to class' constructor must be done after filling the fields
-			$object = unserialize(sprintf('O:%d:"%s":0:{}', strlen($className), $className));
-		}
-
-		$reflector = new \ReflectionObject($object);
-		foreach($properties as $key => $value)
-		{
-			try
-			{
-				$attribute = $reflector->getProperty($key);
-				$attribute->setAccessible(true);
-				$attribute->setValue($object, $value);
-			}
-			catch(\ReflectionException $e)
-			{
-				$object->$key = $value;
-			}
-		}
-
-		// calling constructor
-		call_user_func_array(array($object, '__construct'), $params);
-
-		return $object;
+		return null;
 	}
 	
 	function recordCount()
 	{
-		throw new \ManiaLive\Database\NotSupportedException();
+		$rowCount = 0;
+		while ($row = $this->result->fetchArray(self::FETCH_ASSOC)) {
+			$rowCount++;
+		}
+		return $rowCount;
 	}
 	
 	function recordAvailable()

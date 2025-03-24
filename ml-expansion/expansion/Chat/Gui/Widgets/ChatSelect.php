@@ -38,7 +38,6 @@ class ChatSelect extends Widget
     {
         parent::eXpOnEndConstruct();
         $this->setSize(30, 6);
-        $this->setPosition(-153, 77);
         $this->setScale(0.9);
 
         if (\ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->simpleEnviTitle == "TM") {

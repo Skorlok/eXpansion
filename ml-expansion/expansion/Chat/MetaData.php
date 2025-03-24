@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\ColorCode;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -71,5 +72,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$0af»$z$s ');
         $this->registerVariable($var);
 
+        $var = new TypeFloat("chatSelector_PosX", "Position of Chat Selector Widget X", $config, false, false);
+        $var->setDefaultValue(-153);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("chatSelector_PosY", "Position of Chat Selector Widget Y", $config, false, false);
+        $var->setDefaultValue(77);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
     }
 }

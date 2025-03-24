@@ -180,7 +180,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         if (!$this->enabled || $this->ignore) {
@@ -258,11 +258,11 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
         }
 
+        CurrentTrackWidget::EraseAll();
         $window = CurrentTrackWidget::Create(null);
+        $window->setPosition($this->config->musicWidget_PosX, $this->config->musicWidget_PosY);
         $window->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
         $window->setVisibleLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-        $window->setPosition(0, 80);
-        $window->setSize(100, 10);
         $window->setSong($outsong);
         $window->show();
     }

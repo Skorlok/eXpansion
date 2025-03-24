@@ -57,6 +57,8 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $cmd_reset;
     private $cmd_points;
 
+    private $config;
+
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess = null;
 
@@ -81,6 +83,8 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->enableDatabase();
+
+        $this->config = Config::getInstance();
 
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
@@ -476,7 +480,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
 
             $widget = Gui\Widget\QuizImageWidget::Create(null);
-
+            $widget->setPosition($this->config->quizImage_PosX, $this->config->quizImage_PosY);
             $widget->setImage($this->currentQuestion->getImage());
             $widget->setHiddenQuestion($this->currentQuestion->isHidden, $this->currentQuestion->boxOrder);
             $widget->setImageSize($newWidth, $newHeight);

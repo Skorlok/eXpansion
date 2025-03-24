@@ -22,7 +22,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->setName("Tools: Auto TimeLimit");
 
         $this->addGameModeCompability(GameInfos::GAMEMODE_TIMEATTACK);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT,"Doppler.Script.txt");
+        $this->addGameModeCompability(GameInfos::GAMEMODE_SCRIPT, "doppler");
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
 

@@ -339,7 +339,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("multilap_info_y", "multilap_info_y", $config, false, false);
-        $var->setDefaultValue(61.0);
+        $var->setDefaultValue(-35.0);
         $var->setGroup("TM Position");
         $this->registerVariable($var);
 

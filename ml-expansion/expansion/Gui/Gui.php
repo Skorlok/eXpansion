@@ -7,8 +7,6 @@ use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\HudPanel;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
@@ -24,12 +22,14 @@ class Gui extends ExpPlugin
     private $titleId;
     private $msg_params;
     private $msg_disabled;
-    private $resetLogins = array();
     private $counter = 0;
     private $preloader;
     // next 2 is used by contextMenu
     public static $items = array();
     public static $callbacks = array();
+
+    // used to sent widgets to players when they join, it's more efficient than sending statics widgets with callbacks in plugins
+    public static $persistentWidgets = array();
 
     public $playersWidgets = array();
 
@@ -40,15 +40,12 @@ class Gui extends ExpPlugin
 
     public function eXpOnLoad()
     {
-        HudPanel::$mainPlugin = $this;
-
         $config = Config::getInstance();
     }
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->enableTickerEvent();
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
         $this->setPublicMethod("hudCommands");
@@ -67,12 +64,6 @@ class Gui extends ExpPlugin
         foreach ($this->storage->spectators as $player) {
             $this->onPlayerConnect($player->login, true);
         }
-
-        $this->loadWidgetConfigs();
-
-        $edge = Widgets\Edge::Create(null);
-        $edge->setPosition(-160, -35);
-        $edge->show();
     }
 
     public static function getScaledSize($sizes, $totalSize)
@@ -93,71 +84,100 @@ class Gui extends ExpPlugin
         return $nsize;
     }
 
-    public function loadWidgetConfigs()
-    {
-        $config = WConfig::getInstance();
-        foreach ($config as $confName => $values) {
-
-            $confs = explode('_', $confName);
-            if (sizeof($confs) > 1) {
-
-                $widgetName = str_replace(" ", "", $confs[0]);
-                Widget::setParameter($widgetName, $confs[1], $values);
-            }
-        }
-    }
-
-    public function onTick()
-    {
-        if (count($this->resetLogins) > 0) {
-            /** @var GuiHandler */
-            $guiHandler = GuiHandler::getInstance();
-            foreach ($this->resetLogins as $login => $value) {
-                $this->resetLogins[$login]++;
-                switch ($this->resetLogins[$login]) {
-                    case 1:
-                        ResetHud::Erase($login);
-                        break;
-                    case 2:
-                        $guiHandler->toggleGui($login);
-                        break;
-                    case 3:
-                        $guiHandler->toggleGui($login);
-                        unset($this->resetLogins[$login]);
-                        $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
-                        break;
-                }
-            }
-        }
-        if ($this->counter != 0 && time() - $this->counter > 2) {
-            $this->connection->sendDisplayManialinkPage(
-                null,
-                "<manialinks><manialink id=\"0\"><quad></quad></manialink>
-<custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                0,
-                false
-            );
-            $this->counter = 0;
-        }
-    }
-
     public function onPlayerConnect($login, $isSpectator)
     {
         try {
-
             if ($this->expStorage->simpleEnviTitle == "SM") {
                 $this->counter = time();
                 $this->connection->TriggerModeScriptEvent("LibXmlRpc_DisableAltMenu", $login);
-                $this->connection->sendDisplayManialinkPage(
-                    $login,
-                    "<manialinks><manialink id=\"0\"><quad></quad></manialink
-><custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                    0,
-                    false
-                );
+                $this->connection->sendDisplayManialinkPage($login, '<manialinks><manialink id="0"><quad></quad></manialink><custom_ui><altmenu_scores visible="false" /></custom_ui></manialinks>', 0, false);
             }
         } catch (Exception $e) {
             $this->console("Error while disabling alt menu : " . $e->getMessage());
+        }
+
+        $this->connection->sendDisplayManialinkPage(null,
+<<<EOT
+<manialink id="GuiChecker" version="2" layer="normal" name="GuiChecker">
+<script><!--
+main () {
+    declare persistent Boolean exp_isWidgetsHidden = False;
+    declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+    declare persistent Boolean edge_isLockedVisible = True;
+    declare Boolean edge_isMinimized for UI = False;
+    declare Boolean lastValue = edge_isMinimized;
+    declare Boolean is_edge_animated for UI = edge_isMinimized;
+    declare Integer eXp_lastClockUpdate = Now;
+
+    while(True) {
+        yield;
+        foreach (Event in PendingEvents) {
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F8") {
+                exp_isWidgetsHidden = !exp_isWidgetsHidden;
+                if (exp_isWidgetsHidden == True) {
+                    exp_needToCheckPersistentVars = True;
+                } else {
+                    exp_needToCheckPersistentVars = True;
+                }
+            }
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F9") {
+                edge_isLockedVisible = !edge_isLockedVisible;
+            }
+        }
+
+        if (edge_isLockedVisible == False && (Now - eXp_lastClockUpdate) >= 50) {
+            if (InputPlayer != Null) {
+                declare Real Speed = InputPlayer.Speed*3.6;
+        
+                if ((Speed < 10.0 && Speed > -10.0) || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
+                    if (lastValue == True) {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                    }
+                }
+        
+                if ((Speed > 10.0 || Speed < -10.0) && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
+                    if (lastValue == False) {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                    }
+                }
+            }
+        
+            eXp_lastClockUpdate = Now;
+        }
+
+        if (edge_isLockedVisible == True && (Now - eXp_lastClockUpdate) >= 500) {
+            if (lastValue == True) {
+                edge_isMinimized = False;
+                lastValue = False;
+                is_edge_animated = True;
+            }
+        }
+    }
+}
+--></script>
+</manialink>
+EOT
+        , 0, false);
+
+        
+        $widgetsToSend = "";
+        foreach (self::$persistentWidgets as $widget) {
+            $widgetsToSend .= $widget;
+        }
+
+        if ($widgetsToSend != "") {
+            $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, true);
         }
     }
 
@@ -252,8 +272,8 @@ class Gui extends ExpPlugin
             $window = ResetHud::Create($login);
             $window->setTimeout(1);
             $window->show();
-            $this->resetLogins[$login] = 0;
-            $this->eXpChatSendServerMessage(eXpGetMessage("Starting hud reset, please wait"), $login);
+            $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
+            //ResetHud::Erase($login);
         }
     }
 

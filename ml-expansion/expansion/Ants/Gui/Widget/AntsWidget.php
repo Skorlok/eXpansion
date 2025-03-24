@@ -34,6 +34,10 @@ class AntsWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
             $quad->setId("ant" . ($x + 1));
             //$quad->setScriptEvents();
             $this->addComponent($quad);
+
+            /*$ant = new \ManiaLive\Gui\Elements\Xml();
+            $ant->setContent('<quad id="ant' . ($x + 1) . ' " posn="500 99 0" sizen="5 5" halign="center" valign="center" image="' . $this->config->texture . '"/>');
+            $this->addComponent($ant);*/
         }
 
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Ants/Gui/Script");

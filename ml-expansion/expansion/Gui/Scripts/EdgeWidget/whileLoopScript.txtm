@@ -1,38 +1,4 @@
-if (edge_isLockedVisible2 == False && (Now - eXp_lastClockUpdate2) >= 500) {
-    if (InputPlayer != Null) {
-        declare Real Speed = InputPlayer.Speed*3.6;
-
-        if (Speed < 10.0 || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
-            if (lastValue == True) {
-                edge_isMinimized = False;
-                lastValue = False;
-                edge_animatedId[id] = True;
-            } else {
-                edge_isMinimized = False;
-                lastValue = False;
-            }
-        }
-
-        if (Speed > 10.0 && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
-            if (lastValue == False) {
-                edge_isMinimized = True;
-                lastValue = True;
-                edge_animatedId[id] = True;
-            } else {
-                edge_isMinimized = True;
-                lastValue = True;
-            }
-        }
-    }
-
-    eXp_lastClockUpdate2 = Now;
-}
-
-if (!edge_animatedId.existskey(id) ) {
-    edge_animatedId[id] = edge_isMinimized;
-}
-
-if (edge_animatedId[id] == True) {
+if (is_edge_animated == True) {
 
     if (animActive == False) {
         animActive = True;
@@ -40,7 +6,7 @@ if (edge_animatedId[id] == True) {
     }
 
     if (animActive && edgeStart + 1000 <= Now ) {
-        edge_animatedId[id] = False;
+        is_edge_animated = False;
         animActive = False;
     }
 
@@ -55,11 +21,11 @@ if (edge_animatedId[id] == True) {
         }
 
         if (edge_isMinimized) {
-            declare value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 500.);
+            value = edge * AL::Ease("EaseInCirc", (Now - edgeStart) * 1., 0., 1., 200.);
             Window.RelativePosition.X = p2.X + value;
         }
         else {
-            declare value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 500.);
+            value = edge * AL::Ease("EaseOutCirc", (Now - edgeStart) * 1., 1., -1., 200.);
             Window.RelativePosition.X = p2.X + value;
         }
     }

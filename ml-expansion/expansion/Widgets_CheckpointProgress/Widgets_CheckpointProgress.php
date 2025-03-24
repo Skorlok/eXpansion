@@ -27,15 +27,19 @@ namespace ManiaLivePlugins\eXpansion\Widgets_CheckpointProgress;
 class Widgets_CheckpointProgress extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
+    private $config;
+
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->displayWidget();
     }
 
     private function displayWidget()
     {
         $info = Gui\Widgets\CpProgress::Create(null);
+        $info->setPosition($this->config->checkpointProgressWidget_PosX, $this->config->checkpointProgressWidget_PosY);
         $info->setSize(160, 15);
         $info->show();
     }

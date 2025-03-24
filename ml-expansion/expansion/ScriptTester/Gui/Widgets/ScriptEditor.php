@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\ScriptTester\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\TextEdit;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
@@ -43,37 +42,21 @@ class ScriptEditor extends PlainWidget
         $this->background = new WidgetBackGround(395, 75);
         $this->addComponent($this->background);
 
-        $this->lbl_ml = new WidgetTitle(180, 4);
+        $this->lbl_ml = new WidgetTitle(180, 4, 'Maniascript editor');
         $this->lbl_ml->setPosition(12);
-        $this->lbl_ml->setText('Maniascript editor');
         $this->addComponent($this->lbl_ml);
 
-        $entry = new TextEdit("editor_maniascript", 180, 60);
-        $entry->setId('editor_maniascript');
-        $entry->setPosition(12, -5);
-        $entry->setAlign("left", "top");
-        $entry->setAutoNewline();
-        $entry->setShowLineNumbers();
-        $entry->setTextFormat("script");
-        $entry->setScriptEvents();
-        $entry->setText($config->tester_maniascript);
+        $entry = new \ManiaLive\Gui\Elements\Xml();
+        $entry->setContent('<textedit id="editor_maniascript" posn="12 -5 3.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="' . $config->tester_maniascript . '" textformat="script" name="editor_maniascript" showlinenumbers="1" autonewline="1"/>');
         $this->scriptEditor = $entry;
         $this->addComponent($this->scriptEditor);
 
-        $this->lbl_script = new WidgetTitle(180, 4);
+        $this->lbl_script = new WidgetTitle(180, 4, 'Manialink editor');
         $this->lbl_script->setPosX(210);
-        $this->lbl_script->setText('Manialink editor');
         $this->addComponent($this->lbl_script);
 
-        $entry = new TextEdit("editor_manialink", 180, 60);
-        $entry->setId('editor_manialink');
-        $entry->setPosition(210, -5);
-        $entry->setAlign("left", "top");
-        $entry->setAutoNewline();
-        $entry->setShowLineNumbers();
-        $entry->setTextFormat("script");
-        $entry->setScriptEvents();
-        $entry->setText($config->tester_manialink);
+        $entry = new \ManiaLive\Gui\Elements\Xml();
+        $entry->setContent('<textedit id="editor_manialink" posn="210 -5 6.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="log(&quot;hello&quot;);" textformat="script" name="editor_manialink" showlinenumbers="1" autonewline="1"/>');
         $this->mlEditor = $entry;
         $this->addComponent($this->mlEditor);
 

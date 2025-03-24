@@ -133,16 +133,16 @@ class Core extends types\ExpPlugin
      */
     public function eXpOnInit()
     {
-        //File to log expansion console logs
-        $logFile = "manialive-" . $this->storage->serverLogin . ".console.log";
-        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR . $logFile)) {
-            unlink(__DIR__ . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR . $logFile);
-        }
+        if (file_exists(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php")) {
+            $newFile = str_replace(
+                "define('APP_ROOT', __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);",
+                "define('APP_ROOT', substr(__DIR__, 0, -9));",
+                file_get_contents(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php")
+            );
 
-        //File to load expansion errors to
-        $logFile = "manialive-" . $this->storage->serverLogin . ".error.log";
-        if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR . $logFile)) {
-            unlink(__DIR__ . DIRECTORY_SEPARATOR . "logs" . DIRECTORY_SEPARATOR . $logFile);
+            str_replace("skorlok/expansion/", "", $newFile);
+
+            file_put_contents(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php", $newFile);
         }
 
         //Listen for changes on server events
@@ -1325,6 +1325,7 @@ EOT;
             Gui\Windows\NetStat::Erase($login);
             $win = Gui\Windows\NetStat::Create($login);
             $win->setTitle("Network Status");
+            $win->setPosition($this->config->netStats_PosX, $this->config->netStats_PosY);
             $win->setSize(140, 100);
             $win->show();
         }

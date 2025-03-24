@@ -1,0 +1,101 @@
+
+remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime));
+
+if (remaining >= 0.0) {
+    declare ratio = ML::NearestReal(remaining) / ML::NearestReal(countdown);
+    if (ratio <= 1.0) {
+        if (ratio < 0.0) {
+            ratio = 0.0;
+        }
+        countdownBar.Ratio = ratio;
+    } else {
+        countdownBar.Ratio = 1.0;
+    }
+    countdownText.Value = remaining ^ " seconds left";
+} else {
+    countdownBar.Ratio = 0.0;
+    countdownText.Value = "Vote finished !";
+    Window.Hide();
+}
+
+foreach (Event in PendingEvents) {
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F1") {
+        if (canVote) {
+            TriggerPageAction(actionYes);
+        }
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F2") {
+        if (canVote) {
+            TriggerPageAction(actionNo);
+        }
+    }
+}
+
+
+//  Active Players => 0
+//  Players => 1
+//  Everybody => 2
+
+
+if ((Now - lastUpdateTime) >= 100) {
+    foreach (Player in Players) {
+        if (LocalUser != Null) {
+            if (Player.Login == LocalUser.Login) {
+                if (!Player.RequestsSpectate) {
+                    // PLAYER CASE
+                    showVoteButtons();
+                    canVote = True;
+                } else {
+                    // SPECTATOR CASE
+                    if (voters == 0) {
+                        hideVoteButtons();
+                        canVote = False;
+                    } else {
+                        if (voters == 1) {
+
+                            <?php echo ($this->isTrackmania) ? "" : "/*";?>
+
+                            if (Player.Score is CTmScore) {
+                                if (Player.Score != Null) {
+                                    if (Player.Score.BestRace != Null) {
+                                        if (Player.Score.BestRace.Time > 0) {
+                                            showVoteButtons();
+                                            canVote = True;
+                                        } else {
+                                            hideVoteButtons();
+                                            canVote = False;
+                                        }
+                                    } else {
+                                        hideVoteButtons();
+                                        canVote = False;
+                                    }
+                                } else {
+                                    hideVoteButtons();
+                                    canVote = False;
+                                }
+                            }
+
+                            <?php echo ($this->isTrackmania) ? "" : "*/";?>
+
+                            if (Player.Score is CSmScore) {
+                                if (Player.Score.Points > 0) {
+                                    showVoteButtons();
+                                    canVote = True;
+                                } else {
+                                    hideVoteButtons();
+                                    canVote = False;
+                                }
+                            }
+                        } else {
+                            showVoteButtons();
+                            canVote = True;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    lastUpdateTime = Now;
+}

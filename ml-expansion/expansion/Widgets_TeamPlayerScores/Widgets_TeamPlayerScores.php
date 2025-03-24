@@ -21,6 +21,8 @@ class Widgets_TeamPlayerScores extends ExpPlugin
      */
     private $playerScores = array();
 
+    private $config;
+
     public function eXpOnLoad()
     {
 
@@ -29,6 +31,7 @@ class Widgets_TeamPlayerScores extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->reset();
         $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
 
@@ -118,12 +121,12 @@ class Widgets_TeamPlayerScores extends ExpPlugin
     private function showWidget($layer = null)
     {
         $widget = PlayerScoreWidget::Create();
+        $widget->setPosition($this->config->teamPlayerScorePanel_PosX, $this->config->teamPlayerScorePanel_PosY);
         $widget->setSize(42, 56);
         $widget->setScores($this->playerScores);
         if ($layer != null) {
             $widget->setLayer($layer);
         }
-        $widget->setPosition(-124, 6);
         $widget->show();
     }
 

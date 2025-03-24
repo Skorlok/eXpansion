@@ -21,6 +21,8 @@ class Widgets_TeamRoundScores extends ExpPlugin
     private $roundNumber = 0;
     private $totalScores = array();
 
+    private $config;
+
     public function eXpOnLoad()
     {
         $this->roundScores = array();
@@ -29,6 +31,7 @@ class Widgets_TeamRoundScores extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->reset();
         $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
 
@@ -163,12 +166,12 @@ class Widgets_TeamRoundScores extends ExpPlugin
     private function showWidget($layer = null)
     {
         $widget = Gui\Widgets\RoundScoreWidget::Create();
+        $widget->setPosition($this->config->teamRoundScorePanel_PosX, $this->config->teamRoundScorePanel_PosY);
         $widget->setSize(42, 56);
         $widget->setScores($this->roundScores);
         if ($layer != null) {
             $widget->setLayer($layer);
         }
-        $widget->setPosition(-124, 58);
         $widget->show();
     }
 

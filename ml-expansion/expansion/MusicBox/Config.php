@@ -8,4 +8,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $override = true;
     public $disableJukebox = false;
     public $shuffle = true;
+
+    public $musicWidget_PosX = 0;
+    public $musicWidget_PosY = 80;
 }

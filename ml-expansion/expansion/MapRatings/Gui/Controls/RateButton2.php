@@ -52,6 +52,15 @@ class RateButton2 extends \ManiaLivePlugins\eXpansion\Gui\Control
             case 5:
                 $label->setText(eXpGetMessage("Yes (F5)"));
                 break;
+
+            //following are for extend time vote
+            case 1:
+                $thumb->setAttribute("rot", "180");
+                $label->setText(eXpGetMessage("No (F2)"));
+                break;
+            case 2:
+                $label->setText(eXpGetMessage("Yes (F1)"));
+                break;
         }
 
 

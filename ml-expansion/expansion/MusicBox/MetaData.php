@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\MusicBox;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -36,6 +37,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new Boolean("shuffle", "Shuffle song list ?", $config, false, false);
         $var->setDefaultValue(true);
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("musicWidget_PosX", "Position of Music Widget X", $config, false, false);
+        $var->setDefaultValue(0);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("musicWidget_PosY", "Position of Music Widget Y", $config, false, false);
+        $var->setDefaultValue(80);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

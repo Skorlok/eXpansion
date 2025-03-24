@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Bets;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -23,6 +24,16 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new BoundedTypeInt("timeoutSetBet", "Bet Accept timeout (in seconds)", $configInstance, false, false);
         $var->setMin(20);
         $var->setDefaultValue(45);
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("betWidget_PosX", "Position of Betting Widget X", $configInstance, false, false);
+        $var->setDefaultValue(20);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("betWidget_PosY", "Position of Betting Widget Y", $configInstance, false, false);
+        $var->setDefaultValue(-65);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

@@ -27,6 +27,8 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
     {
         $this->enableDedicatedEvents();
 
+        $this->config = Config::getInstance();
+
         $this->lastUpdate = time();
 
         if ($this->isPluginLoaded('\\ManiaLivePlugins\\eXpansion\\SM_ObstaclesScores\\SM_ObstaclesScores')) {
@@ -39,7 +41,7 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
     {
         LocalPanel::EraseAll();
         $widget = LocalPanel::Create($login);
-        $widget->setPosition(114, 64);
+        $widget->setPosition($this->config->localRecordsPanel_PosX, $this->config->localRecordsPanel_PosY);
         $widget->update();
         $widget->show();
     }
@@ -56,7 +58,7 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         LocalPanel::EraseAll();

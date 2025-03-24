@@ -33,12 +33,11 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
     {
         $this->enableDedicatedEvents();
 
+        $this->config = Config::getInstance();
+
         $this->lastUpdate = time();
         if ($this->isPluginLoaded('\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores')) {
-            self::$localrecords = $this->callPublicMethod(
-                "\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores",
-                "getRecords"
-            );
+            self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores", "getRecords");
         }
 
         $this->updateLocalPanel();
@@ -47,7 +46,7 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
     public function updateLocalPanel($login = null)
     {
         $widget = LocalPanel::Create($login);
-        $widget->setPosition(114, 64);
+        $widget->setPosition($this->config->localScoresPanel_PosX, $this->config->localScoresPanel_PosY);
         $widget->update();
         $widget->show();
     }

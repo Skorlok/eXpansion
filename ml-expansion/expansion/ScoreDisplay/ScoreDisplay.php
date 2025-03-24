@@ -12,9 +12,11 @@ class ScoreDisplay extends ExpPlugin
 {
 
     private $cmd_scores;
+    private $config;
 
     public function eXpOnReady()
     {
+        $this->config = Config::getInstance();
         $cmd = AdminGroups::addAdminCommand('scores', $this, 'scores', Permission::QUIZ_ADMIN);
         $cmd->setHelp('Setup the scores widget');
         $cmd->setHelpMore('$wSetup the scores widget');
@@ -37,6 +39,7 @@ class ScoreDisplay extends ExpPlugin
 
         if ($command == "setup") {
             $window = ScoreSetup::Create($login);
+            $window->setPosition($this->config->scoreWidget_PosX, $this->config->scoreWidget_PosY);
             $window->setSize(120, 80);
             $window->setTitle("ScoreSetup");
             $window->show();

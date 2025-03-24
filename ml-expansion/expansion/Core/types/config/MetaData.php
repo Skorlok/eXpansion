@@ -473,7 +473,7 @@ abstract class MetaData
                 $storage = Storage::getInstance();
                 $gamemode = $storage->gameInfos->gameMode;
                 if ($gamemode == GameInfos::GAMEMODE_SCRIPT) {
-                    $scriptName = $storage->gameInfos->scriptName;
+                    $scriptName = $storage->getCleanGamemodeName();
                 }
             }
 
@@ -500,8 +500,19 @@ abstract class MetaData
     {
         if ($this->scriptCompatibiliyMode) {
             $gmode = Core::eXpGetScriptCompatibilityMode($scriptName);
+            if (isset($this->gameModeSupport[$gmode])) {
+                return $this->gameModeSupport[$gmode];
+            }
 
-            return isset($this->gameModeSupport[$gmode]) ? $this->gameModeSupport[$gmode] : false;
+            if (isset($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT]) && is_array($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT])) {
+                foreach ($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT] as $supportedScript => $active) {
+                    if ($scriptName == $supportedScript) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         if (isset($this->gameModeSupport[0]) && !empty($this->gameModeSupport[0])) {

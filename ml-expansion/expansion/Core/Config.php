@@ -12,10 +12,10 @@ class Config extends \ManiaLib\Utils\Singleton
     public $Colors_error = '$f00'; // general error message color
     public $Colors_admin_action = '$4c1'; // admin actions color
     public $Colors_variable = '$fff'; // generic variable color
-    public $Colors_record = '$3af'; // all other local records
-    public $Colors_record_top = '$2d0'; // top5 local records
+    public $Colors_record = '$90f'; // all other local records
+    public $Colors_record_top = '$3af'; // top5 local records
     public $Colors_dedirecord = '$98f'; // dedimania records
-    public $Colors_rank = '$dee'; // used in record messages and widgets for rank
+    public $Colors_rank = '$ff0'; // used in record messages and widgets for rank
     public $Colors_time = '$fff'; // used for record messages and widgets
     public $Colors_rating = '$d05'; // map ratings color
     public $Colors_queue = '$ff0'; // map queue messages
@@ -48,4 +48,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $scriptRoundsPoints = array('10', '8', '7', '6', '5', '4', '3', '2', '1');
     public $quitDialogManialink = "";
     public $useWhitelist = false;
+
+    public $netStats_PosX = 42;
+    public $netStats_PosY = 0;
 }

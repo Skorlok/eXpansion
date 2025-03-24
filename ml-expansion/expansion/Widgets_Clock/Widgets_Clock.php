@@ -7,18 +7,22 @@ use ManiaLivePlugins\eXpansion\Widgets_Clock\Gui\Widgets\Clock;
 
 class Widgets_Clock extends ExpPlugin
 {
-
+    private $config;
 
     public function eXpOnReady()
     {
-        $this->registerChatCommand("s", "show");
+        $this->config = Config::getInstance();
         $this->show();
     }
 
     public function show()
     {
         $widget = Clock::Create(null);
-        $widget->setDisableAxis("x");
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $widget->setPosition($this->config->clock_PosX_Shootmania, $this->config->clock_PosY_Shootmania);
+        } else {
+            $widget->setPosition($this->config->clock_PosX, $this->config->clock_PosY);
+        }
         $widget->show();
     }
 

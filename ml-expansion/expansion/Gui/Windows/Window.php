@@ -18,18 +18,16 @@ abstract class Window extends \ManiaLive\Gui\Window
     protected $_windowFrame;
     private $_titlebar;
     private $_bg;
-    private $_bgeff;
     private $_topcenter;
     private $_bottomcenter;
     private $_windowBorder;
     private $_title;
-    private $_titleBar;
+    private $moreScripts = array();
     private $script;
     private $_scripts = array();
     private $dDeclares = "";
     private $scriptLib = "";
     private $wLoop = "";
-    private $dIndex = 0;
     private $_name = "window";
     private $dicoMessages = array();
     private $calledScripts = array();
@@ -57,15 +55,6 @@ abstract class Window extends \ManiaLive\Gui\Window
         $this->_bg->setBgcolor($config->windowBackgroundColor);
         $this->_bg->setOpacity(0.9);
         $this->_windowFrame->addComponent($this->_bg);
-
-
-        $this->_bgeff = new \ManiaLib\Gui\Elements\Quad($this->sizeX, $this->sizeY);
-        $this->_bgeff->setAlign("left", "top");
-        $this->_bgeff->setImage('file://Media/Manialinks/TrackMania/Window/tm-structure-background.png', true);
-        $this->_bgeff->setAlign("left", "top");
-
-        $this->_bgeff->setColorize($config->windowBackgroundColor);
-    //    $this->_windowFrame->addComponent($this->_bgeff);
 
         $this->_bottomcenter = new \ManiaLib\Gui\Elements\Quad($this->element, $this->element);
         $this->_bottomcenter->setAlign("left", "top");
@@ -132,7 +121,7 @@ abstract class Window extends \ManiaLive\Gui\Window
     protected function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-        $element = 12;
+        
         $x = $this->sizeX;
         $y = $this->sizeY;
         $o = 6;
@@ -144,9 +133,6 @@ abstract class Window extends \ManiaLive\Gui\Window
 
         $this->_windowBorder->setSize($x + $o * 2, $y + $o * 2);
         $this->_windowBorder->setPosition(-$o, $o);
-
-        $this->_bgeff->setSize($x + $o * 2, $y + $o * 2);
-        $this->_bgeff->setPosition(-$o, $o);
 
         $this->_titlebar->setSize($x + $o * 2, $o);
         $this->_titlebar->setPosition(-$o, $o);
@@ -163,14 +149,9 @@ abstract class Window extends \ManiaLive\Gui\Window
 
     private function detectElements($components)
     {
-        $buttonScript = null;
         foreach ($components as $index => $component) {
             if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel) {
                 $this->dicoMessages[$component->getTextid()] = $component->getMessages();
-            }
-
-            if ($component instanceof \ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\LinePlotter) {
-                $this->addScriptToMain($component->getScript());
             }
 
             if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer) {
@@ -201,14 +182,16 @@ abstract class Window extends \ManiaLive\Gui\Window
     {
         parent::onDraw();
 
-        $this->nbButton = 0;
-        $this->dIndex = 0;
         $this->dDeclares = "";
         $this->scriptLib = "";
         $this->wLoop = "";
         $this->calledScripts = array();
 
         $this->detectElements($this->getComponents());
+
+        foreach ($this->moreScripts as $script) {
+            $this->addScriptToMain($script);
+        }
 
         foreach ($this->calledScripts as $script) {
             $this->addScriptToMain($script->getEndScript($this));
@@ -270,6 +253,11 @@ abstract class Window extends \ManiaLive\Gui\Window
     public function addScriptToLib($script)
     {
         $this->scriptLib .= $script;
+    }
+
+    public function registerMainScript($script)
+    {
+        $this->moreScripts[] = $script;
     }
 
     public function destroy()

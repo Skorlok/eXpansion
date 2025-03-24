@@ -20,6 +20,8 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $label_visit;
     protected $connection;
     protected $url;
+    protected $button_cps;
+    protected $button_seccps;
 
     protected function onConstruct()
     {

@@ -8,6 +8,8 @@ use ManiaLivePlugins\eXpansion\SM_CheckpointCount\Gui\Widgets\CPPanel;
 class SM_CheckpointCount extends ExpPlugin
 {
 
+    private $config;
+
     /*public function eXpOnLoad()
     {
         $this->enableScriptEvents("LibXmlRpc_OnWayPoint");
@@ -16,6 +18,7 @@ class SM_CheckpointCount extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -47,7 +50,7 @@ class SM_CheckpointCount extends ExpPlugin
             $text = '$f00Finish now';
         }
         $info->setText('$fff' . $text);
-        $info->setPosition(-17.5, -63);
+        $info->setPosition($this->config->checkpointCounter_PosX, $this->config->checkpointCounter_PosY);
         $info->show();
     }
 

@@ -41,7 +41,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\LocalRecords\MetaData
         $this->addTitleSupport("TM");
 
         $this->setRelaySupport(false);
-        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'Doppler.Script.txt');
+        $this->addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT, 'doppler');
         $this->setScriptCompatibilityMode(false);
     }
 }

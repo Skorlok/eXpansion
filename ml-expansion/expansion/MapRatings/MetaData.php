@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -66,6 +67,36 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDescription('For apikey: click the header or visit http://karma.mania-exchange.com');
         $var->setGroup("MXKarma");
         $var->setDefaultValue("");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("mapRating_PosX", "Position of MapRating Widget X", $config, false, false);
+        $var->setDefaultValue(128);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("mapRating_PosY", "Position of MapRating Widget Y", $config, false, false);
+        $var->setDefaultValue(75);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("mapRating_PosX_Shootmania", "Position of MapRating Widget X (Shootmania)", $config, false, false);
+        $var->setDefaultValue(38);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("mapRating_PosY_Shootmania", "Position of MapRating Widget Y (Shootmania)", $config, false, false);
+        $var->setDefaultValue(90);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("endMapRating_PosX", "Position of EndMapRating Widget X", $config, false, false);
+        $var->setDefaultValue(-45);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("endMapRating_PosY", "Position of EndMapRating Widget Y", $config, false, false);
+        $var->setDefaultValue(-42);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
 
         $this->setRelaySupport(false);

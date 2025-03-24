@@ -4,12 +4,15 @@ namespace ManiaLivePlugins\eXpansion\Widgets_PersonalBest;
 
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\PluginHandler\Dependency;
+use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
-use ManiaLivePlugins\eXpansion\Widgets_PersonalBest\Gui\Widgets\PBPanel;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 
 class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
+
+    private $config;
 
     public function eXpOnInit()
     {
@@ -18,6 +21,7 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function eXpOnLoad()
     {
+        $this->config = Config::getInstance();
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_PERSONAL_BEST);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
@@ -52,10 +56,12 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && Endurance::$last_round == false) {
             return;
         }
-        PBPanel::EraseAll();
+        $widget = new Widget("Widgets_PersonalBest\Gui\Widgets\PBPanel.xml");
+        $widget->setName("Personal Best Widget");
+        $widget->erase();
     }
 
     public function redrawAll()
@@ -112,11 +118,37 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         }
         $rankTotal = $this->callPublicMethod('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords', 'getTotalRanked');
 
-        $info = PBPanel::Create($login);
-        $info->setRecord($record, $rank, $rankTotal);
-        $info->setSize(30, 13);
-        $info->setPosition(112, -76);
-        $info->show();
+        if ($record == null) {
+            $pbTime = '--';
+            $avgTime = $pbTime;
+            $nbFinish = 0;
+        } else {
+            $pbTime = \ManiaLive\Utilities\Time::fromTM($record->time);
+            if (substr($pbTime, 0, 2) === "0:") {
+                $pbTime = substr($pbTime, 2);
+            }
+            $avgTime = \ManiaLive\Utilities\Time::fromTM($record->avgScore);
+            if (substr($avgTime, 0, 2) === "0:") {
+                $avgTime = substr($avgTime, 2);
+            }
+            $nbFinish = $record->nbFinish;
+        }
+
+        $widget = new Widget("Widgets_PersonalBest\Gui\Widgets\PBPanel.xml");
+        $widget->setName("Personal Best Widget");
+        $widget->setLayer("normal");
+        $widget->setPosition($this->config->personalBestWidget_PosX, $this->config->personalBestWidget_PosY, 0);
+        $widget->setSize(30, 13);
+        $widget->setParam('Personal_Best', __('Personal Best', $login));
+        $widget->setParam('Average', __('Average', $login));
+        $widget->setParam('Finishes', __('Finishes', $login));
+        $widget->setParam('Server Rank', __('Server Rank', $login));
+        $widget->setParam('pbTime', $pbTime);
+        $widget->setParam('avgTime', $avgTime);
+        $widget->setParam('rank', $rank);
+        $widget->setParam('rankTotal', $rankTotal);
+        $widget->setParam('nbFinish', $nbFinish);
+        $widget->show($login);
     }
 
     public function eXpOnUnload()
@@ -125,6 +157,9 @@ class Widgets_PersonalBest extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_FINISH);
-        PBPanel::EraseAll();
+
+        $widget = new Widget("Widgets_PersonalBest\Gui\Widgets\PBPanel.xml");
+        $widget->setName("Personal Best Widget");
+        $widget->erase();
     }
 }

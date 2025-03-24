@@ -139,6 +139,11 @@ class MapRatings extends ExpPlugin
         $this->reload();
 
         $info = RatingsWidget::Create(null);
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+        } else {
+            $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+        }
         $info->setSize(34, 12);
         $info->setRating($this->rating * 20, $this->ratingTotal);
         $info->show();
@@ -191,6 +196,11 @@ class MapRatings extends ExpPlugin
             }
         } else {
             $info = RatingsWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+            } else {
+                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+            }
             $info->setSize(34, 12);
             $info->setRating($this->rating * 20, $this->ratingTotal);
             $info->show();
@@ -230,6 +240,11 @@ class MapRatings extends ExpPlugin
             }
 
             $widget = RatingsWidget::Create();
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $widget->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+            } else {
+                $widget->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+            }
             $widget->setRating($this->mxRatings->voteaverage, $this->mxRatings->votecount);
             $widget->show();
 
@@ -435,6 +450,11 @@ class MapRatings extends ExpPlugin
 
         if (!$this->config->mxKarmaEnabled) {
             $info = RatingsWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+            } else {
+                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+            }
             $info->setSize(34, 12);
             $info->setRating($this->rating * 20, $this->ratingTotal);
             $info->show();
@@ -478,6 +498,13 @@ class MapRatings extends ExpPlugin
         $this->eXpChatSendServerMessage("Vote registered for MXKarma", $player->login);
 
         $widget = RatingsWidget::Create();
+
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $widget->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+        } else {
+            $widget->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+        }
+
         $x = 0;
         $avgTempVotes = 0;
         foreach ($this->mx_votesTemp as $vote) {
@@ -488,6 +515,7 @@ class MapRatings extends ExpPlugin
             $avgTempVotes = $avgTempVotes / $x;
         }
         $newAverage = (($this->mxRatings->voteaverage * $this->mxRatings->votecount) + ($avgTempVotes*$x)) / ($this->mxRatings->votecount+$x);
+
         $widget->setRating($newAverage, ($this->mxRatings->votecount+$x));
         $widget->show();
     }
@@ -679,6 +707,11 @@ class MapRatings extends ExpPlugin
         EndMapRatings::EraseAll();
 
         $info = RatingsWidget::Create(null);
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+        } else {
+            $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+        }
         $info->setSize(34, 12);
         $info->setRating($this->rating * 20, $this->ratingTotal);
         $info->show();
@@ -737,6 +770,11 @@ class MapRatings extends ExpPlugin
 
         if (!$this->config->mxKarmaEnabled) {
             $info = RatingsWidget::Create(null);
+            if ($this->expStorage->simpleEnviTitle == "SM") {
+                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
+            } else {
+                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
+            }
             $info->setSize(34, 12);
             $info->setRating($this->rating * 20, $this->ratingTotal);
             $info->show();
@@ -803,6 +841,7 @@ class MapRatings extends ExpPlugin
                 $group = \ManiaLive\Gui\Group::Create("mapratings", $logins);
                 EndMapRatings::EraseAll();
                 $widget = EndMapRatings::Create(null);
+                $widget->setPosition($this->config->endMapRating_PosX, $this->config->endMapRating_PosY);
                 $widget->setMap($this->storage->currentMap);
                 $widget->show($group);
             }

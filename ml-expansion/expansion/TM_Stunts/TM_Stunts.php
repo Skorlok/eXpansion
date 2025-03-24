@@ -33,11 +33,14 @@ class TM_Stunts extends ExpPlugin
 
     private $counter;
 
+    private $config;
+
     public function eXpOnReady()
     {
+        $this->config = Config::getInstance();
         $this->stuntWindow = Gui\Widgets\StuntWidget::Create(null, true);
         $this->stuntWindow->setSize(60, 12);
-        $this->stuntWindow->setPosition(-30, 58);
+        $this->stuntWindow->setPosition($this->config->stuntWidget_PosX, $this->config->stuntWidget_PosY);
         $this->enableScriptEvents("LibXmlRpc_OnStunt");
         $this->enableScriptEvents("Trackmania.Event.Stunt");
     }

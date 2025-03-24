@@ -24,7 +24,6 @@ namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 
 class LocalRecords extends LocalBase
 {
@@ -70,7 +69,7 @@ class LocalRecords extends LocalBase
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || Endurance::$enduro) && isset($this->storage->players[$player->login]) && $time > 0 && $time < 8388608) {
+        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || $this->storage->getCleanGamemodeName() == "endurocup") && isset($this->storage->players[$player->login]) && $time > 0 && $time < 8388608) {
 
             // if normal map, don't trigger the event for first lap :)
             if ($this->storage->currentMap->nbLaps == 0) {
@@ -193,7 +192,7 @@ class LocalRecords extends LocalBase
                     }
                 }
 
-                if (Endurance::$enduro) {
+                if ($this->storage->getCleanGamemodeName() == "endurocup") {
                     return 1; // Endurance is consired as cup so let this above Cup check
                 }
 

@@ -108,7 +108,7 @@ class Connection extends \ManiaLive\Database\Connection
 
 	function quote($string)
 	{
-		return '\''.\SQLite3::escapeString($string).'\'';
+		return '\''.\SQLite3::escapeString(is_null($string) ? "" : $string).'\'';
 	}
 
 	function select($database)

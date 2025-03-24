@@ -1,38 +1,89 @@
-declare Integer eXp_lastClockUpdate = Now;
-declare Integer start = Now-2000;
-declare persistent Boolean[Text] exp_trayId = Boolean[Text];
-declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
+declare sizeX = <?php echo (gettype($this->sizeX) == "integer") ? ($this->sizeX . '.0') : ($this->sizeX) ?>;
+declare sizeY = <?php echo (gettype($this->sizeY) == "integer") ? ($this->sizeY . '.0') : ($this->sizeY) ?>;
 
-// from edge script
-declare Boolean edge_isMinimized for UI = False;
+declare CMlQuad minimizeButton <=> (Page.GetFirstChild("minimizeButton") as CMlQuad);
+declare CMlLabel TitleWidget <=> (Page.GetFirstChild("widgetTitle") as CMlLabel);
+
+
+
+
+
+declare Boolean edge_isMinimized for UI = True;
 declare Boolean edge_isAnimated for UI = False;
-declare persistent Boolean edge_isLockedVisible2 = True;
 
-declare Boolean[Text] edge_animatedId for UI = Boolean[Text];
-declare Boolean lastValue = edge_isMinimized;
+declare Boolean is_edge_animated for UI = False;
+declare Vec3 p2 = EXP_widgetLastPosRel[id][gameMode];
 
 declare Integer edgeStart = Now;
 declare Boolean animActive = False;
+
 declare Real value = 0.;
 
-if (!edge_animatedId.existskey(id) ) {
-    edge_animatedId[id] = edge_isMinimized;
+declare Real edgeR = -200.;
+if (p2.X > 1) {
+    edgeR = 200.;
 }
+
+if (edge_isMinimized) {
+    Window.RelativePosition.X = edgeR;
+}
+
+
+
+
+
+declare Integer eXp_lastClockUpdate = Now;
+declare Integer start = Now-2000;
+declare Boolean trayAnimActive = False;
+declare persistent Boolean[Text] exp_trayId = Boolean[Text];
 
 if (!exp_trayId.existskey(id) ) {
-    exp_trayId[id] = True;
+    exp_trayId[id] = False;
 }
 
-declare Real diff = -(Window.Size.X / 2) + 8;
+declare Real diff = -160.0 - (Window.RelativePosition.X + sizeX);
 if (Window.RelativePosition.X > 1) {
-    diff = (Window.Size.X / 2) - 10 ;
+    diff = 160.0 - Window.RelativePosition.X;
 }
+
+if (!edge_isMinimized && exp_trayId[id]) {
+    Window.RelativePosition.X = p2.X + diff;
+}
+
+
+
+
 
 if (exp_trayId[id]) {
-    Window.RelativePosition.X = p.X + diff;
-}
+    if (Window.RelativePosition.X > 0.0) {
+        minimizeButton.Size.X = 4.0;
+        minimizeButton.Size.Y = sizeY;
+        minimizeButton.RelativePosition.X = -2.0;
+        minimizeButton.RelativePosition.Y = -(sizeY / 2.0);
 
-declare Real edge = -200.;
-if (p.X > 1) {
-    edge = 200.;
+        TitleWidget.Size[1] = sizeY - 2.0;
+        TitleWidget.RelativePosition.X = -2.0;
+        TitleWidget.RelativePosition.Y = -(sizeY / 2.0);
+        TitleWidget.RelativeRotation = -90.0;
+    } else {
+        minimizeButton.Size.X = 4.0;
+        minimizeButton.Size.Y = sizeY;
+        minimizeButton.RelativePosition.X = sizeX + 2.0;
+        minimizeButton.RelativePosition.Y = -(sizeY / 2.0);
+
+        TitleWidget.Size[1] = sizeY - 2.0;
+        TitleWidget.RelativePosition.X = sizeX + 2.0;
+        TitleWidget.RelativePosition.Y = -(sizeY / 2.0);
+        TitleWidget.RelativeRotation = 90.0;
+    }
+} else {
+    minimizeButton.Size.X = sizeX;
+    minimizeButton.Size.Y = 4.0;
+    minimizeButton.RelativePosition.X = sizeX/2.0;
+    minimizeButton.RelativePosition.Y = -1.5;
+
+    TitleWidget.Size[1] = sizeX - 2.0;
+    TitleWidget.RelativePosition.X = sizeX/2.0;
+    TitleWidget.RelativePosition.Y = -1.5;
+    TitleWidget.RelativeRotation = 0.0;
 }

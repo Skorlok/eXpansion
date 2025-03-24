@@ -28,8 +28,6 @@ declare MoveWindow = False;
 declare CMlQuad quad <=> (Page.GetFirstChild("enableMove") as CMlQuad);
 
 declare CMlLabel coordLabel <=> (Page.GetFirstChild("coordLabel") as CMlLabel);
-declare CMlLabel coordButton <=> (Page.GetFirstChild("coordButton") as CMlLabel);
-declare CMlEntry coordInput <=> (Page.GetFirstChild("_widgetPosition") as CMlEntry);
 
 declare Vec3 LastDelta = <Window.RelativePosition.X, Window.RelativePosition.Y, -3.0>;
 declare Vec3 DeltaPos = <0.0, 0.0, -3.0>;
@@ -45,6 +43,7 @@ declare Boolean exp_enableHudMove for UI = False;
 declare persistent Vec3[Text][Text] EXP_widgetLastPos = Vec3[Text][Text];
 declare persistent Vec3[Text][Text] EXP_widgetLastPosRel =  Vec3[Text][Text];	
 declare persistent Boolean[Text][Text] EXP_widgetVisible = Boolean[Text][Text];
+declare persistent Boolean exp_isWidgetsHidden = False;
 declare Boolean exp_widgetVisibleBuffered;
 
 declare persistent Text[Text][Text] EXP_widgetLayers = Text[Text][Text];  // layer can be "normal" or "scorestable" or some other for future usage
@@ -95,7 +94,7 @@ if (!disablePersonalHud) {
     exp_widgetLayersBuffered = EXP_widgetLayers[id][gameMode];
     
     // reduce flickering on normal layer, when widget update.
-    if (!EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer) {
+    if (!EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer || exp_isWidgetsHidden == True) {
 	    Window.Hide();
 	    exp_widgetCurrentVisible = False;
     }
@@ -109,7 +108,7 @@ if (!disablePersonalHud) {
     exp_widgetLayersBuffered = visibleLayerInit;
     exp_widgetCurrentVisible = True;
     exp_widgetVisibleBuffered = True;
-    if (visibleLayerInit != activeLayer) {
+    if (visibleLayerInit != activeLayer || exp_isWidgetsHidden == True) {
         Window.Hide();
         exp_widgetCurrentVisible = False;
         exp_widgetVisibleBuffered = False;

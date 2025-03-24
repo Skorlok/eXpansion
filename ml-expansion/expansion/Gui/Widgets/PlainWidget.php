@@ -17,6 +17,7 @@ class PlainWidget extends \ManiaLive\Gui\Window
     private $_script;
     private $_scripts = array();
     private $dicoMessages = array();
+    private $calledScripts = array();
 
     protected function onConstruct()
     {
@@ -29,17 +30,11 @@ class PlainWidget extends \ManiaLive\Gui\Window
         $this->xml = new \ManiaLive\Gui\Elements\Xml();
     }
 
-    private $calledScripts = array();
-
     private function detectElements($components)
     {
         foreach ($components as $index => $component) {
             if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel) {
                 $this->dicoMessages[$component->getTextid()] = $component->getMessages();
-            }
-
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\LinePlotter) {
-                $this->addScriptToMain($component->getScript());
             }
 
             if ($component instanceof \ManiaLive\Gui\Container) {
@@ -49,15 +44,6 @@ class PlainWidget extends \ManiaLive\Gui\Window
             if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer) {
                 $script = $component->getScript();
                 $this->applyScript($script, $component);
-            }
-
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Structures\MultipleScriptedContainer) {
-                $scripts = $component->getScripts();
-                if (!empty($scripts)) {
-                    foreach ($scripts as $script) {
-                        $this->applyScript($script, $component);
-                    }
-                }
             }
         }
     }

@@ -1,0 +1,97 @@
+declare Integer nbShow = <?php echo $this->nbRecord ?>;
+declare Integer nbFields =  <?php echo $this->nbFields ?>;
+declare Integer nbFirstFields =  <?php echo $this->nbFirstFields ?>;
+
+declare persistent Boolean[Text] showDiff = Boolean[Text];
+if (!showDiff.existskey(id)) {
+    showDiff[id] = False;
+}
+declare Boolean old_showDiff = showDiff[id];
+
+//Ranks of the players
+declare Integer[Text] playerTimes<?php echo $this->varName ?> for UI = Integer[Text];
+playerTimes<?php echo $this->varName ?>.clear();
+playerTimes<?php echo $this->varName ?> = <?php echo $this->playerTimes ?>;
+
+//The latest chackpoint the player past
+declare Text[Text] playerNickName<?php echo $this->varName ?> for UI = Text[Text];
+playerNickName<?php echo $this->varName ?>.clear();
+playerNickName<?php echo $this->varName ?> = <?php echo $this->playerNicks ?>;
+
+declare playersOnServer = Text[Text];
+declare nbCount = 0;
+
+// test
+declare Boolean needUpdate<?php echo $this->varName ?> for UI = True;
+declare lastUpdateTime = 0;
+
+declare Integer animStart = Now;
+declare Boolean isStart = False;
+declare Boolean isZoom = True;
+declare Boolean triggerBegin = True;
+declare Integer zoomId = -1;
+declare Integer lastZoomId = -2;
+
+declare origPlayerTimes = playerTimes<?php echo $this->varName ?>;
+origPlayerTimes.clear();
+
+foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
+    declare newLogin = TextLib::Replace(Login, "–", "-");
+    origPlayerTimes[newLogin] = Score;
+    playerNickName<?php echo $this->varName ?>[newLogin] = playerNickName<?php echo $this->varName ?>[Login];
+}
+
+playerTimes<?php echo $this->varName ?>.clear();
+playerTimes<?php echo $this->varName ?> = origPlayerTimes;
+
+for (i, 1, nbFields ) {
+    declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+    declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+    declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+    rank.Opacity = 0.;
+    timeLabel.Opacity = 0.;
+    nickLabel.Opacity = 0.;
+}
+
+isStart = True;
+animStart = Now;
+
+
+
+declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+MicroMenu.RelativePosition.Z = 30.0;
+declare Integer itemCount = 3;
+
+declare persistent Boolean[Text] showMenu = Boolean[Text];
+declare hideStamp = 0;
+declare showStamp = 0;
+
+if (!showMenu.existskey(id)) {
+	showMenu[id] = False;
+}
+
+if (showMenu[id]) {
+
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+
+        quad.Opacity = 0.75;
+        item.Opacity = 1.0;
+    }
+
+    MicroMenu.Show();
+
+} else {
+    
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+
+        quad.Opacity = 0.0;
+        item.Opacity = 0.0;
+    }
+
+    MicroMenu.Hide();
+
+}

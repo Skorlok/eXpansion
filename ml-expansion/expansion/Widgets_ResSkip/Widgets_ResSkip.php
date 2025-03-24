@@ -5,7 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_ResSkip;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\DonatePanel\Config as DonateConfig;
+use ManiaLivePlugins\eXpansion\Donate\Config as DonateConfig;
 use ManiaLivePlugins\eXpansion\Widgets_ResSkip\Gui\Widgets\ResSkipButtons;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
@@ -81,8 +81,13 @@ class Widgets_ResSkip extends ExpPlugin
 
 
         $widget = ResSkipButtons::Create(null, true);
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania);
+        } else {
+            $widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY);
+        }
+        
         $widget->setActions($this->actions['res'], $this->actions['skip']);
-        $widget->setServerInfo($this->storage->serverLogin);
         $widget->setSize(32.0, 10.0);
 
 
@@ -227,7 +232,7 @@ class Widgets_ResSkip extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
         ResSkipButtons::EraseAll();

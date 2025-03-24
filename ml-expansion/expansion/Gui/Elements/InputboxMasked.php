@@ -7,7 +7,6 @@ use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLive\Gui\Container;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Config;
 
 class InputboxMasked extends Control
 {
@@ -23,7 +22,6 @@ class InputboxMasked extends Control
 
     public function __construct($name, $sizeX = 35, $editable = true)
     {
-        $config = Config::getInstance();
         $this->name = $name;
 
         $this->createButton($editable);

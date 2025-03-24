@@ -1,0 +1,13 @@
+<manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->getWidgetName() ?>">
+<?php echo $this->getLanguages() ?>
+<frame posn="<?php echo $this->getPosX() . " " . $this->getPosY() . " " . $this->getPosZ() ?>" id="<?php echo $this->getWidgetName() ?>">
+
+<?php echo $this->getXML() ?>
+
+<script>
+<!--
+<?php echo $this->getMlScripts() ?>
+-->
+</script>
+</frame>
+</manialink>

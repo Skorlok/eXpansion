@@ -1,0 +1,6 @@
+<frame scale = "0.75">
+    <quad posn="58 0 0" sizen="45 15" halign="right" valign="top" bgcolor="0000" action="<?php echo $this->getParam('action') ?>"/>
+    <label id="mapName" posn="58 0 1.0E-5" sizen="60 6" halign="right" valign="top" style="TextRaceMessageBig" textsize="2" textcolor="fff" textprefix="$s"/>
+    <label id="mapAuthor" posn="58 -4.5 2.0E-5" sizen="60 6" halign="right" valign="top" style="TextRaceMessageBig" textsize="2" textcolor="fff" textprefix="$s"/>
+    <label id="authorTime" posn="58 -9 3.0E-5" sizen="60 6" halign="right" valign="top" style="TextRaceMessageBig" textsize="2" textcolor="fff" textprefix="$s"/>
+</frame>

@@ -57,7 +57,6 @@ class WidgetButton extends \ManiaLivePlugins\eXpansion\Gui\Control
             foreach ($text as $row) {
                 $label = new DicoLabel($this->sizeX - 2, 3);
                 $label->setAlign('center', 'center2');
-                //$label->setStyle("TextValueMedium");
                 $label->setTextSize(1);
                 $label->setPosY(-($y * 3.2));
                 $label->setText($row);

@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Maps;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\SortedList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -66,6 +67,26 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var = new Boolean("showEndMatchNoticesJukebox", "Show end map notices if someone jukeboxed a map", $config, false, false);
         $var->setGroup("Chat Messages");
         $var->setDefaultValue(true);
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("currentMapWidget_PosX", "Position of CurrentMap Widget X", $config, false, false);
+        $var->setDefaultValue(-80);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("currentMapWidget_PosY", "Position of CurrentMap Widget Y", $config, false, false);
+        $var->setDefaultValue(61);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("nextMapWidget_PosX", "Position of NextMap Widget X", $config, false, false);
+        $var->setDefaultValue(20);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("nextMapWidget_PosY", "Position of NextMap Widget Y", $config, false, false);
+        $var->setDefaultValue(61);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

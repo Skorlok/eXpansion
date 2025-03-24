@@ -134,7 +134,7 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
             return;
         }
 

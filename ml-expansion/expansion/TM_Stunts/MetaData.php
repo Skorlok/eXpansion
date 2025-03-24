@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\TM_Stunts;
 
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
+
 /**
  * Description of MetaData
  *
@@ -21,5 +23,17 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addTitleSupport("Trackmania");
 
         $this->setRelaySupport(false);
+
+        $config = Config::getInstance();
+
+        $var = new TypeFloat("stuntWidget_PosX", "Position of Stunts Widget X", $config, false, false);
+        $var->setDefaultValue(-30);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("stuntWidget_PosY", "Position of Stunts Widget Y", $config, false, false);
+        $var->setDefaultValue(58);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
     }
 }

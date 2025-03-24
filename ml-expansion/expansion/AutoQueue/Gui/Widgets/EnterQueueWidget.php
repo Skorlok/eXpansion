@@ -42,11 +42,10 @@ class EnterQueueWidget extends Widget
         $this->setName("Enter Queue");
         $login = $this->getRecipient();
 
-        $bg = new WidgetBackGround(80, 18);
+        $bg = new WidgetBackGround(81, 18);
         $this->addComponent($bg);
 
-        $header = new WidgetTitle(81, 4);
-        $header->setText(eXpGetMessage("Join Queue"));
+        $header = new WidgetTitle(81, 4, eXpGetMessage("Join Queue"));
         $this->addComponent($header);
 
         $this->dicoLabel = new DicoLabel(50, 10);
@@ -76,7 +75,6 @@ class EnterQueueWidget extends Widget
     protected function eXpOnEndConstruct()
     {
         $this->setSize(80, 18);
-        $this->setPosition(-30, 60);
     }
 
     public function onDraw()

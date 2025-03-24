@@ -147,10 +147,7 @@ class AroundMe extends Widget
 
     public function update()
     {
-
-
         $this->cpUpdate();
-
     }
 
 

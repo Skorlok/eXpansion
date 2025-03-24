@@ -71,7 +71,7 @@ class PlainPanel extends Widget
         $this->bg = new WidgetBackGround($sizeX, $sizeY);
         $this->_windowFrame->addComponent($this->bg);
 
-        $this->bgTitle = new WidgetTitle($sizeX, $sizeY + 2);
+        $this->bgTitle = new WidgetTitle($sizeX, $sizeY + 2, eXpGetMessage('Best Scores'));
         $this->_windowFrame->addComponent($this->bgTitle);
 
         $this->frame = new Frame();
@@ -106,12 +106,6 @@ class PlainPanel extends Widget
         $this->frame->clearComponents();
 
         $index = 1;
-
-        $this->bgTitle->setText(eXpGetMessage('Best Scores'));
-
-
-        $recsData = "";
-        $nickData = "";
 
         for ($index = 1; $index <= $this->nbFields; $index++) {
 

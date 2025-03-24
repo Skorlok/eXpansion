@@ -1,0 +1,11 @@
+<frame posn="20 -6 0">
+    <frame posn="-40 3.5 0">
+        <frame>
+            <label id="Cp" posn="20 0 0" sizen="22 4" halign="right" valign="center" style="TextStaticSmall" scriptevents="1" textcolor="fff" text=""/>
+            <label id="Label" posn="22 0 1.0E-5" sizen="50 4" halign="left" valign="center" style="TextRaceChrono" scriptevents="1" textsize="4" text=""/>
+            <label id="CpTop1" posn="72 0 2.0E-5" sizen="9 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="DediLabel" posn="81 0 3.0E-5" sizen="30 4" halign="left" valign="center" style="TextRaceChrono" textsize="4" text=""/>
+        </frame>
+    </frame>
+    <audio posn="0 260 4.0E-5" looping="0"/>
+</frame>

@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Maps;
 
 use Exception;
-use ManiaLib\Gui\Elements\Icons128x128_1;
 use ManiaLib\Utils\Formatting;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Gui\Window;
@@ -12,11 +11,11 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\DonatePanel\Config as DonateConfig;
+use ManiaLivePlugins\eXpansion\Donate\Config as Donate;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
-use ManiaLivePlugins\eXpansion\Maps\Gui\Widgets\CurrentMapWidget;
-use ManiaLivePlugins\eXpansion\Maps\Gui\Widgets\NextMapWidget;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\AddMaps;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Jukelist;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Maplist;
@@ -45,7 +44,6 @@ class Maps extends ExpPlugin
     private $messages;
 
     /** @var MapWish */
-    private $voteItem;
     private $msg_addQueue;
     private $msg_nextQueue;
     private $msg_nextMap;
@@ -54,6 +52,7 @@ class Maps extends ExpPlugin
     private $msg_errDwld;
     private $msg_errMxId;
     private $msg_mapAdd;
+    private $msg_errToLarge;
     private $msg_skipleft;
     private $actionShowMapList;
     private $actionShowJukeList;
@@ -74,10 +73,6 @@ class Maps extends ExpPlugin
     private $cmd_prev;
     private $cmd_cjb;
 
-    private $actions = array();
-    private $maps = array();
-    private $ratings = array();
-
     private $is_onEndMatch = false;
 
     public function eXpOnInit()
@@ -85,7 +80,7 @@ class Maps extends ExpPlugin
         $this->messages = new \StdClass();
 
         $this->config = Config::getInstance();
-        $this->donateConfig = DonateConfig::getInstance();
+        $this->donateConfig = Donate::getInstance();
 
         $this->setPublicMethod("queueMap");
         $this->setPublicMethod("queueMxMap");
@@ -190,13 +185,19 @@ class Maps extends ExpPlugin
         if ($this->config->showCurrentMapWidget) {
             $this->showCurrentMapWidget();
         } else {
-            CurrentMapWidget::EraseAll();
+            $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
+            $widget->setName("Current Map Widget");
+            $widget->setLayer("scorestable");
+            $widget->erase();
         }
 
         if ($this->config->showNextMapWidget) {
             $this->showNextMapWidget();
         } else {
-            NextMapWidget::EraseAll();
+            $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
+            $widget->setName("Next Map");
+            $widget->setLayer("scorestable");
+            $widget->erase();
         }
     }
 
@@ -291,20 +292,33 @@ class Maps extends ExpPlugin
     public function showCurrentMapWidget()
     {
         if ($this->config->showCurrentMapWidget) {
-            $info = CurrentMapWidget::Create(null, true);
-            $info->setMap($this->storage->currentMap);
-            $info->setLayer(Window::LAYER_SCORES_TABLE);
-            $info->setAction($this->actionShowMapList);
-            $info->show();
+            /*$playerModel = "";
+            if (isset($this->storage->currentMap->playerModel)) {
+                $playerModel = '/' . $this->storage->currentMap->playerModel;
+            }*/
+            $environment = $this->storage->currentMap->environnement /*. $playerModel*/;
+            $country = "http://reaby.kapsi.fi/ml/flags/Other%20Countries.dds";
+            if ($this->storage->currentMap->author == "Nadeo") {
+                $country = "http://reaby.kapsi.fi/ml/flags/France.dds";
+            }
+
+
+            $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
+            $widget->setName("Current Map Widget");
+            $widget->setLayer("scorestable");
+            $widget->setPosition($this->config->currentMapWidget_PosX, $this->config->currentMapWidget_PosY, 0);
+            $widget->setSize(90, 15);
+            $widget->registerScript(new Script("Maps\Gui\Scripts_CurrentMap"));
+            $widget->setParam("action", $this->actionShowMapList);
+            $widget->setParam("country", $country);
+            $widget->setParam("environment", $environment);
+            $widget->show(null, true);
         }
     }
 
     public function showNextMapWidget()
     {
         if ($this->config->showNextMapWidget) {
-            $info = NextMapWidget::Create(null, true);
-            $info->setLayer(Window::LAYER_SCORES_TABLE);
-            $info->setAction($this->actionShowJukeList);
             if (count($this->queue) > 0) {
                 reset($this->queue);
                 $queue = current($this->queue);
@@ -350,14 +364,29 @@ class Maps extends ExpPlugin
                 }
 
             }
-            $info->setMap($gbxInfo);
-            $info->show();
+
+            $country = "http://reaby.kapsi.fi/ml/flags/Other%20Countries.dds";
+            if ($gbxInfo->author == "Nadeo") {
+                $country = "http://reaby.kapsi.fi/ml/flags/France.dds";
+            }
+
+            $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
+            $widget->setName("Next Map");
+            $widget->setLayer("scorestable");
+            $widget->setPosition($this->config->nextMapWidget_PosX, $this->config->nextMapWidget_PosY, 0);
+            $widget->setSize(60, 15);
+            $widget->setParam("action", $this->actionShowJukeList);
+            $widget->setParam("nickname", $gbxInfo->authorNick);
+            $widget->setParam("mapname", $gbxInfo->name);
+            $widget->setParam("country", $country);
+            $widget->setParam("environment", $gbxInfo->envir);
+            $widget->show(null, true);
         }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap, $enduroSkipMap = false)
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false && $enduroSkipMap != true) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false && $enduroSkipMap != true) {
             return;
         }
 
@@ -368,8 +397,15 @@ class Maps extends ExpPlugin
 
         $this->config = Config::getInstance();
 
-        NextMapWidget::EraseAll();
-        CurrentMapWidget::EraseAll();
+        $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
+        $widget->setName("Current Map Widget");
+        $widget->setLayer("scorestable");
+        $widget->erase();
+
+        $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
+        $widget->setName("Next Map");
+        $widget->setLayer("scorestable");
+        $widget->erase();
 
         if (count($this->queue) > 0) {
             reset($this->queue);
@@ -823,8 +859,15 @@ class Maps extends ExpPlugin
             $map = $this->connection->getNextMapInfo();
             $this->connection->nextMap();
 
-            NextMapWidget::EraseAll();
-            CurrentMapWidget::EraseAll();
+            $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
+            $widget->setName("Current Map Widget");
+            $widget->setLayer("scorestable");
+            $widget->erase();
+
+            $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
+            $widget->setName("Next Map");
+            $widget->setLayer("scorestable");
+            $widget->erase();
 
             if (file_exists($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName)) {
                 try {
@@ -1302,15 +1345,23 @@ class Maps extends ExpPlugin
 
     public function onMapSkip()
     {
-        if (\ManiaLivePlugins\eXpansion\Endurance\Endurance::$enduro) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
             $this->onEndMatch(array(),array(), true);
         }
     }
 
     public function eXpOnUnload()
     {
-        CurrentMapWidget::EraseAll();
-        NextMapWidget::EraseAll();
+        $widget = new Widget("Maps\Gui\Widgets\CurrentMapWidget.xml");
+        $widget->setName("Current Map Widget");
+        $widget->setLayer("scorestable");
+        $widget->erase();
+
+        $widget = new Widget("Maps\Gui\Widgets\NextMapWidget.xml");
+        $widget->setName("Next Map");
+        $widget->setLayer("scorestable");
+        $widget->erase();
+
         Maplist::EraseAll();
         AddMaps::EraseAll();
         Jukelist::EraseAll();

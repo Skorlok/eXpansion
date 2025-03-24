@@ -48,8 +48,7 @@ class CommunicationWidget extends Widget
     {
         $this->setName("Messaging Widget");
 
-        $bg = new WidgetBackGround(10, 6);
-        $bg->setPosition(115, -0.25);
+        $bg = new WidgetBackGround(10, 5.5);
         $this->addComponent($bg);
 
         $this->_mainWindow = new Frame();
@@ -130,7 +129,6 @@ class CommunicationWidget extends Widget
     {
         $this->setSize(120, 42);
         $this->setScale(1);
-        $this->setPosition(-278, -20);
         $this->setDisableAxis("x");
         $this->script->setParam("winid", $this->getId());
         $this->script->setParam("posY", $this->getPosY());

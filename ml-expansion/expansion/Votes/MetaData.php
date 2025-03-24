@@ -9,6 +9,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\HashList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -132,6 +133,26 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
             "ExtendTime" => 1,
             "EndRound" => 1,
             "AutoTeamBalance" => 1));
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("voteWidget_PosX", "Position of Vote Widget X", $config, false, false);
+        $var->setDefaultValue(4);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("voteWidget_PosY", "Position of Vote Widget Y", $config, false, false);
+        $var->setDefaultValue(64);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("voteWidget_PosX_Shootmania", "Position of Vote Widget X (Shootmania)", $config, false, false);
+        $var->setDefaultValue(17);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("voteWidget_PosY_Shootmania", "Position of Vote Widget Y (Shootmania)", $config, false, false);
+        $var->setDefaultValue(79);
+        $var->setGroup("Widgets");
         $this->registerVariable($var);
     }
 }

@@ -2,10 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Widgets;
 
-use ManiaLib\Gui\Elements\Label;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
-use ManiaLivePlugins\eXpansion\MapRatings\Gui\Controls\RateButton2;
 
 class GetPlayerWidgets extends Widget
 {
