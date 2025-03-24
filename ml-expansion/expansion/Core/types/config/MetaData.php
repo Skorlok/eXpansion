@@ -464,25 +464,21 @@ abstract class MetaData
      *
      * @return boolean IF is compatible with the game mode
      */
-    public function checkGameCompatibility($gamemode = null, $scriptName = null)
+    public function checkGameCompatibility()
     {
 
         if (!empty($this->gameModeSupport)) {
-            //Get current state if need be
-            if ($gamemode == null) {
-                $storage = Storage::getInstance();
-                $gamemode = $storage->gameInfos->gameMode;
-                if ($gamemode == GameInfos::GAMEMODE_SCRIPT) {
-                    $scriptName = $storage->getCleanGamemodeName();
-                }
-            }
 
-            //Scrit mode special checking.
-            if ($gamemode == GameInfos::GAMEMODE_SCRIPT) {
+            /** @var \ManiaLive\Data\Storage\Storage $storage */
+            $storage = Storage::getInstance();
+            $scriptName = $storage->getCleanGamemodeName();
+            $gamemode = Core::eXpGetScriptCompatibilityMode($scriptName);
+
+            if ($gamemode == 0) {
                 return $this->checkScriptGameModeCompatibility($scriptName);
+            } else {
+                return isset($this->gameModeSupport[$gamemode]) ? $this->gameModeSupport[$gamemode] : $this->checkScriptGameModeCompatibility($scriptName);
             }
-
-            return isset($this->gameModeSupport[$gamemode]) ? $this->gameModeSupport[$gamemode] : false;
         } else {
             //No rules for game compatibility, this plugin supports all modes
             return true;
@@ -499,11 +495,6 @@ abstract class MetaData
     protected function checkScriptGameModeCompatibility($scriptName)
     {
         if ($this->scriptCompatibiliyMode) {
-            $gmode = Core::eXpGetScriptCompatibilityMode($scriptName);
-            if (isset($this->gameModeSupport[$gmode])) {
-                return $this->gameModeSupport[$gmode];
-            }
-
             if (isset($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT]) && is_array($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT])) {
                 foreach ($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT] as $supportedScript => $active) {
                     if ($scriptName == $supportedScript) {

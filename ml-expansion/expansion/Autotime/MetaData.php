@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Autotime;
 
-use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;

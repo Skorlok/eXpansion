@@ -23,13 +23,15 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_AroundMe\Gui\Scripts;
 
-use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Gui\Scripts\CommonScript;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Gui\Script_libraries\TimeToText;
 
-class CpPositions extends CommonScript
+class CpPositions extends Script
 {
 
     public function __construct()
     {
         parent::__construct("Widgets_AroundMe/Gui/Scripts/CpPositions");
+        $this->addLibrary(new TimeToText());
     }
 }
