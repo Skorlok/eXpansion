@@ -8,7 +8,7 @@ declare CMlLabel TitleWidget <=> (Page.GetFirstChild("widgetTitle") as CMlLabel)
 
 
 
-declare Boolean edge_isMinimized for UI = False;
+declare Boolean edge_isMinimized for UI = True;
 declare Boolean edge_isAnimated for UI = False;
 
 declare Boolean is_edge_animated for UI = False;
@@ -38,7 +38,7 @@ declare Boolean trayAnimActive = False;
 declare persistent Boolean[Text] exp_trayId = Boolean[Text];
 
 if (!exp_trayId.existskey(id) ) {
-    exp_trayId[id] = True;
+    exp_trayId[id] = False;
 }
 
 declare Real diff = -160.0 - (Window.RelativePosition.X + sizeX);
