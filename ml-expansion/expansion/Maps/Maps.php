@@ -12,6 +12,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Donate\Config as Donate;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
@@ -376,8 +377,8 @@ class Maps extends ExpPlugin
             $widget->setPosition($this->config->nextMapWidget_PosX, $this->config->nextMapWidget_PosY, 0);
             $widget->setSize(60, 15);
             $widget->setParam("action", $this->actionShowJukeList);
-            $widget->setParam("nickname", $gbxInfo->authorNick);
-            $widget->setParam("mapname", $gbxInfo->name);
+            $widget->setParam("nickname", Gui::fixString($gbxInfo->authorNick));
+            $widget->setParam("mapname", Gui::fixString($gbxInfo->name));
             $widget->setParam("country", $country);
             $widget->setParam("environment", $gbxInfo->envir);
             $widget->show(null, true);
