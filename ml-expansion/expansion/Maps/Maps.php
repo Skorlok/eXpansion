@@ -20,6 +20,7 @@ use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\AddMaps;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Jukelist;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Maplist;
+use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\MapInfo;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapSortMode;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapWish;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapInfos;
@@ -167,7 +168,7 @@ class Maps extends ExpPlugin
 
         Maplist::Initialize($this);
         Jukelist::$mainPlugin = $this;
-        Gui\Windows\AddMaps::$mapsPlugin = $this;
+        AddMaps::$mapsPlugin = $this;
         /** @var \ManiaLive\Gui\ActionHandler */
         $action = \ManiaLive\Gui\ActionHandler::getInstance();
         $this->actionShowMapList = $action->createAction(array($this, "showMapList_menu"));
@@ -1320,7 +1321,7 @@ class Maps extends ExpPlugin
             $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#Can't continue, since this instance of eXpansion is running remote agains the server"), $login);
             return;
         }
-        $window = Gui\Windows\AddMaps::Create($login);
+        $window = AddMaps::Create($login);
         $window->setTitle('Add Maps on server');
         $window->centerOnScreen();
         $window->setSize(130, 100);
@@ -1332,7 +1333,7 @@ class Maps extends ExpPlugin
         if ($uid == null) {
             $uid = $this->storage->currentMap->uId;
         }
-        $window = Gui\Windows\MapInfo::create($login);
+        $window = MapInfo::create($login);
         $window->setMap($uid);
         $window->setTitle("Map Info", $this->storage->currentMap->name);
         $window->setSize(160, 90);
@@ -1366,7 +1367,7 @@ class Maps extends ExpPlugin
         Maplist::EraseAll();
         AddMaps::EraseAll();
         Jukelist::EraseAll();
-        Gui\Windows\MapInfo::EraseAll();
+        MapInfo::EraseAll();
 
         AdminGroups::removeAdminCommand($this->cmd_replay);
         AdminGroups::removeAdminCommand($this->cmd_erease);
