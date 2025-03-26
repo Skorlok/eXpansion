@@ -111,6 +111,11 @@ class LoadScreen extends ExpPlugin
         }
         $this->startTime = time();
         $this->isActive = true;
+
+        /*$xml = '<manialink id="5" version="2" layer="LoadingScreen" name="loading Screen">
+        <quad posn="-160 90 100" sizen="320 180" image="https://cdn.skorlok.com/image/fonde52.jpg"/>
+        </manialink>';
+        $this->connection->sendDisplayManialinkPage(null, $xml);*/
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
