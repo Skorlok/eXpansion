@@ -242,8 +242,9 @@ class GbxRemote
 		if($size == 0 || $handle == 0)
 			throw new TransportException('Incorrect header', TransportException::PROTOCOL_ERROR);
 
-		if($size > self::MAX_RESPONSE_SIZE)
-			throw new MessageException('Response too large', MessageException::RESPONSE_TOO_LARGE);
+		// it makes eXpansion crash when validation replay is too large, and there is no way to reset the buffer
+		//if($size > self::MAX_RESPONSE_SIZE)
+		//	throw new MessageException('Response too large', MessageException::RESPONSE_TOO_LARGE);
 
 		$data = $this->read($size);
 		if($data === false)
