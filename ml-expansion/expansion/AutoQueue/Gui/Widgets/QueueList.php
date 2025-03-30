@@ -57,15 +57,13 @@ class QueueList extends Widget
         $this->queueplayers = $players;
         $this->mainInstance = $instance;
 
+        $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
         foreach ($this->queueplayers as $player) {
             if ($player->login == $this->getRecipient()) {
                 $this->bg = new WidgetBackGround(62, 40);
-                $this->addComponent($this->bg);
-            } else {
-                $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
-                $this->addComponent($this->bg);
             }
         }
+        $this->addComponent($this->bg);
 
         $header = new WidgetTitle(62, 40, eXpGetMessage("Waiting Queue"));
         $this->addComponent($header);
