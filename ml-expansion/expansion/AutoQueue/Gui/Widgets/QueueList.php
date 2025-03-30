@@ -45,15 +45,6 @@ class QueueList extends Widget
     protected function eXpOnBeginConstruct()
     {
         $this->setName("Queue List");
-        $login = $this->getRecipient();
-        $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
-        $this->addComponent($this->bg);
-
-        $header = new WidgetTitle(62, 40, eXpGetMessage("Waiting Queue"));
-        $this->addComponent($header);
-
-        $this->frame = new Frame(1, -2);
-        $this->addComponent($this->frame);
     }
 
     protected function eXpOnEndConstruct()
@@ -70,6 +61,22 @@ class QueueList extends Widget
 
     public function setPlayers($players, $instance)
     {
+        foreach ($this->queueplayers as $player) {
+            if ($player->login == $this->getRecipient()) {
+                $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
+                $this->addComponent($this->bg);
+            } else {
+                $this->bg = new WidgetBackGround(62, 40);
+                $this->addComponent($this->bg);
+            }
+        }
+
+        $header = new WidgetTitle(62, 40, eXpGetMessage("Waiting Queue"));
+        $this->addComponent($header);
+
+        $this->frame = new Frame(1, -2);
+        $this->addComponent($this->frame);
+        
         $this->queueplayers = $players;
         $this->mainInstance = $instance;
 
@@ -93,9 +100,7 @@ class QueueList extends Widget
                 $this->bg->setAction(null);
             }
 
-            if ($player->login != $this->getRecipient()
-                && AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)
-            ) {
+            if ($player->login != $this->getRecipient() && AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)) {
                 $button->setText(__("Remove", $this->getRecipient()));
                 $button->setAction($this->createAction(array($this->mainInstance, "admRemoveQueue"), $player->login));
                 $this->frame->addComponent($button);
