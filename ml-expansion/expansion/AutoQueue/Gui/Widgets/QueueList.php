@@ -52,15 +52,11 @@ class QueueList extends Widget
         $this->setSize(62, 40);
     }
 
-    protected function onDraw()
-    {
-
-
-        parent::onDraw();
-    }
-
     public function setPlayers($players, $instance)
     {
+        $this->queueplayers = $players;
+        $this->mainInstance = $instance;
+
         foreach ($this->queueplayers as $player) {
             if ($player->login == $this->getRecipient()) {
                 $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
@@ -76,9 +72,6 @@ class QueueList extends Widget
 
         $this->frame = new Frame(1, -2);
         $this->addComponent($this->frame);
-        
-        $this->queueplayers = $players;
-        $this->mainInstance = $instance;
 
         $this->frame->clearComponents();
         $x = 1;
