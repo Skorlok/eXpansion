@@ -59,10 +59,10 @@ class QueueList extends Widget
 
         foreach ($this->queueplayers as $player) {
             if ($player->login == $this->getRecipient()) {
-                $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
+                $this->bg = new WidgetBackGround(62, 40);
                 $this->addComponent($this->bg);
             } else {
-                $this->bg = new WidgetBackGround(62, 40);
+                $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
                 $this->addComponent($this->bg);
             }
         }
