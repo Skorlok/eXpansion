@@ -97,7 +97,7 @@ class QueueList extends Widget
                 $button->setText(__("Leave", $this->getRecipient()));
                 $button->setAction($this->createAction(array($this->mainInstance, "leaveQueue")));
                 $this->frame->addComponent($button);
-                $this->bg->setAction(null);
+                //$this->bg->setAction(null);
             }
 
             if ($player->login != $this->getRecipient() && AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)) {
