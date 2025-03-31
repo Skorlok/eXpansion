@@ -106,13 +106,6 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $nbFF = $this->config->liveRankingPanel_nbFirstFields_Default;
         }
 
-        if ($this->widget instanceof Widget) {
-            $this->widget->erase($login);
-            if ($this->widget2 instanceof Widget) {
-                $this->widget2->erase($login);
-            }
-        }
-
         $sizeX = 42;
         $sizeY = 3 + $nbF * 4;
         

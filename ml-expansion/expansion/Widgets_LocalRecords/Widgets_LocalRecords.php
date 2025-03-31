@@ -90,13 +90,6 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $nbF = $this->config->localRecordsPanel_nbFields_Default;
                 $nbFF = $this->config->localRecordsPanel_nbFirstFields_Default;
             }
-            
-            if ($this->widget instanceof Widget) {
-                $this->widget->erase($login);
-                if ($this->widget2 instanceof Widget) {
-                    $this->widget2->erase($login);
-                }
-            }
 
             $sizeX = 42;
             $sizeY = 3 + $nbF * 4;

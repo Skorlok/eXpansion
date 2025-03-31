@@ -168,7 +168,7 @@ main () {
 --></script>
 </manialink>
 EOT
-        , 0, false);
+        , 0, false, false);
 
         
         $widgetsToSend = "";
@@ -177,7 +177,11 @@ EOT
         }
 
         if ($widgetsToSend != "") {
-            $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, true);
+            try {
+                $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, false);
+            } catch (Exception $e) {
+                $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+            }
         }
     }
 

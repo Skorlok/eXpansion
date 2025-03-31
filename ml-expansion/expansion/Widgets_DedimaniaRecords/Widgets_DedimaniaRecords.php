@@ -83,12 +83,6 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
 
         try {
             if (($this->isPluginLoaded($dedi) && $this->callPublicMethod($dedi, 'isRunning'))) {
-                if ($this->widget instanceof Widget) {
-                    $this->widget->erase($login);
-                    if ($this->widget2 instanceof Widget) {
-                        $this->widget2->erase($login);
-                    }
-                }
 
                 $sizeX = 42;
                 $sizeY = 3 + $nbF * 4;

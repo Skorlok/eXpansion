@@ -6,6 +6,7 @@ use ManiaLive\Data\Storage;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class ManiaLink extends Singletons
 {
@@ -239,7 +240,11 @@ class ManiaLink extends Singletons
         $xml = $this->getWidget();
         /*echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);*/
         if ($login !== null) {
-            $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, true);
+            try {
+                $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, false); // fix the bug where player leave so method return `login unknown`
+            } catch (\Exception $e) {
+                Helper::log("Cannot send widget to player, server said: " . $e->getMessage(), array("Gui", "ManiaLink"));
+            }
         } else {
             $this->connection->sendDisplayManialinkPage(null, $xml, 0, false, true);
         }
@@ -252,7 +257,11 @@ class ManiaLink extends Singletons
     public function erase($login = null)
     {
         if ($login !== null) {
-            $this->connection->sendDisplayManialinkPage($login, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, true);
+            try {
+                $this->connection->sendDisplayManialinkPage($login, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, false); // fix the bug where player leave so method return `login unknown`
+            } catch (\Exception $e) {
+                Helper::log("Cannot erase player widget, server said: " . $e->getMessage(), array("Gui", "ManiaLink"));
+            }
         } else {
             $this->connection->sendDisplayManialinkPage(null, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, true);
         }
