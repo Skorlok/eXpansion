@@ -256,6 +256,7 @@ class AutoQueue extends ExpPlugin
 
         if (count($nickNames) > 0) {
             $this->eXpChatSendServerMessage(eXpGetMessage('Rotating players$z %s $z$s$fffto spectator'), null, array(implode('$z, ', $nickNames)));
+            $this->checkQueue = true;
         }
     }
 
