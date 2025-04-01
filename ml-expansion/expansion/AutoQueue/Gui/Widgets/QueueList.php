@@ -22,6 +22,7 @@ use ManiaLib\Gui\Elements\Label;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\AutoQueue\AutoQueue;
 use ManiaLivePlugins\eXpansion\AutoQueue\Structures\QueuePlayer;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
@@ -57,7 +58,7 @@ class QueueList extends Widget
         $this->queueplayers = $players;
         $this->mainInstance = $instance;
 
-        $this->bg = new WidgetBackGround(62, 40, $this->createAction(array($this, "enterQueue")));
+        $this->bg = new WidgetBackGround(62, 40, AutoQueue::$showEnterQueueAction);
         foreach ($this->queueplayers as $player) {
             if ($player->login == $this->getRecipient()) {
                 $this->bg = new WidgetBackGround(62, 40);
@@ -88,7 +89,6 @@ class QueueList extends Widget
                 $button->setText(__("Leave", $this->getRecipient()));
                 $button->setAction($this->createAction(array($this->mainInstance, "leaveQueue")));
                 $this->frame->addComponent($button);
-                //$this->bg->setAction(null);
             }
 
             if ($player->login != $this->getRecipient() && AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)) {
@@ -101,12 +101,6 @@ class QueueList extends Widget
                 break;
             }
         }
-    }
-
-    public function enterQueue($login)
-    {
-        $widget = EnterQueueWidget::Create($login);
-        $widget->show($login);
     }
 
     public function destroy()

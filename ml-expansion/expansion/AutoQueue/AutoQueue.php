@@ -26,22 +26,24 @@ use ManiaLivePlugins\eXpansion\AutoQueue\Gui\Widgets\QueueList;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use Maniaplanet\DedicatedServer\Structures\PlayerInfo;
-use Maniaplanet\DedicatedServer\Structures\Status;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
  * Description of AutoQueue
  *
- * @author Reaby
+ * @author Reaby, Skorlok
  */
 class AutoQueue extends ExpPlugin
 {
     /** @var Queue */
     private $queue;
+    /** @var Config */
+    private $config;
+    private $canUnqueue = true;
+    private $checkQueue = true;
     public static $enterAction;
     public static $leaveAction;
-    private $config;
+    public static $showEnterQueueAction;
     protected $fullMatchPlayers = array();
 
     public function eXpOnReady()
@@ -49,11 +51,16 @@ class AutoQueue extends ExpPlugin
         $this->config = Config::getInstance();
 
         $this->enableDedicatedEvents();
+        $this->enableStorageEvents();
+        $this->enableTickerEvent();
+
         $this->queue = new Queue();
 
+        /** @var ActionHandler $ah */
         $ah = ActionHandler::getInstance();
         self::$enterAction = $ah->createAction(array($this, "enterQueue"));
         self::$leaveAction = $ah->createAction(array($this, "leaveQueue"));
+        self::$showEnterQueueAction = $ah->createAction(array($this, "showEnterQueue"));
 
         foreach ($this->storage->spectators as $login => $player) {
             $this->connection->forceSpectator($login, 1);
@@ -65,6 +72,28 @@ class AutoQueue extends ExpPlugin
         $this->widgetSyncList();
 
         $this->enableScriptEvents("Maniaplanet.StartRound_Start");
+    }
+
+    public function onTick()
+    {
+        if ($this->checkQueue && $this->canUnqueue && $this->storage->server->currentMaxPlayers > count($this->storage->players)) {
+
+            $nbPlayers = count($this->storage->players);
+
+            while ($this->storage->server->currentMaxPlayers > $nbPlayers && $this->queue->getNbPlayers() > 0) {
+                $player = $this->queue->getNextPlayer();
+                if ($player) {
+                    $this->connection->forceSpectator($player->login, 2);
+                    $this->connection->forceSpectator($player->login, 0);
+                    $nbPlayers++;
+                    $msg = eXpGetMessage('You got free spot, good luck and have fun!');
+                    $this->eXpChatSendServerMessage($msg, $player->login);
+                }
+                $this->widgetSyncList();
+            }
+
+            $this->checkQueue = false;
+        }
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -85,56 +114,53 @@ class AutoQueue extends ExpPlugin
         }
     }
 
-    public function onPlayerInfoChanged($info)
-    {
-        if ($this->storage->serverStatus->code != Status::PLAY) {
-            return;
-        }
-
-        $player = PlayerInfo::fromArray($info);
-        $login = $player->login;
-
-        if (in_array($login, $this->queue->getLogins())) {
-            return;
-        }
-
-        if ($player->spectator) {
-            $this->showEnterQueue($login);
-            $this->widgetSyncList();
-
-            try {
-                $this->connection->forceSpectator($login, 1);
-            } catch (\Exception $ex) {
-
-            }
-            if ($player->hasPlayerSlot) {
-                try {
-                    $this->connection->spectatorReleasePlayerSlot($login);
-                } catch (\Exception $e) {
-
-                }
-            }
-
-            if ($this->storage->server->currentMaxPlayers > count($this->storage->players)) {
-                $this->queueReleaseNext();
-            }
-        } else {
-            $this->widgetSyncList();
-            EnterQueueWidget::Erase($login);
-        }
-    }
-
     public function onPlayerDisconnect($login, $disconnectionReason = null)
     {
         if (in_array($login, $this->queue->getLogins())) {
             $this->queue->remove($login);
         }
-        $this->queueReleaseNext();
+        $this->widgetSyncList();
+        $this->checkQueue = true;
+    }
+
+    public function onPlayerChangeSide($player, $oldSide)
+    {
+        if (in_array($player->login, $this->queue->getLogins())) {
+            return;
+        }
+
+        if ($player->spectator) {
+            $this->showEnterQueue($player->login);
+            $this->widgetSyncList();
+
+            try {
+                $this->connection->forceSpectator($player->login, 1);
+            } catch (\Exception $ex) {
+
+            }
+            if ($player->hasPlayerSlot) {
+                try {
+                    $this->connection->spectatorReleasePlayerSlot($player->login);
+                } catch (\Exception $e) {
+
+                }
+            }
+
+            $this->checkQueue = true;
+        } else {
+            $this->widgetSyncList();
+            EnterQueueWidget::Erase($player->login);
+        }
+    }
+
+    public function onBeginMap($map, $warmUp, $matchContinuation)
+    {
+        $this->canUnqueue = true;
     }
 
     public function onBeginMatch()
     {
-        $this->queRealeseAvailable();
+        $this->checkQueue = true;
         foreach ($this->storage->players as $login => $player) {
             $this->fullMatchPlayers[$login] = $player;
         }
@@ -142,28 +168,7 @@ class AutoQueue extends ExpPlugin
 
     public function onBeginRound()
     {
-        $this->queRealeseAvailable();
-    }
-
-    public function queRealeseAvailable()
-    {
-        for ($i = 0; $i < $this->storage->server->currentMaxPlayers; $i++) {
-            $this->queueReleaseNext();
-        }
-    }
-
-    public function queueReleaseNext()
-    {
-        if (count($this->storage->players) < $this->storage->server->currentMaxPlayers) {
-            $player = $this->queue->getNextPlayer();
-            if ($player) {
-                $this->connection->forceSpectator($player->login, 2);
-                $this->connection->forceSpectator($player->login, 0);
-                $msg = eXpGetMessage('You got free spot, good luck and have fun!');
-                $this->eXpChatSendServerMessage($msg, $player->login);
-            }
-        }
-        $this->widgetSyncList();
+        $this->checkQueue = true;
     }
 
     public function admRemoveQueue($login, $target)
@@ -189,9 +194,7 @@ class AutoQueue extends ExpPlugin
         }
         $this->queue->add($login);
 
-        if ($this->storage->server->currentMaxPlayers > count($this->storage->players)) {
-            $this->queueReleaseNext();
-        }
+        $this->checkQueue = true;
 
         EnterQueueWidget::Erase($login);
         $this->widgetSyncList();
@@ -206,6 +209,7 @@ class AutoQueue extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
+        $this->canUnqueue = false;
         $this->rotatePlayers();
         $this->fullMatchPlayers = array();
     }
@@ -219,7 +223,11 @@ class AutoQueue extends ExpPlugin
         }
 
         $ranking = Core::$rankings;
-        $this->sortDesc($ranking);
+        if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TIMEATTACK) {
+            ArrayOfObj::asortDesc($ranking, "bestTime");
+        } else {
+            ArrayOfObj::asortAsc($ranking, "map_points");
+        }
 
         if ($ranking[0]->bestTime <= 0) {
             return;
@@ -251,28 +259,6 @@ class AutoQueue extends ExpPlugin
         }
     }
 
-    public function sortDesc(&$array)
-    {
-        if ($this->eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TIMEATTACK) {
-            ArrayOfObj::asortDesc($array, "best_race_time");
-        } else {
-            ArrayOfObj::asortAsc($array, "map_points");
-        }
-    }
-
-    public function eXpOnUnload()
-    {
-        $ah = ActionHandler::getInstance();
-        $ah->deleteAction(self::$enterAction);
-        $ah->deleteAction(self::$leaveAction);
-        self::$enterAction = null;
-        self::$leaveAction = null;
-        EnterQueueWidget::EraseAll();
-        QueueList::EraseAll();
-        $this->queue = null;
-        $this->fullMatchPlayers = array();
-    }
-
     public function widgetSyncList()
     {
         $this->queue->syncPlayers(array_keys($this->storage->players));
@@ -280,6 +266,7 @@ class AutoQueue extends ExpPlugin
         QueueList::EraseAll();
 
         foreach ($this->storage->spectators as $login => $player) {
+            /** @var QueueList $widget */
             $widget = QueueList::Create($login);
             $widget->setPosition($this->config->queueList_PosX, $this->config->queueList_PosY);
             $widget->setPlayers($this->queue->getQueuedPlayers(), $this);
@@ -296,5 +283,21 @@ class AutoQueue extends ExpPlugin
         $widget = EnterQueueWidget::Create($login);
         $widget->setPosition($this->config->enterQueueList_PosX, $this->config->enterQueueList_PosY);
         $widget->show($login);
+    }
+
+    public function eXpOnUnload()
+    {
+        /** @var ActionHandler $ah */
+        $ah = ActionHandler::getInstance();
+        $ah->deleteAction(self::$enterAction);
+        $ah->deleteAction(self::$leaveAction);
+        $ah->deleteAction(self::$showEnterQueueAction);
+
+        self::$enterAction = null;
+        self::$leaveAction = null;
+        EnterQueueWidget::EraseAll();
+        QueueList::EraseAll();
+        $this->queue = null;
+        $this->fullMatchPlayers = array();
     }
 }

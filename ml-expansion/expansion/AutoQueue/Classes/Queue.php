@@ -77,7 +77,6 @@ class Queue
      */
     public function getNextPlayer()
     {
-
         if ($this->queue->count() > 0) {
             return $this->queue->dequeue();
         }
