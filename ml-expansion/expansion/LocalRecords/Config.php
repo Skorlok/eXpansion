@@ -12,6 +12,5 @@ class Config extends \ManiaLib\Utils\Singleton
     public $lapsModeCountAllLaps = true;
     public $nbMap_rankProcess = 500;
     public $ranking = true;
-    public $saveRecFrequency = 0;
     public $noRedirectTreshold = 30;
 }

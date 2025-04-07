@@ -85,10 +85,5 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setGroup("Chat Messages");
         $var->setDefaultValue(true);
         $this->registerVariable($var);
-
-        $var = new TypeInt('saveRecFrequency', 'Records save Frequency', $config, true, false);
-        $var->setDefaultValue(0);
-        $var->setDescription('Save every X minutes records. If 0 then will save on match end Only.');
-        $this->registerVariable($var);
     }
 }

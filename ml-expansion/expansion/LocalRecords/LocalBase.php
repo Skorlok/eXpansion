@@ -6,8 +6,6 @@ use ManiaLive\Event\Dispatcher;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
-use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEventListener;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
@@ -20,7 +18,7 @@ use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Sector;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\TopSumsWindow;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
 
-abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements ExpansionEventListener
+abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
     const SCORE_TYPE_TIME = 'time';
@@ -98,15 +96,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected $msg_new_top5;
     protected $msg_improved_top1;
     protected $msg_improved_top5;
-    protected $msg_admin_savedRecs;
     protected $msg_equals;
     protected $msg_equals_top5;
     protected $msg_equals_top1;
     protected $msg_showRankAndAverage;
     protected $msg_nextRankAndAverage;
     protected $msg_no_nextRank;
-
-    protected $lastSave = 0;
 
     public static $txt_rank;
     public static $txt_nick;
@@ -214,7 +209,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         // %1$s - nextplayerlogin, %2$s - server rank, %3$s - total # of ranks, %4 - average score, %5 - diff
         $this->msg_nextRankAndAverage = eXpGetMessage('#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]');
         $this->msg_no_nextRank = eXpGetMessage('#record#You are already the best ranked player');
-        $this->msg_admin_savedRecs = eXpGetMessage('#admin_action#Records saved sucessfully into the database');
 
         self::$txt_rank = eXpGetMessage("#");
         self::$txt_nick = eXpGetMessage("NickName");
@@ -232,8 +226,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->enableStorageEvents();
         $this->enableDedicatedEvents();
         $this->enableDatabase();
-        $this->enableTickerEvent();
-        Dispatcher::register(ExpansionEvent::getClass(), $this);
 
         //List of all records
         $cmd = $this->registerChatCommand("recs", "showRecsWindow", 0, true);
@@ -272,9 +264,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $cmd = $this->registerChatCommand("sectors", "showSectorWindow", 0, true);
         $cmd->help = 'Show Players Best Sector times';
-
-        $cmd = AdminGroups::addAdminCommand("saverecs", $this, "chat_forceSave", "records_save");
-        $cmd->setHelp("Will force the save of the records changes in the Database");
 
         $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", "records_save");
         $cmd->setHelp("Deletes all records by login");
@@ -405,16 +394,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
     }
 
-    public function onTick()
-    {
-        if ($this->config->saveRecFrequency > 0) {
-            if ((time() - $this->lastSave) > ($this->config->saveRecFrequency * 60)) {
-                $this->onEndMatch(array(), array());
-                $this->lastSave = time();
-            }
-        }
-    }
-
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         //We get all the records
@@ -447,9 +426,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $this->chat_showRank($login);
             }
         }
-
-        // Consider save done.
-        $this->lastSave = time();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
@@ -1472,12 +1448,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
     }
 
-    public function chat_forceSave($login)
-    {
-        $this->onEndMatch(array(), array());
-        $this->eXpChatSendServerMessage($this->msg_admin_savedRecs, $login);
-    }
-
     public function actionDelete($login, $record)
     {
         $ac = ActionHandler::getInstance();
@@ -1611,21 +1581,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         return false;
     }
 
-
-    public function eXp_onRestartStart()
-    {
-        $this->onEndMatch(array(), array());
-    }
-
-    public function eXp_onRestartEnd()
-    {
-    }
-
-
     public function eXpOnUnload()
     {
-        Dispatcher::unregister(ExpansionEvent::ON_RESTART_START, $this);
-        $this->onEndMatch(array(), array());
         Sector::EraseAll();
         Cps::EraseAll();
         CpDiff::EraseAll();

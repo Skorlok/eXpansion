@@ -7,10 +7,10 @@ declare Boolean sentEvent = False;
 declare Boolean isEventSent = False;
 declare Boolean isVoted = False;
 
-declare CMlLabel Lbl_no <=> (Page.GetFirstChild("rate_0") as CMlLabel);
-declare CMlLabel Lbl_yes <=> (Page.GetFirstChild("rate_5") as CMlLabel);
-declare CMlLabel Lbl_no2 <=> (Page.GetFirstChild("label_0") as CMlLabel);
-declare CMlLabel Lbl_yes2 <=> (Page.GetFirstChild("label_5") as CMlLabel);
+declare CMlLabel Lbl_no <=> (Page.GetFirstChild("rate_1") as CMlLabel);
+declare CMlLabel Lbl_yes <=> (Page.GetFirstChild("rate_2") as CMlLabel);
+declare CMlLabel Lbl_no2 <=> (Page.GetFirstChild("label_1") as CMlLabel);
+declare CMlLabel Lbl_yes2 <=> (Page.GetFirstChild("label_2") as CMlLabel);
 
 declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";

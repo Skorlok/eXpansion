@@ -88,6 +88,10 @@ class AutoQueue extends ExpPlugin
                     $nbPlayers++;
                     $msg = eXpGetMessage('You got free spot, good luck and have fun!');
                     $this->eXpChatSendServerMessage($msg, $player->login);
+                    
+                    // for debug purposes
+                    $msg = eXpGetMessage('$z$s$fffPlayer %s $z$s$fff have been released from queue');
+                    $this->eXpChatSendServerMessage($msg, null, array($player->nickName));
                 }
                 $this->widgetSyncList();
             }
@@ -160,6 +164,7 @@ class AutoQueue extends ExpPlugin
 
     public function onBeginMatch()
     {
+        $this->canUnqueue = true;
         $this->checkQueue = true;
         foreach ($this->storage->players as $login => $player) {
             $this->fullMatchPlayers[$login] = $player;
