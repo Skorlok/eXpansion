@@ -83,14 +83,11 @@ class Database extends ExpPlugin
 
         if ($query->recordCount() == 0) {
             $q = "INSERT INTO `exp_players`
-                    (`player_login`,`player_nickname`, `player_nicknameStripped`, `player_updated`, `player_ip`,
-                        `player_onlinerights`, `player_nation`, `player_wins`, `player_timeplayed`)
+                    (`player_login`,`player_nickname`, `player_updated`, `player_ip`, `player_nation`, `player_wins`, `player_timeplayed`)
                     VALUES (" . $this->db->quote($player->login) . ",
                             " . $this->db->quote($player->nickName) . ",
-                            " . $this->db->quote(StringFormatting::stripStyles($player->nickName)) . ",
                             " . $this->db->quote($time) . ",
                             " . $this->db->quote($player->iPAddress) . ",
-                            " . $this->db->quote($player->onlineRights) . ",
                             " . $this->db->quote($player->path) . ",
                             0,
                             0
@@ -101,10 +98,8 @@ class Database extends ExpPlugin
         } else {
             $q = "UPDATE `exp_players` SET
                 `player_nickname` = " . $this->db->quote($player->nickName) . ",
-                `player_nicknameStripped` = " . $this->db->quote(StringFormatting::stripStyles($player->nickName)) . ",
                 `player_updated` = " . $this->db->quote($time) . ",
-                `player_ip` =  " . $this->db->quote($player->iPAddress) . ",
-                `player_onlinerights` = " . $this->db->quote($player->onlineRights) . "
+                `player_ip` =  " . $this->db->quote($player->iPAddress) . "
              WHERE `player_login` = " . $this->db->quote($login) . ";";
             $this->db->execute($q);
 
@@ -188,7 +183,7 @@ class Database extends ExpPlugin
         }
     }
 
-    public function insertMap($data, $login = 'n/a')
+    public function insertMap($data)
     {
         if (empty($data->mood)) {
             $connection = $this->connection;
@@ -213,7 +208,6 @@ class Database extends ExpPlugin
                                     `challenge_lapRace`,
                                     `challenge_nbLaps`,
                                     `challenge_nbCheckpoints`,
-                                    `challenge_addedby`,
                                     `challenge_addtime`)
                                 VALUES (" . $this->db->quote($data->uId) . ",
                                 " . $this->db->quote($data->name) . ",
@@ -230,7 +224,6 @@ class Database extends ExpPlugin
                                 " . $this->db->quote($data->lapRace ? 1 : 0) . ",
                                 " . $this->db->quote($data->nbLaps) . ",
                                 " . $this->db->quote($data->nbCheckpoints) . ",
-                                " . $this->db->quote($login) . ",
                                 " . $this->db->quote(time()) . ")";
         $this->db->execute($q);
     }
@@ -252,6 +245,13 @@ class Database extends ExpPlugin
             $this->db->execute($q);
         }
 
+        if (count($playerDB) > 8) {
+            $sql = "ALTER TABLE exp_players
+                DROP COLUMN player_onlinerights,
+                DROP COLUMN player_nicknameStripped;";
+            $this->db->execute($sql);
+        }
+
 
         if (!$this->db->tableExists('exp_maps')) {
             $this->createMapTable();
@@ -263,44 +263,48 @@ class Database extends ExpPlugin
             $this->db->execute('ALTER TABLE exp_maps ADD KEY(challenge_uid);');
         }
 
-        if (count($mapsDB) < 53) {
-            $sql = "ALTER TABLE `exp_maps` 
-                ADD `mx_trackID` INT UNSIGNED NULL , 
-                ADD `mx_userID` INT UNSIGNED NULL , 
-                ADD `mx_username` VARCHAR(100) NULL , 
-                ADD `mx_uploadedAt` DATETIME NULL , 
-                ADD `mx_updatedAt` DATETIME NULL , 
-                ADD `mx_typeName` VARCHAR(100) NULL , 
-                ADD `mx_mapType` VARCHAR(255) NULL , 
-                ADD `mx_titlePack` VARCHAR(255) NULL , 
-                ADD `mx_styleName` VARCHAR(255) NULL , 
-                ADD `mx_displayCost` INT NULL , 
-                ADD `mx_modName` VARCHAR(255) NULL , 
-                ADD `mx_lightMap` INT NULL ,
-                ADD `mx_exeVersion` VARCHAR(50) NULL ,
-                ADD `mx_exeBuild` VARCHAR(100) NULL , 
-                ADD `mx_environmentName` VARCHAR(255) NULL ,
-                ADD `mx_vehicleName` VARCHAR(255) NULL , 
-                ADD `mx_unlimiterRequired` BOOLEAN NULL , 
-                ADD `mx_routeName` VARCHAR(255) NULL , 
-                ADD `mx_lengthName` VARCHAR(100) NULL , 
-                ADD `mx_laps` INT NULL,
-                ADD `mx_difficultyName` VARCHAR(100) NULL,
-                ADD `mx_replayTypeName` VARCHAR(100) NULL,
-                ADD `mx_replayWRID` INT UNSIGNED NULL,
-                ADD `mx_replayWRTime` INT NULL,
-                ADD `mx_replayWRUserID` INT NULL,
-                ADD `mx_replayWRUsername` VARCHAR(255) NULL,
-                ADD `mx_ratingVoteCount` INT NULL,
-                ADD `mx_ratingVoteAverage` FLOAT NULL,
-                ADD `mx_replayCount` INT NULL,
-                ADD `mx_trackValue` INT NULL,
-                ADD `mx_comments` TEXT NULL,
-                ADD `mx_commentsCount` INT NULL,
-                ADD `mx_awardCount` INT NULL,
-                ADD `mx_hasScreenshot` BOOLEAN NULL,
-                ADD `mx_hasThumbnail` BOOLEAN NULL,
-                CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+        if (count($mapsDB) > 18) {
+            $sql = "ALTER TABLE exp_maps
+                DROP COLUMN mx_trackID,
+                DROP COLUMN mx_userID,
+                DROP COLUMN mx_username,
+                DROP COLUMN mx_uploadedAt,
+                DROP COLUMN mx_updatedAt,
+                DROP COLUMN mx_typeName,
+                DROP COLUMN mx_mapType,
+                DROP COLUMN mx_titlePack,
+                DROP COLUMN mx_styleName,
+                DROP COLUMN mx_displayCost,
+                DROP COLUMN mx_modName,
+                DROP COLUMN mx_lightMap,
+                DROP COLUMN mx_exeVersion,
+                DROP COLUMN mx_exeBuild,
+                DROP COLUMN mx_environmentName,
+                DROP COLUMN mx_vehicleName,
+                DROP COLUMN mx_unlimiterRequired,
+                DROP COLUMN mx_routeName,
+                DROP COLUMN mx_lengthName,
+                DROP COLUMN mx_laps,
+                DROP COLUMN mx_difficultyName,
+                DROP COLUMN mx_replayTypeName,
+                DROP COLUMN mx_replayWRID,
+                DROP COLUMN mx_replayWRTime,
+                DROP COLUMN mx_replayWRUserID,
+                DROP COLUMN mx_replayWRUsername,
+                DROP COLUMN mx_ratingVoteCount,
+                DROP COLUMN mx_ratingVoteAverage,
+                DROP COLUMN mx_replayCount,
+                DROP COLUMN mx_trackValue,
+                DROP COLUMN mx_comments,
+                DROP COLUMN mx_commentsCount,
+                DROP COLUMN mx_awardCount,
+                DROP COLUMN mx_hasScreenshot,
+                DROP COLUMN mx_hasThumbnail;";
+            $this->db->execute($sql);
+        }
+
+        if (count($mapsDB) > 17) {
+            $sql = "ALTER TABLE exp_maps DROP COLUMN challenge_addedby;";
             $this->db->execute($sql);
         }
     }
@@ -310,11 +314,9 @@ class Database extends ExpPlugin
         $q = "CREATE TABLE IF NOT EXISTS `exp_players` (
                 `player_login` varchar(50) NOT NULL,
                 `player_nickname` varchar(100) NOT NULL,
-                `player_nicknameStripped` varchar(100) NOT NULL,
                 `player_updated` mediumint(9) NOT NULL DEFAULT '0',
                 `player_wins` mediumint(9) NOT NULL DEFAULT '0',
                 `player_timeplayed` mediumint(9) NOT NULL DEFAULT '0',
-                `player_onlinerights` varchar(10) NOT NULL,
                 `player_ip` varchar(50),
                 `player_nation` varchar(100),
                 PRIMARY KEY (`player_login`)
@@ -332,7 +334,6 @@ class Database extends ExpPlugin
                 `challenge_file` VARCHAR( 200 ) NOT NULL ,
                 `challenge_author` VARCHAR( 30 ) NOT NULL ,
                 `challenge_environment` VARCHAR( 15 ) NOT NULL,
-
                 `challenge_mood` VARCHAR( 50 ) NOT NULL,
                 `challenge_bronzeTime` INT( 10 ) NOT NULL,
                 `challenge_silverTime` INT( 10 ) NOT NULL,
@@ -342,7 +343,6 @@ class Database extends ExpPlugin
                 `challenge_lapRace` INT( 3 ) NOT NULL,
                 `challenge_nbLaps` INT( 3 ) NOT NULL,
                 `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
-                `challenge_addedby` VARCHAR(200),
                 `challenge_addtime` INT(9)
                 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = MYISAM ;";
         $this->db->execute($q);
