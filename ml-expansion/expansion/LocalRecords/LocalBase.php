@@ -1000,7 +1000,10 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     {
         Records::Erase($login);
         if ($map === null) {
-            $records = clone $this->currentChallengeRecords;
+            $records = array();
+            foreach ($this->currentChallengeRecords as $record) {
+                $records[] = clone $record;
+            }
             $map = $this->storage->currentMap;
         } else {
             $records = $this->getRecordsForMap($map);
