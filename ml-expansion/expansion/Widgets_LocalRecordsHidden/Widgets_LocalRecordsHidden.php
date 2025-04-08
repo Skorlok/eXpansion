@@ -25,7 +25,7 @@ class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public function eXpOnInit()
     {
-        $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\TM_HiddenLocalRecords\\TM_HiddenLocalRecords'));
+        $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords'));
     }
 
     public function eXpOnLoad()
@@ -41,15 +41,15 @@ class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         $this->enableDedicatedEvents();
 
-        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\TM_HiddenLocalRecords\\TM_HiddenLocalRecords')) {
-            self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\TM_HiddenLocalRecords\\TM_HiddenLocalRecords", "getRecords");
+        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
+            self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
         }
         $this->updateLocalPanel();
     }
 
     public function updateLocalPanel($login = null, $update = false)
     {
-        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\TM_HiddenLocalRecords\\TM_HiddenLocalRecords')) {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords')) {
 
             if ($update) {
                 $xml = '<manialink id="localrecordshidden_updater" version="2" name="localrecordshidden_updater">';

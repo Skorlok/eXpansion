@@ -76,6 +76,10 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(30);
         $this->registerVariable($var);
 
+        $var = new Boolean("hideRecords", "Localrecords: Hide all records others than player one", $config, true, false);
+        $var->setDefaultValue(false);
+        $this->registerVariable($var);
+
         $var = new Boolean("sendBeginMapNotices", "Localrecords: show message at begin map", $config, true, false);
         $var->setGroup("Chat Messages");
         $var->setDefaultValue(true);

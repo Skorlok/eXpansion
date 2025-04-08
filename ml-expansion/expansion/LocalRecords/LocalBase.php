@@ -1010,6 +1010,19 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $currentMap = true;
         }
 
+        if ($this->config->hideRecords) {
+            $hiddenRecords = $records;
+            foreach ($hiddenRecords as $key => $record) {
+                if ($record->login != $login) {
+                    $hiddenRecords[$key]->time = 'HIDDEN';
+                    $hiddenRecords[$key]->avgScore = 'HIDDEN';
+                    $hiddenRecords[$key]->nbFinish = 'HIDDEN';
+                    $hiddenRecords[$key]->ScoreCheckpoints = array();
+                }
+            }
+            $records = $hiddenRecords;
+        }
+
         $window = Records::Create($login);
         /** @var Records $window */
         $window->setTitle(__('Records on a Map', $login));
@@ -1038,6 +1051,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showCpWindow($login)
     {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
         Cps::Erase($login);
 
         $window = Cps::Create($login);
@@ -1051,6 +1069,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showSecCpWindow($login)
     {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
         SecCps::Erase($login);
 
         $window = SecCps::Create($login);
@@ -1064,6 +1087,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showCpDiffWindow($login, $params)
     {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
         if (!is_numeric($params)) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
             return;
@@ -1112,6 +1140,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showCpDiffNoDediWindow($login, $params)
     {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
         if (!is_numeric($params)) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
             return;
@@ -1135,6 +1168,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showSectorWindow($login)
     {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+        
         if (empty($this->currentChallangeSectorTimes)) {
 
             $secs = array();

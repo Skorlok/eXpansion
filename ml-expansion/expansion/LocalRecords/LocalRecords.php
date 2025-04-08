@@ -115,6 +115,9 @@ class LocalRecords extends LocalBase
      */
     public function formatScore($score)
     {
+        if (!is_numeric($score)) {
+            return $score;
+        }
         $time = \ManiaLive\Utilities\Time::fromTM($score);
         if (substr($time, 0, 2) === "0:") {
             $time = substr($time, 2);

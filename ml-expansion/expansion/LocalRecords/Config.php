@@ -13,4 +13,5 @@ class Config extends \ManiaLib\Utils\Singleton
     public $nbMap_rankProcess = 500;
     public $ranking = true;
     public $noRedirectTreshold = 30;
+    public $hideRecords = false;
 }
