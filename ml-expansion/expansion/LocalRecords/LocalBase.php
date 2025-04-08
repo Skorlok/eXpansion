@@ -1000,7 +1000,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     {
         Records::Erase($login);
         if ($map === null) {
-            $records = $this->currentChallengeRecords;
+            $records = clone $this->currentChallengeRecords;
             $map = $this->storage->currentMap;
         } else {
             $records = $this->getRecordsForMap($map);
@@ -1011,16 +1011,14 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
 
         if ($this->config->hideRecords) {
-            $hiddenRecords = $records;
-            foreach ($hiddenRecords as $key => $record) {
+            foreach ($records as $key => $record) {
                 if ($record->login != $login) {
-                    $hiddenRecords[$key]->time = 'HIDDEN';
-                    $hiddenRecords[$key]->avgScore = 'HIDDEN';
-                    $hiddenRecords[$key]->nbFinish = 'HIDDEN';
-                    $hiddenRecords[$key]->ScoreCheckpoints = array();
+                    $records[$key]->time = 'HIDDEN';
+                    $records[$key]->avgScore = 'HIDDEN';
+                    $records[$key]->nbFinish = 'HIDDEN';
+                    $records[$key]->ScoreCheckpoints = array();
                 }
             }
-            $records = $hiddenRecords;
         }
 
         $window = Records::Create($login);
