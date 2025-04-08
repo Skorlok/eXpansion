@@ -54,7 +54,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new BoundedTypeInt("recordPublicMsgTreshold", "Localrecords: Public chat messages to TOP x", $config, true, false);
         $var->setDescription("to show always public messages, set this to same value as recordsCount");
-        $var->setMin(1);
+        $var->setMin(0);
         $var->setMax(1000);
         $var->setDefaultValue(100);
         $this->registerVariable($var);
