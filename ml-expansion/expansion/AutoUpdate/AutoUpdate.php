@@ -65,9 +65,9 @@ class AutoUpdate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->onGoing = true;
 
         if ($this->config->useGit) {
-            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-source --no-interaction --dry-run');
+            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-source --no-interaction --no-progress --dry-run');
         } else {
-            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-dist --no-interaction --dry-run');
+            $cmds = array(PHP_BINARY . ' composer.phar update --prefer-dist --no-interaction --no-progress --dry-run');
         }
 
         $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#admin_action#[#variable#AutoUpdate#admin_action#] Checking updates for #variable#eXpansion & Components');
@@ -125,9 +125,9 @@ class AutoUpdate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->onGoing = true;
 
         if ($this->config->useGit) {
-            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --prefer-source');
+            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --no-progress --prefer-source');
         } else {
-            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --prefer-dist');
+            $cmds = array(PHP_BINARY . ' composer.phar update --no-interaction --no-progress --prefer-dist');
         }
 
         $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#admin_action#[#variable#AutoUpdate#admin_action#] Updating #variable#eXpansion & Components');
@@ -155,8 +155,13 @@ class AutoUpdate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             \ManiaLivePlugins\eXpansion\Gui\Gui::showError($results, AdminGroups::getAdminsByPermission(Permission::SERVER_UPDATE));
             $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#admin_error#Error while updating #variable#eXpansion & Components !!');
         } else {
-            $this->console('eXpansion Updated!!');
-            $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#vote_success#Update of #variable#eXpansion & Components #vote_success#Done');
+            if ($this->arrayContainsText('Nothing to install, update or remove', $results)) {
+                $this->console('eXpansion & Components are already up to date');
+                $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#vote_success#eXpansion & Components are already up to date!');
+            } else {
+                $this->console('eXpansion Updated!!');
+                $AdminGroups->announceToPermission(Permission::SERVER_UPDATE, '#vote_success#Update of #variable#eXpansion & Components #vote_success#Done');
+            }
         }
 
         $this->onGoing = false;
