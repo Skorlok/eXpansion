@@ -153,8 +153,8 @@ class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\
                 $recsData .= ', ';
                 $nickData .= ', ';
             }
-            $recsData .= '"' . Gui::fixString($record->login) . '"=>' . $record->time;
-            $nickData .= '"' . Gui::fixString($record->login) . '"=>"' . Gui::fixString($record->nickName) . '"';
+            $recsData .= '"' . $record->login . '"=>' . $record->time;
+            $nickData .= '"' . $record->login . '"=>"' . Gui::fixString2($record->nickName) . '"';
             $index++;
         }
 

@@ -153,8 +153,8 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $recsData .= ', ';
                 $nickData .= ', ';
             }
-            $recsData .= '"' . Gui::fixString($record->login) . '"=>' . $record->time;
-            $nickData .= '"' . Gui::fixString($record->login) . '"=>"' . Gui::fixString($record->nickName) . '"';
+            $recsData .= '"' . $record->login . '"=>' . $record->time;
+            $nickData .= '"' . $record->login . '"=>"' . Gui::fixString2($record->nickName) . '"';
             $index++;
         }
 

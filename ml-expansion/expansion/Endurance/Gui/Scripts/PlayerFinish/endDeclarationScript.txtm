@@ -32,18 +32,6 @@ declare Boolean triggerBegin = True;
 declare Integer zoomId = -1;
 declare Integer lastZoomId = -2;
 
-declare origPlayerTimes = playerTimes<?php echo $this->varName ?>;
-origPlayerTimes.clear();
-
-foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
-    declare newLogin = TextLib::Replace(Login, "–", "-");
-    origPlayerTimes[newLogin] = Score;
-    playerNickName<?php echo $this->varName ?>[newLogin] = playerNickName<?php echo $this->varName ?>[Login];
-}
-
-playerTimes<?php echo $this->varName ?>.clear();
-playerTimes<?php echo $this->varName ?> = origPlayerTimes;
-
 for (i, 1, nbFields ) {
     declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
     declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);

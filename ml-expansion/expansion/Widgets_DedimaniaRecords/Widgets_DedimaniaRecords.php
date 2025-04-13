@@ -149,8 +149,8 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                 $recsData .= ', ';
                 $nickData .= ', ';
             }
-            $recsData .= '"' . Gui::fixString($record['Login']) . '"=> ' . $record['Best'];
-            $nickData .= '"' . Gui::fixString($record['Login']) . '"=>"' . Gui::fixString($record['NickName']) . '"';
+            $recsData .= '"' . $record['Login'] . '"=> ' . $record['Best'];
+            $nickData .= '"' . $record['Login'] . '"=>"' . Gui::fixString2($record['NickName']) . '"';
             $index++;
         }
 

@@ -329,6 +329,23 @@ EOT
     }
 
     /**
+     * Cleans the string for manialink or maniascript purposes.
+     *
+     * @param string $string The string to clean
+     * @param bool $multiline if the string is multiline
+     * @return string cleaned up string
+     */
+    public static function fixString2($string, $multiline = false)
+    {
+        $out = str_replace('\\', '\\\\', $string);
+        $out = str_replace('"', '\\"', $out);
+        if (!$multiline) {
+            $out = str_replace("\n", '', $out);
+        }
+        return $out;
+    }
+
+    /**
      * @param $login
      * @param $actionId
      * @param string $text

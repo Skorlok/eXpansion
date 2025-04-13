@@ -378,8 +378,8 @@ class Maps extends ExpPlugin
             $widget->setPosition($this->config->nextMapWidget_PosX, $this->config->nextMapWidget_PosY, 0);
             $widget->setSize(60, 15);
             $widget->setParam("action", $this->actionShowJukeList);
-            $widget->setParam("nickname", Gui::fixString($gbxInfo->authorNick));
-            $widget->setParam("mapname", Gui::fixString($gbxInfo->name));
+            $widget->setParam("nickname", Gui::fixString2($gbxInfo->authorNick));
+            $widget->setParam("mapname", Gui::fixString2($gbxInfo->name));
             $widget->setParam("country", $country);
             $widget->setParam("environment", $gbxInfo->envir);
             $widget->show(null, true);

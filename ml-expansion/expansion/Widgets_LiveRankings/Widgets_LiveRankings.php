@@ -328,7 +328,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             if ($index > 1) {
                 $NickNames .= ', ';
             }
-            $NickNames .= '"' . Gui::fixString($login) . '"=>"' . Gui::fixString(Formatting::stripLinks($nickname)) . '"';
+            $NickNames .= '"' . $login . '"=>"' . Gui::fixString2(Formatting::stripLinks($nickname)) . '"';
             $index++;
         }
         $NickNames .= "]";
@@ -418,8 +418,8 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $recsData .= ', ';
                 $nickData .= ', ';
             }
-            $recsData .= '"' . Gui::fixString($player_login) . '"=>' . $record['points'];
-            $nickData .= '"' . Gui::fixString($player_login) . '"=>"' . Gui::fixString($record['name']) . '"';
+            $recsData .= '"' . $player_login . '"=>' . $record['points'];
+            $nickData .= '"' . $player_login . '"=>"' . Gui::fixString2($record['name']) . '"';
             $index++;
         }
 
@@ -472,8 +472,8 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                     $recsData .= ', ';
                     $nickData .= ', ';
                 }
-                $recsData .= '"' . Gui::fixString($player->login) . '"=>' . $player->bestTime;
-                $nickData .= '"' . Gui::fixString($player->login) . '"=>"' . Gui::fixString(Formatting::stripLinks($player->nickName)) . '"';
+                $recsData .= '"' . $player->login . '"=>' . $player->bestTime;
+                $nickData .= '"' . $player->login . '"=>"' . Gui::fixString2(Formatting::stripLinks($player->nickName)) . '"';
                 $index++;
             }
         }
