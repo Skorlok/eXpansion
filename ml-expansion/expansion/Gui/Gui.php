@@ -180,7 +180,19 @@ EOT
             try {
                 $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, false);
             } catch (Exception $e) {
-                $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+                if ($e->getMessage() != "Login unknown.") {
+                    $this->console("Impossible to send persistent widgets to player, server said: " . $e->getMessage());
+                    $this->console("Trying to send persistent widgets to player again.");
+                    foreach (self::$persistentWidgets as $widget) {
+                        try {
+                            $this->connection->sendDisplayManialinkPage($login, $widget, 0, false, false);
+                        } catch (Exception $e) {
+                            $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+                        }
+                    }
+                } else {
+                    $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+                }
             }
         }
     }

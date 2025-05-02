@@ -323,8 +323,6 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                     
                 } else {
 
-                    echo "searching for: " . Maps::$searchTerm[$login] . "\n";
-                    print_r(Maps::$searchTerm[$login]);
                     $substring_name = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->strippedName)));
                     $dist_name = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring_name);
 

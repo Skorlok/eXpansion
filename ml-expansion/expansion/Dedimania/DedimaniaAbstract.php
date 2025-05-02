@@ -142,6 +142,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                     $this->registerChatCommand("dedicps", "showCpDiff", 1, true);
                     $cmd = AdminGroups::addAdminCommand("savededi", $this, "force_dedisave", Permission::GAME_SETTINGS);
                     $cmd->setHelp("Force dedimania to send dedi records");
+                    $cmd = AdminGroups::addAdminCommand("sendlocaldedi", $this, "sendlocaldedi", Permission::GAME_SETTINGS);
+                    $cmd->setHelp("Send local records to dedimania if ReplaySaver is enabled");
+                    
                     $this->setPublicMethod("showRecs");
                     $this->setPublicMethod("showCps");
                     $this->setPublicMethod("showSecCps");
@@ -677,7 +680,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->sendScores();
         $this->EndMatch();
         $this->records = array();
-        $this->dedimania->getChallengeRecords();
 
         // rankings are reset in sensScores()
         $this->rankings = $rankings;
@@ -685,6 +687,53 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->vReplay = $vReplaySaved;
 
         $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
+    }
+
+    public function sendlocaldedi($login)
+    {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+            $lRecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+        } else {
+            $this->eXpChatSendServerMessage("#admin_error#Local records plugin not loaded!", $login);
+            return;
+        }
+
+        $rankings = array();
+        $gReplay = "";
+        $vReplay = "";
+        $allCps = array();
+        foreach ($lRecs as $record) {
+            $rankings[$record->login] = array('Login' => $record->login, 'BestTime' => $record->time, 'BestCheckpoints' => $record->ScoreCheckpoints);
+            
+            if ($record->place == 1) {
+                $fileNameReplay = $this->connection->gameDataDirectory() . 'Replays' . DIRECTORY_SEPARATOR . $this->storage->serverLogin . DIRECTORY_SEPARATOR . $this->storage->currentMap->uId . DIRECTORY_SEPARATOR . $record->login;
+                
+                if (file_exists($fileNameReplay . ".VReplay.Gbx")) {
+                    $gReplay = file_get_contents($fileNameReplay . ".VReplay.Gbx");
+                } else {
+                    $this->expChatSendServerMessage("Replay not found: " . $fileNameReplay . ".VReplay.Gbx", $login);
+                    return;
+                }
+
+                if (file_exists($fileNameReplay . ".Replay.Gbx")) {
+                    $vReplay = file_get_contents($fileNameReplay . ".Replay.Gbx");
+                } else {
+                    $this->expChatSendServerMessage("Replay not found: " . $fileNameReplay . ".Replay.Gbx", $login);
+                    return;
+                }
+
+                $allCps = implode(",", $record->ScoreCheckpoints);
+            }
+        }
+
+        if (count($rankings) < 1) {
+            $this->eXpChatSendServerMessage("#admin_error#No score found, dedi not sent !", $login);
+            return;
+        }
+
+        $this->dedimania->forceDediSend = true;
+        $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $vReplay, $gReplay, $allCps);
+        $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $login);
     }
 
     public function isRunning()

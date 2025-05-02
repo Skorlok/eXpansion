@@ -155,7 +155,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = $json[0];
 
         if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
-            $query = "https://tm.mania.exchange/api/replays/?count=25&mapId=" .$json[0]->TrackID;
+            $query = "https://tm.mania.exchange/api/replays/?count=25&best=1&mapId=" .$json[0]->TrackID;
 
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
             $this->dataAccess->httpCurl($query, array($this, "xGetReplaysInfo"), null, $options);

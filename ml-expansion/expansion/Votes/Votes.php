@@ -171,6 +171,17 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         // Check if vote passes when we suppose that all players that didn't vote would vote NO.
         $playerCount = count($this->storage->players) + count($this->storage->spectators);
+        if ($this->currentVote->voters == 0) {
+            $playerCount = count($this->storage->players);
+        } else if ($this->currentVote->voters == 1) {
+            $playerCount = count($this->storage->players);
+            foreach ($this->storage->spectators as $login => $player) {
+                if (isset($this->expStorage->playerTimes[$login]) && $this->expStorage->playerTimes[$login] > 0) {
+                    $playerCount++;
+                }
+            }
+        }
+
         if ($playerCount > 0 && ($this->currentVote->getYes() / $playerCount) > $this->currentVote->voteRatio) {
             $this->handleEndVote(true);
             return;

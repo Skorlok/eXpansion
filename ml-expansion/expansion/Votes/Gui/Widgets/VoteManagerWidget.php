@@ -64,6 +64,7 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->button_yes->setPosX(1);
         $this->button_yes->setPosY(-11);
         $this->button_yes->setId("button_yes");
+        $this->button_yes->setHidden(1);
         $this->addComponent($this->button_yes);
 
         $actionNo = $this->createAction(array(self::$parentPlugin, "handlePlayerVote"), "no");
@@ -74,6 +75,7 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->button_no->setPosX(77);
         $this->button_no->setPosY(-11);
         $this->button_no->setId("button_no");
+        $this->button_no->setHidden(1);
         $this->addComponent($this->button_no);
 
 

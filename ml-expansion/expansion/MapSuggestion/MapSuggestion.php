@@ -55,7 +55,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
             }
 
             $gameData = \ManiaLivePlugins\eXpansion\Helpers\Helper::getPaths()->getGameDataPath();
-            $file = $gameData . DIRECTORY_SEPARATOR . "map_suggestions.txt";
+            $file = $gameData . DIRECTORY_SEPARATOR . "Maps/map_suggestions.txt";
 
             $data .= $mxid . ";" . $from . ";\"" . $description . "\"\r\n";
             $dataAccess->save($file, $data, true);

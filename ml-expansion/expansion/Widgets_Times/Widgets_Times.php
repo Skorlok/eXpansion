@@ -18,7 +18,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     // widget
     protected $totalCp = 0;
     protected $lapRace = false;
-    protected $checkValidCps = true;
     protected $localrecords = array();
     protected $dedirecords = array();
 
@@ -101,7 +100,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $map = $this->storage->currentMap;
         $gamemode = $this->eXpGetCurrentCompatibilityGameMode();
-        $scriptSettings = $this->connection->getModeScriptSettings();
 
         if ($this->storage->getCleanGamemodeName() == "endurocup") {
             $gamemode = GameInfos::GAMEMODE_LAPS;
@@ -109,8 +107,8 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP) {
 
             if ($map->lapRace) {
+                $scriptSettings = $this->connection->getModeScriptSettings();
 
-                $this->checkValidCps = false;
                 $this->lapRace = 2;
 
                 if (array_key_exists("S_ForceLapsNb", $scriptSettings)) {
@@ -124,7 +122,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }
 
             } else {
-                $this->checkValidCps = true;
                 $this->totalCp = $map->nbCheckpoints;
                 $this->lapRace = 0;
             }
@@ -136,7 +133,6 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $this->lapRace = 0;
             }
             $this->totalCp = $map->nbCheckpoints;
-            $this->checkValidCps = true;
         }
     }
 
@@ -151,10 +147,8 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function getScript($reference, $target)
+    public function getScript($reference, $target, $update = false)
     {
-        $script = new Script('Widgets_Times/Gui/Scripts_Time');
-
         $playerRecord = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue($this->localrecords, "login", $target);
         $drecord = array_search($target, array_column($this->dedirecords, 'Login'));
 
@@ -183,64 +177,25 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $record = $playerRecord;
         }
 
-        if ($this->checkValidCps) {
+        $checkpoints = "[ -1 ]";
 
-            $checkpoints = "[ -1 ]";
-            $noRecs = true;
-
-            // Add record information for MS usage.
-            if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
-                // Normally all CP even last one should be in the object,
-                // but not in databases imported from XAseco where last CP is missing.
-                if (sizeof($record->ScoreCheckpoints) == $this->totalCp) {
-                    // Normal DB entry with all CP's.
-                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
-                    $noRecs = false;
-                    // XAseco entry missing last CP. Add the record time as it is the the same value.
-                } elseif (sizeof($record->ScoreCheckpoints) == $this->totalCp - 1) {
-                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
-                    $noRecs = false;
-                }
+        if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
+            // Normally all CP even last one should be in the object,
+            // but not in databases imported from XAseco where last CP is missing.
+            if ($record->ScoreCheckpoints[count($record->ScoreCheckpoints) - 1] != $record->time) {
+                $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
+            } else {
+                $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
             }
-
-            // If CP in database don't match Map or no records send empty CP information.
-            if ($noRecs) {
-                $checkpoints = '[';
-                for ($i = 0; $i < $this->totalCp; $i++) {
-                    if ($i > 0) {
-                        $checkpoints .= ', ';
-                    }
-                    $checkpoints .= -1;
-                }
-                $checkpoints .= ']';
-            }
-
         } else {
-
-            $checkpoints = "[ -1 ]";
-            $noRecs = true;
-
-            if ($record instanceof \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record) {
-                if ($record->ScoreCheckpoints[count($record->ScoreCheckpoints) - 1] != $record->time) {
-                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . ", " . $record->time . "]";
-                    $noRecs = false;
-                } else {
-                    $checkpoints = "[" . implode(",", $record->ScoreCheckpoints) . "]";
-                    $noRecs = false;
+            $checkpoints = '[';
+            for ($i = 0; $i < $this->totalCp; $i++) {
+                if ($i > 0) {
+                    $checkpoints .= ', ';
                 }
+                $checkpoints .= -1;
             }
-
-            if ($noRecs) {
-                $checkpoints = '[';
-                for ($i = 0; $i < $this->totalCp; $i++) {
-                    if ($i > 0) {
-                        $checkpoints .= ', ';
-                    }
-                    $checkpoints .= -1;
-                }
-                $checkpoints .= ']';
-            }
-
+            $checkpoints .= ']';
         }
 
         // Send data for the dedimania records.
@@ -264,21 +219,32 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $dediTime .= ']';
         }
 
-        $script->setParam('checkpoints', $checkpoints);
-        $script->setParam('deditimes', $dediTime);
-        $script->setParam('totalCp', $this->totalCp);
-        $script->setParam('target', $target);
-        $script->setParam('lapRace', $this->lapRace);
-        $script->setParam("playSound", 'True');
-        $script->setParam("reference", $reference);
+        if ($update) {
+            return "main () {
+                declare Integer[] pbCheckpoints for UI = Integer[];
+                pbCheckpoints.clear();
+                pbCheckpoints = $checkpoints;
 
-        return $script;
+                declare Integer[] Deditimes for UI = Integer[];
+                Deditimes.clear();
+                Deditimes = $dediTime;
+            }";
+        } else {
+            $script = new Script('Widgets_Times/Gui/Scripts_Time');
+            $script->setParam('checkpoints', $checkpoints);
+            $script->setParam('deditimes', $dediTime);
+            $script->setParam('totalCp', $this->totalCp);
+            $script->setParam('target', $target);
+            $script->setParam('lapRace', $this->lapRace);
+            $script->setParam("playSound", 'True');
+            $script->setParam("reference", $reference);
+
+            return $script;
+        }
     }
 
-    public function showPanel($login, $playerObject)
+    public function showPanel($login, $playerObject, $update = false)
     {
-        $this->getRecords();
-
         $reference = 1;
         $target = "";
         $spectatorTarget = $login;
@@ -300,13 +266,22 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $reference = $this->references[$login];
         }
 
-        $widget = new Widget("Widgets_Times\Gui\Widgets\TimePanel.xml");
-        $widget->setName("Player Time Panel");
-        $widget->setLayer("normal");
-        $widget->setPosition($this->config->timePanel_PosX, $this->config->timePanel_PosY, 0);
-        $widget->setSize(30, 6);
-        $widget->registerScript($this->getScript($reference, $target));
-        $widget->show($login);
+        if ($update) {
+            $xml = '<manialink id="playertimepanel_updater" version="2" name="playertimepanel_updater">';
+            $xml .= '<script><!--';
+            $xml .= $this->getScript($reference, $target, true);
+            $xml .= '--></script>';
+            $xml .= '</manialink>';
+            $this->connection->sendDisplayManialinkPage($login, $xml);
+        } else {
+            $widget = new Widget("Widgets_Times\Gui\Widgets\TimePanel.xml");
+            $widget->setName("Player Time Panel");
+            $widget->setLayer("normal");
+            $widget->setPosition($this->config->timePanel_PosX, $this->config->timePanel_PosY, 0);
+            $widget->setSize(30, 6);
+            $widget->registerScript($this->getScript($reference, $target, false));
+            $widget->show($login);
+        }
     }
 
     public function onPlayerConnect($login, $isSpectator)
@@ -325,6 +300,11 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->localrecords = $data;
     }
 
+    public function onNewRecord($data)
+    {
+        $this->localrecords = $data;
+    }
+
     public function onDedimaniaUpdateRecords($data)
     {
         $this->dedirecords = $data['Records'];
@@ -338,17 +318,10 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onRecordPlayerFinished($login)
     {
-
     }
 
     public function onDedimaniaOpenSession()
     {
-
-    }
-
-    public function onNewRecord($data)
-    {
-
     }
 
     public function onRecordDeleted($removedRecord, $records)
@@ -358,17 +331,15 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onPersonalBestRecord($data)
     {
-        $this->showPanel($data->login, false);
+        $this->showPanel($data->login, false, true);
     }
 
     public function onDedimaniaPlayerConnect($data)
     {
-
     }
 
     public function onDedimaniaPlayerDisconnect($login)
     {
-
     }
 
     public function onDedimaniaRecord($record, $oldrecord)
@@ -384,7 +355,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 );
             }
         }
-        $this->showPanel($record->login, false);
+        $this->showPanel($record->login, false, true);
     }
 
     public function onDedimaniaNewRecord($record)
@@ -400,12 +371,11 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 );
             }
         }
-        $this->showPanel($record->login, false);
+        $this->showPanel($record->login, false, true);
     }
 
     public function eXpOnUnload()
     {
-        Dispatcher::unregister(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         Dispatcher::unregister(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         Dispatcher::unregister(LocalEvent::getClass(), $this);
         

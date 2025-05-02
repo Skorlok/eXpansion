@@ -125,6 +125,9 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
     /** @var Player[] */
     public $spectators = array();
 
+    /** @var Array */
+    public $playerTimes = array();
+
     /**
      * is this eXpansion running locally on server (true)
      * or
@@ -147,6 +150,8 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
         Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_PLAYER_DISCONNECT);
         Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_PLAYER_INFO_CHANGED);
         Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_BEGIN_MAP);
+        Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_BEGIN_MATCH);
+        Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_PLAYER_FINISH);
         Dispatcher::register(\ManiaLive\Application\Event::getClass(), $this, \ManiaLive\Application\Event::ON_PRE_LOOP);
 
         $this->connection = Singletons::getInstance()->getDediConnection();
@@ -235,6 +240,7 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
+        $this->playerTimes = array();
         $this->players = array();
         foreach ($this->storage->players as $player) {
             if ($player->isConnected) {
@@ -420,6 +426,7 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
      */
     public function onBeginMatch()
     {
+        $this->playerTimes = array();
     }
 
     /**
@@ -507,6 +514,16 @@ class Storage extends Singleton implements \ManiaLive\Event\Listener, ServerList
      */
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
+        if ($timeOrScore <= 0) {
+            return;
+        }
+        if (!isset($this->playerTimes[$login]) || $this->playerTimes[$login] <= 0) {
+            $this->playerTimes[$login] = $timeOrScore;
+        } else {
+            if ($this->playerTimes[$login] > $timeOrScore) {
+                $this->playerTimes[$login] = $timeOrScore;
+            }
+        }
     }
 
     /**

@@ -1,4 +1,5 @@
 
+// REMAINING TIME
 remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime));
 
 if (remaining >= 0.0) {
@@ -18,6 +19,7 @@ if (remaining >= 0.0) {
     Window.Hide();
 }
 
+// Handle the vote
 foreach (Event in PendingEvents) {
 
     if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F1") {
@@ -40,6 +42,53 @@ foreach (Event in PendingEvents) {
 
 
 if ((Now - lastUpdateTime) >= 100) {
+    nbYes = 0;
+    nbTotal = 0;
+    foreach (Login => Score in playersVote) {
+
+        if (Score == "yes") {
+            if (LocalUser != Null) {
+                if (Login == LocalUser.Login) {
+                    declare confirmVoteYes = (Page.GetFirstChild("confirmVoteYes") as CMlQuad);
+                    confirmVoteYes.Show();
+                }
+            }
+            nbYes += 1;
+        }
+    
+        if (Score == "no") {
+            if (LocalUser != Null) {
+                if (Login == LocalUser.Login) {
+                    declare confirmVoteNo = (Page.GetFirstChild("confirmVoteNo") as CMlQuad);
+                    confirmVoteNo.Show();
+                }
+            }
+            
+        }
+        nbTotal +=1;
+    }
+    
+    if (nbTotal > 0) {
+        agreeSize = ((ML::NearestReal(nbYes) / ML::NearestReal(nbTotal)) * 58);
+    }
+    
+    declare bgYes = (Page.GetFirstChild("bgYes") as CMlQuad);
+    declare bgYes2 = (Page.GetFirstChild("bgYes2") as CMlQuad);
+    declare bgNo = (Page.GetFirstChild("bgNo") as CMlQuad);
+    declare bgNo2 = (Page.GetFirstChild("bgNo2") as CMlQuad);
+    
+    bgYes.Size[0] = agreeSize + 0.1;
+    bgYes2.Size[0] = agreeSize + 0.1;
+    bgNo.Size[0] = 58.01 - agreeSize;
+    bgNo2.Size[0] = 58.01 - agreeSize;
+    
+    bgYes.Show();
+    bgYes2.Show();
+    bgNo.Show();
+    bgNo2.Show();
+
+
+
     foreach (Player in Players) {
         if (LocalUser != Null) {
             if (Player.Login == LocalUser.Login) {

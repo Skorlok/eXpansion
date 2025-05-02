@@ -71,9 +71,9 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $quadImage = new \ManiaLib\Gui\Elements\Quad(60, 37);
         $quadImage->setPosition(-4, 0);
         if (ManiaExchange::$mxInfo->HasScreenshot) {
-            $quadImage->setImage("http://" . $title . ".mania-exchange.com/maps/" . ManiaExchange::$mxInfo->TrackID . "/image/1?.png", true);
+            $quadImage->setImage("https://" . $title . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.webp", true); //TODO fix when image is PNG
         } else {
-            $quadImage->setImage("http://" . $title . ".mania-exchange.com/tracks/screenshot/normal/" . ManiaExchange::$mxInfo->TrackID . "/?.jpg", true);
+            $quadImage->setImage("https://" . $title . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.png", true);
         }
         $this->mainFrame->addComponent($quadImage);
 
@@ -85,12 +85,12 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $button_visit->setAction($action);
         $this->mainFrame->addComponent($button_visit);
 
-        $button_award = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
+        /*$button_award = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
         $button_award->setText(__("Award this map", $login));
         $button_award->setPosition(88, -2.6);
         $action = $this->createAction(array($this, 'handleButtonAward'));
         $button_award->setAction($action);
-        $this->mainFrame->addComponent($button_award);
+        $this->mainFrame->addComponent($button_award);*/
 
 
         $mapData = array("Name" => "Name:", "Username" => "Author:", "UploadedAt" => "Uploaded:", "UpdatedAt" => "Updated:", "AwardCount" => "Awards:", "DifficultyName" => "Difficulty:", "LengthName" => "Length:", "Mood" => "Mood:", "StyleName" => "Style:", "TitlePack" => "TitlePack:", "RouteName" => "Routes:", "MapType" => "MapType:");
@@ -280,7 +280,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $title = (($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) ? "sm" : "tm");
 
-        $link = "http://" . $title . ".mania-exchange.com/tracks/view/" . ManiaExchange::$mxInfo->TrackID;
+        $link = "https://" . $title . ".mania.exchange/mapshow/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 
@@ -290,7 +290,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $title = (($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) ? "sm" : "tm");
 
-        $link = "http://" . $title . ".mania-exchange.com/awards/add/" . ManiaExchange::$mxInfo->TrackID;
+        $link = "https://" . $title . ".mania.exchange/awards/add/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 
