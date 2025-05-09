@@ -341,7 +341,7 @@ EOT
     }
 
     /**
-     * Cleans the string for manialink or maniascript purposes.
+     * Cleans the string for maniascript purposes.
      *
      * @param string $string The string to clean
      * @param bool $multiline if the string is multiline
