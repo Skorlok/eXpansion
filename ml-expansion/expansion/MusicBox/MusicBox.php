@@ -56,7 +56,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 shuffle($this->songs);
             }
         } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . utf8_encode($e->getMessage()));
+            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . $e->getMessage());
             $this->enabled = false;
         }
 
@@ -77,7 +77,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 shuffle($this->songs);
             }
         } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . utf8_encode($e->getMessage()));
+            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . $e->getMessage());
             $this->enabled = false;
         }
     }

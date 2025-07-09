@@ -16,7 +16,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $chrono = true;
     public $speed_and_distance = true;
     public $personal_best_and_rank = false;
-    public $position = true;
+    public $position = false;
     public $checkpoint_time = true;
     public $chat_avatar = false;
     public $warmup = true;

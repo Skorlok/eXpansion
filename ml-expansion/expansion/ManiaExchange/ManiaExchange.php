@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\ManiaExchange;
 
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -10,6 +11,7 @@ use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 use oliverde8\AsynchronousJobs\Job\Curl;
 use ManiaLive\Utilities\Time;
 
@@ -36,6 +38,7 @@ class ManiaExchange extends ExpPlugin
     private $cmd_random;
     private $cmd_pack;
 
+    /** @var StdClass $mxInfo */
     public static $mxInfo = array();
     public static $mxReplays = array();
     public static $openInfosAction = null;
@@ -50,6 +53,14 @@ class ManiaExchange extends ExpPlugin
         $this->msg_add = eXpGetMessage('#mx#Map $fff%s $z$s#mx# added from MX Succesfully');
         $this->msg_worldRec = eXpGetMessage('#mx#MX World Record: #time#%s#mx# by #variable#%s');
         $this->msg_not_found = eXpGetMessage('#error#Map not found on ManiaExchange');
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("ManiaExchange",
+            array("Maps" => array(null, array(
+                "ManiaExchange" => array(Permission::MAP_ADD_MX, $aH->createAction(array($this, "mxSearch")))
+            )))
+        );
     }
 
     public function eXpOnReady()

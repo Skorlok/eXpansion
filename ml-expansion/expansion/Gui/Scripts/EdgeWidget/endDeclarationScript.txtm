@@ -14,6 +14,8 @@ if (p2.X > 1) {
     edgeR = 200.;
 }
 
+declare Boolean minimizeFirstLoop = False;
 if (edge_isMinimized) {
     Window.RelativePosition.X = edgeR;
+    minimizeFirstLoop = True;
 }

@@ -10,6 +10,7 @@ use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
+use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
 
 class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -48,9 +49,10 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $login = $this->getRecipient();
         $this->connection = Singletons::getInstance()->getDediConnection();
 
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
-
-        $title = (($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) ? "sm" : "tm");
+        /** @var Storage @storage */
+        $storage = Storage::getInstance();
+        /** @var eXpStorage @eXpStorage */
+        $eXpStorage = eXpStorage::getInstance();
 
 
         $frame = new \ManiaLive\Gui\Controls\Frame(183);
@@ -58,7 +60,12 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $frame->setPosY(-5);
         $frame->setLayout(new \ManiaLib\Gui\Layouts\Column());
         foreach (ManiaExchange::$mxReplays as $rec_nb => $rec) {
-            $frame->addComponent(new RecItem($rec_nb, $rec->Username, $rec->ReplayTime));
+            $pass = "";
+            if ($storage->server->password) {
+                $pass = ":" . $storage->server->password;
+            }
+            $link = '$h[https://skorlok.com/r.php?login=' . $storage->serverLogin . $pass . '&tp=' . $eXpStorage->titleId . '&mx=t&replay=' . $rec->ReplayId . ']';
+            $frame->addComponent(new RecItem($rec_nb, $rec->Username, $rec->ReplayTime, $this->handleSpecialChars($link)));
         }
         $this->mainFrame->addComponent($frame);
 
@@ -71,9 +78,9 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $quadImage = new \ManiaLib\Gui\Elements\Quad(60, 37);
         $quadImage->setPosition(-4, 0);
         if (ManiaExchange::$mxInfo->HasScreenshot) {
-            $quadImage->setImage("https://" . $title . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.webp", true); //TODO fix when image is PNG
+            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.webp", true); //TODO fix when image is PNG
         } else {
-            $quadImage->setImage("https://" . $title . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.png", true);
+            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.png", true);
         }
         $this->mainFrame->addComponent($quadImage);
 
@@ -129,7 +136,6 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
 
 
-        $storage = Storage::getInstance();
         $map = ArrayOfObj::getObjbyPropValue($storage->maps, "uId", $storage->currentMap->uId);
         $this->connection = Singletons::getInstance()->getDediConnection();
         $mapPath = $this->connection->getMapsDirectory();
@@ -154,7 +160,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                     $map->modName = $gbxInfo->modName;
                     $map->{"nick"} = $gbxInfo->authorNick;
                 }
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 \ManiaLive\Utilities\Console::println("Info: Map not found or error while reading gbx info for map.");
             }
 
@@ -276,21 +282,19 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function handleButtonVisit($login)
     {
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+        /** @var eXpStorage @eXpStorage */
+        $eXpStorage = eXpStorage::getInstance();
 
-        $title = (($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) ? "sm" : "tm");
-
-        $link = "https://" . $title . ".mania.exchange/mapshow/" . ManiaExchange::$mxInfo->TrackID;
+        $link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapshow/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 
     public function handleButtonAward($login)
     {
-        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+        /** @var eXpStorage @eXpStorage */
+        $eXpStorage = eXpStorage::getInstance();
 
-        $title = (($storage->simpleEnviTitle == \ManiaLivePlugins\eXpansion\Helpers\Storage::TITLE_SIMPLE_SM) ? "sm" : "tm");
-
-        $link = "https://" . $title . ".mania.exchange/awards/add/" . ManiaExchange::$mxInfo->TrackID;
+        $link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/awards/add/" . ManiaExchange::$mxInfo->TrackID;
         $this->connection->sendOpenLink($login, $link, 0);
     }
 

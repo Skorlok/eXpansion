@@ -45,7 +45,7 @@ class SqlFile extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label = new \ManiaLib\Gui\Elements\Label(120, 4);
         $this->label->setAlign('left', 'center');
         $file = explode('/', $filename);
-        $text = utf8_encode(end($file));
+        $text = end($file);
         $text = str_replace(".txt", "", $text);
         $this->label->setText($text);
         $this->label->setScale(0.8);

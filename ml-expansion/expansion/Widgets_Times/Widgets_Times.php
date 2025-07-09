@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Widgets_Times;
 
 use ManiaLive\Event\Dispatcher;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Endurance\Endurance;

@@ -35,11 +35,13 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Widgets\ServerPanel;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\PlayerList;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\ServerList;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -67,6 +69,15 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->setVersion("1.0");
         $this->config = Config::getInstance();
         $this->setPublicMethod("showServerList");
+    }
+
+    public function eXpOnLoad()
+    {
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("ServerNeighborhood",
+            array("Server Neighborhood" => array(null, $aH->createAction(array($this, "showServerList"))))
+        );
     }
 
     public function eXpOnReady()

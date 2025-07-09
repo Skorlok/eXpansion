@@ -98,7 +98,7 @@ class Gui extends ExpPlugin
 
         $this->connection->sendDisplayManialinkPage(null,
 <<<EOT
-<manialink id="GuiChecker" version="2" layer="normal" name="GuiChecker">
+<manialink id="GuiChecker" version="2" layer="scorestable" name="GuiChecker">
 <script><!--
 main () {
     declare persistent Boolean exp_isWidgetsHidden = False;
@@ -130,7 +130,7 @@ main () {
             if (InputPlayer != Null) {
                 declare Real Speed = InputPlayer.Speed*3.6;
         
-                if ((Speed < 10.0 && Speed > -10.0) || InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished) {
+                if ((Speed < 10.0 && Speed > -10.0) || (InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished || PageIsVisible)) {
                     if (lastValue == True) {
                         edge_isMinimized = False;
                         lastValue = False;
@@ -141,7 +141,7 @@ main () {
                     }
                 }
         
-                if ((Speed > 10.0 || Speed < -10.0) && InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished) {
+                if ((Speed > 10.0 || Speed < -10.0) && (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished && !PageIsVisible)) {
                     if (lastValue == False) {
                         edge_isMinimized = True;
                         lastValue = True;

@@ -3,11 +3,13 @@
 namespace ManiaLivePlugins\eXpansion\Faq;
 
 use DirectoryIterator;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Faq\Gui\Windows\FaqWidget;
 use ManiaLivePlugins\eXpansion\Faq\Gui\Windows\FaqWindow;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 class Faq extends ExpPlugin
 {
@@ -22,6 +24,12 @@ class Faq extends ExpPlugin
         $this->msg_admin_redirect = eXpGetMessage('Notice: a help page is displayed by an admin!');
         $this->msg_admin_info = eXpGetMessage('Notice: Displaying a help page "%1$s" to "%2$s"');
         $this->setPublicMethod("showFaq");
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Faq",
+            array("Help" => array(null, $aH->createAction(array($this, "showFaq"))))
+        );
 
         $langs = new DirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . "Topics");
 

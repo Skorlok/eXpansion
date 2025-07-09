@@ -2,6 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Statistics;
 
+use ManiaLive\Gui\ActionHandler;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
+
 class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
@@ -11,11 +14,21 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database"));
     }
 
+    public function eXpOnLoad()
+    {
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Statistics",
+            array("Statistics" => array(null, $aH->createAction(array($this, "showTopWinners"))))
+        );
+    }
+
     public function eXpOnReady()
     {
         parent::eXpOnReady();
         $this->enableDatabase();
-        $aHandler = \ManiaLive\Gui\ActionHandler::getInstance();
+        /** @var ActionHandler $aHandler */
+        $aHandler = ActionHandler::getInstance();
 
         $menu = new Gui\Controls\Menu();
         $menu->setSize(70, 100);

@@ -11,9 +11,9 @@ class Widget extends ManiaLink
     protected $userScript;
     protected $widgetScript;
     protected $scripts;
-    protected $dicoMessages;
     protected $eXpWidgetScript;
     protected $axisDisabled;
+    protected $size;
 
     public function __construct($path)
     {
@@ -23,12 +23,27 @@ class Widget extends ManiaLink
 
         $this->userScript = array();
         $this->scripts = array('declarationScript' => "", 'whileLoopScript' => "", 'libScript' => "", 'endDeclarationScript' => "");
-        $this->dicoMessages = array();
         $this->axisDisabled = "";
 
         $this->eXpWidgetScript = new Script("Gui\Scripts\\templateWidgetScript");
         $this->eXpWidgetScript->setParam('disablePersonalHud', guiConfig::getInstance()->disablePersonalHud ? 'True' : 'False');
         $this->registerScript($this->eXpWidgetScript);
+        $this->size = array(0, 0);
+    }
+
+    public function getSizeX()
+    {
+        return $this->size[0];
+    }
+
+    public function getSizeY()
+    {
+        return $this->size[1];
+    }
+
+    public function setSize($x, $y)
+    {
+        $this->size = array($x, $y);
     }
 
     public function setDisableAxis($axis)

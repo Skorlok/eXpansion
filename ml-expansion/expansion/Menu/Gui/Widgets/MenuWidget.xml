@@ -1,0 +1,5 @@
+<frame id="Menu">
+    <frame>
+        <?php echo $this->getParam('menuItems') ?>
+    </frame>
+</frame>

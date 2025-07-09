@@ -1,3 +1,8 @@
+if (minimizeFirstLoop) {
+    Window.RelativePosition.X = p2.X + diff;
+    minimizeFirstLoop = False;
+}
+
 foreach (Event in PendingEvents) {
     if (Event.Type == CMlEvent::Type::MouseClick && ( Event.ControlId == "minimizeButton" || Event.ControlId == "mQuad_2" )) {
 		if (eXp_lastClockUpdate != Now) {

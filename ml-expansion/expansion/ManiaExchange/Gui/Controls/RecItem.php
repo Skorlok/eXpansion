@@ -9,7 +9,7 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
     protected $bg;
 
-    public function __construct($indexNumber, $name, $score) {
+    public function __construct($indexNumber, $name, $score, $link) {
         $this->sizeY = 3.5;
         $this->bg = new ListBackGround($indexNumber, 42, 3.5);
         $this->addComponent($this->bg);
@@ -18,7 +18,7 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $xml->setContent('<frame>
         <label sizen="10 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . ($indexNumber + 1) . '."/>
         <label posn="6 0 1.0" sizen="30 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $name . '"/>
-        <label posn="28 0 1.0" sizen="15 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . Time::fromTM($score) . '"/>
+        <label posn="28 0 1.0" sizen="15 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $link . Time::fromTM($score) . '"/>
         </frame>');
         $this->addComponent($xml);
     }

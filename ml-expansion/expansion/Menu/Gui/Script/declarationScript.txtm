@@ -3,17 +3,11 @@ declare CMlFrame Menu <=> (Page.GetFirstChild("Menu") as CMlFrame);
 Menu.Hide(); // reduce flicker on refresh
 
 declare Boolean toggleSubmenu = False;
-declare persistent Boolean[Text][Text] EXP_widgetVisible;
 
-declare Text id = "<?php echo $this->name ?>";
-declare Text gameMode = "<?php echo $this->gameMode; ?>";
-declare Boolean forceReset = <?php echo $this->forceReset ?>;
 declare Integer itemCount = <?php echo $this->itemCount ?>;
 
 declare Boolean eXp_mouseRightState = False;
 declare eXp_mouseRightTime = 0;
-declare eXp_tabPressed = False;
-declare eXp_tabTime = 0;
 
 declare Boolean eXp_mouseMiddleState = False;
 declare eXp_mouseMiddleTime = 0;
@@ -21,21 +15,12 @@ declare lastMousePos = <0., 0.>;
 declare hideStamp = 0;
 declare showStamp = 0;
 
-declare Boolean firstClick = False;
 declare Boolean exp_enableHudMove for UI = False;
 declare Boolean exp_needToCheckPersistentVars for UI = False;
 declare Boolean showStatus = False;
 declare Boolean needUpdate = True;
 declare Boolean needHidden = False;
 declare Text lastItem = "";
-
-if (!EXP_widgetVisible.existskey(id) || forceReset) {
-	EXP_widgetVisible[id] = Boolean[Text];
-}
-
-if (!EXP_widgetVisible[id].existskey(gameMode)) {
-	EXP_widgetVisible[id][gameMode] = True;
-}
 
 Menu.RelativePosition.Z = 30.0;
 

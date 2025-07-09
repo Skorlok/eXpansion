@@ -17,6 +17,7 @@ use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Records;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Sector;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\TopSumsWindow;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -267,6 +268,16 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", "records_save");
         $cmd->setHelp("Deletes all records by login");
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("LocalRecords",
+            array("Records" => array(null, array(
+                "Local" => array(null, $aH->createAction(array($this, "showRecsWindow"))),
+                "Hall of Fame" => array(null, $aH->createAction(array($this, "showTopSums"))),
+                "Server Ranks" => array(null, $aH->createAction(array($this, "showRanksWindow")))
+            )))
+        );
 
         //$this->previewRecordMessages();
     }

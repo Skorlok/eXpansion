@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Gui\ManiaLink;
 
 use ManiaLive\Data\Storage;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
@@ -17,10 +18,10 @@ class ManiaLink extends Singletons
     protected $name;
     protected $layer;
     protected $position;
-    protected $size;
 
     protected $xml;
     protected $scripts;
+    protected $widgetScript;
     protected $dicoMessages;
 
     /** @var \ManiaLive\Data\Storage\Storage $storage */
@@ -36,6 +37,7 @@ class ManiaLink extends Singletons
 
         $this->relPath = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . $path;
         $this->maniaLinkPath = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "Gui\ManiaLink\Head.xml";
+        $this->widgetScript = new Script("Gui\Scripts\PlainManialinkScript");
         $this->storage = Storage::getInstance();
         $this->eXpStorage = eXpStorage::getInstance();
         $this->connection = $this->getDediConnection();
@@ -43,7 +45,6 @@ class ManiaLink extends Singletons
         $this->name = "";
         $this->layer = "normal";
         $this->position = array(0, 0, 0);
-        $this->size = array(0, 0);
         $this->dicoMessages = array();
     }
 
@@ -74,16 +75,6 @@ class ManiaLink extends Singletons
         return $this->position[2];
     }
 
-    public function getSizeX()
-    {
-        return $this->size[0];
-    }
-
-    public function getSizeY()
-    {
-        return $this->size[1];
-    }
-
     public function getLayer()
     {
         if (strtolower($this->layer == "scorestable")) {
@@ -108,11 +99,6 @@ class ManiaLink extends Singletons
     public function setPosition($x, $y, $z)
     {
         $this->position = array($x, $y, $z);
-    }
-
-    public function setSize($x, $y)
-    {
-        $this->size = array($x, $y);
     }
 
     public function setScripts($scripts)
@@ -166,6 +152,14 @@ class ManiaLink extends Singletons
         return "False";
     }
 
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<'), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;'), $string);
+    }
+
     /**
      * @return string The code of the widget
      */
@@ -208,7 +202,11 @@ class ManiaLink extends Singletons
     }
 
     protected function getMlScripts() {
-        return $this->scripts;
+        $this->widgetScript->setParam("dDeclares", $this->scripts->getDeclarationScript($this, false) . $this->scripts->getEndScript($this, false));
+        $this->widgetScript->setParam("scriptLib", $this->scripts->getlibScript($this, false));
+        $this->widgetScript->setParam("wLoop", $this->scripts->getWhileLoopScript($this, false));
+
+        return $this->widgetScript->getDeclarationScript(false, false);
     }
 
     protected function getLanguages() {
@@ -238,12 +236,26 @@ class ManiaLink extends Singletons
     {
         $this->getUserXML();
         $xml = $this->getWidget();
-        /*echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);*/
+        if ($this->name == "XXX") {
+            echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);
+        }
         if ($login !== null) {
             try {
                 $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, false); // fix the bug where player leave so method return `login unknown`
             } catch (\Exception $e) {
-                Helper::log("Cannot send widget to player, server said: " . $e->getMessage(), array("Gui", "ManiaLink"));
+                if (is_array($login)) {
+                    Helper::log('Cannot send widget: "' . $this->name . '" to players, retrying each login individually, server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+
+                    foreach ($login as $l) {
+                        try {
+                            $this->connection->sendDisplayManialinkPage($l, $xml, 0, false, false);
+                        } catch (\Exception $e2) {
+                            Helper::log('Cannot send widget: "' . $this->name . '" to player: "' . $l . '" , server said: ' . $e2->getMessage(), array("Gui", "ManiaLink"));
+                        }
+                    }
+                } else {
+                    Helper::log('Cannot send widget: "' . $this->name . '" to player: "' . $login . '" , server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+                }
             }
         } else {
             $this->connection->sendDisplayManialinkPage(null, $xml, 0, false, true);

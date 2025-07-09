@@ -2,14 +2,17 @@
 
 namespace ManiaLivePlugins\eXpansion\Votes;
 
-use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLive\Gui\ActionHandler;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Widgets\VoteManagerWidget;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
-use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use ManiaLive\Event\Dispatcher;
-use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+
 
 class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -89,6 +92,21 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = AdminGroups::addAdminCommand('passvote', $this, 'passVote', 'pass_vote');
         $cmd->setHelp('Pass current running vote');
         AdminGroups::addAlias($cmd, "passv");
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Votes",
+            array("Vote" => array(null, array(
+                "Skip" => array(null, $aH->createAction(array($this, "vote_Skip"))),
+                "Res" => array(null, $aH->createAction(array($this, "vote_Restart"))),
+                "Extend Time" => array(null, $aH->createAction(array($this, "vote_Extend"))),
+                "End Round" => array(null, $aH->createAction(array($this, "vote_EndRound"))),
+                "Balance Teams" => array(null, $aH->createAction(array($this, "vote_balance"))),
+                "Config..." => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "showVotesConfig"))),
+                '$f00Cancel' => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "cancelVote"))),
+                '$0c0Pass' => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "passVote")))
+            )))
+        );
     }
 
     public function eXpOnReady()

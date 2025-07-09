@@ -5,14 +5,12 @@ namespace ManiaLivePlugins\eXpansion\Maps;
 use Exception;
 use ManiaLib\Utils\Formatting;
 use ManiaLive\Gui\ActionHandler;
-use ManiaLive\Gui\Window;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Donate\Config as Donate;
-use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
@@ -24,6 +22,7 @@ use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\MapInfo;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapSortMode;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapWish;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapInfos;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\Map;
 
@@ -112,6 +111,18 @@ class Maps extends ExpPlugin
         $this->msg_skipleft = eXpGetMessage('#queue#Skipping map #variable#%1$s #queue#, because #variable#%2$s #queue#left'); // '%1$s' = Map Name, '%2$s' = requester nickname
         $this->enableDedicatedEvents();
         $this->enableDatabase();
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Maps",
+            array("Maps" => array(null, array(
+                "Show Maps" => array(null, $aH->createAction(array($this, "showMapList"))),
+                "Show Jukebox" => array(null, $aH->createAction(array($this, "showJukeList"))),
+                "Add Local Maps" => array(Permission::MAP_ADD_LOCAL, $aH->createAction(array($this, "addMaps"))),
+                '$f00Remove this' => array(Permission::MAP_REMOVE_MAP, $aH->createAction(array($this, "chat_removeMap"))),
+                '$f00Trash this' => array(Permission::MAP_REMOVE_MAP, $aH->createAction(array($this, "chat_eraseMap")))
+            )))
+        );
     }
 
     public function eXpOnReady()
@@ -378,8 +389,8 @@ class Maps extends ExpPlugin
             $widget->setPosition($this->config->nextMapWidget_PosX, $this->config->nextMapWidget_PosY, 0);
             $widget->setSize(60, 15);
             $widget->setParam("action", $this->actionShowJukeList);
-            $widget->setParam("nickname", Gui::fixString2($gbxInfo->authorNick));
-            $widget->setParam("mapname", Gui::fixString2($gbxInfo->name));
+            $widget->setParam("nickname", $widget->handleSpecialChars($gbxInfo->authorNick));
+            $widget->setParam("mapname", $widget->handleSpecialChars($gbxInfo->name));
             $widget->setParam("country", $country);
             $widget->setParam("environment", $gbxInfo->envir);
             $widget->show(null, true);

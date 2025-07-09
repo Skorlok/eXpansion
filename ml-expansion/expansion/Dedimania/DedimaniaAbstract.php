@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Dedimania;
 
 use ManiaLive\Application\ErrorHandling;
 use ManiaLive\Event\Dispatcher;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\Core;
@@ -14,6 +15,7 @@ use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 /**
  * Description of DedimaniaAbstract
@@ -93,6 +95,14 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->msg_new = eXpGetMessage('%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s');
         $this->msg_improved = eXpGetMessage('%1$s #dedirecord#improves #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
         $this->msg_secure = eXpGetMessage('%1$s #dedirecord#secures #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Dedimania",
+            array("Records" => array(null, array(
+                "Dedimania" => array(null, $aH->createAction(array($this, "showRecs")))
+            )))
+        );
     }
 
     public function eXpOnReady()

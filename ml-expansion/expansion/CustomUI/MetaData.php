@@ -85,7 +85,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
 		$var = new Boolean("position", "position", $config, false, false);
-        $var->setDefaultValue(true);
+        $var->setDefaultValue(false);
         $var->setGroup("TM Visibility");
         $this->registerVariable($var);
 		

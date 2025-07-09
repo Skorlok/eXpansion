@@ -17,6 +17,8 @@
 
 namespace ManiaLivePlugins\eXpansion\AutoQueue;
 
+use ManiaLive\DedicatedApi\Callback\Event;
+use ManiaLive\Event\Dispatcher;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
@@ -53,6 +55,8 @@ class AutoQueue extends ExpPlugin
         $this->enableDedicatedEvents();
         $this->enableStorageEvents();
         $this->enableTickerEvent();
+        $this->disableDedicatedEvents(Event::ON_BEGIN_MAP);
+        Dispatcher::register(Event::getClass(), $this, Event::ON_BEGIN_MAP, 20); // Ensure players can join queue before the match starts, avoid staring with seconds late
 
         $this->queue = new Queue();
 
@@ -160,6 +164,7 @@ class AutoQueue extends ExpPlugin
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         $this->canUnqueue = true;
+        $this->onTick(); // Force check queue on map start to avoid players starting later than the match
     }
 
     public function onBeginMatch()

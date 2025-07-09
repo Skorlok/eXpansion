@@ -2,6 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Donate;
 
+use ManiaLive\Gui\ActionHandler;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
+
 class Donate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
@@ -24,6 +27,20 @@ class Donate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = $this->registerChatCommand("donate", "donate", 2, true);
         $cmd = $this->registerChatCommand("donate", "donate", 1, true);
         $cmd->help = '/donate X where X is ammount of Planets';
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        Menu::addMenuItem("Donate",
+            array("Donate" => array(null, array(
+                "Donate 20 planets" => array(null, $aH->createAction(array($this, "donate"), "20")),
+                "Donate 50 planets" => array(null, $aH->createAction(array($this, "donate"), "50")),
+                "Donate 100 planets" => array(null, $aH->createAction(array($this, "donate"), "100")),
+                "Donate 250 planets" => array(null, $aH->createAction(array($this, "donate"), "250")),
+                "Donate 500 planets" => array(null, $aH->createAction(array($this, "donate"), "500")),
+                "Donate 1000 planets" => array(null, $aH->createAction(array($this, "donate"), "1000")),
+                "Donate 2000 planets" => array(null, $aH->createAction(array($this, "donate"), "2000"))
+            )))
+        );
     }
 
     /**
