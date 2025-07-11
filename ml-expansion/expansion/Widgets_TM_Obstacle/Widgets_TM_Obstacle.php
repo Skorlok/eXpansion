@@ -19,6 +19,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_TM_Obstacle;
 
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 /**
  * Description of Widgets_CheckpointProgress
  *
@@ -28,21 +31,36 @@ class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
 {
 
     private $config;
+    private $widget;
+    private $script;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
+
+        $this->script = new Script("Widgets_TM_Obstacle\Gui\Scripts_Infos");
+        $this->script->setParam("playerCount", 10);
+        $this->script->setParam("serverLogin", $this->storage->serverLogin);
+
+        $this->widget = new Widget("Widgets_TM_Obstacle\Gui\Widgets\CpProgress.xml");
+        $this->widget->setName("Obstacle progress Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(70, 60);
+        $this->widget->registerScript($this->script);
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+
+
         $this->displayWidget();
     }
 
     private function displayWidget()
     {
-        Gui\Widgets\CpProgress::EraseAll();
-        $info = Gui\Widgets\CpProgress::Create(null);
-        $info->setPosition($this->config->obstaclePanel_PosX, $this->config->obstaclePanel_PosY);
-        $info->setSize(70, 60);
-        $info->show();
+        $this->script->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
+        $this->widget->setPosition($this->config->obstaclePanel_PosX, $this->config->obstaclePanel_PosY, 0);
+        $this->widget->show(null, true);
     }
 
     public function onBeginMatch()
@@ -55,11 +73,13 @@ class Widgets_TM_Obstacle extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
         if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        Gui\Widgets\CpProgress::EraseAll();
+        $this->widget->erase();
     }
 
     public function eXpOnUnload()
     {
-        Gui\Widgets\CpProgress::EraseAll();
+        $this->widget->erase();
+        $this->widget = null;
+        $this->script = null;
     }
 }

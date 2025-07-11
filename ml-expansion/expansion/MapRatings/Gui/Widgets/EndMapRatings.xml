@@ -1,0 +1,21 @@
+<frame posn="0 0 2.0">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(90, 24.75); ?>
+</frame>
+<frame posn="0 0 3.0">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(90, 4, $this->addLang("Did you like the map ?")); ?>
+</frame>
+<label posn="45 -6 6.0" sizen="80 9" halign="center" valign="top" style="TextCardSmallScores2" textsize="3" textemboss="1" text="<?php echo $this->getParam('mapName')  ?>"/>
+<frame posn="27 -16 7.0">
+    <frame>
+        <frame>
+            <quad id="button_0" posn="-2 -0.75 0" sizen="19 8" halign="left" valign="center2" bgcolor="0000" scriptevents="1" class="rateButton"/>
+            <quad id="rate_0" posn="1 0 1.0" sizen="10 10" halign="center" valign="center" style="Icons64x64_1" substyle="StateSuggested" class="rateButton" rot="180"/>
+            <label id="label_0" posn="6 -1 2.0" sizen="16 6" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang("No") ?>"/>
+        </frame>
+        <frame posn="26 0 0">
+            <quad id="button_5" posn="-2 -0.75 0" sizen="19 8" halign="left" valign="center2" bgcolor="0000" scriptevents="1" class="rateButton"/>
+            <quad id="rate_5" posn="1 0 1.0" sizen="10 10" halign="center" valign="center" style="Icons64x64_1" substyle="StateSuggested" class="rateButton"/>
+            <label id="label_5" posn="6 -1 2.0" sizen="16 6" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang("Yes") ?>"/>
+        </frame>
+    </frame>
+</frame>

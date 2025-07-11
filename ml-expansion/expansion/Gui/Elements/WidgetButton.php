@@ -2,102 +2,21 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-class WidgetButton extends \ManiaLivePlugins\eXpansion\Gui\Control
+class WidgetButton
 {
-
-    protected $button;
-
-    protected $quad;
-
-    protected $text;
-
-    protected $value;
-
-    protected $isActive = false;
-
-    /**
-     * Button
-     *
-     * @param int $sizeX = 24
-     * @param int $sizeY = 6
-     */
-    public function __construct($sizeX = 12, $sizeY = 12)
+    public static function getXML($sizeX, $sizeY, Array $text, $action = null)
     {
-        $this->quad = new WidgetBackGround($sizeX, $sizeY);
-        $this->quad->setAlign('center', 'top');
-        $this->addComponent($this->quad);
+        $xml = '<frame posn="-5 0 -1">';
+        $xml .= \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML($sizeX, $sizeY);
+        $xml .= '</frame>';
+        $xml .= '<quad posn="0 0 1" sizen="'. $sizeX . ' ' . $sizeY . '" halign="center" valign="top" bgcolor="0000" bgcolorfocus="fff6" ' . ($action ? 'action="' . $action . '"' : '') . ' scriptevents="1"/>';
 
-        $this->button = new \ManiaLib\Gui\Elements\Quad($sizeX, $sizeY);
-        $this->button->setAlign('center', 'top');
-        $this->button->setBgcolor("0000");
-        $this->button->setBgcolorFocus("fff6");
-        $this->button->setScriptEvents();
-        $this->addComponent($this->button);
-
-        $this->sizeX = $sizeX;
-        $this->sizeY = $sizeY;
-        $this->setSize($sizeX, $sizeY);
-    }
-
-    protected function onResize($oldX, $oldY)
-    {
-        $this->quad->setSize($this->sizeX, $this->sizeY);
-        $this->quad->setPosZ($this->posZ - 1);
-    }
-
-    public function getText()
-    {
-        return $this->text;
-    }
-
-    public function setText($text)
-    {
-        if (is_array($text)) {
-            $y = 0.5;
-            foreach ($text as $row) {
-                $label = new DicoLabel($this->sizeX - 2, 3);
-                $label->setAlign('center', 'center2');
-                $label->setTextSize(1);
-                $label->setPosY(-($y * 3.2));
-                $label->setText($row);
-                $this->addComponent($label);
-                $this->text .= $row . " ";
-                $y++;
-            }
-            $this->text = rtrim($this->text);
-        } else {
-            $label = new DicoLabel($this->sizeX - 2, 2);
-            $label->setAlign('center', 'center');
-            $label->setStyle("TextValueMedium");
-            $label->setTextSize(1);
-            $label->setText($text);
-            $this->addComponent($label);
-            $this->text = $text;
+        $y = 0.5;
+        foreach ($text as $row) {
+            $xml .= '<label posn="0 ' . -($y * 3.2) . ' 2.0E-5" sizen="' . $sizeX - 2 . ' 3" halign="center" valign="center2" style="TextStaticSmall" textsize="1" textid="' . $row . '"/>';
+            $y++;
         }
-    }
 
-    public function setManialink($url)
-    {
-        $this->button->setManialink($url);
-    }
-
-    public function setActive($bool = true)
-    {
-        $this->isActive = $bool;
-    }
-
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    public function setValue($text)
-    {
-        $this->value = $text;
-    }
-
-    public function setAction($action)
-    {
-        $this->button->setAction($action);
+        return $xml;
     }
 }

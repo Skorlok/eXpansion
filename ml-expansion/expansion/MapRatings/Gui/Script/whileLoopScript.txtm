@@ -1,5 +1,4 @@
 foreach (Event in PendingEvents) {
-    
     if (Event.Type == CMlEvent::Type::MouseOver) {
          if (Event.ControlId == "button_0") {
             declare CMlQuad quad <=> (Page.GetFirstChild("rate_0") as CMlQuad);            
@@ -14,17 +13,6 @@ foreach (Event in PendingEvents) {
             label.RelativeScale = 1.5;
             quad.RelativeScale = 1.5;
         }
-
-    }
-
-    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F5") {
-        TriggerPageAction(rate_5);
-	    Window.Hide();
-    }
-
-    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F6") {
-        TriggerPageAction(rate_0);
-	    Window.Hide();
     }
     
     if (Event.Type == CMlEvent::Type::MouseOut) {
@@ -39,16 +27,16 @@ foreach (Event in PendingEvents) {
             label.RelativeScale = 1.0;
             label2.RelativeScale = 1.0;
         }
-    } 
+    }
 
     if (Event.Type == CMlEvent::Type::MouseClick) {    
-	if (Event.ControlId == "button_0") {	
-	    TriggerPageAction(rate_0);
-	    Window.Hide();
-	}    	
-	if (Event.ControlId == "button_5") {	
-	    TriggerPageAction(rate_5);
-	    Window.Hide();
-	}    
+        if (Event.ControlId == "button_0") {	
+            TriggerPageAction(rate_0);
+            Window.Hide();
+        }
+        if (Event.ControlId == "button_5") {	
+            TriggerPageAction(rate_5);
+            Window.Hide();
+        }
     }
 }

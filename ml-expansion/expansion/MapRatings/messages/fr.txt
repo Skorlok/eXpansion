@@ -19,11 +19,11 @@ votes
 Map Rating
 Note de la carte
 
-No (F6)
-Non (F6)
+No
+Non
 
-Yes (F5)
-Oui (F5)
+Yes
+Oui
 
 Did you like the map ?
 Avez-vous aimé le circuit?

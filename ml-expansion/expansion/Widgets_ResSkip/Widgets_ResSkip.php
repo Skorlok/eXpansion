@@ -6,7 +6,8 @@ use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Donate\Config as DonateConfig;
-use ManiaLivePlugins\eXpansion\Widgets_ResSkip\Gui\Widgets\ResSkipButtons;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_ResSkip extends ExpPlugin
@@ -36,6 +37,8 @@ class Widgets_ResSkip extends ExpPlugin
 
     private $actions = array();
 
+    private $widget;
+
     public function eXpOnLoad()
     {
         $this->msg_resOnProgress = eXpGetMessage("The restart of this track is in progress!");
@@ -60,7 +63,7 @@ class Widgets_ResSkip extends ExpPlugin
         $this->actions['skip'] = ActionHandler::getInstance()->createAction(array($this, "skipMap"));
         $this->actions['res'] = ActionHandler::getInstance()->createAction(array($this, "restartMap"));
 
-        $this->showResSkip(null);
+        $this->showResSkip();
     }
 
     public function isPublicResIsActive()
@@ -73,49 +76,40 @@ class Widgets_ResSkip extends ExpPlugin
         return !(empty($this->config->publicSkipAmount) || $this->config->publicSkipAmount[0] == -1);
     }
 
-    public function showResSkip($login)
+    public function showResSkip()
     {
         if ($this->expStorage->isRelay) {
             return;
         }
 
+        $skipAmount = null;
+        $resAmount = null;
+        if (isset($this->config->publicSkipAmount[$this->skipCount]) && $this->config->publicSkipAmount[$this->skipCount] > 0) {
+            $skipAmount = $this->config->publicSkipAmount[$this->skipCount];
+        }
 
-        $widget = ResSkipButtons::Create(null, true);
+        if (isset($this->config->publicResAmount[$this->resCount]) && $this->config->publicResAmount[$this->resCount] > 0) {
+            $resAmount = $this->config->publicResAmount[$this->resCount];
+        }
+
+
+        $this->widget = new Widget("Widgets_ResSkip\Gui\Widgets\ResSkipButtons.xml");
+        $this->widget->setName("Skip and Res Buttons");
+        $this->widget->setLayer("normal");
         if ($this->expStorage->simpleEnviTitle == "SM") {
-            $widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania);
+            $this->widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania, 0);
         } else {
-            $widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY);
+            $this->widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY, 0);
         }
-        
-        $widget->setActions($this->actions['res'], $this->actions['skip']);
-        $widget->setSize(32.0, 10.0);
-
-
-        $nbSkips = isset($this->skipCount[$login]) ? $this->skipCount[$login] : 0;
-
-        if (isset($this->config->publicSkipAmount[$nbSkips]) && $this->config->publicSkipAmount[$nbSkips] > 0) {
-            $widget->setSkipAmount($this->config->publicSkipAmount[$nbSkips]);
-        } else {
-            $widget->setSkipAmount("max");
+        $this->widget->setSize(20, 10);
+        $this->widget->setParam("resAmount", $resAmount);
+        $this->widget->setParam("skipAmount", $skipAmount);
+        $this->widget->setParam("resAction", ($resAmount != null ? $this->actions['res'] : null));
+        $this->widget->setParam("skipAction", ($skipAmount != null ? $this->actions['skip'] : null));
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
-
-        if (isset($this->config->publicResAmount[$this->resCount])
-            && $this->config->publicResAmount[$this->resCount] > 0
-        ) {
-            $widget->setResAmount($this->config->publicResAmount[$this->resCount]);
-        } else {
-            $widget->setResAmount("max");
-        }
-
-        $widget->show();
-    }
-
-    public function onPlayerDisconnect($login, $disconnectionReason = null)
-    {
-        if (isset($this->skipCount[$login])) {
-            unset($this->skipCount[$login]);
-        }
-        ResSkipButtons::Erase($login);
+        $this->widget->show(null, true);
     }
 
     public function restartMap($login)
@@ -124,10 +118,7 @@ class Widgets_ResSkip extends ExpPlugin
         if ($this->resActive) {
             //Already restarted no need to do
             $this->eXpChatSendServerMessage($this->msg_resOnProgress, $login);
-        } elseif (isset($this->config->publicResAmount[$this->resCount])
-            && $this->config->publicResAmount[$this->resCount] != -1
-            && $this->resCount < count($this->config->publicResAmount)
-        ) {
+        } elseif (isset($this->config->publicResAmount[$this->resCount]) && $this->config->publicResAmount[$this->resCount] != -1 && $this->resCount < count($this->config->publicResAmount)) {
             $amount = $this->config->publicResAmount[$this->resCount];
             $this->resActive = true;
 
@@ -137,13 +128,7 @@ class Widgets_ResSkip extends ExpPlugin
                 $toLogin = $this->storage->serverLogin;
             }
 
-            $bill = $this->eXpStartBill(
-                $login,
-                $toLogin,
-                $amount,
-                __("Are you sure you want to restart this map", $login),
-                array($this, 'publicRestartMap')
-            );
+            $bill = $this->eXpStartBill($login, $toLogin, $amount, __("Are you sure you want to restart this map", $login), array($this, 'publicRestartMap'));
             $bill->setSubject('map_restart');
             $bill->setErrorCallback(5, array($this, 'failRestartMap'));
             $bill->setErrorCallback(6, array($this, 'failRestartMap'));
@@ -184,13 +169,8 @@ class Widgets_ResSkip extends ExpPlugin
 
     public function skipMap($login)
     {
-        $nbSkips = isset($this->skipCount[$login]) ? $this->skipCount[$login] : 0;
-
-        if (isset($this->config->publicSkipAmount[$nbSkips])
-            && $this->config->publicSkipAmount[$nbSkips]
-            != -1 && $nbSkips < count($this->config->publicSkipAmount)
-        ) {
-            $amount = $this->config->publicSkipAmount[$nbSkips];
+        if (isset($this->config->publicSkipAmount[$this->skipCount]) && $this->config->publicSkipAmount[$this->skipCount] != -1 && $this->skipCount < count($this->config->publicSkipAmount)) {
+            $amount = $this->config->publicSkipAmount[$this->skipCount];
 
             if (!empty($this->donateConfig->toLogin)) {
                 $toLogin = $this->donateConfig->toLogin;
@@ -198,13 +178,7 @@ class Widgets_ResSkip extends ExpPlugin
                 $toLogin = $this->storage->serverLogin;
             }
 
-            $bill = $this->eXpStartBill(
-                $login,
-                $toLogin,
-                $amount,
-                __("Are you sure you want to skip this map", $login),
-                array($this, 'publicSkipMap')
-            );
+            $bill = $this->eXpStartBill($login, $toLogin, $amount, __("Are you sure you want to skip this map", $login), array($this, 'publicSkipMap'));
             $bill->setSubject('map_skip');
         } else {
             if (empty($this->config->publicSkipAmount) || $this->config->publicSkipAmount[0] == -1) {
@@ -226,7 +200,7 @@ class Widgets_ResSkip extends ExpPlugin
         $this->resActive = false;
 
         if (!$this->skipActive) {
-            $this->skipCount = array();
+            $this->skipCount = 0;
         }
     }
 
@@ -235,17 +209,18 @@ class Widgets_ResSkip extends ExpPlugin
         if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        ResSkipButtons::EraseAll();
+        $this->widget->erase();
     }
 
     public function onBeginMatch()
     {
         $this->countMapRestart();
-        $this->showResSkip(null);
+        $this->showResSkip();
     }
 
     public function eXpOnUnload()
     {
-        ResSkipButtons::EraseAll();
+        $this->widget->erase();
+        $this->widget = null;
     }
 }

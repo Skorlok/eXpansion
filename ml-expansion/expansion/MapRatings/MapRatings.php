@@ -3,12 +3,13 @@
 namespace ManiaLivePlugins\eXpansion\MapRatings;
 
 use ManiaLive\Gui\ActionHandler;
+use ManiaLib\Utils\Formatting;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use ManiaLivePlugins\eXpansion\MapRatings\Gui\Widgets\EndMapRatings;
-use ManiaLivePlugins\eXpansion\MapRatings\Gui\Widgets\RatingsWidget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\MapRatings\Gui\Windows\MapRatingsManager;
 use ManiaLivePlugins\eXpansion\MapRatings\Structures\PlayerVote;
 use ManiaLivePlugins\eXpansion\MapRatings\Classes\Connection as mxConnection;
@@ -60,13 +61,44 @@ class MapRatings extends ExpPlugin
 
     private $settingsChanged = array();
 
+    private $widget;
+    private $widgetEndMap;
+
+    private $action = null;
+    private $actionEndMap = array(0 => null, 5 => null);
+
     public function eXpOnInit()
     {
-        EndMapRatings::$parentPlugin = $this;
-        \ManiaLivePlugins\eXpansion\MapRatings\Gui\Widgets\RatingsWidget::$parentPlugin = $this;
-        $actionFinal = ActionHandler::getInstance()->createAction(array($this, "autoRemove"));
-        Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($actionFinal);
         $this->config = Config::getInstance();
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        
+        $this->action = $aH->createAction(array($this, "showRatingsManager"));
+        $this->actionEndMap[0] = $aH->createAction(array($this, "saveRating"), 0);
+        $this->actionEndMap[5] = $aH->createAction(array($this, "saveRating"), 5);
+
+        $actionFinal = $aH->createAction(array($this, "autoRemove"));
+        Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($actionFinal);
+
+        $this->widget = new Widget("MapRatings\Gui\Widgets\RatingsWidget.xml");
+        $this->widget->setName("Map Ratings Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(34, 10);
+        $this->widget->setParam("action", $this->action);
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+
+        $this->widgetEndMap = new Widget("MapRatings\Gui\Widgets\EndMapRatings.xml");
+        $this->widgetEndMap->setName("Map ratings (endmap)");
+        $this->widgetEndMap->setLayer("normal");
+        $this->widgetEndMap->setSize(90, 25);
+
+        $script = new Script("MapRatings\Gui\Script");
+        $script->setParam("rate_" . 0, $this->actionEndMap[0]);
+        $script->setParam("rate_" . 5, $this->actionEndMap[5]);
+        $this->widgetEndMap->registerScript($script);
     }
 
     public function eXpOnLoad()
@@ -138,15 +170,7 @@ class MapRatings extends ExpPlugin
     {
         $this->reload();
 
-        $info = RatingsWidget::Create(null);
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-        } else {
-            $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-        }
-        $info->setSize(34, 12);
-        $info->setRating($this->rating * 20, $this->ratingTotal);
-        $info->show();
+        $this->showWidget();
 
         $this->affectAllRatings();
 
@@ -195,16 +219,39 @@ class MapRatings extends ExpPlugin
                 }
             }
         } else {
-            $info = RatingsWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-            } else {
-                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-            }
-            $info->setSize(34, 12);
-            $info->setRating($this->rating * 20, $this->ratingTotal);
-            $info->show();
+            $this->showWidget();
         }
+    }
+
+    public function showWidget($votes = null, $nbVotes = null)
+    {
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $this->widget->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania, 0);
+        } else {
+            $this->widget->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY, 0);
+        }
+        
+        if ($votes === null) {
+            $votes = $this->rating * 20;
+            $nbVotes = $this->ratingTotal;
+            if ($this->config->mxKarmaEnabled && $this->mxRatings != null) {
+                if ($this->mxRatings->votecount > 0) {
+                    $votes = $this->mxRatings->voteaverage;
+                    $nbVotes = $this->mxRatings->votecount;
+                }
+            }
+        }
+        $this->widget->setParam("rating", $votes);
+        $this->widget->setParam("nbVotes", $nbVotes);
+        
+        $this->widget->show(null, true);
+    }
+
+    public function showEndMapWidget($logins)
+    {
+        $this->widgetEndMap->setPosition($this->config->endMapRating_PosX, $this->config->endMapRating_PosY, 0);
+        $this->widgetEndMap->setParam("mapName", Formatting::stripCodes($this->storage->currentMap->name, "wosn"));
+        $this->widgetEndMap->show($logins);
     }
 
     public function MXKarma_onConnected()
@@ -239,14 +286,7 @@ class MapRatings extends ExpPlugin
                 $this->mx_votes[] = $vote;
             }
 
-            $widget = RatingsWidget::Create();
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $widget->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-            } else {
-                $widget->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-            }
-            $widget->setRating($this->mxRatings->voteaverage, $this->mxRatings->votecount);
-            $widget->show();
+            $this->showWidget();
 
             //send msg
             if ($this->config->sendBeginMapNotices) {
@@ -402,7 +442,7 @@ class MapRatings extends ExpPlugin
 
     public function saveRating($login, $rating)
     {
-        EndMapRatings::Erase($login);
+        $this->widgetEndMap->erase($login);
 
         if ($this->config->karmaRequireFinishes > 0) {
             if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
@@ -449,15 +489,7 @@ class MapRatings extends ExpPlugin
         $this->pendingRatings[$login] = $rating;
 
         if (!$this->config->mxKarmaEnabled) {
-            $info = RatingsWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-            } else {
-                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-            }
-            $info->setSize(34, 12);
-            $info->setRating($this->rating * 20, $this->ratingTotal);
-            $info->show();
+            $this->showWidget();
         }
 
         $this->sendRatingMsg($login, $rating);
@@ -497,14 +529,6 @@ class MapRatings extends ExpPlugin
         $this->mx_votesTemp[$player->login] = new MXVote($player, $vote);
         $this->eXpChatSendServerMessage("Vote registered for MXKarma", $player->login);
 
-        $widget = RatingsWidget::Create();
-
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $widget->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-        } else {
-            $widget->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-        }
-
         $x = 0;
         $avgTempVotes = 0;
         foreach ($this->mx_votesTemp as $vote) {
@@ -516,8 +540,7 @@ class MapRatings extends ExpPlugin
         }
         $newAverage = (($this->mxRatings->voteaverage * $this->mxRatings->votecount) + ($avgTempVotes*$x)) / ($this->mxRatings->votecount+$x);
 
-        $widget->setRating($newAverage, ($this->mxRatings->votecount+$x));
-        $widget->show();
+        $this->showWidget($newAverage, ($this->mxRatings->votecount+$x));
     }
 
     public function getObjbyPropValue(&$array, $prop, $value)
@@ -704,17 +727,9 @@ class MapRatings extends ExpPlugin
 
         $this->reload();
 
-        EndMapRatings::EraseAll();
+        $this->widgetEndMap->erase();
 
-        $info = RatingsWidget::Create(null);
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-        } else {
-            $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-        }
-        $info->setSize(34, 12);
-        $info->setRating($this->rating * 20, $this->ratingTotal);
-        $info->show();
+        $this->showWidget();
 
         //send msg
         if ($this->config->sendBeginMapNotices && !$this->config->mxKarmaEnabled) {
@@ -743,7 +758,7 @@ class MapRatings extends ExpPlugin
             $this->storage->currentMap->mapRating->totalvotes = $this->ratingTotal;
         }
 
-        RatingsWidget::EraseAll();
+        $this->widget->erase();
 
         // MXKarma
         if ($this->config->mxKarmaEnabled) {
@@ -766,18 +781,10 @@ class MapRatings extends ExpPlugin
 
     public function onBeginMatch()
     {
-        EndMapRatings::EraseAll();
+        $this->widgetEndMap->erase();
 
         if (!$this->config->mxKarmaEnabled) {
-            $info = RatingsWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $info->setPosition($this->config->mapRating_PosX_Shootmania, $this->config->mapRating_PosY_Shootmania);
-            } else {
-                $info->setPosition($this->config->mapRating_PosX, $this->config->mapRating_PosY);
-            }
-            $info->setSize(34, 12);
-            $info->setRating($this->rating * 20, $this->ratingTotal);
-            $info->show();
+            $this->showWidget();
         }
     }
 
@@ -837,13 +844,7 @@ class MapRatings extends ExpPlugin
 
 
             if (sizeof($logins) > 0) {
-                \ManiaLive\Gui\Group::Erase("mapratings");
-                $group = \ManiaLive\Gui\Group::Create("mapratings", $logins);
-                EndMapRatings::EraseAll();
-                $widget = EndMapRatings::Create(null);
-                $widget->setPosition($this->config->endMapRating_PosX, $this->config->endMapRating_PosY);
-                $widget->setMap($this->storage->currentMap);
-                $widget->show($group);
+                $this->showEndMapWidget($logins);
             }
         }
     }
@@ -924,8 +925,10 @@ class MapRatings extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        EndMapRatings::EraseAll();
-        RatingsWidget::EraseAll();
+        $this->widgetEndMap->erase();
+        $this->widgetEndMap = null;
+        $this->widget->erase();
+        $this->widget = null;
         MapRatingsManager::EraseAll();
 
         \ManiaLive\Event\Dispatcher::unregister(MXKarmaEvent::getClass(), $this);

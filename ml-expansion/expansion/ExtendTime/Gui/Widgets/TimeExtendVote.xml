@@ -1,0 +1,15 @@
+<label posn="45 -6 2.0" sizen="80 9" halign="center" valign="top" style="TextCardSmallScores2" textsize="3" textemboss="1" textid="<?php echo $this->addLang("Extend Timelimit ?") ?>"/>
+<frame posn="27 -16 3.0">
+    <frame>
+        <frame>
+            <quad id="button_2" posn="-2 -0.75 0" sizen="19 8" halign="left" valign="center2" bgcolor="0000" scriptevents="1" class="rateButton"/>
+            <quad id="rate_2" posn="1 0 1.0E-5" sizen="10 10" halign="center" valign="center" style="Icons64x64_1" substyle="StateSuggested" class="rateButton"/>
+            <label id="label_2" posn="6 -1 2.0E-5" sizen="16 6" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang("Yes (F1)") ?>"/>
+        </frame>
+        <frame posn="26 0 0">
+            <quad id="button_1" posn="-2 -0.75 0" sizen="19 8" halign="left" valign="center2" bgcolor="0000" scriptevents="1" class="rateButton"/>
+            <quad id="rate_1" posn="1 0 1.0E-5" sizen="10 10" halign="center" valign="center" style="Icons64x64_1" substyle="StateSuggested" class="rateButton" rot="180"/>
+            <label id="label_1" posn="6 -1 2.0E-5" sizen="16 6" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang("No (F2)") ?>"/>
+        </frame>
+    </frame>
+</frame>

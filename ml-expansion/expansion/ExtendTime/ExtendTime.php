@@ -2,10 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\ExtendTime;
 
-use ManiaLive\Gui\Window;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\ExtendTime\Gui\Widgets\TimeExtendVote;
-use ManiaLivePlugins\eXpansion\Votes\Votes;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 class ExtendTime extends ExpPlugin
 {
@@ -14,13 +14,37 @@ class ExtendTime extends ExpPlugin
     protected $voters = [];
     protected $config;
     protected $voteCount = 0;
+    protected $widget;
+    protected $actionYes;
+    protected $actionNo;
+    protected $actionCalcVotes;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+
         /** @var Config $config */
         $this->config = Config::getInstance();
-        TimeExtendVote::$parentPlugin = $this;
+
+        /** @var ActionHandler @aH */
+        $ah = ActionHandler::getInstance();
+        $this->actionYes = $ah->createAction(array($this, "vote"), "yes");
+        $this->actionNo = $ah->createAction(array($this, "vote"), "no");
+        $this->actionCalcVotes = $ah->createAction(array($this, "calcVotes"));
+
+        
+        $script = new Script("ExtendTime/Gui/Script");
+        $script->setParam("actionYes", $this->actionYes);
+        $script->setParam("actionNo", $this->actionNo);
+        $script->setParam("calcVotes", $this->actionCalcVotes);
+
+        $this->widget = new Widget("ExtendTime\Gui\Widgets\TimeExtendVote.xml");
+        $this->widget->setName("Extend Timelimit");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(90, 25);
+        $this->widget->registerScript($script);
+
+
         $this->showWidget();
     }
 
@@ -34,7 +58,7 @@ class ExtendTime extends ExpPlugin
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        TimeExtendVote::EraseAll();
+        $this->widget->erase();
     }
 
     public function calcVotes()
@@ -51,7 +75,7 @@ class ExtendTime extends ExpPlugin
             $this->voteCount++;
 
             if ($this->voteCount >= Config::getInstance()->limit_votes && Config::getInstance()->limit_votes != -1) {
-                TimeExtendVote::EraseAll();
+                $this->widget->erase();
             }
         }
 
@@ -67,17 +91,23 @@ class ExtendTime extends ExpPlugin
         }
     }
 
-
     public function showWidget()
     {
-        TimeExtendVote::EraseAll();
-        $widget = TimeExtendVote::Create(null);
-        $widget->setPosition($this->config->extendWidget_PosX, $this->config->extendWidget_PosY);
-        $widget->show();
+        $this->widget->setPosition($this->config->extendWidget_PosX, $this->config->extendWidget_PosY, 0);
+        $this->widget->show(null, true);
     }
 
     public function eXpOnUnload()
     {
-        TimeExtendVote::EraseAll();
+        $this->widget->erase();
+        /** @var ActionHandler @aH */
+        $ah = ActionHandler::getInstance();
+        $ah->deleteAction($this->actionYes);
+        $ah->deleteAction($this->actionNo);
+        $ah->deleteAction($this->actionCalcVotes);
+        $this->votes = [];
+        $this->voters = [];
+        $this->voteCount = 0;
+        $this->config = null;
     }
 }

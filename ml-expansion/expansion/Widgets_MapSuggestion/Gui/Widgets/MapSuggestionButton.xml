@@ -1,0 +1,7 @@
+<frame posn="6 0 0">
+    <frame>
+        <frame posn="0 0 50">
+            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetButton::getXML(10, 10, array($this->addLang('$sWish'), $this->addLang('$sfor'), $this->addLang('$sMap')), $this->getParam('action')); ?>
+        </frame>
+    </frame>
+</frame>

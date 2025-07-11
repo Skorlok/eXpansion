@@ -77,9 +77,3 @@ if (sentEvent == True && isEventSent == False) {
     isEventSent = True;
     TriggerPageAction(actionCalcVotes);
 }
-
-//Label.Value = ""^(CutOffTimeLimit - GameTime + 1);
-//Label.Value = TL::TimeToText(CutOffTimeLimit - GameTime + 1);
-
-// if (CutOffTimeLimit >= GameTime) Label_Countdown.Value = TimeToText(CutOffTimeLimit - GameTime + 1);
-//    else Label_Countdown.Value = TimeToText(0);

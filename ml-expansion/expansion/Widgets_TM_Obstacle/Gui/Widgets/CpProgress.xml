@@ -1,0 +1,16 @@
+<frame>
+<frame>
+
+<?php
+for ($x = 0; $x < 10; $x++) {
+    echo '<frame posn="0 ' . $x*-6 . ' 0">';
+    echo '<label id="player_' . $x . '" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>';
+    echo '<gauge id="gauge_' . $x . '" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>';
+    echo '<label id="cp_' . $x . '" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>';
+    echo '</frame>';
+}
+
+?>
+
+</frame>
+</frame>
