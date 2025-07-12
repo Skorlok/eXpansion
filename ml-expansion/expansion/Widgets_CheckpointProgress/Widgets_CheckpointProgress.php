@@ -19,29 +19,43 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_CheckpointProgress;
 
+use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 /**
  * Description of Widgets_CheckpointProgress
  *
  * @author Petri
  */
-class Widgets_CheckpointProgress extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
+class Widgets_CheckpointProgress extends ExpPlugin
 {
 
     private $config;
+    private $widget;
+    private $script;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
+
+        $this->script = new Script("Widgets_CheckpointProgress\Gui\Scripts_Infos");
+
+        $this->widget = new Widget("Widgets_CheckpointProgress\Gui\Widgets\CpProgress.xml");
+        $this->widget->setName("Checkpoint progress Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(160, 15);
+        $this->widget->registerScript($this->script);
+
         $this->displayWidget();
     }
 
     private function displayWidget()
     {
-        $info = Gui\Widgets\CpProgress::Create(null);
-        $info->setPosition($this->config->checkpointProgressWidget_PosX, $this->config->checkpointProgressWidget_PosY);
-        $info->setSize(160, 15);
-        $info->show();
+        $this->script->setParam("totalCp", $this->storage->currentMap->nbCheckpoints);
+        $this->widget->setPosition($this->config->checkpointProgressWidget_PosX, $this->config->checkpointProgressWidget_PosY, 0);
+        $this->widget->show(null, true);
     }
 
     public function onBeginMatch()
@@ -51,11 +65,13 @@ class Widgets_CheckpointProgress extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        Gui\Widgets\CpProgress::EraseAll();
+        $this->widget->erase();
     }
 
     public function eXpOnUnload()
     {
-        Gui\Widgets\CpProgress::EraseAll();
+        $this->widget->erase();
+        $this->widget = null;
+        $this->script = null;
     }
 }

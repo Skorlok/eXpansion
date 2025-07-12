@@ -29,6 +29,9 @@ class Widgets_Clock extends ExpPlugin
         }
         $this->widget->setSize(16.5, 6);
         $this->widget->registerScript(new Script("Widgets_Clock/Gui/Script"));
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
         $this->widget->show(null, true);
     }
 

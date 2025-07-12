@@ -3,14 +3,18 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Gui\Widgets\BestCpPanel;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
+use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints\Structures\Checkpoint;
 
-class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
+class Widgets_BestCheckpoints extends ExpPlugin
 {
     public $bestCps = array();
     public $finishTimes = array();
     private $config;
+    private $widget;
 
     public function eXpOnReady()
     {
@@ -18,6 +22,11 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
         $this->config = Config::getInstance();
         $this->bestCps = array();
         $this->finishTimes = array();
+
+        $this->widget = new Widget("Widgets_BestCheckpoints\Gui\Widgets\BestCpPanel.xml");
+        $this->widget->setName("Best CheckPoints Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(190, 7);
     }
 
     /**
@@ -27,11 +36,12 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
      */
     public function displayWidget($checkpoints)
     {
-        $info = BestCpPanel::Create(null, true);
-        $info->populateList($checkpoints);
-        $info->setPosition($this->config->bestCpWidget_PosX, $this->config->bestCpWidget_PosY);
-        $info->setSize(190, 7);
-        $info->show();
+        $this->widget->setPosition($this->config->bestCpWidget_PosX, $this->config->bestCpWidget_PosY, 0);
+        $this->widget->setParam("checkpoints", $checkpoints);
+        $this->widget->setParam("cpLimit", Config::getInstance()->CPNumber);
+        $this->widget->setParam("guiConfig", guiConfig::getInstance());
+        $this->widget->setParam("colorParser", ColorParser::getInstance());
+        $this->widget->show(null, true);
     }
 
     public function onBeginMatch()
@@ -42,7 +52,8 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        BestCpPanel::EraseAll();
+        $this->widget->erase();
+
         $this->bestCps = array();
         $this->finishTimes = array();
     }
@@ -83,14 +94,16 @@ class Widgets_BestCheckpoints extends \ManiaLivePlugins\eXpansion\Core\types\Exp
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        BestCpPanel::EraseAll();
+        $this->widget->erase();
+
         $this->bestCps = array();
         $this->finishTimes = array();
     }
 
     public function eXpOnUnload()
     {
-        BestCpPanel::EraseAll();
+        $this->widget->erase();
+        $this->widget = null;
         parent::eXpOnUnload();
     }
 }
