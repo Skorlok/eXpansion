@@ -126,9 +126,15 @@ class Widgets_EndRankings extends ExpPlugin
 
     public function hide()
     {
-        $this->widget1->erase();
-        $this->widget2->erase();
-        $this->widget3->erase();
+        if ($this->widget1 instanceof Widget) {
+            $this->widget1->erase();
+        }
+        if ($this->widget2 instanceof Widget) {
+            $this->widget2->erase();
+        }
+        if ($this->widget3 instanceof Widget) {
+            $this->widget3->erase();
+        }
     }
 
     public function eXpOnUnload()
