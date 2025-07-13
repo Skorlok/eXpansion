@@ -3,23 +3,25 @@
 namespace ManiaLivePlugins\eXpansion\MusicBox;
 
 use Exception;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Helpers\Helper;
-use ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows\CurrentTrackWidget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows\MusicListWindow;
 use ManiaLivePlugins\eXpansion\MusicBox\Structures\Song;
 
 class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
+
     private $config;
     private $songs = array();
     private $enabled = true;
     private $wishes = array();
-    private $nextSong = null;
     private $music = null;
     private $ignore = false;
     private $counter = 0;
+    private $widget;
+    private $action;
 
     /**
      * onLoad()
@@ -31,13 +33,23 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
-        CurrentTrackWidget::$musicBoxPlugin = $this;
         Gui\Windows\MusicListWindow::$musicPlugin = $this;
 
         $command = $this->registerChatCommand("music", "mbox", 0, true);
         $command = $this->registerChatCommand("music", "mbox", 1, true);
         $command = $this->registerChatCommand("mlist", "mbox", 0, true); // xaseco
         $command = $this->registerChatCommand("mlist", "mbox", 1, true); // xaseco
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+
+        $this->action = $aH->createAction(array($this, "musicList"));
+
+        $this->widget = new Widget("MusicBox\Gui\Widgets\CurrentTrackWidget.xml");
+        $this->widget->setName("Music Widget");
+        $this->widget->setLayer("scorestable");
+        $this->widget->setSize(45, 7);
+        $this->widget->setParam("action", $this->action);
     }
 
     /*
@@ -66,6 +78,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
+        /** @var Config $config */
         $this->config = Config::getInstance();
 
         $this->songs = array();
@@ -85,10 +98,10 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         try {
-            CurrentTrackWidget::EraseAll();
+            $this->widget->erase();
+            $this->widget = null;
             MusicListWindow::EraseAll();
 
-            CurrentTrackWidget::$musicBoxPlugin = null;
             Gui\Windows\MusicListWindow::$musicPlugin = null;
 			$this->connection->setForcedMusic(false, "");
 		} catch (Exception $e) {
@@ -199,7 +212,6 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $song = $this->songs[$this->counter];
             }
 
-            $this->nextSong = $song;
             $folder = urlencode($song->folder);
             $folder = str_replace("%2F", "/", $folder);
 
@@ -257,14 +269,11 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }
             }
         }
-
-        CurrentTrackWidget::EraseAll();
-        $window = CurrentTrackWidget::Create(null);
-        $window->setPosition($this->config->musicWidget_PosX, $this->config->musicWidget_PosY);
-        $window->setLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-        $window->setVisibleLayer(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
-        $window->setSong($outsong);
-        $window->show();
+        
+        $this->widget->setPosition($this->config->musicWidget_PosX, $this->config->musicWidget_PosY, 0);
+        $this->widget->setParam('artist', str_replace('$', '$$', $this->widget->handleSpecialChars($outsong->artist)));
+        $this->widget->setParam('title', str_replace('$', '$$', $this->widget->handleSpecialChars($outsong->title)));
+        $this->widget->show(null, true);
     }
 
     /**

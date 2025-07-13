@@ -1,0 +1,33 @@
+<frame posn="0 0 0">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(40, (3 * $this->getParam('nbFields')) + 4.5); ?>
+</frame>
+<frame posn="0 0 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(40, 4, $this->addLang($this->getParam('title'))); ?>
+</frame>
+<frame posn="4 -5 0">
+    <frame>
+        <?php
+        $x = 0;
+        foreach ($this->getParam('items') as $item) {
+            echo '<frame posn="0 -'. ($x * 3) . ' 0">';
+                if (property_exists($item, 'longDate')) {
+                    echo '<label posn="14 0 0" sizen="20 4" scale="0.75" halign="left" valign="center" style="TextRaceChat" textcolor="fff" text="' . $this->handleSpecialChars($item->nickname) . '"/>';
+                    echo '<label posn="13 0 1.0E-5" sizen="20 5" scale="0.75" halign="right" valign="center" style="TextRaceChat" textcolor="ff0" text="' . $this->getParam('formatter')->format($item->longDate) . '"/>';
+                } else if (property_exists($item, 'tscore')) {
+                    echo '<label sizen="4 4" scale="0.75" halign="right" valign="center" style="TextRaceChat" textcolor="fff" text="' . ($x+1) . '"/>';
+                    echo '<label posn="0.75 0 1.0E-5" sizen="14 5" scale="0.75" halign="left" valign="center" style="TextRaceChat" textcolor="ff0" text="' . number_format($item->tscore + 1, 2) . '"/>';
+                    echo '<label posn="9 0 2.0E-5" sizen="29 4" scale="0.75" halign="left" valign="center" style="TextRaceChat" textcolor="fff" text="' . $this->handleSpecialChars($item->player_nickname) . '"/>';
+                } else {
+                    echo '<label sizen="4 4" scale="0.75" halign="right" valign="center" style="TextRaceChat" textcolor="fff" text="' . ($x+1) . '"/>';
+                    echo '<label posn="13 0 1.0E-5" sizen="28 4" scale="0.75" halign="left" valign="center" style="TextRaceChat" textcolor="fff" text="' . $this->handleSpecialChars($item->nickname) . '"/>';
+                    echo '<label posn="1 0 2.0E-5" sizen="14 5" scale="0.75" halign="left" valign="center" style="TextRaceChat" textcolor="ff0" text="' . $item->data . '"/>';
+                }
+            echo '</frame>';
+            
+            $x++;
+            if ($x == $this->getParam('nbFields')) {
+                break;
+            }
+        }?>
+    </frame>
+</frame>

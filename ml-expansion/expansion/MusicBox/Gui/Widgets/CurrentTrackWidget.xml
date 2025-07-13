@@ -1,0 +1,9 @@
+<frame>
+    <quad sizen="100 8" halign="center" valign="top" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" action="<?php echo $this->getParam('action') ?>" colorize="ff0"/>
+    <frame posn="-45 -3.5 1.0E-5">
+        <frame>
+            <label sizen="16 8" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="Now Playing: "/>
+            <label posn="16 0 1.0E-5" sizen="80 8" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="<?php echo $this->getParam('artist') ?> - <?php echo $this->getParam('title') ?>"/>
+        </frame>
+    </frame>
+</frame>
