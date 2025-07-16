@@ -1,0 +1,31 @@
+<frame>
+    <?php
+        $x = 0;
+        foreach ($this->getParam('bestRuns') as $run) {
+            echo '<frame posn="0 -'. ($x*5) . ' 0">';
+                echo '<quad posn="-1 0 0" sizen="45 5" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" colorize="' . $this->getParam('guiConfig')->style_widget_bgColorize . '"/>';
+                echo '<label posn="0 0 1.0E-5" sizen="30 3" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="' . $this->handleSpecialChars($run->nickname) . '"/>';
+                echo '<label posn="32 0 2.0E-5" sizen="13 3" halign="left" valign="center" style="TextStaticSmall" textsize="1" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#time#")) . '" text="' . \ManiaLive\Utilities\Time::fromTM($run->totalTime) . '"/>';
+                
+                $y = 0;
+                echo '<frame posn="52 0 0">';
+                foreach ($run->checkpoints as $cp) {
+                    echo '<frame posn="' . (15 * ($y % 11)) . ' -' . (5*(floor($y/11))) . ' 0">';
+                        echo '<quad posn="-7.5 0 0" sizen="15 5" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" colorize="' . $this->getParam('guiConfig')->style_widget_bgColorize . '"/>';
+                        echo '<label sizen="15 5" halign="center" valign="center" style="TextStaticSmall" textsize="1" text="' . $this->getParam('colorParser')->getColor("#rank#") . ($y + 1) . ' ' . $this->getParam('colorParser')->getColor("#time#") . \ManiaLive\Utilities\Time::fromTM($cp) . '"/>';
+                    echo '</frame>';
+                    $y++;
+                    if ($y > 10) {
+                        break; // Putting more than 1 line of checkpoints takes too much space and hell to compute next player
+                    }
+                }
+                echo '</frame>';
+            echo '</frame>';
+
+            $x++;
+            if ($x >= $this->getParam('nbFields')) {
+                break;
+            }
+        }
+    ?>
+</frame>

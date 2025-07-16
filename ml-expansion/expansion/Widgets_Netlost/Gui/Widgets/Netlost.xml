@@ -1,0 +1,15 @@
+<quad id="icon" sizen="4 4" halign="left" valign="center" style="Icons64x64_2" substyle="Disconnected" hidden="1"/>
+<frame posn="6 0 1.0E-5">
+    <label id="netlost_0" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_1" posn="41 0 1.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_2" posn="82 0 2.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_3" posn="123 0 3.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_4" posn="0 -5 4.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_5" posn="41 -5 5.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_6" posn="82 -5 6.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_7" posn="123 -5 7.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_8" posn="0 -10 8.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_9" posn="41 -10 9.0E-5" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_10" posn="82 -10 0.0001" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+    <label id="netlost_11" posn="123 -10 0.00011" sizen="40 5" halign="left" valign="center" style="TextRaceChat" textsize="2" textcolor="fff" textemboss="1" text=""/>
+</frame>

@@ -1,0 +1,28 @@
+<frame posn="0 0 2.0E-5" id="Frame">
+    <frame>
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(46, (3.25 + $this->getParam('nbFields') * 4)); ?>
+    </frame>
+    <frame posn="0 0 1.0E-5">
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(46, 4, $this->addLang($this->getParam('title'))); ?>
+    </frame>
+    <frame posn="24 -5 3.0E-5">
+        <frame>
+            <?php
+            $x = 1;
+            foreach ($this->getParam('records') as $record) {
+                echo '<frame posn="-19 '. (- $x*4.0 + 4.0) . ' 0">';
+                    echo '<quad id="RecBgBlink_' . $x . '" posn="38 1.5 0" sizen="4 45.6" halign="left" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerLine" opacity="0.75" hidden="1" rot="90" colorize="0f0"/>';
+                    echo '<quad id="RecBg_' . $x . '" posn="0 -2.25 1.0E-5" sizen="4 57" halign="left" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerLine" opacity="0.75" hidden="1" rot="270" colorize="3af"/>';
+                    echo '<label id="RecRank_' . $x . '" posn="3 0 2.0E-5" sizen="4 4" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="' . $x . '"/>';
+                    echo '<label id="RecTime_' . $x . '" posn="3.7 0 3.0E-5" sizen="11 5" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . ($this->getParam('isTime') ? \ManiaLive\Utilities\Time::fromTM($record->time) : $record->time) . '"/>';
+                    echo '<label id="RecNick_' . $x . '" posn="15.5 0 4.0E-5" sizen="22 4" halign="left" valign="center" style="TextCardSmallScores2" scriptevents="1" class="nickLabel" textsize="1" textcolor="fff" text="' . $this->handleSpecialChars($record->nickName) . '"/>';
+                echo '</frame>';
+
+                $x++;
+                if ($x > $this->getParam('nbFields')) {
+                    break;
+                }
+            }?>
+        </frame>
+    </frame>
+</frame>

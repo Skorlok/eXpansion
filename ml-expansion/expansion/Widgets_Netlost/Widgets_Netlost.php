@@ -3,34 +3,32 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_Netlost;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\Group;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Events\Event as AdminGroupEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Widgets_Netlost\Gui\Widgets\Netlost;
-use ManiaLivePlugins\eXpansion\Widgets_Netlost\Gui\Widgets\NetlostUpdate;
 use Maniaplanet\DedicatedServer\Structures\PlayerNetInfo;
 
 class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\AdminGroups\Events\Listener
 {
 
-    private $buffer = "";
-
-    private $group;
-
     private $config;
+
+    private $widget;
 
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
-        $this->updateGroup();
-    }
-
-    public function eXpOnReady()
-    {
         Dispatcher::register(AdminGroupEvent::getClass(), $this);
+
+        $this->widget = new Widget("Widgets_Netlost\Gui\Widgets\Netlost.xml");
+        $this->widget->setName("Netlost Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->registerScript(new Script('Widgets_Netlost\Gui\Scripts_Netlost'));
+
         $this->displayWidget();
     }
 
@@ -54,26 +52,70 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
             $out = "[" . $out . "]";
         }
 
-        if ($this->buffer !== $out) {
-
-            $recepient = null;
-            if (Config::getInstance()->showOnlyAdmins) {
-                $recepient = $this->group;
+        $recepient = null;
+        if (Config::getInstance()->showOnlyAdmins) {
+            $recepient = $this->getConnectedAdmins();
+            if ($recepient === false) {
+                return;
             }
+        }
 
-            $update = NetlostUpdate::Create($recepient);
-            $update->setPlayer($out);
-            $update->setTimeout(2);
-            $update->show();
-            $this->buffer = $out;
+        $script = "main () {
+            declare eXp_lastUpdate = 0;
+            declare Text[] netLost for UI = Text[];
+            declare Integer[Text] netLostTimeouts for UI;
+
+            declare Boolean isNetlostUpdated for UI;
+
+            netLost = " . $out . ";
+            isNetlostUpdated = True;
+        }";
+
+        $xml = '<manialink id="netlost_messaging" version="2" name="netlost_messaging">';
+        $xml .= '<script><!--';
+        $xml .= $script;
+        $xml .= '--></script>';
+        $xml .= '</manialink>';
+        
+        try {
+            $this->connection->sendDisplayManialinkPage($recepient, $xml);
+        } catch (\Exception $e) {
+            if ($recepient !== null) {
+                $this->console('Could not send netlost update to admins, retrying every logins: ' . $e->getMessage());
+                foreach ($recepient as $login) {
+                    try {
+                        $this->connection->sendDisplayManialinkPage($login, $xml);
+                    } catch (\Exception $e) {
+                        $this->console('Could not send netlost update to ' . $login . ': ' . $e->getMessage());
+                    }
+                }
+            } else {
+                $this->console('Could not send netlost update: ' . $e->getMessage());
+            }
         }
     }
 
-    public function updateGroup()
+    public function getConnectedAdmins()
     {
-        $adminlist = AdminGroups::getInstance()->get();
-        $this->group = Group::Create("netlost_admins", $adminlist);
-        $this->displayWidget();
+        $admins = AdminGroups::getInstance()->get();
+
+        $playersConnected = array();
+        foreach ($this->storage->players as $player) {
+            if (in_array($player->login, $admins)) {
+                $playersConnected[] = $player->login;
+            }
+        }
+        foreach ($this->storage->spectators as $player) {
+            if (in_array($player->login, $admins)) {
+                $playersConnected[] = $player->login;
+            }
+        }
+        
+        if (empty($playersConnected)) {
+            return false;
+        } else {
+            return $playersConnected;
+        }
     }
 
     /**
@@ -85,32 +127,47 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
     {
         $recepient = null;
         if (Config::getInstance()->showOnlyAdmins) {
-            $recepient = $this->group;
+            $recepient = $this->getConnectedAdmins();
+            if ($recepient === false) {
+                return;
+            }
         }
 
-        $info = Netlost::Create($recepient);
-        $info->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY);
-        $info->setSize(200, 12);
-        $info->show();
+        $this->widget->setSize(200, 12);
+        $this->widget->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY, 0);
+        $this->widget->show($recepient);
+    }
+
+    public function onPlayerConnect($login, $isSpectator)
+    {
+        if ($this->widget instanceof Widget) {
+            if (Config::getInstance()->showOnlyAdmins && !in_array($login, AdminGroups::getInstance()->get())) {
+                return;
+            }
+            $this->widget->show($login);
+        }
+    }
+
+    public function eXpAdminAdded($login)
+    {
+        $this->displayWidget();
+    }
+
+    public function eXpAdminRemoved($login)
+    {
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase($login);
+        }
+        $this->displayWidget();
     }
 
     public function eXpOnUnload()
     {
         Dispatcher::unregister(AdminGroupEvent::getClass(), $this);
-        Netlost::EraseAll();
-        NetlostUpdate::EraseAll();
-        Group::Erase("netlost_admins");
-        $this->group = null;
-    }
 
-    public function eXpAdminAdded($login)
-    {
-        $this->updateGroup();
-    }
-
-    public function eXpAdminRemoved($login)
-    {
-        $this->updateGroup();
-        Netlost::Erase($login);
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
     }
 }

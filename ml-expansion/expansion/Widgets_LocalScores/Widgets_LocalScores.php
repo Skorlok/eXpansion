@@ -3,57 +3,56 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_LocalScores;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\PluginHandler\Dependency;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Listener;
-use ManiaLivePlugins\eXpansion\Widgets_LocalScores\Gui\Widgets\LocalPanel;
 
 class Widgets_LocalScores extends ExpPlugin implements Listener
 {
-
     public static $localrecords = array();
 
     /** @var Config */
     private $config;
-
-    public function eXpOnInit()
-    {
-        $this->addDependency(new Dependency('\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores'));
-    }
+    private $widget;
 
     public function eXpOnLoad()
     {
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
+        Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::register(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
+
+        $this->config = Config::getInstance();
+
+        $this->widget = new Widget("Widgets_PlainLocalRecords\Gui\Widgets\RecordsPanel.xml");
+        $this->widget->setName("Local Scores Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->setParam("title", "Best Scores");
+        $this->widget->setParam("isTime", false);
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
     }
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
 
-        $this->config = Config::getInstance();
-
-        $this->lastUpdate = time();
         if ($this->isPluginLoaded('\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores')) {
             self::$localrecords = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores", "getRecords");
         }
-
         $this->updateLocalPanel();
     }
 
-    public function updateLocalPanel($login = null)
+    public function updateLocalPanel()
     {
-        $widget = LocalPanel::Create($login);
-        $widget->setPosition($this->config->localScoresPanel_PosX, $this->config->localScoresPanel_PosY);
-        $widget->update();
-        $widget->show();
-    }
-
-    public function showLocalPanel($login)
-    {
-        $this->updateLocalPanel($login);
+        $this->widget->setSize(46, ($this->config->localScoresPanel_nbFields * 4) + 3.25);
+        $this->widget->setPosition($this->config->localScoresPanel_PosX, $this->config->localScoresPanel_PosY, 0);
+        $this->widget->setParam("nbFields", $this->config->localScoresPanel_nbFields);
+        $this->widget->setParam("records", self::$localrecords);
+        $this->widget->show(null, true);
     }
 
     public function onBeginMatch()
@@ -63,23 +62,19 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        LocalPanel::EraseAll();
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+            return;
+        }
+
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function onRecordsLoaded($records)
     {
         self::$localrecords = $records;
         $this->updateLocalPanel();
-    }
-
-    public function onPlayerConnect($login, $isSpectator)
-    {
-        $this->showLocalPanel($login);
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-
     }
 
     public function onUpdateRecords($data)
@@ -98,22 +93,26 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
     {
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORDS_LOADED);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_UPDATE_RECORDS);
+        Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_NEW_RECORD);
         Dispatcher::unregister(LocalEvent::getClass(), $this, LocalEvent::ON_RECORD_DELETED);
-        LocalPanel::EraseAll();
+        
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
     }
 
     public function onPersonalBestRecord($record)
     {
-
     }
 
     public function onRecordPlayerFinished($record)
     {
-
     }
 
     public function onNewRecord($record, $oldRecord)
     {
-
+        self::$localrecords = $record;
+        $this->updateLocalPanel();
     }
 }

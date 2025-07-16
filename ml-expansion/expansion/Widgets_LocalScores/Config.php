@@ -6,4 +6,5 @@ class Config extends \ManiaLib\Utils\Singleton
 {
     public $localScoresPanel_PosX = 114;
     public $localScoresPanel_PosY = 64;
+    public $localScoresPanel_nbFields = 23;
 }

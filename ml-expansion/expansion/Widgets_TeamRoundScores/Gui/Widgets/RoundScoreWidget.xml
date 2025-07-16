@@ -1,0 +1,52 @@
+<?php
+$var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+
+if (isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) {
+    $color = array(-1 => "fff", 0 => $var["team1Color"], 1 => $var["team2Color"]);
+} else {
+    $color = array(-1 => "fff", 0 => "3af", 1 => "d00");
+}
+?>
+
+<frame>
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(42, (5 + $this->getParam('nbFields') * 4)); ?>
+</frame>
+<quad posn="0 0 1.0E-5" sizen="42 4.2" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" colorize="3af"/>
+<label posn="21 -2 2.0E-5" sizen="30 5" halign="center" valign="center" style="TextCardScores2" textsize="1" textcolor="fff" textid="<?php echo $this->addLang($this->getParam('title')) ?>"/>
+<frame posn="2 -6.5 3.0E-5">
+    <frame>
+        <?php
+            $x = 1;
+            foreach ($this->getParam('roundScores') as $score) {
+
+                $text = "";
+                $textColor = "fff";
+                switch ($score->winningTeamId) {
+                    case 0:
+                        $text = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$3afBlue');
+                        break;
+                    case 1:
+                        $text = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$d00Red');
+                        break;
+                    default:
+                        $text = "Draw";
+                        $textColor = "aaa";
+                        break;
+                }
+
+                echo '<frame posn="0 '. (- $x*4.0 + 4.0) . ' 0">';
+                    echo '<label posn="3 0 0" sizen="5 4" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="r' . ($score->roundNumber + 1) . '"/>';
+                    echo '<label posn="6 0 1.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="' . $color[0] . '" text="' . $score->totalScore[0] . '"/>';
+                    echo '<label posn="11 0 2.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="' . $color[1] . '" text="' . $score->totalScore[1] . '"/>';
+                    echo '<label posn="22 0 3.0E-5" sizen="16 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="' . $textColor . '" text="' . $text . '"/>';
+                    echo '<label posn="32 0 4.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="' . $color[0] . '" text="' . $score->score[0] . '"/>';
+                    echo '<label posn="38 0 5.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="' . $color[1] . '" text="' . $score->score[1] . '"/>';
+                echo '</frame>';
+
+                $x++;
+                if ($x > $this->getParam('nbFields')) {
+                    break;
+                }
+            }?>
+    </frame>
+</frame>

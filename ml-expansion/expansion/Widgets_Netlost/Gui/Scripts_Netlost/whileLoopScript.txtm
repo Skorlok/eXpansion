@@ -1,5 +1,4 @@
-    
-if( isNetlostUpdated == True) {
+if (isNetlostUpdated == True) {
 
     isNetlostUpdated = False;
     
@@ -10,17 +9,13 @@ if( isNetlostUpdated == True) {
     }
 
     declare Integer x;
-    for ( x, 0, 11) {    
+    for (x, 0, 11) {    
         declare CMlLabel label <=> (Page.GetFirstChild("netlost_"^x) as CMlLabel);
         if (netLost.existskey(x)) {
             label.Value = netLost[x];
-        }
-        else {    
+        } else {    
             label.Value = "";
         }
     
     } 
 }
-
-    
- 

@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 
 /**
  * Description of MetaData
@@ -30,6 +31,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new TypeFloat("teamPlayerScorePanel_PosY", "Position of TeamPlayerScores Panel Y", $config, false, false);
         $var->setDefaultValue(6);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeInt("teamPlayerScorePanel_nbFields", "Number of field in TeamPlayerScores Panel", $config, false, false);
+        $var->setDefaultValue(12);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
     }

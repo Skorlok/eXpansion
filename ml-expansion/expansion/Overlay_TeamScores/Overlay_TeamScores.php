@@ -15,13 +15,6 @@ class Overlay_TeamScores extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     private $access;
     private $clublinks = array("", "");
 
-    public function eXpOnInit()
-    {
-        $this->exp_addTitleSupport("TM");
-        $this->exp_addTitleSupport("Trackmania");
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM);
-    }
-
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
@@ -33,7 +26,7 @@ class Overlay_TeamScores extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $scores = $this->connection->getCurrentRanking(1, 0);
         $this->teams[0] = new Structures\Team($scores[0]->nickName);
         $this->teams[0]->score = $scores[0]->score;
-        $scores = $this->connection->getCurrentRanking(1, 1);
+        $scores = $this->connection->getCurrentRanking(1, 0); // CHANGE TO 1, 1
         $this->teams[1] = new Structures\Team($scores[0]->nickName);
         $this->teams[1]->score = $scores[0]->score;
 

@@ -3,7 +3,9 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_BestRuns;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Widgets_BestRuns\Gui\Widgets\BestRunPanel;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
+use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Widgets_BestRuns\Structures\Run;
 
 /**
@@ -14,97 +16,73 @@ use ManiaLivePlugins\eXpansion\Widgets_BestRuns\Structures\Run;
 class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    private $bestTime = 0;
-
-    private $nbDisplay = 1;
+    /** @var \ManiaLivePlugins\eXpansion\Widgets_BestRuns\Structures\Run[] */
+    public $bestRuns;
 
     private $config;
+    private $widget;
 
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
         $this->enableStorageEvents();
         $this->config = Config::getInstance();
-    }
 
-    public function eXpOnReady()
-    {
-        $this->onBeginMatch();
+        $this->bestRuns = array();
 
-        $this->onPlayerFinish(null, -1, 0);
-    }
-
-    public function onBeginMatch()
-    {
-        $this->bestTime = 0;
-        BestRunPanel::$bestRuns = array();
-
-        foreach ($this->storage->players as $player) {
-            $this->onPlayerConnect($player->login, false);
-        }
-        foreach ($this->storage->spectators as $player) {
-            $this->onPlayerConnect($player->login, true);
-        }
+        $this->widget = new Widget("Widgets_BestRuns\Gui\Widgets\BestRunPanel.xml");
+        $this->widget->setName("Best Runs Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(200, 7);
     }
 
     public function onPlayerFinish($playerUid, $login, $time)
     {
         // ignore finish without times
-        if ($time == 0) {
+        if ($time <= 0) {
             return;
         }
 
-        // othervice if the players new best time is faster than the buffer, update
-        if ($this->bestTime == 0 || $time < $this->bestTime) {
+        $data = new \Maniaplanet\DedicatedServer\Structures\PlayerRanking();
+        $data->bestTime = $time;
+        $data->nickName = $this->storage->getPlayerObject($login)->nickName;
+        $data->bestCheckpoints = Core::$playerInfo[$login]->checkpoints;
 
-            $this->bestTime = $time;
-            BestRunPanel::$bestRuns = array();
+        $this->bestRuns[] = new Run($data);
 
-            $data = new \Maniaplanet\DedicatedServer\Structures\PlayerRanking();
-            $data->bestTime = $time;
-            $data->nickName = $this->storage->getPlayerObject($login)->nickName;
-            $data->bestCheckpoints = Core::$playerInfo[$login]->checkpoints;
+        // Sort the runs by time
+        usort($this->bestRuns, function ($a, $b) {
+            return $a->totalTime <=> $b->totalTime;
+        });
 
-            BestRunPanel::$bestRuns[] = new Run($data);
-
-            BestRunPanel::RedrawAll();
-        }
+        $this->displayWidget();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        BestRunPanel::EraseAll();
-        $this->bestTime = 0;
-        BestRunPanel::$bestRuns = array();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->bestRuns = array();
     }
 
-    /**
-     * displayWidget(string $login)
-     *
-     * @param string $login
-     */
-    public function displayWidget($login = null)
+    public function displayWidget()
     {
-        $info = BestRunPanel::Create($login);
-        $info->setPosition($this->config->bestRunsWidget_PosX, $this->config->bestRunsWidget_PosY);
-        $info->setSize(220, 20);
-        $info->setAlign("center", "top");
-        $info->show();
-    }
-
-    public function onPlayerConnect($login, $isSpectator)
-    {
-        $this->displayWidget($login);
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        BestRunPanel::Erase($login);
+        $this->widget->setPosition($this->config->bestRunsWidget_PosX, $this->config->bestRunsWidget_PosY, 0);
+        $this->widget->setParam("bestRuns", $this->bestRuns);
+        $this->widget->setParam("nbFields", $this->config->bestRunsWidget_nbDisplay);
+        $this->widget->setParam("guiConfig", guiConfig::getInstance());
+        $this->widget->setParam("colorParser", ColorParser::getInstance());
+        $this->widget->show(null, true);
     }
 
     public function eXpOnUnload()
     {
-        BestRunPanel::EraseAll();
+        $this->bestRuns = array();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
         parent::eXpOnUnload();
     }
 }

@@ -4,8 +4,8 @@ namespace ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores\Gui\Widgets\PlayerScoreWidget;
 use ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores\Structures\PlayerScore;
 
 /**
@@ -23,37 +23,31 @@ class Widgets_TeamPlayerScores extends ExpPlugin
 
     private $config;
 
-    public function eXpOnLoad()
-    {
-
-    }
+    private $widget;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
         $this->reset();
-        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
 
-        $this->enableScriptEvents(array("Maniaplanet.StartRound_Start", "Maniaplanet.EndRound_Start"));
+        $this->enableScriptEvents("Maniaplanet.EndRound_Start");
+
+        $this->widget = new Widget("Widgets_TeamPlayerScores\Gui\Widgets\PlayerScoreWidget.xml");
+        $this->widget->setName("Player Scores for team mode");
+        $this->widget->setLayer("scorestable");
+        $this->widget->setParam("title", "Round Points");
+
+        $this->showWidget();
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
     {
         switch ($callback) {
-            case "Maniaplanet.StartRound_Start":
-                $this->onBeginRound(0);
-                break;
             case "Maniaplanet.EndRound_Start":
                 $this->onEndRound(0);
                 break;
         }
-    }
-
-    public function onBeginRound()
-    {
-        $this->hideWidget();
-        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
     }
 
     public function onEndRound()
@@ -90,20 +84,17 @@ class Widgets_TeamPlayerScores extends ExpPlugin
             }
         }
         ArrayOfObj::asortDesc($this->playerScores, "score");
-        $this->hideWidget();
-        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
+        $this->showWidget();
     }
 
     public function onBeginMatch()
     {
         $this->reset();
-        $this->hideWidget();
-        $this->showWidget(\ManiaLive\Gui\Window::LAYER_SCORES_TABLE);
+        $this->showWidget();
     }
 
     private function getScore($position)
     {
-        /** @var int[] */
         $total = count($this->storage->players);
         $points = $total - $position;
         if ($points < 0) {
@@ -118,21 +109,20 @@ class Widgets_TeamPlayerScores extends ExpPlugin
         $this->playerScores = array();
     }
 
-    private function showWidget($layer = null)
+    private function showWidget()
     {
-        $widget = PlayerScoreWidget::Create();
-        $widget->setPosition($this->config->teamPlayerScorePanel_PosX, $this->config->teamPlayerScorePanel_PosY);
-        $widget->setSize(42, 56);
-        $widget->setScores($this->playerScores);
-        if ($layer != null) {
-            $widget->setLayer($layer);
-        }
-        $widget->show();
+        $this->widget->setSize(42, (($this->config->teamPlayerScorePanel_nbFields) * 4 + 4.75));
+        $this->widget->setPosition($this->config->teamPlayerScorePanel_PosX, $this->config->teamPlayerScorePanel_PosY, 0);
+        $this->widget->setParam("nbFields", $this->config->teamPlayerScorePanel_nbFields);
+        $this->widget->setParam("playerScores", $this->playerScores);
+        $this->widget->show(null, true);
     }
 
     private function hideWidget()
     {
-        PlayerScoreWidget::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function eXpOnUnload()

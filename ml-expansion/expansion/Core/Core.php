@@ -85,6 +85,8 @@ class Core extends types\ExpPlugin
      */
     public static $netStat = array();
 
+    public $netLostBuffer = array();
+
     /** @var string[int] */
     public static $roundFinishOrder = array();
 
@@ -1306,9 +1308,11 @@ EOT;
                     $outPlayers[$player->login] = $player;
                 }
             }
-            if (sizeof($outPlayers) < 0) {
+            if ($outPlayers != $this->netLostBuffer) {
                 Dispatcher::dispatch(new Events\PlayerEvent(Events\PlayerEvent::ON_PLAYER_NETLOST, $outPlayers));
             }
+
+            $this->netLostBuffer = $outPlayers;
 
             $this->debug("Memory usage: " . $this->echo_memory_usage());
         }

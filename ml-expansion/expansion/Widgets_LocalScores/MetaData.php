@@ -2,7 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_LocalScores;
 
+use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 
 /**
  * Description of MetaData
@@ -30,5 +32,26 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(64);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
+
+        $var = new TypeInt("localScoresPanel_nbFields", "Number of fields in LocalScores Panel", $config, false, false);
+        $var->setDefaultValue(23);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+    }
+
+    public function checkOtherCompatibility()
+    {
+        $errors = parent::checkOtherCompatibility();
+
+        /** @var PluginHandler $phandler */
+        $phandler = PluginHandler::getInstance();
+
+        if ($phandler->isLoaded('\\ManiaLivePlugins\\eXpansion\\SM_PlatformScores\\SM_PlatformScores')) {
+            return $errors;
+        }
+
+        $errors[] = 'Local Scores Panel needs a running Platform Scores plugin!!';
+
+        return $errors;
     }
 }
