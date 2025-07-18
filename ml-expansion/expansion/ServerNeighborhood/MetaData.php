@@ -30,13 +30,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
 
-        $var = new TypeInt(
-            'refresh_interval',
-            "Refresh the Panel every [INT] seconds",
-            $config,
-            Variable::SCOPE_GLOBAL,
-            false
-        );
+        $var = new TypeInt('refresh_interval', "Refresh the Panel every [INT] seconds", $config, Variable::SCOPE_GLOBAL, false);
         $var->setDefaultValue(20);
         $this->registerVariable($var);
 
@@ -44,13 +38,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(5);
         $this->registerVariable($var);
 
-        $var = new TypeString(
-            'storing_path',
-            "Path to store server information",
-            $config,
-            Variable::SCOPE_SERVER,
-            false
-        );
+        $var = new TypeString('style', "Widget Style (can be \"Small\" or \"UndefStyle\")", $config, Variable::SCOPE_SERVER, false);
+        $var->setDefaultValue("Small");
+        $this->registerVariable($var);
+
+        $var = new TypeString('storing_path', "Path to store server information", $config, Variable::SCOPE_SERVER, false);
         $var->setDefaultValue("../");
         $this->registerVariable($var);
 
@@ -69,6 +61,5 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(80);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
-
     }
 }

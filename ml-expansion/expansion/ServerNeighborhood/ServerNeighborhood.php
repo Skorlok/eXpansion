@@ -38,7 +38,8 @@ namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Widgets\ServerPanel;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\PlayerList;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\ServerList;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
@@ -46,27 +47,27 @@ use ManiaLivePlugins\eXpansion\Menu\Menu;
 class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    public static $gamemodes = array(
-        0 => array('name' => 'SCRIPT', 'icon' => 'RT_Script'),
-        1 => array('name' => 'ROUNDS', 'icon' => 'RT_Rounds'),
-        2 => array('name' => 'TIME_ATTACK', 'icon' => 'RT_TimeAttack'),
-        3 => array('name' => 'TEAM', 'icon' => 'RT_Team'),
-        4 => array('name' => 'LAPS', 'icon' => 'RT_Laps'),
-        5 => array('name' => 'CUP', 'icon' => 'RT_Cup'),
-        6 => array('name' => 'STUNTS', 'icon' => 'RT_Stunts'),
-    );
-
     private $server;
 
     private $servers = array();
+    private $onlineServers = array();
+
+    private $lastOnlineCount = 0;
+    private $lastOnlineStartIndex = 0;
 
     private $lastSent = 0;
 
     private $config;
 
+    private $actionHandler;
+    private $action;
+
+    private $widget;
+    private $script;
+
     public function eXpOnInit()
     {
-        $this->setVersion("1.0");
+        $this->setVersion("1.5");
         $this->config = Config::getInstance();
         $this->setPublicMethod("showServerList");
     }
@@ -74,10 +75,41 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     public function eXpOnLoad()
     {
         /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
+        $this->actionHandler = ActionHandler::getInstance();
+        $this->action = $this->actionHandler->createAction(array($this, "showServerList"));
+
         Menu::addMenuItem("ServerNeighborhood",
-            array("Server Neighborhood" => array(null, $aH->createAction(array($this, "showServerList"))))
+            array("Server Neighborhood" => array(null, $this->action))
         );
+
+        $this->initWidget();
+    }
+
+    public function initWidget()
+    {
+        $this->script = new Script("ServerNeighborhood/Gui/Scripts/Time");
+        
+        $this->widget = new Widget("ServerNeighborhood\Gui\Widgets\ServerNeighborhood.xml");
+        $this->widget->setName("Server Neighborhood Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->setParam("action", $this->action);
+        $this->widget->setParam('ownLogin', $this->storage->serverLogin);
+        $this->widget->setParam('title', 'Server Neighborhood');
+        $this->widget->registerScript($this->script);
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+        if ($this->config->snwidget_isDockable) {
+            $trayScript = new Script("Gui/Scripts/TrayWidget");
+            $trayScript->setParam('isMinimized', 'True');
+            $trayScript->setParam('autoCloseTimeout', $this->config->refresh_interval * 1000);
+            $trayScript->setParam('posXMin', -33);
+            $trayScript->setParam('posX', -33);
+            $trayScript->setParam('posXMax', -3);
+            $trayScript->setParam('specilaCase', '');
+            $this->widget->registerScript($trayScript);
+            $this->widget->setDisableAxis("x");
+        }
     }
 
     public function eXpOnReady()
@@ -92,6 +124,8 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function onSettingsChanged(Variable $var)
     {
+        $this->config = Config::getInstance();
+
         if ($var->getName() == 'storing_path') {
             $status = $this->saveData($this->server->createXML($this->connection, $this->storage));
             $this->lastSent = time();
@@ -104,8 +138,11 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         if ($var->getName() == 'snwidget_isDockable') {
             $this->getData();
-            ServerPanel::EraseAll();
-            $this->showWidget($this->servers);
+            if ($this->widget instanceof Widget) {
+                $this->widget->erase();
+            }
+            $this->initWidget();
+            $this->showWidget();
             $this->lastSent = time();
         }
     }
@@ -113,27 +150,29 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     public function onTick()
     {
         parent::onTick();
-        if ((time() - $this->lastSent) > Config::getInstance()->refresh_interval) {
+        if ((time() - $this->lastSent) > $this->config->refresh_interval) {
             $this->saveData($this->server->createXML($this->connection, $this->storage));
             $this->lastSent = time();
 
             if (sizeof($this->storage->players) > 0 || sizeof($this->storage->spectators) > 0) {
                 $this->getData();
-                $this->showWidget($this->servers);
+                $this->showWidget();
             }
         }
     }
 
     public function saveData($data)
     {
-        $filename = Config::getInstance()->storing_path . $this->storage->serverLogin . '_serverinfo.xml';
+        $filename = $this->config->storing_path . $this->storage->serverLogin . '_serverinfo.xml';
 
         // Opens the file for writing and truncates it to zero length
         // Try min. 40 times to open if it fails (write block)
         $tries = 0;
 
+        $context = stream_context_create(array('ftp' => array('overwrite' => true)));
+
         try {
-            $fh = fopen($filename, "w", 0, stream_context_create(array('ftp' => array('overwrite' => true))));
+            $fh = fopen($filename, "w", 0, $context);
         } catch (\Exception $ex) {
             $fh = false;
         }
@@ -143,7 +182,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
             $tries++;
             try {
-                $fh = fopen($filename, "w", 0, $this->stream_context);
+                $fh = fopen($filename, "w", 0, $context);
             } catch (\Exception $ex) {
                 $fh = false;
             }
@@ -161,6 +200,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function getData()
     {
+        $this->onlineServers = array();
         foreach ($this->config->servers as $serverPath) {
             if (!file_exists($serverPath) && !is_dir($serverPath)) {
                 $this->console('Error loading : ' . $serverPath . ' file does not exist!');
@@ -207,29 +247,61 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             } else {
                 $server = new Server();
                 $this->servers[$cleanIndex] = $server;
+                $this->servers[$cleanIndex]->mlAction = $this->actionHandler->createAction(array($this, "showServerPlayers"), $this->servers[$cleanIndex]);
             }
 
             $server->setServer_data($xml);
+            
+            if ($server->isOnline()) {
+                $this->onlineServers[] = $server;
+            }
         } catch (\Exception $ex) {
             $this->console('Error loading : ' . $serverPath);
         }
     }
 
-    public function showWidget($servers)
+    public function showWidget()
     {
-        $windows = ServerPanel::GetAll();
-        if (empty($windows)) {
-            $window = ServerPanel::Create(null);
-            $windows[] = $window;
-            $window->setPosition($this->config->serverPanel_PosX, $this->config->serverPanel_PosY);
-            $window->setSize(33, 25);
-            $window->update($servers);
-            $window->show();
-        } else {
-            foreach ($windows as $window) {
-                $window->redraw();
-            }
+        // compute new start index
+        $nbOnline = count($this->onlineServers);
+        if ($nbOnline != $this->lastOnlineCount) {
+            $this->lastOnlineStartIndex = 0;
+        } elseif ($this->lastOnlineStartIndex >= $nbOnline) {
+            $this->lastOnlineStartIndex = 0;
         }
+        $this->lastOnlineCount = $nbOnline;
+
+        $servers = array_slice($this->onlineServers, $this->lastOnlineStartIndex, $this->config->nbElement);
+
+        $this->lastOnlineStartIndex += $this->config->nbElement;
+
+
+        if ($this->config->style == 'UndefStyle') {
+            $sizeY = 5.8;
+        } else {
+            $sizeY = 3.4;
+        }
+
+        $this->script->setParam('refresh_interval', $this->config->refresh_interval * 1000);
+
+        $this->widget->setPosition($this->config->serverPanel_PosX, $this->config->serverPanel_PosY, 25);
+        $this->widget->setSize(33, $sizeY * $this->config->nbElement + 9);
+        $this->widget->setParam('refresh_interval', $this->config->refresh_interval);
+        $this->widget->setParam('style', $this->config->style);
+        $this->widget->setParam('nbFields', $this->config->nbElement);
+        $this->widget->setParam('items', $servers);
+        $this->widget->show(null, true);
+    }
+
+    public function showServerPlayers($login, $server)
+    {
+        PlayerList::Erase($login);
+        $w = PlayerList::Create($login);
+        $w->setTitle('ServerNeighborhood - Server Players');
+        $w->setSize(120, 105);
+        $w->setServer($server);
+        $w->centerOnScreen();
+        $w->show();
     }
 
     public function showServerList($login)
@@ -245,8 +317,13 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function eXpOnUnload()
     {
-        ServerPanel::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
         ServerList::EraseAll();
         PlayerList::EraseAll();
+
+        $this->actionHandler->deleteAction($this->action);
     }
 }

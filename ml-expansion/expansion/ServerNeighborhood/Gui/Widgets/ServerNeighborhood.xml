@@ -1,0 +1,76 @@
+<?php
+$gamemodes = array(
+    'rounds' => 'RT_Rounds',
+    'timeattack' => 'RT_TimeAttack',
+    'team' => 'RT_Team',
+    'laps' => 'RT_Laps',
+    'cup' => 'RT_Cup'
+);
+?>
+
+<frame posn="0 0 2.0" id="Frame">
+    <frame>
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(37, 4, $this->addLang($this->getParam('title'))); ?>
+    </frame>
+    <quad posn="2 -4.2 3.0E-5" sizen="30 4" style="BgsPlayerCard" substyle="BgCardSystem"/>
+    <quad posn="26 -4.2 4.0E-5" sizen="4 4" style="Icons64x64_1" substyle="ArrowNext" action="<?php echo $this->getParam('action') ?>"/>
+    <label posn="26 -5.2 5.0E-5" sizen="20 4" scale="0.6" halign="right" valign="top" style="TextStaticSmall" action="<?php echo $this->getParam('action') ?>" textid="<?php echo $this->addLang('$FFFShow All') ?>"/>
+    <label id="ode8_sn_SecCounter" posn="5 -5.2 6.0E-5" sizen="5 4" scale="0.6" halign="left" valign="top" style="TextStaticSmall" text="$FFF<?php echo $this->getParam('refresh_interval') ?>"/>
+    <quad id="minimizeButton" posn="33 0 7.0E-5" sizen="5 5" style="Icons128x128_1" substyle="ServersAll" scriptevents="1"/>
+    <frame posn="0 -8.2 8.0E-5">
+        <?php
+        $x = 0;
+        foreach ($this->getParam('items') as $srv) {
+            if ($this->getParam('style') == 'UndefStyle') {
+                $sizeY = 5.8;
+
+                $icon_style = 'empty';
+                $icon_substyle = 'empty';
+                if ($srv->getServer_data()->server->login == $this->getParam('ownLogin')) {
+                    $icon_style = 'Icons128x128_1';
+                    $icon_substyle = 'Back';
+                } elseif ($srv->getServer_data()->server->private == 'true') {
+                    $icon_style = 'Icons128x128_1';
+                    $icon_substyle = 'Padlock';
+                }
+
+                $isMaxPlayers = '$FFF';
+                if ((int)$srv->getServer_data()->server->players->current >= (int)$srv->getServer_data()->server->players->maximum) {
+                    $isMaxPlayers = '$F00';
+                }
+
+                $isMaxSpecs = '$FFF';
+                if ((int)$srv->getServer_data()->server->spectators->current >= (int)$srv->getServer_data()->server->spectators->maximum) {
+                    $isMaxSpecs = '$F00';
+                }
+
+                echo '<frame posn="0 -'. ($x*$sizeY) . ' 0">';
+                    echo '<quad sizen="30 5.8" halign="left" valign="top" style="BgsPlayerCard" substyle="BgCardSystem" action="' . $srv->mlAction . '"/>';
+                    echo '<quad posn="27.8 -0.2 1.0E-5" sizen="5.4 5.4" style="' . $icon_style . '" substyle="' . $icon_substyle . '"/>';
+                    echo '<quad posn="26 -0.4 2.0E-5" sizen="3 3" style="Icons128x32_1" substyle="' . (isset($gamemodes[strval($srv->getServer_data()->server->gamemode)]) ? $gamemodes[strval($srv->getServer_data()->server->gamemode)] : 'RT_Script') . '"/>';
+                    echo '<quad posn="2.5 -2.8 3.0E-5" sizen="2.5 2.5" style="Icons64x64_1" substyle="Buddy"/>';
+                    echo '<label posn="4.5 -3.3 4.0E-5" sizen="10 5.4" scale="0.5" style="TextStaticSmall" text="' . $isMaxPlayers . $srv->getServer_data()->server->players->current . '/' . $srv->getServer_data()->server->players->maximum . '"/>';
+                    echo '<quad posn="13 -2.8 5.0E-5" sizen="2.5 2.5" style="Icons64x64_1" substyle="IconPlayers"/>';
+                    echo '<label posn="15 -3.3 6.0E-5" sizen="10 5.4" scale="0.5" style="TextStaticSmall" text="' . $isMaxSpecs . $srv->getServer_data()->server->spectators->current . '/' . $srv->getServer_data()->server->spectators->maximum . '"/>';
+                    echo '<quad posn="22 -2.8 7.0E-5" sizen="2.5 2.5" style="Icons64x64_1" substyle="ToolLeague1"/>';
+                    echo '<label posn="24 -3.3 8.0E-5" sizen="10 5.4" scale="0.5" style="TextStaticSmall" text="$FFF' . $srv->getServer_data()->server->ladder->minimum . '/' . $srv->getServer_data()->server->ladder->maximum . '"/>';
+                    echo '<label posn="2 -0.6 9.0E-5" sizen="38 4" scale="0.6" halign="left" valign="top" style="TextStaticSmall" text="$AAA' . $srv->getServer_data()->server->name . '"/>';
+                echo '</frame>';
+            } else {
+                $sizeY = 3.4;
+                echo '<frame posn="0 -'. ($x*$sizeY) . ' 0">';
+                    echo '<quad sizen="30 3.4" halign="left" valign="top" style="BgsPlayerCard" substyle="BgCardSystem" action="' . $srv->mlAction . '"/>';
+                    echo '<label posn="1 -0.5 1.0E-5" sizen="48 4" scale="0.6" halign="left" valign="top" style="TextStaticSmall" text="$AAA' . $srv->getServer_data()->server->name . '"/>';
+                echo '</frame>';
+            }
+
+            $x++;
+            if ($x >= $this->getParam('nbFields')) {
+                break;
+            }
+        }?>
+    </frame>
+    <frame>
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(33, $sizeY * $this->getParam('nbFields') + 8.75); ?>
+    </frame>
+</frame>
