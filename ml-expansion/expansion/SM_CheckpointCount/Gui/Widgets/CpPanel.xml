@@ -1,0 +1,2 @@
+<quad posn="0 0 2.0E-5" sizen="35 6" style="EnergyBar" substyle="EnergyBar"/>
+<label posn="17.5 -1.5 3.0E-5" sizen="16 4" halign="center" valign="top" style="TextRaceMessageBig" textsize="2" text="<?php echo $this->getParam('text') ?>"/>

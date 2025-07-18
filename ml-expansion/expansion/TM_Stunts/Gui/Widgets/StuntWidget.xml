@@ -1,0 +1,1 @@
+<label id="stuntname_1" posn="30 -6 0" sizen="60 6" halign="center" valign="center" style="TextRaceMessageBig" textsize="3" textemboss="1" text="<?php echo $this->getParam('text') ?>"/>
