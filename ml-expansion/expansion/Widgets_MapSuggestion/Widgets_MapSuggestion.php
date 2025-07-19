@@ -31,7 +31,7 @@ class Widgets_MapSuggestion extends ExpPlugin
         $this->widget = new Widget("Widgets_MapSuggestion\Gui\Widgets\MapSuggestionButton.xml");
         $this->widget->setName("Map Suggestion Button");
         $this->widget->setLayer("normal");
-        $this->widget->setPosition($this->config->mapSuggestionButton_PosX, $this->config->mapSuggestionButton_PosY, 0);
+        $this->widget->setPosition($this->config->mapSuggestionButton_PosX, $this->config->mapSuggestionButton_PosY, 15);
         $this->widget->setSize(10, 10);
         $this->widget->setParam("action", $this->action);
         if ($this->expStorage->simpleEnviTitle == "TM") {
