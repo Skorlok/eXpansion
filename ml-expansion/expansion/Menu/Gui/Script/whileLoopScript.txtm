@@ -14,7 +14,7 @@ if (MouseRightButton && !eXp_mouseRightState) {
             needUpdate = True;
             Menu.RelativePosition.X = MouseX-1.0;
             Menu.RelativePosition.Y = MouseY+.5;
-            Menu.RelativePosition.Z = 50.0;
+            Menu.RelativePosition.Z = 23.0;
         }
     } else {
         needUpdate = True;

@@ -22,7 +22,7 @@ declare Boolean needUpdate = True;
 declare Boolean needHidden = False;
 declare Text lastItem = "";
 
-Menu.RelativePosition.Z = 30.0;
+Menu.RelativePosition.Z = 10.0;
 
 Page.GetClassChildren("sub" , Menu , True);
 foreach (control in Page.GetClassChildren_Result) {
