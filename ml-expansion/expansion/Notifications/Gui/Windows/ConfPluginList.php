@@ -64,7 +64,7 @@ class ConfPluginList extends Window
 
         $this->configManager = ConfigManager::getInstance();
 
-        $this->buttonSave = new Button();
+        $this->buttonSave = new Button(30, 5);
         $this->buttonSave->setText(__("Save"));
         $this->buttonSave->setAction($this->createAction(array($this, 'saveAction')));
         $this->mainFrame->addComponent($this->buttonSave);
@@ -75,7 +75,6 @@ class ConfPluginList extends Window
         parent::onResize($oldX, $oldY);
         $this->pagerFrame->setSize($this->getSizeX() - 3, $this->getSizeY() - 8);
 
-        $this->buttonSave->setSize(30, 5);
         $this->buttonSave->setPosition($this->sizeX * (1 / 0.8) - 60 * (1 / 0.8), -3);
     }
 

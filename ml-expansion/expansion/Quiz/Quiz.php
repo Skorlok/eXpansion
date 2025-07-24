@@ -5,7 +5,9 @@ namespace ManiaLivePlugins\eXpansion\Quiz;
 use ManiaLive\Application\ErrorHandling;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Quiz\Gui\Widget\QuizImageWidget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\AddPoint;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\HiddenQuestionWindow;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\QuestionWindow;
@@ -58,6 +60,9 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $cmd_points;
 
     private $config;
+
+    private $widget;
+    private $script;
 
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess = null;
@@ -150,6 +155,14 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->msg_pointAdd = eXpGetMessage('#quiz#$oPoint added for #variable#%s');
         $this->msg_pointRemove = eXpGetMessage('#quiz#$oPoint removed from #variable#%s');
         $this->msg_errorImageType = eXpGetMessage('#quiz#$Displaying image not possible, due unsupported media type was detected.');
+
+        $this->script = new Script("Quiz/Gui/Scripts/Widget");
+
+        $this->widget = new Widget("Quiz\Gui\Widget\QuizImageWidget.xml");
+        $this->widget->setName("Quiz Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(24, 24);
+        $this->widget->registerScript($this->script);
     }
 
     public function eXpOnReady()
@@ -157,7 +170,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Gui\Windows\QuestionWindow::$mainPlugin = $this;
         Gui\Windows\Playerlist::$mainPlugin = $this;
         Gui\Windows\AddPoint::$mainPlugin = $this;
-        Gui\Widget\QuizImageWidget::EraseAll();
 
         $data = $this->db->execute("SELECT * FROM `quiz_points` order by score desc;")->fetchArrayOfObject();
         foreach ($data as $player) {
@@ -242,11 +254,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                 $this->addPoint(null, $login);
                 $this->currentQuestion = null;
-                $widget = QuizImageWidget::GetAll();
-                foreach ($widget as $window) {
-                    $window->revealAnswer();
-                    $window->redraw();
-                }
+                
+                $this->script->setParam("reveal", "True");
+                $this->widget->show(null, true);
+
                 $this->chooseNextQuestion();
                 break;
             case Structures\Question::MoreAnswersNeeded:
@@ -269,7 +280,9 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function cancel($login)
     {
-        Gui\Widget\QuizImageWidget::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
 
         if ($this->currentQuestion === null) {
             return;
@@ -293,7 +306,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->questionCounter = 0;
         $this->db->execute('TRUNCATE TABLE`quiz_points`;');
         $this->eXpChatSendServerMessage($this->msg_reset);
-        Gui\Widget\QuizImageWidget::EraseAll();
+        
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function showAnswer($login)
@@ -314,7 +330,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->eXpChatSendServerMessage($this->msg_rightAnswer, null, array($answer));
 
             $this->currentQuestion = null;
-            Gui\Widget\QuizImageWidget::EraseAll();
+            
+            if ($this->widget instanceof Widget) {
+                $this->widget->erase();
+            }
             $this->chooseNextQuestion();
         }
     }
@@ -340,13 +359,17 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (count($this->questionDb) >= 1) {
             $this->currentQuestion = array_shift($this->questionDb);
             $this->questionCounter++;
-            Gui\Widget\QuizImageWidget::EraseAll();
+            if ($this->widget instanceof Widget) {
+                $this->widget->erase();
+            }
 
             $this->showQuestion();
         } else {
             $this->currentQuestion = null;
             $this->questionDb = null;
-            Gui\Widget\QuizImageWidget::EraseAll();
+            if ($this->widget instanceof Widget) {
+                $this->widget->erase();
+            }
         }
     }
 
@@ -479,12 +502,21 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $newHeight = $maxHeight;
             }
 
-            $widget = Gui\Widget\QuizImageWidget::Create(null);
-            $widget->setPosition($this->config->quizImage_PosX, $this->config->quizImage_PosY);
-            $widget->setImage($this->currentQuestion->getImage());
-            $widget->setHiddenQuestion($this->currentQuestion->isHidden, $this->currentQuestion->boxOrder);
-            $widget->setImageSize($newWidth, $newHeight);
-            $widget->show();
+            $order = Maniascript::stringifyAsList($this->currentQuestion->boxOrder);
+            if ($order == "[]") {
+                $order = "Integer[]";
+            }
+            $this->script->setParam("delay", 20);
+            $this->script->setParam("boxOrder", $order);
+            $this->script->setParam("reveal", "False");
+            $this->script->setParam("isHidden", Maniascript::getBoolean($this->currentQuestion->isHidden));
+            
+            $this->widget->setPosition($this->config->quizImage_PosX, $this->config->quizImage_PosY, 5);
+            $this->widget->setParam("imageUrl", $this->currentQuestion->getImage());
+            $this->widget->setParam("width", $newWidth);
+            $this->widget->setParam("height", $newHeight);
+            $this->widget->setParam("hiddenQuestion", $this->currentQuestion->isHidden);
+            $this->widget->show(null, true);
         } else {
             $this->eXpChatSendServerMessage($this->msg_errorImageType);
         }
@@ -615,7 +647,11 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         AddPoint::EraseAll();
         Gui\Windows\Playerlist::EraseAll();
         QuestionWindow::EraseAll();
-        Gui\Widget\QuizImageWidget::EraseAll();
+        
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        
         AdminGroups::removeAdminCommand($this->cmd_reset);
         AdminGroups::removeAdminCommand($this->cmd_points);
     }

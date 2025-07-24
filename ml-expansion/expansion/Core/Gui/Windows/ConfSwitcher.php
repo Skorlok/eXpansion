@@ -66,7 +66,7 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->input->setScale(0.8);
         $this->mainFrame->addComponent($this->input);
 
-        $this->buttonSave = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(20, 5);
+        $this->buttonSave = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(25, 5);
         $this->buttonSave->setText(__("Save"));
         $this->buttonSave->setAction($this->createAction(array($this, 'saveAction')));
         $this->buttonSave->setScale(0.8);
@@ -82,8 +82,7 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->input->setSize($this->sizeX * (1 / 0.8) - 60, 7);
         $this->input->setPosition(0, -3);
 
-        $this->buttonSave->setSize(30, 5);
-        $this->buttonSave->setPosition($this->sizeX * (1 / 0.8) - 60 * (1 / 0.8), -3);
+        $this->buttonSave->setPosition($this->sizeX * (1 / 0.8) - 55 * (1 / 0.8), -3);
     }
 
 

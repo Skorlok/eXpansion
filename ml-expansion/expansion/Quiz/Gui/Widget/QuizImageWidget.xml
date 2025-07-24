@@ -1,0 +1,28 @@
+<frame>
+    <quad sizen="24 21.75" bgcolor="222" opacity=" 0.6"/>
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(24, 21.75); ?>
+</frame>
+<frame posn="0 0 1">
+    <quad posn="12 -1.5 0" sizen="24 4" halign="center" valign="center" style="Bgs1InRace" substyle="BgWindow4" opacity="0.6" colorize="53BE55"/>
+    <label id="widgetTitle" posn="12 -1.5 1.0E-5" sizen="22 4" halign="center" valign="center" style="TextCardScores2" textsize="1" textcolor="fff" text="Question"/>
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(24, 4, $this->addLang("Question")); ?>
+</frame>
+<frame posn="2 -4 3">
+    <quad id="image" sizen="<?php echo $this->getParam('width') ?> <?php echo $this->getParam('height') ?>" image="<?php echo $this->getParam('imageUrl') ?>" scriptevents="1" class="quad"/>
+    <?php
+        $y = $this->getParam('height') / 3;
+        $x = $this->getParam('width') / 3;
+
+        $c = 0;
+        $opacity = 0.;
+        if ($this->getParam('hiddenQuestion')) {
+            $opacity = 1.;
+        }
+        for ($i = 0; $i < 3; $i++) {
+            for ($j = 0; $j < 3; $j++) {
+                echo '<quad id="quad_' . $c . '" posn="' . $i * $x . ' ' . -$j * $y . ' 1" sizen="' . $x . ' ' . $y . '" bgcolor="000" opacity="' . $opacity . '" scriptevents="1" class="quad"/>';
+                $c++;
+            }
+        }
+    ?>
+</frame>
