@@ -24,7 +24,6 @@ namespace ManiaLivePlugins\eXpansion\Widgets_ChatEnhancement\Gui\Widgets;
 
 use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\Chat\MetaData as ChatMetaData;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget;
 
 class Chat extends PlainWidget
@@ -43,10 +42,8 @@ class Chat extends PlainWidget
         $params = func_get_args();
 
         if ($phandler->isLoaded('\ManiaLivePlugins\eXpansion\Chatlog\Chatlog')) {
-            $this->chatLogIcon = new Button(8, 8);
-            $this->chatLogIcon->setIcon('UIConstruction_Buttons', 'Text');
-            $this->chatLogIcon->setDescription('Display Chat History');
-            $this->chatLogIcon->setAction($params[0]);
+            $this->chatLogIcon = new \ManiaLive\Gui\Elements\Xml();
+            $this->chatLogIcon->setContent(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(8, 8, null, array('Display Chat History'), null, null, null, null, $params[0], null, null, array('UIConstruction_Buttons', 'Text'), null, null, null));
             $this->addComponent($this->chatLogIcon);
         }
 
@@ -59,13 +56,10 @@ class Chat extends PlainWidget
             }
         }
 
-        $this->chatState = new Button(4, 4);
-        $this->chatState->setIcon('Icons64x64_1', $chatEnabled ? 'LvlGreen' : 'LvlRed');
-        $this->chatState->setDescription('Is public chat active');
-        $this->chatState->setAction($params[1]);
-        $this->chatState->setPositionX(2);
-        $this->chatState->setPositionY(-4);
-        $this->chatState->setPositionZ(30);
+        $this->chatState = new \ManiaLive\Gui\Elements\Xml();
+        $this->chatState->setContent('<frame posn="2 -4 30">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(4, 4, null, array('Is public chat active'), null, null, null, null, $params[1], null, null, array('Icons64x64_1', $chatEnabled ? 'LvlGreen' : 'LvlRed'), null, null, null) . '</frame>');
         $this->addComponent($this->chatState);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 }

@@ -9,7 +9,6 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\CmdMore;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
 /**
@@ -56,10 +55,8 @@ class HelpItem extends Control
         $gui_desc->setScale(0.8);
         $frame->addComponent($gui_desc);
 
-        $this->moreButton = new MyButton(30, 6);
-        $this->moreButton->setAction($this->action);
-        $this->moreButton->setText(__(AdminGroups::$txt_descMore, $login));
-        $this->moreButton->setScale(0.6);
+        $this->moreButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->moreButton->setContent('<frame posn="130 0 1" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 6, __(AdminGroups::$txt_descMore, $login), null, null, null, null, null, $this->action, null, null, null, null, null, null) . '</frame>');
         $frame->addComponent($this->moreButton);
 
         $this->addComponent($frame);
@@ -77,7 +74,6 @@ class HelpItem extends Control
 
     public function erase()
     {
-        $this->moreButton->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

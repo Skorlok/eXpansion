@@ -7,7 +7,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use Maniaplanet\DedicatedServer\Structures\Player;
 
 class IgnoredPlayeritem extends Control
@@ -43,9 +42,8 @@ class IgnoredPlayeritem extends Control
 
         $this->frame->addComponent($spacer);
 
-        $this->unignoreButton = new Button();
-        $this->unignoreButton->setText(__("Remove"));
-        $this->unignoreButton->setAction($this->unignoreAction);
+        $this->unignoreButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->unignoreButton->setContent('<frame posn="44 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $login), null, null, null, null, null, $this->unignoreAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->unignoreButton);
 
 
@@ -54,11 +52,5 @@ class IgnoredPlayeritem extends Control
         $this->sizeX = $sizeX;
         $this->sizeY = $sizeY;
         $this->setSize($sizeX, $sizeY);
-    }
-
-    public function destroy()
-    {
-        $this->unignoreButton->destroy();
-        parent::destroy();
     }
 }

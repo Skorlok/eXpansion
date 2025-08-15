@@ -95,21 +95,6 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_date->setAlign('left', 'center');
         $this->label_date->setScale(0.8);
         $this->frame->addComponent($this->label_date);
-
-        $this->button_sectors = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_sectors->setText("Top Sector Times");
-        $this->button_sectors->setAction(LocalRecords::$openSectorsAction);
-        $this->mainFrame->addComponent($this->button_sectors);
-
-        $this->button_cps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_cps->setText("Cp Times");
-        $this->button_cps->setAction(LocalRecords::$openCpsAction);
-        $this->mainFrame->addComponent($this->button_cps);
-
-        $this->button_seccps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_seccps->setText("Sectors Times");
-        $this->button_seccps->setAction(LocalRecords::$openSecCpsAction);
-        $this->mainFrame->addComponent($this->button_seccps);
     }
 
     public function onResize($oldX, $oldY)
@@ -129,10 +114,6 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         foreach ($this->items as $item) {
             $item->setSizeX($this->getSizeX());
         }
-
-        $this->button_sectors->setPosition($this->getSizeX() - 31, -$this->getSizeY() + 6);
-        $this->button_cps->setPosition($this->getSizeX() - 57, -$this->getSizeY() + 6);
-        $this->button_seccps->setPosition($this->getSizeX() - 83, -$this->getSizeY() + 6);
     }
 
     public function onShow()
@@ -165,10 +146,20 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->localBase = $localBase;
 
         $this->pager->clearItems();
-        $this->button_sectors->setVisibility($currentMap);
-        $this->button_cps->setVisibility($currentMap);
-        $this->button_seccps->setVisibility($currentMap);
-        $login = $this->getRecipient();
+        if ($currentMap) {
+            $this->button_sectors = new \ManiaLive\Gui\Elements\Xml();
+            $this->button_sectors->setContent('<frame posn="149 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, "Top Sector Times", null, null, null, null, null, LocalRecords::$openSectorsAction, null, null, null, null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->button_sectors);
+
+            $this->button_cps = new \ManiaLive\Gui\Elements\Xml();
+            $this->button_cps->setContent('<frame posn="123 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, "Cp Times", null, null, null, null, null, LocalRecords::$openCpsAction, null, null, null, null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->button_cps);
+
+            $this->button_seccps = new \ManiaLive\Gui\Elements\Xml();
+            $this->button_seccps->setContent('<frame posn="97 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, "Sectors Times", null, null, null, null, null, LocalRecords::$openSecCpsAction, null, null, null, null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->button_seccps);
+        }
+        
         $x = 0;
 
         RecItem::$widths = $this->widths;

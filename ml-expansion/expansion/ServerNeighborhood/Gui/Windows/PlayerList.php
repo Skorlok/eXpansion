@@ -50,6 +50,7 @@ class PlayerList extends Window
             $this->pager->addItem($pitem);
         }
 
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     public function onResize($oldX, $oldY)

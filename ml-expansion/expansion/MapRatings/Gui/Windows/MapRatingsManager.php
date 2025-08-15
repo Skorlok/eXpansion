@@ -16,8 +16,6 @@ class MapRatingsManager extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     protected $btn_remove;
 
-    protected $btn_close;
-
     public function onConstruct()
     {
         parent::onConstruct();
@@ -25,16 +23,9 @@ class MapRatingsManager extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->addComponent($this->pager);
 
-        $this->btn_remove = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btn_remove->setText(__("Remove", $login));
-        $this->btn_remove->colorize("d00");
-        $this->btn_remove->setAction(self::$removeId);
+        $this->btn_remove = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_remove->setContent('<frame posn="100 -84 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $login), null, null, "d00", null, null, self::$removeId, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->btn_remove);
-
-        $this->btn_close = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btn_close->setText(__("Close", $login));
-        $this->btn_close->setAction($this->createAction(array($this, "close")));
-        $this->addComponent($this->btn_close);
     }
 
     /**
@@ -56,21 +47,11 @@ class MapRatingsManager extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX, $this->sizeY - 22);
-        $this->btn_remove->setPosition($this->sizeX - 40, -$this->sizeY + 6);
-        $this->btn_close->setPosition($this->sizeX - 20, -$this->sizeY + 6);
-    }
-
-    public function close($login)
-    {
-        $this->Erase($login);
     }
 
     public function destroy()
     {
         $this->pager->destroy();
-        $this->btn_remove->destroy();
-        $this->btn_close->destroy();
-
         parent::destroy();
     }
 }

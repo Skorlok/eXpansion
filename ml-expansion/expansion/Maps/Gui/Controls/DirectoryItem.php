@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Maps\Gui\Controls;
 
 use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 
 class DirectoryItem extends \ManiaLivePlugins\eXpansion\Gui\Control
@@ -62,12 +61,8 @@ class DirectoryItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->frame->addComponent($spacer);
 
-
-        $this->changeDirButton = new MyButton(24, 5);
-        $this->changeDirButton->setText(__("Open", $login));
-        $this->changeDirButton->setAction($this->changeDirAction);
-        $this->changeDirButton->setScale(0.5);
-        $this->changeDirButton->colorize("2a2");
+        $this->changeDirButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->changeDirButton->setContent('<frame posn="107 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(24, 5, __("Open", $login), null, null, '2a2', null, null, $this->changeDirAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->changeDirButton);
 
         $this->addComponent($this->frame);
@@ -83,7 +78,6 @@ class DirectoryItem extends \ManiaLivePlugins\eXpansion\Gui\Control
     // manialive 3.1 override to do nothing.
     public function destroy()
     {
-
     }
 
     /*
@@ -94,7 +88,6 @@ class DirectoryItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         ActionHandler::getInstance()->deleteAction($this->deleteAction);
         $this->frame->clearComponents();
         $this->frame->destroy();
-        $this->changeDirButton->destroy();
         $this->destroyComponents();
         $this->destroy();
         parent::destroy();

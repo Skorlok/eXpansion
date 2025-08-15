@@ -71,23 +71,12 @@ class ScoresOverlay extends \ManiaLive\Gui\Window
         $this->team1->setAction(self::$action);
         $this->team2->setAction(self::$action2);
 
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission(
-            $this->getRecipient(),
-            \ManiaLivePlugins\eXpansion\AdminGroups\Permission::GAME_SETTINGS
-        )) {
-            $this->button = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $this->button->colorize("0000");
-            $this->button->setAlign("center", "center");
-            $this->button->setPosition(-10, -($this->background->getSizeY()));
-            $this->button->setAction(self::$toggleAction);
+        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($this->getRecipient(), \ManiaLivePlugins\eXpansion\AdminGroups\Permission::GAME_SETTINGS)) {
+            $this->button = new \ManiaLive\Gui\Elements\Xml();
             $this->addComponent($this->button);
 
-            $this->reset = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $this->reset->setText('$dddReset');
-            $this->reset->colorize("000");
-            $this->reset->setAlign("center", "center");
-            $this->reset->setPosition(10, -($this->background->getSizeY()));
-            $this->reset->setAction(self::$resetAction);
+            $this->reset = new \ManiaLive\Gui\Elements\Xml();
+            $this->reset->setContent('<frame posn="-2.75 -15 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, '$dddReset', null, null, "0000", null, null, self::$resetAction, null, null, null, null, null, null) . '</frame>');
             $this->addComponent($this->reset);
         }
     }
@@ -125,12 +114,12 @@ class ScoresOverlay extends \ManiaLive\Gui\Window
     {
         $this->setDisable();
         if (is_object($this->button)) {
-            $this->button->setText('$dddEnable');
+            $this->button->setContent('<frame posn="-22.75 -15 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, '$dddEnable', null, null, "0000", null, null, self::$toggleAction, null, null, null, null, null, null) . '</frame>');
         }
         if (self::$status == true) {
             $this->setEnable();
             if (is_object($this->button)) {
-                $this->button->setText('$dddDisable');
+                $this->button->setContent('<frame posn="-22.75 -15 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, '$dddDisable', null, null, "0000", null, null, self::$toggleAction, null, null, null, null, null, null) . '</frame>');
             }
         }
     }

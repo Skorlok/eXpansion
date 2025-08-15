@@ -10,6 +10,7 @@ use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
+use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 use oliverde8\AsynchronousJobs\Job\Curl;
@@ -39,8 +40,8 @@ class ManiaExchange extends ExpPlugin
     private $cmd_pack;
 
     /** @var StdClass $mxInfo */
-    public static $mxInfo = array();
-    public static $mxReplays = array();
+    public static $mxInfo = null;
+    public static $mxReplays = null;
     public static $openInfosAction = null;
 
     public function eXpOnInit()
@@ -139,10 +140,12 @@ class ManiaExchange extends ExpPlugin
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        self::$mxInfo = array();
-        self::$mxReplays = array();
+        self::$mxInfo = null;
+        self::$mxReplays = null;
 
-        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps/get_map_info/multi/' . $this->storage->currentMap->uId;
+        $fields = "fields=MapId,MapUid,Name,GbxMapName,UploadedAt,UpdatedAt,Uploader.Name,Tags,Images,MapType,MoodFull,Routes,Difficulty,Length,AwardCount,TitlePack,ReplayCount,Feature.Comment";
+
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?' . $fields . "&uid=" . $this->storage->currentMap->uId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xGetMapInfo"), null, $options);
@@ -158,15 +161,15 @@ class ManiaExchange extends ExpPlugin
             return;
         }
 
-        $json = json_decode($data);
-        if ($json == false || !isset($json[0])) {
+        $json = json_decode($data, true);
+        if ($json == false || !array_key_exists("Results", $json)) {
             return;
         }
 
-        self::$mxInfo = $json[0];
+        self::$mxInfo = MxMap::fromArray($json['Results'][0]);
 
-        if ($this->expStorage->simpleEnviTitle == "TM" && $json[0]->ReplayCount > 0) {
-            $query = "https://tm.mania.exchange/api/replays/?count=25&best=1&mapId=" .$json[0]->TrackID;
+        if ($this->expStorage->simpleEnviTitle == "TM" && self::$mxInfo->replayCount > 0) {
+            $query = "https://tm.mania.exchange/api/replays/?count=25&best=1&mapId=" . self::$mxInfo->mapId;
 
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
             $this->dataAccess->httpCurl($query, array($this, "xGetReplaysInfo"), null, $options);
@@ -215,7 +218,7 @@ class ManiaExchange extends ExpPlugin
 
     public function showMxInfos($login)
     {
-        if (self::$mxInfo == array()) {
+        if (!self::$mxInfo) {
             $this->eXpChatSendServerMessage($this->msg_not_found, $login);
             return;
         }
@@ -602,9 +605,14 @@ class ManiaExchange extends ExpPlugin
         }
 
         if ($this->dataAccess->save($file, $data)) {
-            if (!$this->connection->checkMapForCurrentServerParams($file)) {
-                $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
-                $this->eXpChatSendServerMessage($msg, $login);
+            try {
+                if (!$this->connection->checkMapForCurrentServerParams($file)) {
+                    $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
+                    $this->eXpChatSendServerMessage($msg, $login);
+                    return;
+                }
+            } catch (\Exception $e) {
+                $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                 return;
             }
             $this->callPublicMethod('\ManiaLivePlugins\eXpansion\\Maps\\Maps', 'queueMxMap', $login, $file);
@@ -635,7 +643,8 @@ class ManiaExchange extends ExpPlugin
         }
 
 
-        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/tracks/get_track_info/id/' . $mxId;
+        $fields = "fields=MapUid,Name,Uploader.Name,TitlePack";
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?' . $fields . "&id=" . $mxId;
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xVote"), array("login" => $login, "mxId" => $mxId), $options);
@@ -669,24 +678,27 @@ class ManiaExchange extends ExpPlugin
 
         $data = $job->getResponse();
 
-        if ($code !== 200) {
-            if ($code == 302) {
-                $this->eXpChatSendServerMessage("#admin_error#Map author has declined the permission to download this map!", $login);
-                return;
-            }
+        if ($data === false || $code !== 200) {
             $this->eXpChatSendServerMessage("#admin_error#Mx error: $code", $login);
+        }
+
+        $json = json_decode($data, true);
+        if ($json == false || !array_key_exists("Results", $json)) {
+            $this->connection->chatSendServerMessage(__('Unable to retrieve track info from MX..  wrong ID..?'), $login);
             return;
         }
-        $map = json_decode($data, true);
 
-        if (!$map) {
-            $this->connection->chatSendServerMessage(__('Unable to retrieve track info from MX..  wrong ID..?'), $login);
+        $map = MxMap::fromArray($json['Results'][0]);
+
+        $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $map->mapUid);
+        if ($mapFileName){
+            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $mapFileName, false, true);
             return;
         }
 
         $version = $this->connection->getVersion();
 
-        if (strtolower(substr($version->titleId, 2)) != strtolower($map['TitlePack'])) {
+        if (strpos(strtolower($version->titleId), strtolower($map->titlePack)) === false) {
             $this->connection->chatSendServerMessage(__('Wrong environment!'), $login);
             return;
         }
@@ -697,7 +709,7 @@ class ManiaExchange extends ExpPlugin
 
         $vote = new \Maniaplanet\DedicatedServer\Structures\Vote();
         $vote->callerLogin = $login;
-        $vote->cmdName = '$0f0add $fff$o' . $map['Name'] . '$o$0f0 by $eee' . $map['Username'] . ' $0f0';
+        $vote->cmdName = '$0f0add $fff$o' . $map->name . '$o$0f0 by $eee' . $map->getUploader() . ' $0f0';
         $vote->cmdParam = array('to the queue from MX?$3f3');
         $this->connection->callVote( $vote, $this->config->mxVote_ratios, ($this->config->mxVote_timeouts * 1000), $this->config->mxVote_voters);
     }

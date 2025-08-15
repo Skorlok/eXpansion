@@ -6,7 +6,6 @@ use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 
 class MatchSettingsFile extends Control
 {
@@ -81,33 +80,25 @@ class MatchSettingsFile extends Control
 
         $this->frame->addComponent($spacer);
 
+        if (AdminGroups::hasPermission($login, Permission::GAME_MATCH_SETTINGS)) {
+            $this->loadButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->loadButton->setContent('<frame posn="98 0 3.0E-5" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(26, 5, __("Load", $login), null, null, null, null, null, $this->loadAction, null, null, null, null, null, null) . '</frame>');
+            $this->frame->addComponent($this->loadButton);
+        }
 
-        $this->loadButton = new MyButton(26, 5);
-        $this->loadButton->setText(__("Load", $login));
-        $this->loadButton->setAction($this->loadAction);
-        $this->loadButton->setScale(0.6);
+        if (AdminGroups::hasPermission($login, Permission::GAME_MATCH_SAVE)) {
+            $this->saveButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->saveButton->setContent('<frame posn="114.8 0 3.0E-5" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(26, 5, __("Save", $login), null, null, "0d0", null, null, $this->saveAction, null, null, null, null, null, null) . '</frame>');
+            $this->frame->addComponent($this->saveButton);
+        }
 
-        $this->frame->addComponent($this->loadButton);
-
-        $this->saveButton = new MyButton(26, 5);
-        $this->saveButton->setText(__("Save", $login));
-        $this->saveButton->setAction($this->saveAction);
-        $this->saveButton->colorize("0d0");
-        $this->saveButton->setScale(0.6);
-        $this->frame->addComponent($this->saveButton);
-
-        $this->deleteButton = new MyButton(26, 5);
-        $this->deleteButton->setText(__("Delete", $login));
-        $this->deleteButton->colorize("d00");
-        $this->deleteButton->setAction($this->deleteAction);
-        $this->deleteButton->setScale(0.6);
-        $this->frame->addComponent($this->deleteButton);
+        if (AdminGroups::hasPermission($login, Permission::GAME_MATCH_DELETE)) {
+            $this->deleteButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->deleteButton->setContent('<frame posn="131.6 0 3.0E-5" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(26, 5, __("Delete", $login), null, null, "d00", null, null, $this->deleteAction, null, null, null, null, null, null) . '</frame>');
+            $this->frame->addComponent($this->deleteButton);
+        }
 
         $this->addComponent($this->frame);
-
-        $this->loadButton->setVisibility(AdminGroups::hasPermission($login, Permission::GAME_MATCH_SETTINGS));
-        $this->saveButton->setVisibility(AdminGroups::hasPermission($login, Permission::GAME_MATCH_SAVE));
-        $this->deleteButton->setVisibility(AdminGroups::hasPermission($login, Permission::GAME_MATCH_DELETE));
 
         $this->sizeX = $sizeX;
         $this->sizeY = $sizeY;
@@ -136,8 +127,6 @@ class MatchSettingsFile extends Control
     {
         ActionHandler::getInstance()->deleteAction($this->deleteAction);
         ActionHandler::getInstance()->deleteAction($this->deleteActionf);
-        $this->saveButton->destroy();
-        $this->loadButton->destroy();
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

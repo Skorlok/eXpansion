@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Database\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-
 class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
@@ -20,7 +18,7 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     protected $frame;
 
-    protected $ok;
+    protected $repair;
 
     protected $optimize;
 
@@ -33,8 +31,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $actionRepair;
 
     protected $actionOptimize;
-
-    protected $actionCancel;
 
     protected $actionBackup;
 
@@ -56,42 +52,27 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->actionRepair = $this->createAction(array($this, "Repair"));
         $this->actionOptimize = $this->createAction(array($this, "Optimize"));
         $this->actionBackup = $this->createAction(array($this, "Backup"));
-        $this->actionCancel = $this->createAction(array($this, "Cancel"));
         $this->actionTruncate = $this->createAction(array($this, "Truncate"));
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
         $this->addComponent($this->frame);
 
-        $this->truncate = new OkButton();
-        $this->truncate->colorize("d00");
-        $this->truncate->setText("Clear Table");
-        $this->truncate->setDescription("BEWARE, No confirm, No undo!", 60);
-        $this->truncate->setAction($this->actionTruncate);
+        $this->truncate = new \ManiaLive\Gui\Elements\Xml();
+        $this->truncate->setContent('<frame posn="25.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Clear Table', array("BEWARE, No confirm, No undo!", 60), null, "d00", null, null, $this->actionTruncate, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->truncate);
 
-        $this->ok = new OkButton();
+        $this->repair = new \ManiaLive\Gui\Elements\Xml();
+        $this->repair->setContent('<frame posn="51 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Repair', null, null, null, null, null, $this->actionRepair, null, null, null, null, null, null) . '</frame>');
+        $this->frame->addComponent($this->repair);
 
-        $this->ok->setText("Repair");
-        $this->ok->setAction($this->actionRepair);
-        $this->frame->addComponent($this->ok);
-
-        $this->optimize = new OkButton();
-
-        $this->optimize->setText("Optimize");
-        $this->optimize->setAction($this->actionOptimize);
+        $this->optimize = new \ManiaLive\Gui\Elements\Xml();
+        $this->optimize->setContent('<frame posn="76.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Optimize', null, null, null, null, null, $this->actionOptimize, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->optimize);
 
-        $this->backup = new OkButton();
-        $this->backup->colorize("0d0");
-        $this->backup->setText("Backup");
-        $this->backup->setAction($this->actionBackup);
+        $this->backup = new \ManiaLive\Gui\Elements\Xml();
+        $this->backup->setContent('<frame posn="102 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Access Backups', null, null, "0d0", null, null, $this->actionBackup, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->backup);
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText("Cancel");
-        $this->cancel->setAction($this->actionCancel);
-        $this->frame->addComponent($this->cancel);
     }
 
     protected function onResize($oldX, $oldY)
@@ -165,7 +146,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 );
             }
         }
-        //   $this->erase($login);
     }
 
     public function Truncate($login, $args)
@@ -176,10 +156,7 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($item->checkBox->getStatus()) {
                 // repair table
                 $status = $this->db->execute("TRUNCATE TABLE " . $item->tableName . ";");
-                $this->connection->chatSendServerMessage(
-                    'Table \'$0d0' . $item->tableName . '$fff\' contents is now $d00CLEARED$fff!',
-                    $login
-                );
+                $this->connection->chatSendServerMessage('Table \'$0d0' . $item->tableName . '$fff\' contents is now $d00CLEARED$fff!', $login);
             }
         }
     }
@@ -193,17 +170,9 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($item->checkBox->getStatus()) {
                 // repair table
                 $status = $this->db->execute("OPTIMIZE TABLE `" . $item->tableName . "`;")->fetchObject();
-                $this->connection->chatSendServerMessage(
-                    "Table " . $status->Table . " Optimized with " . $status->Msg_type . ":" . $status->Msg_text,
-                    $login
-                );
+                $this->connection->chatSendServerMessage("Table " . $status->Table . " Optimized with " . $status->Msg_type . ":" . $status->Msg_text, $login);
             }
         }
-    }
-
-    public function Cancel($login)
-    {
-        $this->erase($login);
     }
 
     public function destroy()

@@ -57,18 +57,12 @@ class SqlFile extends \ManiaLivePlugins\eXpansion\Gui\Control
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->frame->addComponent($spacer);
 
-        $this->btnRestore = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btnRestore->setText("Restore");
-        $this->btnRestore->colorize("dd0");
-        $this->btnRestore->setScale(0.5);
-        $this->btnRestore->setAction($this->actionRestore);
+        $this->btnRestore = new \ManiaLive\Gui\Elements\Xml();
+        $this->btnRestore->setContent('<frame posn="100 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Restore", null, null, "dd0", null, null, $this->actionRestore, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->btnRestore);
 
-        $this->btnDelete = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btnDelete->setText('$dd0Delete');
-        $this->btnDelete->colorize("222");
-        $this->btnDelete->setScale(0.5);
-        $this->btnDelete->setAction($this->actionDelete);
+        $this->btnDelete = new \ManiaLive\Gui\Elements\Xml();
+        $this->btnDelete->setContent('<frame posn="117 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, '$dd0Delete', null, null, "222", null, null, $this->actionDelete, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->btnDelete);
 
         $this->addComponent($this->frame);
@@ -97,10 +91,6 @@ class SqlFile extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function erase()
     {
-
-        $this->btnRestore->destroy();
-        $this->btnDelete->destroy();
-
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

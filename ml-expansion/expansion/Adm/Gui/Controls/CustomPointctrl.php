@@ -56,10 +56,8 @@ class CustomPointctrl extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->addComponent($this->frame);
 
-        $this->button = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->button->setText(__("Set", $login));
-        $this->button->setAction($this->action);
-        $this->button->setScale(0.6);
+        $this->button = new \ManiaLive\Gui\Elements\Xml();
+        $this->button->setContent('<frame posn="130 0 5.0E-5" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Set", $login), null, null, null, null, null, $this->action, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->button);
 
         $this->addComponent($this->frame);
@@ -86,7 +84,6 @@ class CustomPointctrl extends \ManiaLivePlugins\eXpansion\Gui\Control
      */
     public function erase()
     {
-        $this->button->destroy();
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

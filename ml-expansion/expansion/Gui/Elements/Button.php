@@ -4,27 +4,34 @@ namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
 use ManiaLivePlugins\eXpansion\Gui\Config;
 
-class Button extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
+class Button
 {
 
     protected static $counter = 0;
     protected static $script = null;
-    protected $label;
-    protected $labelDesc;
-    protected $activeFrame;
-    protected $backGround;
-    protected $bgFrame;
-    protected $backGroundDesc;
-    protected $frameDescription;
-    protected $icon;
-    protected $buttonId;
-    protected $text;
-    protected $description;
-    protected $value;
-    protected $isActive = false;
-    protected $action = 0;
 
-    public function __construct($sizeX = 32, $sizeY = 6)
+    public static function getScriptML()
+    {
+        return self::$script;
+    }
+
+    public static function getXML(
+        $sizeX = 32,
+        $sizeY = 6,
+        $text = null,
+        $description = null,
+        $active = null,
+        $colorize = null,
+        $textcolor = null,
+        $value = null,
+        $action = null,
+        $manialink = null,
+        $url = null,
+        $icon = null,
+        $id = null,
+        $class = null,
+        $attribute = null
+    )
     {
         if (self::$script === null) {
             self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ButtonScript();
@@ -32,286 +39,68 @@ class Button extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLi
 
         /** @var Config $config */
         $config = Config::getInstance();
-        $this->buttonId = self::$counter++;
+        $buttonId = self::$counter++;
         if (self::$counter > 100000) {
             self::$counter = 0;
         }
 
-        $this->activeFrame = new \ManiaLib\Gui\Elements\Quad($sizeX + 2, $sizeY + 2.5);
-        $this->activeFrame->setPosition(-1, 0);
-        $this->activeFrame->setAlign('left', 'center');
-        $this->activeFrame->setStyle("Icons128x128_Blink");
-        $this->activeFrame->setSubStyle("ShareBlink");
-
-
-        $this->label = new \ManiaLib\Gui\Elements\Label($sizeX, $sizeY - 2);
-        $this->label->setAlign('center', 'center2');
-        $this->label->setStyle("TextValueSmallSm");
-        $this->label->setTextSize(2);
-        $this->label->setTextEmboss();
-        $this->label->setTextColor($config->buttonTitleColor);
-
-        $this->frameDescription = new \ManiaLive\Gui\Controls\Frame();
-        $this->frameDescription->setPositionZ($this->getPosZ() + 10);
-        $this->frameDescription->setAttribute('class', 'exp_button');
-
-        $this->bgFrame = new \ManiaLib\Gui\Elements\Quad($sizeX + 2, $sizeY + 1);
-        $this->bgFrame->setAlign('left', 'center2');
-        $this->bgFrame->setStyle('Bgs1InRace');
-        $this->bgFrame->setSubStyle('BgColorContour');
-        $this->bgFrame->setColorize($config->buttonBackgroundColor);
-
-
-        $this->backGround = new \ManiaLib\Gui\Elements\Quad($sizeX + 2, $sizeY + 1);
-        $this->backGround->setAlign('left', 'center2');
-        $this->backGround->setStyle("Bgs1InRace");
-        $this->backGround->setSubStyle('BgCard');
-        $this->backGround->setId("backGround_" . $this->buttonId);
-        $this->backGround->setScriptEvents();
-        $this->backGround->setColorize($config->buttonBackgroundColor);
-
-
-        $this->labelDesc = new \ManiaLib\Gui\Elements\Label(20, 6);
-        $this->labelDesc->setAlign('left', 'center2');
-        $this->labelDesc->setId("eXp_ButtonDescText_Icon_" . $this->buttonId);
-        $this->labelDesc->setPosition(7, 3);
-        $this->labelDesc->setPositionZ(5);
-        $this->labelDesc->setAttribute('hidden', '1');
-        $this->frameDescription->addComponent($this->labelDesc);
-
-        $this->backGroundDesc = new \ManiaLib\Gui\Elements\Quad(32, 6);
-        $this->backGroundDesc->setAlign('left', 'center');
-        $this->backGroundDesc->setId("eXp_ButtonDescBg_Icon_" . $this->buttonId);
-        $this->backGroundDesc->setStyle('Bgs1');
-        $this->backGroundDesc->setSubStyle('BgMetalBar');
-        $this->backGroundDesc->setColorize("fff");
-        $this->backGroundDesc->setPosition(5, 3);
-        $this->backGroundDesc->setPositionZ(1);
-        $this->backGroundDesc->setAttribute('hidden', '1');
-        $this->frameDescription->addComponent($this->backGroundDesc);
-
-        $this->sizeX = $sizeX + 2;
-        $this->sizeY = $sizeY + 2;
-        $this->setSize($sizeX + 2, $sizeY + 2);
-    }
-
-    protected function onResize($oldX, $oldY)
-    {
-
-        if ($this->icon == null) {
-            $this->label->setPosX(($this->sizeX) / 2);
-            $this->label->setPosZ($this->posZ);
-        } else {
-            $this->label->setPosX((($this->sizeX) / 2) + ($this->getSizeY() - 1));
-            $this->label->setSizeX($this->getSizeX() - ($this->getSizeY() + 1));
-            $this->icon->setSize($this->sizeX, $this->sizeY);
+        if ($colorize && !$textcolor) {
+            $textcolor = 'fff';
         }
 
-        $this->setScale(0.75);
-        parent::onResize($oldX, $oldY);
-    }
-
-    protected function onDraw()
-    {
-        self::$script->reset();
-
-        if ($this->icon == null) {
-            $this->addComponent($this->backGround);
-        }
-        if ($this->isActive) {
-            $this->addComponent($this->activeFrame);
-        }
-
-        if (!empty($this->text)) {
-            $this->addComponent($this->label);
-            $this->label->setText($this->text);
+        $colorizeBackground = 'colorize="' . ($colorize ? $colorize : $config->buttonBackgroundColor) . '" ';
+        $class = ($class ? 'class="' . $class . '" ' : '');
+        $action = ($action ? 'action="' . $action . '" ' : '');
+        $textcolor = 'textcolor="' . ($textcolor ? $textcolor : $config->buttonTitleColor) . '" ';
+        $url = ($url ? 'url="' . $url . '" ' : '');
+        $manialink = ($manialink ? 'manialink="' . $manialink . '" ' : '');
+        $attributeXml = '';
+        if (is_array($attribute)) {
+            foreach ($attribute as $key => $value) {
+                if ($key != null) {
+                    $attributeXml .= ' ' . $key . '="' . $value . '"';
+                }
+            }
         }
 
-        if (!empty($this->description)) {
-            $this->addComponent($this->frameDescription);
-            $this->labelDesc->setText($this->description);
+        $xml = '<frame scale="0.75">';
+		if (!$icon) {
+            $xml .='<quad id="' . ($id ? $id : "backGround_" . $buttonId) . '" sizen="' . ($sizeX+2) . ' ' . ($sizeY+1) . '" halign="left" valign="center2" style="Bgs1InRace" substyle="BgCard" ' . $action . 'scriptevents="1" ' . $url . $manialink . $class . $colorizeBackground . $attributeXml . '/>';
+        }
+        if ($active) {
+            $xml .= '<quad posn="-0.5 0 1" sizen="' . ($sizeX+3) . ' ' . ($sizeY+2.5) . '" halign="left" valign="center" style="Icons128x128_Blink" substyle="ShareBlink"/>';
+        }
+        if (!empty($text)) {
+            $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" text="' . $text . '"/>';
         }
 
-        if ($this->icon != null) {
-            $this->addComponent($this->icon);
-        }
-    }
-
-    public function getText()
-    {
-        return $this->text;
-    }
-
-    public function setText($text)
-    {
-        $this->text = $text;
-    }
-
-    /**
-     * Set a description to the button. This will add a tooltip;
-     *
-     * @param string|array $description The description to disiplay. If it's an array it will
-     *                                  be displayed on multiple lines.
-     * @param int $sizeX
-     * @param int $sizeY
-     * @param int $maxLine
-     */
-    public function setDescription($description, $sizeX = 30, $sizeY = 5, $maxLine = 1)
-    {
         if (is_array($description)) {
-            $maxLine = count($description);
-            $description = implode("\n", $description);
+            if (is_array($description[0])) {
+                $maxLine = count($description[0]);
+                $description[0] = implode("&#10;", $description[0]);
+            } else {
+                $maxLine = (isset($description[3]) ? $description[3] : 1);
+            }
+            $sizeXDesc = (isset($description[1]) ? $description[1] : 30);
+            $sizeYDesc = (isset($description[2]) ? $description[2] : 5 * $maxLine);
+            $xml .='<frame posn="0 0 10" class="exp_button">';
+            $xml .='<label id="eXp_ButtonDescText_' . ($id ? $id : "Icon_" . $buttonId) . '" posn="7 3 5" sizen="' . $sizeXDesc . ' ' . $sizeYDesc . '" halign="left" valign="center2" style="TextStaticSmall" hidden="1" text="$000' . $description[0] . '" maxline="' . $maxLine . '"/>';
+            $xml .='<quad id="eXp_ButtonDescBg_' . ($id ? $id : "Icon_" . $buttonId) . '" posn="5 3 1" sizen="' . ($sizeXDesc+4) . ' ' . $sizeYDesc . '" halign="left" valign="center" style="Bgs1" substyle="BgMetalBar" hidden="1" colorize="fff"/>';
+            $xml .='</frame>';
         }
 
-        $this->description = "$000" . $description;
-        $this->labelDesc->setSizeX($sizeX);
-        $this->labelDesc->setSizeY($sizeY * $maxLine);
-        $this->labelDesc->setMaxline($maxLine);
-        $this->backGroundDesc->setSizeX($sizeX + 4);
-        $this->backGroundDesc->setSizeY($sizeY * $maxLine);
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    public function setActive($bool = true)
-    {
-        $this->isActive = $bool;
-    }
-
-    public function getValue()
-    {
-        return $this->value;
-    }
-
-    /**
-     * Colorize the button background
-     *
-     * @param string $value 4-digit RGBa code
-     */
-    public function colorize($value)
-    {
-        $this->label->setTextColor("fff");
-        $this->backGround->setColorize($value);
-        if ($this->icon != null) {
-            $this->icon->setColorize($value);
-        }
-    }
-
-    /**
-     * Sets text color
-     *
-     * @param string $value 4-digit RGBa code
-     */
-    public function setTextColor($textcolor)
-    {
-        $this->label->setTextColor($textcolor);
-    }
-
-    public function setValue($text)
-    {
-        $this->value = $text;
-    }
-
-    public function setAction($action)
-    {
-        $this->backGround->setAction($action);
-
-        $this->action = $action;
-        if ($this->icon != null) {
-            $this->icon->setAction($action);
-        }
-    }
-
-    public function setManialink($manialink)
-    {
-        $this->label->setManialink($manialink);
-        if ($this->icon != null) {
-            $this->icon->setManialink($manialink);
-        }
-    }
-
-    public function setUrl($url)
-    {
-        $this->label->setUrl($url);
-    }
-
-    public function setIcon($style, $subStyle = null)
-    {
-        $this->icon = new \ManiaLib\Gui\Elements\Quad($this->getSizeY(), $this->getSizeY());
-        $this->icon->setAlign('left', 'center');
-        $this->icon->setScriptEvents(1);
-        if ($subStyle != null) {
-            $this->icon->setStyle($style);
-            $this->icon->setSubStyle($subStyle);
-        } else {
-            $this->icon->setImage($style, true);
-        }
-        $this->icon->setId("Icon_" . $this->buttonId);
-        if ($this->action != 0) {
-            $this->icon->setAction($this->action);
-        }
-        $this->addComponent($this->icon);
-
-        $this->label->setPosX((($this->sizeX - 2) / 2) + ($this->getSizeY() - 1));
-        $this->label->setSizeX($this->getSizeX() - ($this->getSizeY() + 1));
-    }
-
-    public function setId($id)
-    {
-        $this->buttonId = $id;
-
-        if ($this->icon != null) {
-            $this->icon->setId($this->buttonId);
-        } else {
-            $this->backGround->setId($id);
-            $this->backGround->setScriptEvents();
+        if ($icon) {
+            $colorizeIcon = ($colorize ? 'colorize="' . $colorize . '" ' : '');
+            if (is_array($icon)) {
+                $iconXml = 'style="' . $icon[0] . '" ' . (isset($icon[1]) ? 'substyle="' . $icon[1] . '" ' : '');
+            } else {
+                $iconXml = 'image="' . $icon . '" ';
+            }
+            $xml .='<quad id="' . ($id ? $id : "Icon_" . $buttonId) . '" sizen="' . ($sizeX+2) . ' ' . ($sizeY+2) . '" halign="left" valign="center" ' . $iconXml . $action . $colorizeIcon . $url . $manialink . $class . $attributeXml . 'scriptevents="1"/>';
         }
 
-        $this->label->setId("eXp_ButtonLabel_" . $this->buttonId);
-        $this->labelDesc->setId("eXp_ButtonDescText_" . $this->buttonId);
-        $this->backGroundDesc->setId("eXp_ButtonDescBg_" . $this->buttonId);
-    }
+        $xml .='</frame>';
 
-    public function setClass($class)
-    {
-        if ($this->icon != null) {
-            $this->icon->setAttribute('class', $class);
-        } else {
-            $this->backGround->setAttribute('class', $class);
-        }
-    }
-
-    public function setAttribute($key, $value)
-    {
-
-        if ($key == "class") {
-            $value = $this->getAttribute($key) . " " . $value;
-        }
-
-        if ($this->icon != null) {
-            $this->icon->setAttribute($key, $value);
-        } else {
-            $this->backGround->setAttribute($key, $value);
-        }
-
-    }
-
-    public function getButtonId()
-    {
-        return $this->buttonId;
-    }
-
-    public function onIsRemoved(\ManiaLive\Gui\Container $target)
-    {
-        parent::onIsRemoved($target);
-        parent::destroy();
-    }
-
-    public function getScript()
-    {
-        return self::$script;
+        return $xml;
     }
 }

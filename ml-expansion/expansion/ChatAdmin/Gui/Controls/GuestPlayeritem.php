@@ -8,7 +8,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use Maniaplanet\DedicatedServer\Structures\Player;
 
 
@@ -56,10 +55,8 @@ class GuestPlayeritem extends Control
 
         $this->frame->addComponent($spacer);
 
-        $this->removeButton = new Button();
-        $this->removeButton->setText(__("Remove"));
-        $this->removeButton->setAction($this->removeAction);
-        $this->removeButton->setScale(0.6);
+        $this->removeButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->removeButton->setContent('<frame posn="24 0 1" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $login), null, null, null, null, null, $this->removeAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->removeButton);
 
         $this->addComponent($this->frame);

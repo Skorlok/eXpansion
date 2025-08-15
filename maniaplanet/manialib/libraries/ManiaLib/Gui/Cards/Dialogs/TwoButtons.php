@@ -15,9 +15,6 @@ namespace ManiaLib\Gui\Cards\Dialogs;
 class TwoButtons extends OneButton
 {
 
-	/**
-	 * @var \ManiaLib\Gui\Elements\Button
-	 */
 	public $button2;
 
 	function __construct($sizeX = 65, $sizeY = 25)

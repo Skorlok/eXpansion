@@ -2,10 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Core\Core;
-use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -47,7 +44,6 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
         $this->actionOk = $this->createAction(array($this, "ok"));
-        $this->actionCancel = $this->createAction(array($this, "cancel"));
 
         $this->buttonframe = new \ManiaLive\Gui\Controls\Frame(40, 2);
         $line = new \ManiaLib\Gui\Layouts\Line();
@@ -56,32 +52,30 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->mainFrame->addComponent($this->buttonframe);
 
 
-        $this->btn_clearScores = new OkButton(32, 6);
-        $this->btn_clearScores->setAction($this->createAction(array($this, "resetScores")));
-        $this->btn_clearScores->setText(__("Reset scores", $login));
+        $this->btn_clearScores = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_clearScores->setContent(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Reset scores", $login), null, null, null, null, null, $this->createAction(array($this, "resetScores")), null, null, null, null, null, null));
         $this->buttonframe->addComponent($this->btn_clearScores);
 
-        $this->btn_resetSkip = new OkButton(32, 6);
-        $this->btn_resetSkip->setAction($this->createAction(array($this, "resetSkip")));
-        $this->btn_resetSkip->setText(__("Skip & reset", $login));
+        $this->btn_resetSkip = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_resetSkip->setContent('<frame posn="27.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->handleSpecialChars(__("Skip & reset", $login)), null, null, null, null, null, $this->createAction(array($this, "resetSkip")), null, null, null, null, null, null) . '</frame>');
         $this->buttonframe->addComponent($this->btn_resetSkip);
 
-        $this->btn_resetRes = new OkButton(32, 6);
-        $this->btn_resetRes->setAction($this->createAction(array($this, "resetRes")));
-        $this->btn_resetRes->setText(__("Restart & reset", $login));
+        $this->btn_resetRes = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_resetRes->setContent('<frame posn="55 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->handleSpecialChars(__("Restart & reset", $login)), null, null, null, null, null, $this->createAction(array($this, "resetRes")), null, null, null, null, null, null) . '</frame>');
         $this->buttonframe->addComponent($this->btn_resetRes);
 
 
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="129 -74 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
+    }
 
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<'), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;'), $string);
     }
 
     protected function onResize($oldX, $oldY)
@@ -89,8 +83,6 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX, $this->sizeY - 8);
         $this->pager->setStretchContentX($this->sizeX);
-        $this->ok->setPosition($this->sizeX - 50, -$this->sizeY + 6);
-        $this->cancel->setPosition($this->sizeX - 24, -$this->sizeY + 6);
     }
 
     protected function onShow()
@@ -121,7 +113,7 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
-    public function ok($login, $scores = array())
+    public function ok($fromLogin, $scores = array())
     {
         $outScores = array();
 
@@ -139,10 +131,10 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
         $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         self::$mainPlugin->forceScoresOk();
-        $this->erase($login);
+        $this->erase($fromLogin);
     }
 
-    public function resetScores($login)
+    public function resetScores($fromLogin)
     {
         $rankings = Core::$rankings;
 
@@ -178,11 +170,6 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->Erase($login);
     }
 
-    public function cancel($login)
-    {
-        $this->Erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -191,8 +178,6 @@ class ForceScores extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->pager->destroy();
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->destroyComponents();

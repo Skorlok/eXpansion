@@ -23,18 +23,11 @@ class Jukelist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->mainFrame->addComponent($this->pager);
 
         $this->actionRemoveAll = $this->createAction(array(self::$mainPlugin, "emptyWishesGui"));
-        $this->btnRemoveAll = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btnRemoveAll->setAction($this->actionRemoveAll);
-        $this->btnRemoveAll->setText("Clear Jukebox");
-        $this->btnRemoveAll->colorize("d00");
     }
 
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-        if (is_object($this->btnRemoveAll)) {
-            $this->btnRemoveAll->setPosition(4, -$this->sizeY + 6);
-        }
 
         $this->pager->setSize($this->sizeX - 2, $this->sizeY - 14);
         $this->pager->setStretchContentX($this->sizeX);
@@ -51,11 +44,10 @@ class Jukelist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager->clearItems();
         $this->items = array();
 
-        $isAdmin = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission(
-            $login,
-            Permission::MAP_JUKEBOX_ADMIN
-        );
+        $isAdmin = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN);
         if ($isAdmin) {
+            $this->btnRemoveAll = new \ManiaLive\Gui\Elements\Xml();
+            $this->btnRemoveAll->setContent('<frame posn="4 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Clear Jukebox", null, null, 'd00', null, null, $this->actionRemoveAll, null, null, null, null, null, null) . '</frame>');
             $this->mainFrame->addComponent($this->btnRemoveAll);
         }
 
@@ -79,9 +71,6 @@ class Jukelist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->erase();
         }
         $this->items = null;
-        if (is_object($this->btnRemoveAll)) {
-            $this->btnRemoveAll->destroy();
-        }
         $this->pager->destroy();
         $this->destroyComponents();
         parent::destroy();

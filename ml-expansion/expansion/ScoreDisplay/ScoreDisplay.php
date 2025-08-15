@@ -39,8 +39,8 @@ class ScoreDisplay extends ExpPlugin
 
         if ($command == "setup") {
             $window = ScoreSetup::Create($login);
-            $window->setPosition($this->config->scoreWidget_PosX, $this->config->scoreWidget_PosY);
-            $window->setSize(120, 80);
+            //$window->setPosition($this->config->scoreWidget_PosX, $this->config->scoreWidget_PosY);
+            $window->setSize(40, 80);
             $window->setTitle("ScoreSetup");
             $window->show();
             return;

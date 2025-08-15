@@ -22,7 +22,6 @@ use ManiaLib\Gui\Layouts\Flow;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Bets\Bets;
 use ManiaLivePlugins\eXpansion\Bets\Config;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
@@ -48,7 +47,6 @@ class BetWidget extends Widget
     protected $labelAccept;
     protected $bg;
     protected $header;
-    protected $closeButton;
     protected $buttonAccept;
     protected $script;
 
@@ -64,11 +62,9 @@ class BetWidget extends Widget
         $this->script->setParam("hideFor", "Text[]");
         $this->registerScript($this->script);
 
-        $this->closeButton = new Button();
-        $this->closeButton->setText("Close");
-        $this->closeButton->setId("closeButton");
-        $this->closeButton->setScriptEvents();
-        $this->addComponent($this->closeButton);
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="52 -15 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Close", null, null, null, null, null, null, null, null, null, "closeButton", null, null) . '</frame>');
+        $this->addComponent($button);
     }
 
     public function onDraw()
@@ -79,7 +75,6 @@ class BetWidget extends Widget
         if (Bets::$state == Bets::ACCEPT) {
             $this->acceptBets();
         }
-        $this->closeButton->setPosition($this->sizeX - 28, -$this->sizeY + 5);
         parent::onDraw();
     }
 
@@ -102,12 +97,8 @@ class BetWidget extends Widget
         $this->labelAccept->setText(eXpGetMessage('Accept bet for %1$s planets ?'), array("" . Bets::$betAmount));
         $line->addComponent($this->labelAccept);
 
-        $button = new Button();
-        $button->setText("Accept");
-        $button->colorize('$0f0');
-        $button->setPosition($this->sizeX - 28, -$this->sizeY + 12);
-        $button->setAction(self::$action_acceptBet);
-
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="52 -8 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Accept", null, null, "0f0", null, null, self::$action_acceptBet, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($button);
         $this->frame->addComponent($line);
     }
@@ -128,24 +119,21 @@ class BetWidget extends Widget
         $line->setLayout(new Flow());
         $line->setSize(60, 6);
 
+        $x = 0;
         foreach (array(25, 50, 100, 250, 500) as $value) {
-
-            $button = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(20, 6);
             $var = "action_setAmount" . $value;
-            $button->setAction(self::$$var);
-            $button->setText($value);
-            $button->colorize("3af");
+            $button = new \ManiaLive\Gui\Elements\Xml();
+            $button->setContent('<frame posn="' . (16.5 * ($x % 3)) . ' -' . ((6*(floor($x/3)))) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $value, null, null, "3af", null, null, self::$$var, null, null, null, null, null, null) . '</frame>');
             $line->addComponent($button);
+            $x++;
         }
 
         $inputbox = new Inputbox("betAmount", 18);
+        $inputbox->setPosition(33, -6);
         $line->addComponent($inputbox);
 
-        $button = new Button();
-        $button->setText("Accept");
-        $button->colorize("0d0");
-        $button->setAction(self::$action_setAmount);
-        $button->setPosition($this->sizeX - 28, -$this->sizeY + 12);
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="52 -8 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Accept", null, null, "0d0", null, null, self::$action_setAmount, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($button);
 
         $this->frame->addComponent($line);

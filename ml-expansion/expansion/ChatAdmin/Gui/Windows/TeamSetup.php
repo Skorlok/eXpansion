@@ -5,8 +5,6 @@ namespace ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows;
 use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLib\Gui\Elements\Label;
-use ManiaLivePlugins\eXpansion\Helpers\ColorConversion;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -53,11 +51,8 @@ class TeamSetup extends Window
         $input->setPosY(-44);
         $this->addComponent($input);
 
-        $button = new Button();
-        $button->setText("Ok");
-        $button->setAction($this->createAction(array($this, "ok")));
-        $button->setPosX(5);
-        $button->setPosY(-3);
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="5 -51 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Ok", null, null, null, null, null, $this->createAction(array($this, "Ok")), null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($button);
     }
 

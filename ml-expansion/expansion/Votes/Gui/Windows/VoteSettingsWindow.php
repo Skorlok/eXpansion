@@ -21,11 +21,7 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     protected $ok;
 
-    protected $cancel;
-
     protected $actionOk;
-
-    protected $actionCancel;
 
     /**
      *
@@ -43,27 +39,16 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->addComponent($this->pager);
         $this->actionOk = $this->createAction(array($this, "Ok"));
-        $this->actionCancel = $this->createAction(array($this, "Cancel"));
 
-        $this->ok = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="96 -93 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->ok);
-
-        $this->cancel = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->addComponent($this->cancel);
     }
 
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX - 5, $this->sizeY - 12);
-
-        $this->ok->setPosition($this->sizeX - 50, -$this->sizeY + 3);
-        $this->cancel->setPosition($this->sizeX - 24, -$this->sizeY + 3);
     }
 
     /**
@@ -209,11 +194,6 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->Erase($login);
     }
 
-    public function Cancel($login)
-    {
-        $this->Erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -222,8 +202,6 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->pager->destroy();
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->destroyComponents();

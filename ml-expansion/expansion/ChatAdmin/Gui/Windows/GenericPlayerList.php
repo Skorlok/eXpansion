@@ -2,11 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
-
 
 class GenericPlayerList extends Window
 {
@@ -14,7 +12,6 @@ class GenericPlayerList extends Window
     protected $pager;
     /** @var  Inputbox */
     protected $inputbox;
-    /** @var  Button */
     protected $button;
 
     protected function onConstruct()
@@ -25,12 +22,6 @@ class GenericPlayerList extends Window
         $this->inputbox->setPosition(0, -6);
         $this->inputbox->setLabel("Login to add");
         $this->addComponent($this->inputbox);
-
-        $this->button = new Button();
-        $this->button->setPosition(55, -6);
-        $this->button->setText(eXpGetMessage("add"));
-        $this->addComponent($this->button);
-
 
         $this->pager = new Pager();
         $this->addComponent($this->pager);
@@ -58,6 +49,8 @@ class GenericPlayerList extends Window
 
     public function setAction($action)
     {
-        $this->button->setAction($action);
+        $this->button = new \ManiaLive\Gui\Elements\Xml();
+        $this->button->setContent('<frame posn="55 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("add", $this->getRecipient()), null, null, null, null, null, $action, null, null, null, null, null, null) . '</frame>');
+        $this->addComponent($this->button);
     }
 }

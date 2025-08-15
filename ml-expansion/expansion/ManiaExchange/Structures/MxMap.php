@@ -30,6 +30,20 @@ class MxMap extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 
     public $updatedAt;
 
+    public $name;
+
+    public $uploadedAt;
+
+    public $images;
+
+    public $mapType;
+
+    public $routes;
+
+    public $replayCount;
+
+    public $feature;
+
     public function getEnvironment()
     {
         switch ($this->environment) {
@@ -84,6 +98,20 @@ class MxMap extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
     public function getLength()
     {
         return $this->timeString($this->length);
+    }
+
+    public function getRouteType()
+    {
+        switch ($this->difficulty) {
+            case 0:
+                return "Single";
+            case 1:
+                return "Multiple";
+            case 2:
+                return "Symmetrical";
+            default:
+                return "Unknown";
+        }
     }
 
     // function to convert time in milliseconds to a string

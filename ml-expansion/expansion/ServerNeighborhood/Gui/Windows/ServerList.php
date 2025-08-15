@@ -45,6 +45,8 @@ class ServerList extends Window
                 $i++;
             }
         }
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
 

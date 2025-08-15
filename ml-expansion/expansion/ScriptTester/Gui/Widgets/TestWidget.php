@@ -31,12 +31,8 @@ class TestWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->frame->setColorize("f00");
         $this->addComponent($this->frame);
 
-        $this->xmlData = new \ManiaLive\Gui\Elements\Xml();
-        $this->addComponent($this->xmlData);
-
-        $this->closeButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->closeButton->setText("Close");
-        $this->closeButton->setAction($this->createAction(array($this, 'close')));
+        $this->closeButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->closeButton->setContent('<frame posn="74 3.5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Close", null, null, null, null, null, $this->createAction(array($this, 'close')), null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->closeButton);
     }
 
@@ -51,7 +47,6 @@ class TestWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->frame->setSize($this->sizeX, $this->sizeY);
         $this->title->setPosY(6);
         $this->title->setSize($this->sizeX, 6);
-        $this->closeButton->setPosition($this->sizeX - 26, 3.5);
     }
 
     public function setScriptContent($script)
@@ -62,7 +57,9 @@ class TestWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 
     public function setXmlData($xml)
     {
+        $this->xmlData = new \ManiaLive\Gui\Elements\Xml();
         $this->xmlData->setContent($xml);
+        $this->addComponent($this->xmlData);
     }
 
     public function close($login)

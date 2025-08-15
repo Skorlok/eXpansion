@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Players\Gui\Windows;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -44,33 +43,32 @@ class Playerlist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
 
         if (AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
-            $btn = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $btn->setText(__("Ignore List", $login));
-            $btn->setAction(\ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['ignore']);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Ignore List", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['ignore'], null, null, null, null, null, null) . '</frame>');
             $line->addComponent($btn);
         }
 
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            $btn = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $btn->setText(__("Guest List", $login));
-            $btn->setAction(\ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['guest']);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="25.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Guest List", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['guest'], null, null, null, null, null, null) . '</frame>');
             $line->addComponent($btn);
         }
 
         if (AdminGroups::hasPermission($login, Permission::PLAYER_UNBAN)) {
-            $btn = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $btn->setText(__("Ban List", $login));
-            $btn->setAction(\ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['ban']);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="51 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Ban List", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['ban'], null, null, null, null, null, null) . '</frame>');
             $line->addComponent($btn);
         }
+
         if (AdminGroups::hasPermission($login, Permission::PLAYER_BLACK)) {
-            $btn = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $btn->setText(__("Black List", $login));
-            $btn->setAction(\ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['black']);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="76.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Black List", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin::$showActions['black'], null, null, null, null, null, null) . '</frame>');
             $line->addComponent($btn);
         }
 
         $this->mainFrame->addComponent($line);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
 
         Gui::getScaledSize(self::$widths, $this->sizeX);
     }

@@ -157,7 +157,7 @@ class ManiaLink extends Singletons
         if ($string == null) {
             return "";
         }
-        return str_replace(array('&', '"', "'", '>', '<'), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;'), $string);
+        return str_replace(array('&', '"', "'", '>', '<', "\n"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;'), $string);
     }
 
     /**

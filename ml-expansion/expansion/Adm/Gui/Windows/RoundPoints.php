@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
 use ManiaLivePlugins\eXpansion\Adm\Structures\CustomPoint;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 
 class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -20,10 +19,6 @@ class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     private $items = array();
 
-    private $cancel;
-
-    private $actionCancel;
-
     private $rpoints = array();
 
     protected function onConstruct()
@@ -36,14 +31,6 @@ class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
-
-        $this->actionCancel = $this->createAction(array($this, "cancel"));
-
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Close", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
 
 
         $this->rpoints[] = new CustomPoint('Formula 1 GP New', array(25, 18, 15, 12, 10, 8, 6, 4, 2, 1));
@@ -79,7 +66,6 @@ class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX, $this->sizeY - 8);
-        $this->cancel->setPosition($this->sizeX - 20, -$this->sizeY + 6);
     }
 
     protected function onShow()
@@ -139,11 +125,6 @@ class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->erase($login);
     }
 
-    public function cancel($login)
-    {
-        $this->erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -152,7 +133,6 @@ class RoundPoints extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->pager->destroy();
-        $this->cancel->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->destroyComponents();

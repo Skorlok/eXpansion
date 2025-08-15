@@ -9,7 +9,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\Admin;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
@@ -50,10 +49,8 @@ class AdminItem extends Control
         $frame->addComponent($gui_nick);
 
         if (AdminGroups::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS) && !$admin->isReadOnly()) {
-            $this->plistButton = new MyButton(30, 4);
-            $this->plistButton->setAction($actionRemove);
-            $this->plistButton->setText(__(AdminGroups::$txt_rmPlayer, $login));
-            $this->plistButton->setScale(0.7);
+            $this->plistButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->plistButton->setContent('<frame posn="60 0 0" scale="0.933333333">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 4, __(AdminGroups::$txt_rmPlayer, $login), null, null, null, null, null, $actionRemove, null, null, null, null, null, null) . '</frame>');
             $frame->addComponent($this->plistButton);
         }
 
@@ -75,10 +72,6 @@ class AdminItem extends Control
      */
     public function erase()
     {
-        if ($this->plistButton != null) {
-            $this->plistButton->destroy();
-        }
-        $this->plistButton = null;
         $this->destroyComponents();
         parent::destroy();
     }

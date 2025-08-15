@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Quiz\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 
@@ -12,11 +10,7 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     protected $ok;
 
-    protected $cancel;
-
     protected $actionOk;
-
-    protected $actionCancel;
 
     protected $IBanswers;
 
@@ -30,7 +24,6 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     /** @var \ManiaLivePlugins\eXpansion\Quiz\Quiz */
     public static $mainPlugin;
-    /** @var  CheckboxScripted */
     protected $checkbox;
 
     protected function onConstruct()
@@ -57,34 +50,16 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->IBimageUrl->setLabel(__("Url for image", $login), $login);
         $this->frame->addComponent($this->IBimageUrl);
 
-        $this->checkbox = new OkButton();
-        $this->checkbox->setText(__("Ask hidden", $login));
-        $this->checkbox->setAction($this->createAction(array($this, "Hidden")));
+        $this->checkbox = new \ManiaLive\Gui\Elements\Xml();
+        $this->checkbox->setContent('<frame posn="0 -108 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Ask hidden", $login), null, null, null, null, null, $this->createAction(array($this, "Hidden")), null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->checkbox);
 
         $this->mainFrame->addComponent($this->frame);
 
         $this->actionOk = $this->createAction(array($this, "Ok"));
-        $this->actionCancel = $this->createAction(array($this, "Cancel"));
-
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="66 -111 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-        parent::onResize($oldX, $oldY);
-
-        $this->ok->setPosition($this->sizeX - 50, -$this->sizeY + 9);
-        $this->cancel->setPosition($this->sizeX - 24, -$this->sizeY + 9);
     }
 
     public function setQuestion(\ManiaLivePlugins\eXpansion\Quiz\Structures\Question $question)
@@ -145,17 +120,8 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
-
-    public function Cancel($login)
-    {
-        $this->erase($login);
-    }
-
     public function destroy()
     {
-
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

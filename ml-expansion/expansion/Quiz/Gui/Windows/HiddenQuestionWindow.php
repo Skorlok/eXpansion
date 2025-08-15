@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Quiz\Gui\Windows;
 use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Quiz\Structures\Question;
 
@@ -13,8 +12,6 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
 {
 
     protected $ok;
-
-    protected $cancel;
     /** @var  Frame */
     protected $frame;
     /** @var  Quad */
@@ -41,22 +38,13 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
         $this->frame = new Frame();
         $this->addComponent($this->frame);
 
-        $undo = new OkButton();
-        $undo->setText("Undo");
-        $undo->setPosition(64, -30);
-        $undo->setId("undo");
+        $undo = new \ManiaLive\Gui\Elements\Xml();
+        $undo->setContent('<frame posn="64 -30 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Undo", null, null, null, null, null, null, null, null, null, "undo", null, null) . '</frame>');
         $this->addComponent($undo);
 
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->createAction(array($this, "Ok")));
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="66 -81 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->createAction(array($this, "Ok")), null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->ok);
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->createAction(array($this, "Cancel")));
-        $this->addComponent($this->cancel);
 
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Quiz/Gui/Scripts/ClickScript");
         $this->registerScript($this->script);
@@ -71,9 +59,6 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-
-        $this->ok->setPosition($this->sizeX - 50, -$this->sizeY + 9);
-        $this->cancel->setPosition($this->sizeX - 24, -$this->sizeY + 9);
     }
 
     public function setQuestion(\ManiaLivePlugins\eXpansion\Quiz\Structures\Question $question)
@@ -135,16 +120,8 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
         $this->erase($login);
     }
 
-    public function Cancel($login)
-    {
-        $this->erase($login);
-    }
-
     public function destroy()
     {
-
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

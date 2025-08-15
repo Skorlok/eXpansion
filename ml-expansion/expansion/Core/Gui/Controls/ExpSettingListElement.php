@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Controls;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
 class ExpSettingListElement extends \ManiaLivePlugins\eXpansion\Gui\Control
@@ -30,12 +29,8 @@ class ExpSettingListElement extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label_value->setId('column_' . $indexNumber . '_1');
         $this->addComponent($this->label_value);
 
-        $this->button_remove = new Button(25, 6);
-        $this->button_remove->setText(__('Remove', $login));
-        $this->button_remove->setAction($action);
-        $this->button_remove->setDescription(__('Removes this value', $login), 40);
-        $this->button_remove->setId('column_' . $indexNumber . '_2');
-        $this->button_remove->setClass("eXpOptimizedPagerAction");
+        $this->button_remove = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_remove->setContent('<frame posn="139 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(25, 6, __('Remove', $login), array(__('Removes this value', $login), 40), null, null, null, null, $action, null, null, null, 'column_' . $indexNumber . '_2', "eXpOptimizedPagerAction", null) . '</frame>');
         $this->addComponent($this->button_remove);
 
 
@@ -58,9 +53,6 @@ class ExpSettingListElement extends \ManiaLivePlugins\eXpansion\Gui\Control
         }
 
         $this->bg->setSize($this->getSizeX(), $this->getSizeY());
-
-        $this->button_remove->setPosition($this->getSizeX() - 20, 0);
-
     }
 
     public function getNbTextColumns()

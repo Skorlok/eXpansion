@@ -7,7 +7,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
@@ -114,14 +113,13 @@ class MxMap extends Control
 
 
         if (!empty($buttons)) {
+            $x = 158;
             foreach ($buttons as $button) {
-                $newButton = new myButton(24, 5);
-                $newButton->setText(__($button->label));
-                $newButton->colorize($button->buttonColorize);
-                $newButton->setAction($this->createAction($button->callback, $map->mapId));
-
+                $newButton = new \ManiaLive\Gui\Elements\Xml();
+                $newButton->setContent('<frame posn="' . $x . ' 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(24, 5, __($button->label), null, null, $button->buttonColorize, null, null, $this->createAction($button->callback, $map->mapId), null, null, null, null, null, null) . '</frame>');
                 $this->line1->addComponent($newButton);
                 $this->buttons[] = $newButton;
+                $x += 19.5;
             }
         }
 
@@ -131,12 +129,14 @@ class MxMap extends Control
             $info->setStyle("Icons64x64_1");
             $info->setSubStyle("OfficialRace");
             $info->setAlign('center', 'center');
+            $info->setPosZ(1.5);
             $this->line2->addComponent($info);
 
             $info = new Label(12, 5);
             $info->setPosY(3);
             $info->setAlign('center', 'center');
             $info->setText($map->awardCount);
+            $info->setPosZ(1.5);
             $this->line2->addComponent($info);
         }
         $this->addComponent($this->line1);
@@ -157,12 +157,6 @@ class MxMap extends Control
      */
     public function erase()
     {
-        if (!empty($this->buttons)) {
-            foreach ($this->buttons as $button) {
-                $button->destroy();
-            }
-        }
-
         $this->line1->clearComponents();
         $this->line1->destroy();
         $this->line2->clearComponents();

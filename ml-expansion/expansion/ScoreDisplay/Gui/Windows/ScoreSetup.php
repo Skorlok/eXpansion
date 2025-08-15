@@ -4,9 +4,9 @@ namespace ManiaLivePlugins\eXpansion\ScoreDisplay\Gui\Windows;
 
 use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
+use ManiaLivePlugins\eXpansion\ScoreDisplay\Config;
 use ManiaLivePlugins\eXpansion\ScoreDisplay\Gui\Widgets\Scores;
 
 class ScoreSetup extends Window
@@ -38,11 +38,9 @@ class ScoreSetup extends Window
         $input->setLabel("Team2 Name");
         $this->frame->addComponent($input);
 
-        $button = new Button();
-        $button->setText("Ok");
-        $button->setAction($this->createAction(array($this, "ok")));
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="0 -48 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Ok", null, null, null, null, null, $this->createAction(array($this, "Ok")), null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($button);
-
     }
 
     public function Ok($login, $data)
@@ -50,6 +48,7 @@ class ScoreSetup extends Window
         $this->EraseAll();
         $scores = Scores::Create(null);
         $scores->setData($data);
+        $scores->setPosition(Config::getInstance()->scoreWidget_PosX, Config::getInstance()->scoreWidget_PosY);
         $scores->setName("ScoreWidget");
         $scores->setScale(0.8);
         $scores->show();

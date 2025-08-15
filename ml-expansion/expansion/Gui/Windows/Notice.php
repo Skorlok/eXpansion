@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Windows;
 
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
 
 class Notice extends Window
@@ -21,12 +20,8 @@ class Notice extends Window
         $this->actionOk = $this->createAction(array($this, "Ok"));
         $this->setSize(90, 60);
 
-        $this->ok = new OkButton();
-        //$this->ok->colorize("0d0");
-        $this->ok->setPosition(45, -48);
-        $this->ok->setText(__("Close", $login));
-        $this->ok->setAction($this->actionOk);
-        $this->ok->setAlign("center", "top");
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="32.25 -48 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Close", $login), null, null, null, null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
 
         $this->setTitle(__("Notice", $login));

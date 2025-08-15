@@ -7,7 +7,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use Maniaplanet\DedicatedServer\Structures\Player;
 
@@ -55,9 +54,8 @@ class BlacklistPlayeritem extends Control
 
         $this->frame->addComponent($spacer);
 
-        $this->unblackButton = new MyButton();
-        $this->unblackButton->setText(__("Remove"));
-        $this->unblackButton->setAction($this->unblackAction);
+        $this->unblackButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->unblackButton->setContent('<frame posn="54 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $login), null, null, null, null, null, $this->unblackAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->unblackButton);
 
 

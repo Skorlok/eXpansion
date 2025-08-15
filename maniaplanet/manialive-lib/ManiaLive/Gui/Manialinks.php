@@ -35,6 +35,8 @@ abstract class Manialinks
 
     final public static function getXml()
     {
+        /*self::$domDocument->preserveWhiteSpace = false;
+        self::$domDocument->formatOutput = true;*/
         $xml = self::$domDocument->saveXML(self::$domDocument);
         $xml = str_replace('<?xml version="1.0" encoding="UTF-8"?>', '', $xml);
         return $xml;

@@ -18,10 +18,8 @@
 
 namespace ManiaLivePlugins\eXpansion\AutoQueue\Gui\Widgets;
 
-use ManiaLib\Gui\Layouts\Column;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AutoQueue\AutoQueue;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
@@ -55,32 +53,23 @@ class EnterQueueWidget extends Widget
         $this->addComponent($this->dicoLabel);
 
         $frame = new Frame(50, -7);
-        $frame->setLayout(new Column());
 
-        $this->button = new Button();
-        $this->button->setText(__("Join", $login));
-        $this->button->colorize("0f0");
-
+        $this->button = new \ManiaLive\Gui\Elements\Xml();
+        $this->button->setContent(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Join", $login), null, null, "0f0", null, null, AutoQueue::$enterAction, null, null, null, null, null, null));
         $frame->addComponent($this->button);
 
-        $button = new Button();
-        $button->setText(__("Hide", $login));
-        $button->setDescription("Click waiting queue to show this window again.");
-        $button->setAction($this->createAction(array($this, "hideWidget")));
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="0 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Hide", $login), array("Click waiting queue to show this window again."), null, null, null, null, $this->createAction(array($this, "hideWidget")), null, null, null, null, null, null) . '</frame>');
         $frame->addComponent($button);
 
         $this->addComponent($frame);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     protected function eXpOnEndConstruct()
     {
         $this->setSize(80, 18);
-    }
-
-    public function onDraw()
-    {
-        $this->button->setAction(AutoQueue::$enterAction);
-        parent::onDraw();
     }
 
     public function hideWidget($login)

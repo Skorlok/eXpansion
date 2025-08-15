@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-
 class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
@@ -16,9 +14,7 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     private $storage;
     private $items = array();
     private $ok;
-    private $cancel;
     private $actionOk;
-    private $actionCancel;
 
     public static $mainPlugin;
 
@@ -34,18 +30,10 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager->setPosX(5);
         $this->mainFrame->addComponent($this->pager);
         $this->actionOk = $this->createAction(array($this, "ok"));
-        $this->actionCancel = $this->createAction(array($this, "cancel"));
 
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="140 -95.75 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
     }
 
     protected function onResize($oldX, $oldY)
@@ -53,8 +41,6 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX - 5, $this->sizeY - 8);
         $this->pager->setStretchContentX($this->sizeX);
-        $this->ok->setPosition($this->sizeX - 38, -$this->sizeY + 6);
-        $this->cancel->setPosition($this->sizeX - 20, -$this->sizeY + 6);
     }
 
     protected function onShow()
@@ -115,11 +101,6 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->Erase($login);
     }
 
-    public function cancel($login)
-    {
-        $this->Erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -128,8 +109,6 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->pager->destroy();
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->destroyComponents();

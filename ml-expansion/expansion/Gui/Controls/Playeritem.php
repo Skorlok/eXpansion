@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Controls;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
-
 class Playeritem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
@@ -52,14 +50,10 @@ class Playeritem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-
         $this->frame->addComponent($spacer);
 
-        $this->sendButton = new MyButton(20, 6);
-        $this->sendButton->setAction($this->sendAction);
-        $this->sendButton->setScale(0.6);
-        $this->sendButton->setText($text);
-
+        $this->sendButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->sendButton->setContent('<frame posn="64 0 1" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $text, null, null, null, null, null, $this->sendAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->sendButton);
 
         $this->addComponent($this->frame);
@@ -81,7 +75,6 @@ class Playeritem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function erase()
     {
-        $this->sendButton->destroy();
         parent::destroy();
     }
 }

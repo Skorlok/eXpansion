@@ -31,7 +31,6 @@ use ManiaLivePlugins\eXpansion\Faq\Gui\Controls\Line;
 class TutorialWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    protected $button;
     protected $frame;
     protected $mScript;
 
@@ -86,12 +85,9 @@ class TutorialWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->frame->addComponent($line);
         }
 
-        $button = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(45, 6);
-        $button->setText("Close - don't show again");
-        $button->setId("CloseNotAgain");
-        $button->setScriptEvents();
-        $this->button = $button;
-        $this->addComponent($this->button);
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="120 -74 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(45, 6, "Close - don't show again", null, null, null, null, null, null, null, null, null, "CloseNotAgain", null, null) . '</frame>');
+        $this->addComponent($button);
 
         $this->mScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Tutorial\Gui\Scripts");
         $this->registerScript($this->mScript);
@@ -100,12 +96,5 @@ class TutorialWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function close($login)
     {
         $this->Erase($login);
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-        parent::onResize($oldX, $oldY);
-        $this->button->setPosition($this->sizeX - 40, -$this->sizeY + 6);
-
     }
 }

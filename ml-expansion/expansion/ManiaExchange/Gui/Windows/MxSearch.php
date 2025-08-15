@@ -5,8 +5,6 @@ namespace ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows;
 use ManiaLib\Application\ErrorHandling;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
@@ -99,11 +97,8 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
-        $this->buttonSearch = new OkButton(24, 6);
-        $this->buttonSearch->setText("Search");
-        $this->buttonSearch->colorize('0a0');
-        $this->buttonSearch->setScale(0.6);
-        $this->buttonSearch->setAction($this->actionSearch);
+        $this->buttonSearch = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonSearch->setContent('<frame posn="186 0 1" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(24, 6, "Search", null, null, '0a0', null, null, $this->actionSearch, null, null, null, null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->buttonSearch);
 
         $this->mainFrame->addComponent($this->searchframe);

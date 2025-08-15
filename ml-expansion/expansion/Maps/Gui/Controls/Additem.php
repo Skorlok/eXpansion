@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Maps\Gui\Controls;
 
 use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 
 class Additem extends \ManiaLivePlugins\eXpansion\Gui\Control
@@ -103,19 +102,12 @@ class Additem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->frame->addComponent($spacer);
 
-
-        $this->addButton = new MyButton(24, 5);
-        $this->addButton->setText(__("Add", $login));
-        $this->addButton->setAction($this->addMapAction);
-        $this->addButton->setScale(0.5);
-        $this->addButton->colorize("2a2");
+        $this->addButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->addButton->setContent('<frame posn="165.4 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(24, 5, __("Add", $login), null, null, '2a2', null, null, $this->addMapAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->addButton);
 
-        $this->deleteButton = new MyButton(24, 5);
-        $this->deleteButton->setAction($this->deleteAction);
-        $this->deleteButton->setScale(0.5);
-        $this->deleteButton->setText('$ff0' . __("Delete", $login));
-        $this->deleteButton->colorize("222");
+        $this->deleteButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->deleteButton->setContent('<frame posn="179.4 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(24, 5, '$ff0' . __("Delete", $login), null, null, '222', null, null, $this->deleteAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->deleteButton);
 
         $this->addComponent($this->frame);
@@ -131,8 +123,6 @@ class Additem extends \ManiaLivePlugins\eXpansion\Gui\Control
     // manialive 3.1 override to do nothing.
     public function destroy()
     {
-
-
     }
 
     /*
@@ -143,8 +133,6 @@ class Additem extends \ManiaLivePlugins\eXpansion\Gui\Control
         ActionHandler::getInstance()->deleteAction($this->deleteAction);
         $this->frame->clearComponents();
         $this->frame->destroy();
-        $this->addButton->destroy();
-        $this->deleteButton->destroy();
 
         $this->destroyComponents();
 

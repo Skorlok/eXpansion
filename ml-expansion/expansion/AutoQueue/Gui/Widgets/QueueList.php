@@ -24,7 +24,6 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AutoQueue\AutoQueue;
 use ManiaLivePlugins\eXpansion\AutoQueue\Structures\QueuePlayer;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
@@ -82,29 +81,20 @@ class QueueList extends Widget
             $label->setText($x . ".  " . $player->nickName);
             $this->frame->addComponent($label);
 
-
-            $button = new Button();
-            $button->setPosition(32, -($x * 6));
             if ($player->login == $this->getRecipient()) {
-                $button->setText(__("Leave", $this->getRecipient()));
-                $button->setAction($this->createAction(array($this->mainInstance, "leaveQueue")));
+                $button = new \ManiaLive\Gui\Elements\Xml();
+                $button->setContent('<frame posn="32 -' . ($x * 6) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Leave", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this->mainInstance, "leaveQueue")), null, null, null, null, null, null) . '</frame>');
+                $this->frame->addComponent($button);
+            } else if (AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)) {
+                $button = new \ManiaLive\Gui\Elements\Xml();
+                $button->setContent('<frame posn="32 -' . ($x * 6) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this->mainInstance, "admRemoveQueue"), $player->login), null, null, null, null, null, null) . '</frame>');
                 $this->frame->addComponent($button);
             }
-
-            if ($player->login != $this->getRecipient() && AdminGroups::hasPermission($this->getRecipient(), Permission::SERVER_ADMIN)) {
-                $button->setText(__("Remove", $this->getRecipient()));
-                $button->setAction($this->createAction(array($this->mainInstance, "admRemoveQueue"), $player->login));
-                $this->frame->addComponent($button);
-            }
+            
             $x++;
             if ($x > 8) {
                 break;
             }
         }
-    }
-
-    public function destroy()
-    {
-        parent::destroy();
     }
 }

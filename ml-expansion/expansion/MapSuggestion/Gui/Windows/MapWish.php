@@ -85,15 +85,8 @@ class MapWish extends Window
         $this->inputbox_description->setLabel(__("Why you would like this map to be added ?", $login));
         $this->frame->addComponent($this->inputbox_description);
 
-        $this->button_send = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->button_send->colorize("0d0");
-        $this->button_send->setAction($this->createAction(array($this, "apply")));
-        $this->button_send->setText(__("Apply", $login));
-        $row->addComponent($this->button_send);
-
-        $this->button_cancel = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->button_cancel->setAction($this->createAction(array($this, "cancel")));
-        $this->button_cancel->setText(__("Cancel", $login));
+        $this->button_send = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_send->setContent(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->createAction(array($this, "apply")), null, null, null, null, null, null));
         $row->addComponent($this->button_send);
 
         $this->frame->addComponent($row);

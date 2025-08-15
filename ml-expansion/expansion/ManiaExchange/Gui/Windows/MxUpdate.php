@@ -209,9 +209,9 @@ class MxUpdate extends Window
 
     public function updateMap($login, $mapId)
     {
-        $mapUid = ArrayOfObj::getObjbyPropValue($this->maps, "trackID", $mapId);
+        $mapUid = ArrayOfObj::getObjbyPropValue($this->maps, "mapId", $mapId);
 
-        $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $mapUid->trackUID);
+        $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $mapUid->mapUid);
         if ($mapFileName){
             $this->connection->removeMap($mapFileName->fileName);
         }

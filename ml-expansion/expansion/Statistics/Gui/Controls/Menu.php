@@ -2,16 +2,16 @@
 
 namespace ManiaLivePlugins\eXpansion\Statistics\Gui\Controls;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
-
 class Menu extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
     public $frame;
+    public static $nbButtons = 0;
 
 
     public function __construct()
     {
+        self::$nbButtons = 0;
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setSize($this->getSizeX(), 4);
         $this->frame->setPosY(0);
@@ -27,14 +27,10 @@ class Menu extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function addItem($label, $action, $color = null)
     {
-        $button = new Button($this->getSizeX(), 6);
-        $button->setText($label);
-        $button->setAction($action);
-
-        if ($color != null) {
-            $button->colorize($color);
-        }
-
+        $button = new \ManiaLive\Gui\Elements\Xml();
+        $button->setContent('<frame posn="0 -' . (self::$nbButtons*6) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($this->getSizeX(), 6, $label, null, null, $color, null, null, $action, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($button);
+
+        self::$nbButtons++;
     }
 }

@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Chat\Gui\Widgets;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Chat\Chat;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
@@ -27,9 +26,8 @@ class ChatSelect extends Widget
         $this->channelSelect = new Dropdown("channel");
         $this->channelSelect->addItems(Chat::$channels);
         $this->frame->addComponent($this->channelSelect);
-        $this->button = new Button();
-        $this->button->setText("Change");
-        $this->button->setAction($this->createAction(array($this, "ok")));
+        $this->button = new \ManiaLive\Gui\Elements\Xml();
+        $this->button->setContent('<frame posn="35 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Change", null, null, null, null, null, $this->createAction(array($this, "ok")), null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->button);
         $this->addComponent($this->frame);
     }

@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Database\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 
 class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -14,14 +13,10 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     /** @var \Maniaplanet\DedicatedServer\Connection */
     private $connection;
 
-    /** @var \ManiaLive\Data\Storage */
-    private $storage;
     private $items = array();
     private $ok;
-    private $cancel;
     private $inputbox;
     private $actionBackup;
-    private $actionCancel;
 
     /** @var  \ManiaLive\Database\Connection */
     private $db;
@@ -31,33 +26,28 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onConstruct();
         $config = \ManiaLive\DedicatedApi\Config::getInstance();
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
+
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
+
         $this->actionBackup = $this->createAction(array(self::$mainPlugin, "exportToSql"));
-        $this->actionCancel = $this->createAction(array($this, "Cancel"));
+
         $this->inputbox = new Inputbox("filename", 60);
         $this->inputbox->setLabel("Backup filename");
+        $this->inputbox->setPosition(0, -94);
         $this->mainFrame->addComponent($this->inputbox);
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText("Create Backup");
-        $this->ok->setAction($this->actionBackup);
-        $this->mainFrame->addComponent($this->ok);
 
-        $this->cancel = new OkButton();
-        $this->cancel->setText("Cancel");
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="62 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Create Backup', null, null, "0d0", null, null, $this->actionBackup, null, null, null, null, null, null) . '</frame>');
+        $this->mainFrame->addComponent($this->ok);
     }
 
     protected function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX, $this->sizeY - 8);
+        $this->pager->setPosition(0, 5);
         $this->pager->setStretchContentX($this->sizeX);
-        $this->inputbox->setPosition(4, -$this->sizeY + 6);
-        $this->ok->setPosition($this->sizeX - 38, -$this->sizeY + 6);
-        $this->cancel->setPosition($this->sizeX - 20, -$this->sizeY + 6);
     }
 
     protected function onShow()
@@ -130,11 +120,6 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->RedrawAll();
     }
 
-    public function Cancel($login)
-    {
-        $this->erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -144,11 +129,8 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->db = null;
         $this->items = array();
         $this->pager->destroy();
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->inputbox->destroy();
         $this->connection = null;
-        $this->storage = null;
         $this->destroyComponents();
         parent::destroy();
     }

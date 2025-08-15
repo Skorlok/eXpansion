@@ -63,9 +63,8 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label_login->setText($record->login);
         $this->frame->addComponent($this->label_login);
 
-        $this->button_report = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(8.84, 8);
-        $this->button_report->setIcon("Icons64x64_2", "Disconnected");
-        $this->button_report->setAction($this->createAction(array($this, "openRepWindow"), $record->login));
+        $this->button_report = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_report->setContent('<frame posn="106.153 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(8.846, 8, null, null, null, null, null, null, $this->createAction(array($this, "openRepWindow"), $record->login), null, null, array("Icons64x64_2", "Disconnected"), null, null, null) . '</frame>');
         $this->frame->addComponent($this->button_report);
     }
 
@@ -86,7 +85,6 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label_score->setSizeX($scaledSizes[1]);
         $this->label_nick->setSizeX($scaledSizes[2]);
         $this->label_login->setSizeX($scaledSizes[3]);
-        //$this->button_report->setSizeX($scaledSizes[4]);
     }
 
     // manialive 3.1 override to do nothing.

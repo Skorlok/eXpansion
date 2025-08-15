@@ -90,12 +90,8 @@ class NetStatWindow extends Window
             $status->setText('$fff' . $stat->ipAddress);
             //$line->addComponent($status);
 
-            $kick = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-            $kick->setScale(0.5);
-            $kick->setPosY(-1.5);
-            $kick->setText(__('Kick', $login));
-            $action = $this->createAction(array($this, 'kick'), $login);
-            $kick->setAction($action);
+            $kick = new \ManiaLive\Gui\Elements\Xml();
+            $kick->setContent('<frame posn="51 -1.5 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __('Kick', $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'kick'), $login), null, null, null, null, null, null) . '</frame>');
             $line->addComponent($kick);
 
             $this->frame->addComponent($line);
@@ -105,7 +101,6 @@ class NetStatWindow extends Window
 
     public function kick($login, $kickLogin)
     {
-        print $login . " -> " . $kickLogin;
         $adminGroup = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
         $adminGroup->adminCmd($login, "kick " . $kickLogin . " \"Network Lag was too big\"");
     }

@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Maps\Gui\Controls;
 
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\Structures\OptimizedPagerElement;
@@ -90,52 +89,29 @@ class Mapitem extends Control implements OptimizedPagerElement
         $this->actionsFrame->setLayout(new \ManiaLib\Gui\Layouts\Line());
         $this->frame->addComponent($this->actionsFrame);
 
-        $this->showInfoButton = new MyButton(5, 5);
-        $this->showInfoButton->setDescription(__('Map Info', $login), 40);
-        $this->showInfoButton->setAction($action);
-        $this->showInfoButton->setIcon('Icons64x64_1', 'TrackInfo');
-        $this->showInfoButton->setId('column_' . $indexNumber . '_6');
-        $this->showInfoButton->setClass("eXpOptimizedPagerAction");
+        $this->showInfoButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->showInfoButton->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Map Info', $login), 40), null, null, null, null, $action, null, null, array('Icons64x64_1', 'TrackInfo'), 'column_' . $indexNumber . '_6', "eXpOptimizedPagerAction", null) . '</frame>');
         $this->actionsFrame->addComponent($this->showInfoButton);
 
         if (Maplist::$localrecordsLoaded) {
-            $this->showRecsButton = new MyButton(5, 5);
-            $this->showRecsButton->setDescription(__('Show Records', $login), 40);
-            $this->showRecsButton->setAction($action);
-            $this->showRecsButton->setIcon('BgRaceScore2', 'ScoreLink');
-            $this->showRecsButton->setId('column_' . $indexNumber . '_7');
-            $this->showRecsButton->setClass("eXpOptimizedPagerAction");
+            $this->showRecsButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->showRecsButton->setContent('<frame posn="5.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Show Records', $login), 40), null, null, null, null, $action, null, null, array('BgRaceScore2', 'ScoreLink'), 'column_' . $indexNumber . '_7', "eXpOptimizedPagerAction", null) . '</frame>');
             $this->actionsFrame->addComponent($this->showRecsButton);
         }
 
         if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN)) {
-            $this->jumpButton = new MyButton(5, 5);
-            $this->jumpButton->setDescription(__('Skip to this map', $login), 70);
-            $this->jumpButton->setAction($action);
-            $this->jumpButton->colorize('a22');
-            $this->jumpButton->setIcon('Icons64x64_1', 'ClipPlay');
-            $this->jumpButton->setId('column_' . $indexNumber . '_8');
-            $this->jumpButton->setClass("eXpOptimizedPagerAction");
+            $this->jumpButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->jumpButton->setContent('<frame posn="10.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Skip to this map', $login), 70), null, null, null, null, $action, null, null, array('Icons64x64_1', 'ClipPlay'), 'column_' . $indexNumber . '_8', "eXpOptimizedPagerAction", null) . '</frame>');
             $this->actionsFrame->addComponent($this->jumpButton);
         }
 
         if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
-            $this->removeButton = new MyButton(5, 5);
-            $this->removeButton->setDescription(__('$F22Remove this map from server', $login), 70);
-            $this->removeButton->setAction($action);
-            $this->removeButton->colorize('a22');
-            $this->removeButton->setIcon('Icons128x32_1', 'Close');
-            $this->removeButton->setId('column_' . $indexNumber . '_9');
-            $this->removeButton->setClass("eXpOptimizedPagerAction");
+            $this->removeButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->removeButton->setContent('<frame posn="15.75 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('$F22Remove this map from server', $login), 70), null, null, null, null, $action, null, null, array('Icons128x32_1', 'Close'), 'column_' . $indexNumber . '_9', "eXpOptimizedPagerAction", null) . '</frame>');
             $this->actionsFrame->addComponent($this->removeButton);
 
-            $this->trashButton = new MyButton(5, 5);
-            $this->trashButton->setDescription(__('$F22Erase this map and the file from server', $login), 70);
-            $this->trashButton->setAction($action);
-            $this->trashButton->colorize('a22');
-            $this->trashButton->setIcon('Icons64x64_1', 'Close');
-            $this->trashButton->setId('column_' . $indexNumber . '_10');
-            $this->trashButton->setClass("eXpOptimizedPagerAction");
+            $this->trashButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->trashButton->setContent('<frame posn="21 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('$F22Erase this map and the file from server', $login), 70), null, null, null, null, $action, null, null, array('Icons64x64_1', 'Close'), 'column_' . $indexNumber . '_10', "eXpOptimizedPagerAction", null) . '</frame>');
             $this->actionsFrame->addComponent($this->trashButton);
         }
 
@@ -159,25 +135,6 @@ class Mapitem extends Control implements OptimizedPagerElement
 
     public function destroy()
     {
-        if (is_object($this->queueButton)) {
-            $this->queueButton->destroy();
-        }
-        if (is_object($this->goButton)) {
-            $this->goButton->destroy();
-        }
-        if (is_object($this->removeButton)) {
-            $this->removeButton->destroy();
-        }
-        if (is_object($this->trashButton)) {
-            $this->trashButton->destroy();
-        }
-        if (is_object($this->jumpButton)) {
-            $this->jumpButton->destroy();
-        }
-        if (is_object($this->showRecsButton)) {
-            $this->showRecsButton->destroy();
-        }
-
         $this->destroyComponents();
         parent::destroy();
     }

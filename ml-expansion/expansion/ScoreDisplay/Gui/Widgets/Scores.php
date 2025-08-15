@@ -8,7 +8,6 @@ use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Helpers\Countries;
 
@@ -36,28 +35,20 @@ class Scores extends Widget
         $spacer = new Label(16, 6);
         $this->frame2->addComponent($spacer);
 
-
-        $btn = new Button(9, 6);
-        $btn->setText("+");
-        $btn->setAction($this->createAction(array($this, "add"), 0));
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="16 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "+", null, null, null, null, null, $this->createAction(array($this, "add"), 0), null, null, null, null, null, null) . '</frame>');
         $this->frame2->addComponent($btn);
 
-        $btn = new Button(9, 6);
-        $btn->setText("-");
-        $btn->setAction($this->createAction(array($this, "sub"), 0));
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="24.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "-", null, null, null, null, null, $this->createAction(array($this, "sub"), 0), null, null, null, null, null, null) . '</frame>');
         $this->frame2->addComponent($btn);
 
-        $spacer = new Label(52, 6);
-        $this->frame2->addComponent($spacer);
-
-        $btn = new Button(9, 6);
-        $btn->setText("+");
-        $btn->setAction($this->createAction(array($this, "add"), 1));
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="84.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "+", null, null, null, null, null, $this->createAction(array($this, "add"), 1), null, null, null, null, null, null) . '</frame>');
         $this->frame2->addComponent($btn);
 
-        $btn = new Button(9, 6);
-        $btn->setText("-");
-        $btn->setAction($this->createAction(array($this, "sub"), 1));
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="92.75 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "-", null, null, null, null, null, $this->createAction(array($this, "sub"), 1), null, null, null, null, null, null) . '</frame>');
         $this->frame2->addComponent($btn);
     }
 

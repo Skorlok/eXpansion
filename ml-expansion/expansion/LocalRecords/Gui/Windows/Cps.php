@@ -62,14 +62,12 @@ class Cps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->frameCP->addComponent($label);
         }
 
-        $this->prevButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->prevButton->setIcon("Icons64x64_1", "ArrowPrev");
-        $this->prevButton->setAction($this->createAction(array($this, "prevPage")));
+        $this->prevButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->prevButton->setContent('<frame posn="105 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, null, null, null, null, null, $this->createAction(array($this, "prevPage")), null, null, array("Icons64x64_1", "ArrowPrev"), null, null, null) . '</frame>');
         $this->frameCP->addComponent($this->prevButton);
 
-        $this->nextButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->nextButton->setIcon("Icons64x64_1", "ArrowNext");
-        $this->nextButton->setAction($this->createAction(array($this, "nextPage")));
+        $this->nextButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->nextButton->setContent('<frame posn="111 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, null, null, null, null, null, $this->createAction(array($this, "nextPage")), null, null, array("Icons64x64_1", "ArrowNext"), null, null, null) . '</frame>');
         $this->frameCP->addComponent($this->nextButton);
 
         $this->frame->addComponent($this->frameCP);
@@ -159,14 +157,12 @@ class Cps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->frameCP->addComponent($label);
         }
 
-        $this->prevButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->prevButton->setIcon("Icons64x64_1", "ArrowPrev");
-        $this->prevButton->setAction($this->createAction(array($this, "prevPage")));
+        $this->prevButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->prevButton->setContent('<frame posn="105 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, null, null, null, null, null, $this->createAction(array($this, "prevPage")), null, null, array("Icons64x64_1", "ArrowPrev"), null, null, null) . '</frame>');
         $this->frameCP->addComponent($this->prevButton);
 
-        $this->nextButton = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(6, 6);
-        $this->nextButton->setIcon("Icons64x64_1", "ArrowNext");
-        $this->nextButton->setAction($this->createAction(array($this, "nextPage")));
+        $this->nextButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->nextButton->setContent('<frame posn="111 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, null, null, null, null, null, $this->createAction(array($this, "nextPage")), null, null, array("Icons64x64_1", "ArrowNext"), null, null, null) . '</frame>');
         $this->frameCP->addComponent($this->nextButton);
 
         $x = 0;

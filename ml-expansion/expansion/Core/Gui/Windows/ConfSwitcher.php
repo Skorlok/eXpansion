@@ -66,12 +66,11 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->input->setScale(0.8);
         $this->mainFrame->addComponent($this->input);
 
-        $this->buttonSave = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(25, 5);
-        $this->buttonSave->setText(__("Save"));
-        $this->buttonSave->setAction($this->createAction(array($this, 'saveAction')));
-        $this->buttonSave->setScale(0.8);
+        $this->buttonSave = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonSave->setContent('<frame posn="56.25 -3 1" scale="1.066666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(25, 5, __("Save", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'saveAction')), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonSave);
 
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     public function onResize($oldX, $oldY)
@@ -81,8 +80,6 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->input->setSize($this->sizeX * (1 / 0.8) - 60, 7);
         $this->input->setPosition(0, -3);
-
-        $this->buttonSave->setPosition($this->sizeX * (1 / 0.8) - 55 * (1 / 0.8), -3);
     }
 
 

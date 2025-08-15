@@ -57,26 +57,13 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_login->setAlign('left', 'center');
         $this->frame->addComponent($this->label_login);
 
-        $this->button_cps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_cps->setText(__("Checkpoints", $login));
-        $this->button_cps->setAction(\ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenCps);
+        $this->button_cps = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_cps->setContent('<frame posn="90 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, __("Checkpoints", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenCps, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->button_cps);
 
-        $this->button_seccps = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(30, 5);
-        $this->button_seccps->setText(__("Sectors", $login));
-        $this->button_seccps->setAction(\ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenSecCps);
+        $this->button_seccps = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_seccps->setContent('<frame posn="64 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, __("Sectors", $login), null, null, null, null, null, \ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract::$actionOpenSecCps, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->button_seccps);
-
-        $this->label_visit = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(50);
-        $action = $this->createAction(array($this, 'handleVisitButton'));
-        $this->label_visit->setAction($action);
-        $this->label_visit->setText(__("Visit Dedimania at Web", $login));
-        $this->mainFrame->addComponent($this->label_visit);
-    }
-
-    public function handleVisitButton($login)
-    {
-        $this->connection->sendOpenLink($login, $this->url, 0);
     }
 
     public function onResize($oldX, $oldY)
@@ -88,10 +75,6 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_score->setSizeX($scaledSizes[1]);
         $this->label_nick->setSizeX($scaledSizes[2]);
         $this->label_login->setSizeX($scaledSizes[3]);
-
-        $this->button_cps->setPosition($this->getSizeX() - 30, -$this->getSizeY() + 6);
-        $this->button_seccps->setPosition($this->getSizeX() - 56, -$this->getSizeY() + 6);
-        $this->label_visit->setPosition($this->getSizeX() - 97, -$this->getSizeY() + 6);
 
         $this->pager->setSize($this->getSizeX(), $this->getSizeY() - 12);
         foreach ($this->items as $item) {
@@ -130,8 +113,19 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;'), $string);
+    }
+
     public function setDediUrl($url)
     {
         $this->url = $url;
+        $this->label_visit = new \ManiaLive\Gui\Elements\Xml();
+        $this->label_visit->setContent('<frame posn="23 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(50, 6, __("Visit Dedimania at Web", $this->getRecipient()), null, null, null, null, null, null, null, $this->handleSpecialChars($this->url), null, null, null, null) . '</frame>');
+        $this->mainFrame->addComponent($this->label_visit);
     }
 }

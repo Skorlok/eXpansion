@@ -15,7 +15,6 @@ use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
-use ManiaLivePlugins\eXpansion\Helpers\GbxReader\Map;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use Maniaplanet\DedicatedServer\Connection;
@@ -135,22 +134,18 @@ class MapInfo extends Window
 
         // Mod file
         if ($gbxInfo->modUrl) {
-            $this->button_mod = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-            $this->button_mod->setText(__("Download Mod"));
-            $this->button_mod->setPosition(80, -85);
-            $action = $this->createAction(array($this, 'handleButtonMod'));
-            $this->button_mod->setAction($action);
-            $this->frame->addComponent($this->button_mod);
+            $link = $this->handleSpecialChars($this->gbxInfo->modUrl);
+            $button_mod = new \ManiaLive\Gui\Elements\Xml();
+            $button_mod->setContent('<frame posn="80 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Mod", $this->getRecipient()), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
+            $this->frame->addComponent($button_mod);
         }
 
         // Song file
         if ($gbxInfo->songUrl) {
-            $this->button_song = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-            $this->button_song->setText(__("Download Song"));
-            $this->button_song->setPosition(110, -85);
-            $action = $this->createAction(array($this, 'handleButtonSong'));
-            $this->button_song->setAction($action);
-            $this->frame->addComponent($this->button_song);
+            $link = $this->handleSpecialChars($this->gbxInfo->songUrl);
+            $button_song = new \ManiaLive\Gui\Elements\Xml();
+            $button_song->setContent('<frame posn="80 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Song", $this->getRecipient()), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
+            $this->frame->addComponent($button_song);
         }
 
         $lbl = new Label($x, 6);
@@ -208,14 +203,28 @@ class MapInfo extends Window
         return true;
     }
 
-    public function handleButtonMod($login)
+    private function handleSpecialChars($string)
     {
-        $this->connection->sendOpenLink($login, $this->gbxInfo->modUrl, 0);
-    }
-
-    public function handleButtonSong($login)
-    {
-        $this->connection->sendOpenLink($login, $this->gbxInfo->songUrl, 0);
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(
+			array(
+				'&',
+				'"',
+				"'",
+				'>',
+				'<'
+			),
+			array(
+				'&amp;',
+				'&quot;',
+				'&apos;',
+				'&gt;',
+				'&lt;'
+			),
+			$string
+	    );
     }
 
     protected function onHide()

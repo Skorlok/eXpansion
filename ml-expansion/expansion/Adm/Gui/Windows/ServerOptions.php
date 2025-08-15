@@ -13,7 +13,6 @@ use ManiaLive\DedicatedApi\Config;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked;
@@ -49,13 +48,11 @@ class ServerOptions extends Window
     protected $frameLadder;
 
     protected $buttonOK;
-    protected $buttonCancel;
 
     /** @var Connection */
     protected $connection;
 
     protected $actionOK;
-    protected $actionCancel;
 
     protected $e = array();
 
@@ -65,7 +62,6 @@ class ServerOptions extends Window
         $config = Config::getInstance();
         $this->connection = Connection::factory($config->host, $config->port);
         $this->actionOK = $this->createAction(array($this, "serverOptionsOk"));
-        $this->actionCancel = $this->createAction(array($this, "serverOptionsCancel"));
 
         $this->setTitle(__('Server Options', $this->getRecipient()));
 
@@ -98,7 +94,7 @@ class ServerOptions extends Window
 
 
         $this->serverCommentE = new \Manialive\Gui\Elements\Xml();
-        $this->serverCommentE->setContent('<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . $this->connection->getServerComment() . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>');
+        $this->serverCommentE->setContent('<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . str_replace("\n", "&#10;", $this->connection->getServerComment()) . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>');
         $this->frameInputbox->addComponent($this->serverCommentE);
 
         $spacer = new Quad(3, 26);
@@ -258,23 +254,9 @@ class ServerOptions extends Window
         $quad->setStyle(Bgs1::BgEmpty);
         $this->frameCb->addComponent($quad);
 
-        // Ok and Cancel buttons goes for own row
-        $frame = new Frame();
-        $frame->setAlign("left", "top");
-        $frame->setSize(40, 20);
-        $frame->setLayout(new Line());
-
-        $this->buttonOK = new OkButton();
-        $this->buttonOK->setText(__("Apply", $this->getRecipient()));
-        $this->buttonOK->setAction($this->actionOK);
+        $this->buttonOK = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonOK->setContent('<frame posn="126 -100 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $this->getRecipient()), null, null, null, null, null, $this->actionOK, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->buttonOK);
-
-        $this->buttonCancel = new OkButton();
-        $this->buttonCancel->setText(__("Cancel", $this->getRecipient()));
-        $this->buttonCancel->setAction($this->actionCancel);
-        $this->addComponent($this->buttonCancel);
-
-        $this->frameCb->addComponent($frame);
     }
 
     protected function onDraw()
@@ -318,9 +300,6 @@ class ServerOptions extends Window
         $this->refereePass->setSizeX(($this->sizeX - 8) / 2);
         $this->frameInputbox->setPosition(0, -6);
         $this->frameCb->setPosition($this->sizeX / 2 + 20, -25);
-
-        $this->buttonOK->setPosition($this->sizeX - $this->buttonCancel->sizeX - $this->buttonOK->sizeX, -$this->sizeY);
-        $this->buttonCancel->setPosition($this->sizeX - $this->buttonCancel->sizeX, -$this->sizeY);
     }
 
     public function serverOptionsOk($login, $args)
@@ -384,11 +363,6 @@ class ServerOptions extends Window
             $this->connection->chatSendServerMessage(__("Settings not changed.", $login));
         }
 
-        $this->Erase($this->getRecipient());
-    }
-
-    public function serverOptionsCancel($login)
-    {
         $this->Erase($this->getRecipient());
     }
 }

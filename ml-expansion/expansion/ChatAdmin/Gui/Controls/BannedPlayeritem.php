@@ -8,7 +8,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use Maniaplanet\DedicatedServer\Structures\PlayerBan;
 
 class BannedPlayeritem extends Control
@@ -58,9 +57,8 @@ class BannedPlayeritem extends Control
 
         $this->frame->addComponent($spacer);
 
-        $this->unbanButton = new MyButton();
-        $this->unbanButton->setText(__("Remove"));
-        $this->unbanButton->setAction($this->unbanAction);
+        $this->unbanButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->unbanButton->setContent('<frame posn="54 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Remove", $login), null, null, null, null, null, $this->unbanAction, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->unbanButton);
 
 

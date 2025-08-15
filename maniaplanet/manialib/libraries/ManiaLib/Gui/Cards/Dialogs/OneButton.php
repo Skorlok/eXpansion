@@ -17,9 +17,6 @@ use ManiaLib\Gui\Elements\Label;
 class OneButton extends \ManiaLib\Gui\Cards\Panel
 {
 
-	/**
-	 * @var \ManiaLib\Gui\Elements\Button
-	 */
 	public $button;
 
 	/**

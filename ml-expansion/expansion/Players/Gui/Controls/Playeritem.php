@@ -12,7 +12,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as MyButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Structures\OptimizedPagerElement;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
@@ -88,130 +87,83 @@ class Playeritem extends Control implements OptimizedPagerElement
         // admin additions
         if (AdminGroups::isInList($login)) {
             if (AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
-                $this->ignoreButton = new MyButton(7, 5);
-                $this->ignoreButton->setDescription(__('Ignore/UnIgnore player', $login), 50);
-                $this->ignoreButton->setTextColor("fff");
-                $this->ignoreButton->colorize("a22");
-                $this->ignoreButton->setAction($action);
-                $this->ignoreButton->setIcon('Icons128x128_1', 'Easy');
-                //$this->ignoreButton->setIcon('Icons128x128_1', 'Beginner'); IN CASE OF ALREADY MUTED
-                $this->ignoreButton->setId('column_' . $indexNumber . '_2');
-                $this->ignoreButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->ignoreButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->ignoreButton->setContent('<frame posn="84 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Ignore/UnIgnore player', $login), 50), null, null, "fff", null, $action, null, null, array('Icons128x128_1', 'Easy'), 'column_' . $indexNumber . '_2', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->ignoreButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_KICK)) {
-                $this->kickButton = new MyButton(7, 5);
-                $this->kickButton->setDescription(__('Kick player', $login), 50);
-                $this->kickButton->setTextColor("fff");
-                $this->kickButton->colorize("a22");
-                $this->kickButton->setAction($action);
-                $this->kickButton->setIcon('Icons128x128_1', 'Medium');
-                $this->kickButton->setId('column_' . $indexNumber . '_3');
-                $this->kickButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->kickButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->kickButton->setContent('<frame posn="90.75 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Kick player', $login), 50), null, null, "fff", null, $action, null, null, array('Icons128x128_1', 'Medium'), 'column_' . $indexNumber . '_3', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->kickButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_BAN)) {
-                $this->banButton = new MyButton(7, 5);
-                $this->banButton->setDescription(__('Ban player', $login), 50);
-                $this->banButton->setTextColor("fff");
-                $this->banButton->colorize("a22");
-                $this->banButton->setAction($action);
-                $this->banButton->setIcon('Icons128x128_1', 'Hard');
-                $this->banButton->setId('column_' . $indexNumber . '_4');
-                $this->banButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->banButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->banButton->setContent('<frame posn="97.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Ban player', $login), 50), null, null, "fff", null, $action, null, null, array('Icons128x128_1', 'Hard'), 'column_' . $indexNumber . '_4', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->banButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_BLACK)) {
-                $this->blacklistButton = new MyButton(7, 5);
-                $this->blacklistButton->setDescription(__('Blacklist player', $login), 50);
-                $this->blacklistButton->setTextColor("fff");
-                $this->blacklistButton->colorize("a22");
-                $this->blacklistButton->setAction($action);
-                $this->blacklistButton->setIcon('Icons128x128_1', 'Extreme');
-                $this->blacklistButton->setId('column_' . $indexNumber . '_5');
-                $this->blacklistButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->blacklistButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->blacklistButton->setContent('<frame posn="104.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Blacklist player', $login), 50), null, null, "fff", null, $action, null, null, array('Icons128x128_1', 'Extreme'), 'column_' . $indexNumber . '_5', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->blacklistButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->switchSpecButton = new MyButton(6, 5);
-                $this->switchSpecButton->setAction($action);
-                $this->switchSpecButton->colorize("2f2");
-                $this->switchSpecButton->setIcon('BgRaceScore2', 'Spectator');
-                $this->switchSpecButton->setDescription(__('Switch to spectate', $login), 50);
-                $this->switchSpecButton->setId('column_' . $indexNumber . '_6');
-                $this->switchSpecButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->switchSpecButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->switchSpecButton->setContent('<frame posn="111 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Switch to spectate', $login), 50), null, null, null, null, $action, null, null, array('BgRaceScore2', 'Spectator'), 'column_' . $indexNumber . '_6', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->switchSpecButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->switchPlayButton = new MyButton(6, 5);
-                $this->switchPlayButton->setAction($action);
-                $this->switchPlayButton->colorize("2f2");
-                $this->switchPlayButton->setIcon('Icons64x64_1', 'Opponents');
-                $this->switchPlayButton->setDescription(__('Switch to play', $login), 50);
-                $this->switchPlayButton->setId('column_' . $indexNumber . '_7');
-                $this->switchPlayButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->switchPlayButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->switchPlayButton->setContent('<frame posn="117 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Switch to play', $login), 50), null, null, null, null, $action, null, null, array('Icons64x64_1', 'Opponents'), 'column_' . $indexNumber . '_7', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->switchPlayButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->forceSpecButton = new MyButton(6, 5);
-                $this->forceSpecButton->setAction($action);
-                $this->forceSpecButton->colorize("2f2");
-                $this->forceSpecButton->setIcon('BgRaceScore2', 'Spectator');
-                $this->forceSpecButton->setDescription(__('Force to spectate', $login), 50);
-                $this->forceSpecButton->setId('column_' . $indexNumber . '_8');
-                $this->forceSpecButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->forceSpecButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->forceSpecButton->setContent('<frame posn="123 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Force to spectate', $login), 50), null, null, null, null, $action, null, null, array('BgRaceScore2', 'Spectator'), 'column_' . $indexNumber . '_8', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->forceSpecButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_FORCESPEC)) {
-                $this->forcePlayButton = new MyButton(6, 5);
-                $this->forcePlayButton->setAction($action);
-                $this->forcePlayButton->colorize("2f2");
-                $this->forcePlayButton->setIcon('Icons64x64_1', 'Opponents');
-                $this->forcePlayButton->setDescription(__('Force to play', $login), 50);
-                $this->forcePlayButton->setId('column_' . $indexNumber . '_9');
-                $this->forcePlayButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->forcePlayButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->forcePlayButton->setContent('<frame posn="129 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Force to play', $login), 50), null, null, null, null, $action, null, null, array('Icons64x64_1', 'Opponents'), 'column_' . $indexNumber . '_9', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->forcePlayButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_GUEST)) {
-                $this->guestButton = new MyButton(6, 5);
-                $this->guestButton->setAction($action);
-                $this->guestButton->colorize("2f2");
-                $this->guestButton->setIcon('Icons128x128_1', 'Buddies');
-                $this->guestButton->setDescription(__('Add to guest list', $login), 50);
-                $this->guestButton->setId('column_' . $indexNumber . '_10');
-
-                $this->guestButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->guestButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->guestButton->setContent('<frame posn="135 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Add to guest list', $login), 50), null, null, null, null, $action, null, null, array('Icons128x128_1', 'Buddies'), 'column_' . $indexNumber . '_10', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->guestButton);
+
+                $this->columnCount++;
             }
 
             if (AdminGroups::hasPermission($login, Permission::PLAYER_CHANGE_TEAM)) {
-                $this->teamButton = new MyButton(6, 5);
-                $this->teamButton->setAction($action);
-                $this->teamButton->colorize("2f2");
-                $this->teamButton->setIcon('Icons128x32_1', 'RT_Team');
-                $this->teamButton->setDescription(__('Switch player team', $login), 50);
-                $this->teamButton->setId('column_' . $indexNumber . '_11');
-
-                $this->teamButton->setClass("eXpOptimizedPagerAction");
-                $this->columnCount++;
+                $this->teamButton = new \ManiaLive\Gui\Elements\Xml();
+                $this->teamButton->setContent('<frame posn="141 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(5, 5, null, array(__('Switch player team', $login), 50), null, null, null, null, $action, null, null, array('Icons128x32_1', 'RT_Team'), 'column_' . $indexNumber . '_11', "eXpOptimizedPagerAction", null) . '</frame>');
                 $this->frame->addComponent($this->teamButton);
+
+                $this->columnCount++;
             }
         }
 
@@ -231,37 +183,6 @@ class Playeritem extends Control implements OptimizedPagerElement
 
     public function destroy()
     {
-        if (is_object($this->banButton)) {
-            $this->banButton->destroy();
-        }
-        if (is_object($this->switchSpecButton)) {
-            $this->switchSpecButton->destroy();
-        }
-        if (is_object($this->switchPlayButton)) {
-            $this->switchPlayButton->destroy();
-        }
-        if (is_object($this->forceSpecButton)) {
-            $this->forceSpecButton->destroy();
-        }
-        if (is_object($this->forcePlayButton)) {
-            $this->forcePlayButton->destroy();
-        }
-        if (is_object($this->kickButton)) {
-            $this->kickButton->destroy();
-        }
-        if (is_object($this->blacklistButton)) {
-            $this->blacklistButton->destroy();
-        }
-        if (is_object($this->ignoreButton)) {
-            $this->ignoreButton->destroy();
-        }
-        if (is_object($this->guestButton)) {
-            $this->guestButton->destroy();
-        }
-        if (is_object($this->teamButton)) {
-            $this->teamButton->destroy();
-        }
-
         $this->destroyComponents();
 
         parent::destroy();

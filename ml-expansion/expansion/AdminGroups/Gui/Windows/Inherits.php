@@ -16,9 +16,7 @@ class Inherits extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $pager;
     protected $group;
     protected $button_ok;
-    protected $button_cancel;
     protected $action_ok;
-    protected $action_cancel;
     protected $items = array();
     protected $inherits = array();
 
@@ -28,17 +26,11 @@ class Inherits extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
 
-        $this->button_ok = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(20, 5);
-        $this->button_ok->setText(__("OK"));
         $this->action_ok = $this->createAction(array($this, 'clickOk'));
-        $this->button_ok->setAction($this->action_ok);
-        $this->mainFrame->addComponent($this->button_ok);
 
-        $this->button_cancel = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(20, 5);
-        $this->button_cancel->setText(__("Cancel"));
-        $this->action_cancel = $this->createAction(array($this, 'clickCancel'));
-        $this->button_cancel->setAction($this->action_cancel);
-        $this->mainFrame->addComponent($this->button_cancel);
+        $this->button_ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_ok->setContent('<frame posn="32 -95 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 5, __("OK"), null, null, null, null, null, $this->action_ok, null, null, null, null, null, null) . '</frame>');
+        $this->mainFrame->addComponent($this->button_ok);
     }
 
     public function setGroup(Group $group)
@@ -56,10 +48,6 @@ class Inherits extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX - 2, $this->sizeY - 12);
         $this->pager->setPosition(1, -1);
-
-        $centerX = $this->sizeX / 2 - 10;
-        $this->button_ok->setPosition($centerX + 5, -$this->sizeY + 5);
-        $this->button_cancel->setPosition($centerX + 30, -$this->sizeY + 5);
     }
 
     public function onShow()
@@ -132,11 +120,6 @@ class Inherits extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         }
     }
 
-    public function clickCancel()
-    {
-        $this->Erase($this->getRecipient());
-    }
-
     public function destroy()
     {
         foreach ($this->inherits as $item) {
@@ -150,10 +133,6 @@ class Inherits extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items = array();
         $this->pager->destroy();
         \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction($this->action_ok);
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction($this->action_cancel);
-
-        $this->button_cancel->destroy();
-        $this->button_ok->destroy();
 
         parent::destroy();
     }

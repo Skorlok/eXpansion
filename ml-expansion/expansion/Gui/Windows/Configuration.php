@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
 
 class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -19,8 +18,6 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     private $actionOk;
 
-    private $actionCancel;
-
     private $gameMode;
 
     protected function onConstruct()
@@ -30,19 +27,12 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->setTitle(__("Configure HUD", $login));
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->mainFrame->addComponent($this->pager);
+
         $this->actionOk = $this->createAction(array($this, "Ok"));
-        $this->actionCancel = $this->createAction(array($this, "Cancel"));
 
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setText(__("Apply", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="94 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0D0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
-
-        $this->cancel = new OkButton();
-        $this->cancel->setText(__("Cancel", $login));
-        $this->cancel->setAction($this->actionCancel);
-        $this->mainFrame->addComponent($this->cancel);
     }
 
     public function onResize($oldX, $oldY)
@@ -50,14 +40,10 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         parent::onResize($oldX, $oldY);
         $this->pager->setSize($this->sizeX, $this->sizeY - 8);
         $this->pager->setStretchContentX($this->sizeX);
-        $this->ok->setPosition($this->sizeX - 44, -$this->sizeY + 6);
-        $this->cancel->setPosition($this->sizeX - 26, -$this->sizeY + 6);
     }
 
     public function setData($data)
     {
-        $login = $this->getRecipient();
-
         foreach ($this->items as $item) {
             $item->destroy();
         }
@@ -68,6 +54,7 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $x = 0;
         foreach ($statuses as $status) {
             $this->items[$x] = new \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted(4, 4, 50);
+            $this->items[$x]->setPosZ(1);
             $this->items[$x]->setText($status->id);
             $this->items[$x]->setStatus($status->value);
             $this->pager->addItem($this->items[$x]);
@@ -101,7 +88,6 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->gameMode = $val[1];
             $items[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem($val[0], $val[1], $val[2]);
         }
-        shuffle($items);
 
         return $items;
     }
@@ -113,11 +99,7 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         foreach ($this->items as $component) {
             if ($component instanceof Checkbox) {
                 $component->setArgs($options);
-                $outValues[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem(
-                    $component->getText(),
-                    $this->gameMode,
-                    $component->getStatus()
-                );
+                $outValues[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem($component->getText(), $this->gameMode, $component->getStatus());
             }
         }
 
@@ -128,11 +110,6 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->Erase($login);
     }
 
-    public function Cancel($login)
-    {
-        $this->erase($login);
-    }
-
     public function destroy()
     {
         foreach ($this->items as $item) {
@@ -141,8 +118,6 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->pager->destroy();
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->destroyComponents();

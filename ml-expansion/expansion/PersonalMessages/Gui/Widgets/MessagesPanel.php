@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\PersonalMessages\Gui\Widgets;
 
 use ManiaLivePlugins\eXpansion\Gui\Config;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 
 class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
 {
@@ -73,13 +72,8 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->_windowFrame->addComponent($this->labelReciever);
 
 
-        $this->labelPlayer = new myButton();
-        $this->labelPlayer->setAlign("left", "top");
-        $this->labelPlayer->setTextColor('fff');
-        $this->labelPlayer->setText("Select...");
-        $this->labelPlayer->setPosY(-3);
-        $this->labelPlayer->setDescription("Select player whom to send the message", 35);
-        $this->labelPlayer->setAction($this->actionPlayers);
+        $this->labelPlayer = new \ManiaLive\Gui\Elements\Xml();
+        $this->labelPlayer->setContent('<frame posn="0 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Select...", array("Select player whom to send the message", 35), null, null, 'fff', null, $this->actionPlayers, null, null, null, null, null, null) . '</frame>');
         $frame->addComponent($this->labelPlayer);
 
         $this->inputboxMessage = new \ManiaLib\Gui\Elements\Entry(78, 6);
@@ -87,6 +81,7 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->inputboxMessage->setId("messagebox");
         $this->inputboxMessage->setName("message");
         $this->inputboxMessage->setScale(0.8);
+        $this->inputboxMessage->setPosX(27.5);
         $this->inputboxMessage->setPosY(-0.5);
         $this->inputboxMessage->setTextColor('fff');
         $this->inputboxMessage->setScriptEvents(true);
@@ -122,6 +117,8 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
             $this->edgeWidget = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/EdgeWidget");
             $this->registerScript($this->edgeWidget);
         }
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     public function onResize($oldX, $oldY)
@@ -135,7 +132,7 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
     {
         $this->targetPlayer = $target;
         $targetPlayer = $this->storage->getPlayerObject($target);
-        $this->labelPlayer->setText($targetPlayer->nickName);
+        $this->labelPlayer->setContent('<frame posn="0 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->handleSpecialChars($targetPlayer->nickName), array("Select player whom to send the message", 35), null, null, 'fff', null, $this->actionPlayers, null, null, null, null, null, null) . '</frame>');
         \ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection::Erase($login);
         $this->onResize($this->sizeX, $this->sizeY);
         $this->redraw($this->getRecipient());
@@ -188,5 +185,29 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->onResize($this->sizeX, $this->sizeY);
         // $this->status = "False";
         $this->redraw($this->getRecipient());
+    }
+
+    private function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(
+			array(
+				'&',
+				'"',
+				"'",
+				'>',
+				'<'
+			),
+			array(
+				'&amp;',
+				'&quot;',
+				'&apos;',
+				'&gt;',
+				'&lt;'
+			),
+			$string
+	    );
     }
 }

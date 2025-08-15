@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ScriptTester\Gui\Widgets;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
@@ -42,36 +41,30 @@ class ScriptEditor extends PlainWidget
         $this->background = new WidgetBackGround(395, 75);
         $this->addComponent($this->background);
 
-        $this->lbl_ml = new WidgetTitle(180, 4, 'Maniascript editor');
+        $this->lbl_ml = new WidgetTitle(180, 4, 'Manialink editor');
         $this->lbl_ml->setPosition(12);
         $this->addComponent($this->lbl_ml);
 
         $entry = new \ManiaLive\Gui\Elements\Xml();
-        $entry->setContent('<textedit id="editor_maniascript" posn="12 -5 3.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="' . $config->tester_maniascript . '" textformat="script" name="editor_maniascript" showlinenumbers="1" autonewline="1"/>');
+        $entry->setContent('<textedit id="editor_manialink" posn="12 -5 3.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="' . $this->handleSpecialChars($config->tester_manialink) . '" textformat="script" name="editor_manialink" showlinenumbers="1" autonewline="1"/>');
         $this->scriptEditor = $entry;
         $this->addComponent($this->scriptEditor);
 
-        $this->lbl_script = new WidgetTitle(180, 4, 'Manialink editor');
+        $this->lbl_script = new WidgetTitle(180, 4, 'Maniascript editor');
         $this->lbl_script->setPosX(210);
         $this->addComponent($this->lbl_script);
 
         $entry = new \ManiaLive\Gui\Elements\Xml();
-        $entry->setContent('<textedit id="editor_manialink" posn="210 -5 6.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="log(&quot;hello&quot;);" textformat="script" name="editor_manialink" showlinenumbers="1" autonewline="1"/>');
+        $entry->setContent('<textedit id="editor_maniascript" posn="210 -5 6.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="' . $this->handleSpecialChars($config->tester_maniascript) . '" textformat="script" name="editor_maniascript" showlinenumbers="1" autonewline="1"/>');
         $this->mlEditor = $entry;
         $this->addComponent($this->mlEditor);
 
-        $this->btn_apply = new Button(40);
-        $this->btn_apply->setId("apply");
-        $this->btn_apply->setPosition(190, -70);
-        $this->btn_apply->colorize('0d0');
-        $this->btn_apply->setText("Save & Test");
+        $this->btn_apply = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_apply->setContent('<frame posn="190 -70 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, "Save &amp; Test", null, null, '0d0', null, null, null, null, null, null, "apply", null, null) . '</frame>');
         $this->addComponent($this->btn_apply);
 
-        $this->btn_close = new Button();
-        $this->btn_close->setPosition(365, -70);
-        $this->btn_close->colorize('d00');
-        $this->btn_close->setText("Close");
-        $this->btn_close->setAction($this->createAction(array($this, 'close')));
+        $this->btn_close = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_close->setContent('<frame posn="365 -70 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Close", null, null, 'd00', null, null, $this->createAction(array($this, 'close')), null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->btn_close);
 
         $this->input_ml = new Inputbox('manialink', 100);
@@ -99,5 +92,13 @@ class ScriptEditor extends PlainWidget
     public function close($login)
     {
         $this->closeWindow();
+    }
+
+    private function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;'), $string);
     }
 }

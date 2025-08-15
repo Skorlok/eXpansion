@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\InfoLine;
 
 /**
@@ -17,8 +16,6 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public static $mainPlugin;
     protected $frame;
     protected $contentFrame;
-    protected $closeButton;
-    protected $actions;
     protected $btn1;
     protected $btn2;
     protected $btn3;
@@ -32,43 +29,21 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
 
-        $this->actions = new \stdClass();
-        $this->actions->close = $this->createAction(array($this, "close"));
-
-
-        $this->btn1 = new myButton(6, 6);
-        $this->btn1->setDescription(__("Number of Players statistics", $login), 30);
-        $this->btn1->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverPlayerAction);
-        $this->btn1->colorize("f00");
-        $this->btn1->setScale(0.8);
-        $this->btn1->setPosZ(4);
-        $this->btn1->setIcon("Icons128x128_1", 'Rankings');
+        $this->btn1 = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn1->setContent('<frame posn="0 0 1" scale="1.066666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array(__("Number of Players statistics", $login), 30), null, null, null, null, \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverPlayerAction, null, null, array("Icons128x128_1", 'Rankings'), null, null, null) . '</frame>');
         $this->frame->addComponent($this->btn1);
 
-        $this->btn2 = new myButton(6, 6);
-        $this->btn2->setDescription(__("Memory usage statistics", $login), 30);
-        $this->btn2->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverMemAction);
-        $this->btn2->colorize("f00");
-        $this->btn2->setScale(0.8);
-        $this->btn2->setPosZ(4);
-        $this->btn2->setIcon("http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/ramStat.png", null);
+        $this->btn2 = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn2->setContent('<frame posn="6.4 0 1" scale="1.066666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array(__("Memory usage statistics", $login), 30), null, null, null, null, \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverMemAction, null, null, "http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/ramStat.png", null, null, null) . '</frame>');
         $this->frame->addComponent($this->btn2);
 
-
-        $this->btn3 = new myButton(6, 6);
-        $this->btn3->setDescription(__("Cpu  usage statistic", $login), 30);
-        $this->btn3->setAction(\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverCpuAction);
-        $this->btn3->colorize("f00");
-        $this->btn3->setScale(0.8);
-        $this->btn3->setPosZ(4);
-        $this->btn3->setIcon("http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/cpuStat.png", null);
+        $this->btn3 = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn3->setContent('<frame posn="12.8 0 1" scale="1.066666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array(__("Cpu  usage statistic", $login), 30), null, null, null, null, \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverCpuAction, null, null, "http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/cpuStat.png", null, null, null) . '</frame>');
         $this->frame->addComponent($this->btn3);
 
         $this->mainFrame->addComponent($this->frame);
-        $this->closeButton = new myButton(30, 5);
-        $this->closeButton->setText(__("Close", $login));
-        $this->closeButton->setAction($this->actions->close);
-        $this->mainFrame->addComponent($this->closeButton);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     public function setData($data, \ManiaLive\Data\Storage $storage)
@@ -100,26 +75,14 @@ class StatsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->contentFrame->addComponent($label);
     }
 
-    public function close()
-    {
-        $this->Erase($this->getRecipient());
-    }
-
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
         $this->frame->setPosition(2, -($this->sizeY - 6));
-        $this->closeButton->setPosition($this->sizeX - $this->closeButton->sizeX, -($this->sizeY - 6));
     }
 
     public function destroy()
     {
-
-        unset($this->actions);
-        $this->btn1->destroy();
-        $this->btn2->destroy();
-        $this->btn3->destroy();
-
         $this->frame->clearComponents();
         $this->connection = null;
         $this->storage = null;

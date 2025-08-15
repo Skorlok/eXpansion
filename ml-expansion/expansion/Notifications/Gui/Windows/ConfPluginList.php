@@ -26,7 +26,6 @@ namespace ManiaLivePlugins\eXpansion\Notifications\Gui\Windows;
 use ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -64,9 +63,8 @@ class ConfPluginList extends Window
 
         $this->configManager = ConfigManager::getInstance();
 
-        $this->buttonSave = new Button(30, 5);
-        $this->buttonSave->setText(__("Save"));
-        $this->buttonSave->setAction($this->createAction(array($this, 'saveAction')));
+        $this->buttonSave = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonSave->setContent('<frame posn="50 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, __('Save', $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'saveAction')), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonSave);
     }
 
@@ -74,8 +72,6 @@ class ConfPluginList extends Window
     {
         parent::onResize($oldX, $oldY);
         $this->pagerFrame->setSize($this->getSizeX() - 3, $this->getSizeY() - 8);
-
-        $this->buttonSave->setPosition($this->sizeX * (1 / 0.8) - 60 * (1 / 0.8), -3);
     }
 
     public function populate(Variable $var)

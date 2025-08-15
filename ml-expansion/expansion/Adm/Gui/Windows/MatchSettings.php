@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Controls\MatchSettingsFile;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
@@ -49,23 +48,20 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->actionSave = $this->createAction(array($this, "saveAs"));
 
-        $this->saveButton = new OkButton();
-        $this->saveButton->setText('$fff' . __("Save", $login));
-        $this->saveButton->colorize("d00");
-        $this->saveButton->setAction($this->actionSave);
+        $this->saveButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->saveButton->setContent('<frame posn="42 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Save", $login), null, null, "d00", null, null, $this->actionSave, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->saveButton);
 
         // Load
         $this->inputboxLoadAs = new Inputbox("LoadAs", 40);
         $this->inputboxLoadAs->setLabel(__("Load MatchSettings by name", $login));
+        $this->inputboxLoadAs->setPosX(27.5);
         $this->frame->addComponent($this->inputboxLoadAs);
 
         $this->actionLoad = $this->createAction(array($this, "loadAs"));
 
-        $this->loadButton = new OkButton();
-        $this->loadButton->setText('$fff' . __("Load", $login));
-        $this->loadButton->colorize("0d0");
-        $this->loadButton->setAction($this->actionLoad);
+        $this->loadButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->loadButton->setContent('<frame posn="111.5 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Load", $login), null, null, "0d0", null, null, $this->actionLoad, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->loadButton);
 
         $this->mainFrame->addComponent($this->frame);
@@ -215,7 +211,6 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
 
-        $this->saveButton->destroy();
         $this->inputboxSaveAs->destroy();
         $this->frame->destroy();
 

@@ -12,10 +12,6 @@ use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    /**
-     *
-     * @var \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu
-     */
     public $menuFrame = null;
     public $pagerFrame = null;
     public $actions = array();
@@ -26,7 +22,6 @@ class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $confName = "main";
 
     protected $button_validate = null;
-    protected $button_cancel = null;
 
     protected function onConstruct()
     {
@@ -39,11 +34,6 @@ class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->mainFrame->addComponent($this->pagerFrame);
         $this->mainFrame->addComponent($this->menuFrame);
-
-        $this->button_validate = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->button_validate->setText("Save");
-        $this->button_validate->setAction($this->createAction(array($this, 'applySettings')));
-        $this->mainFrame->addComponent($this->button_validate);
     }
 
     public function onResize($oldX, $oldY)
@@ -55,8 +45,11 @@ class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pagerFrame->setPosX($this->getSizeX() / 4);
         $this->pagerFrame->setSize($this->getSizeX() * 3 / 4 - 3, $this->getSizeY() - 8);
 
-        $this->button_validate->setPosX($this->getSizeX() - $this->button_validate->getSizeX());
-        $this->button_validate->setPosY(-$this->getSizeY() + 5);
+        $this->button_validate = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_validate->setContent('<frame posn="' . ($this->getSizeX() - 34) . ' -95 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Save", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'applySettings')), null, null, null, null, null, null) . '</frame>');
+        $this->mainFrame->addComponent($this->button_validate);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     /**
@@ -101,7 +94,7 @@ class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         if (isset($groupVars[$this->currentGroup])) {
             foreach ($groupVars[$this->currentGroup] as $var) {
                 if ($var->getVisible()) {
-                    $item = new \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSetting($i, $var, $this->getRecipient(), $this);
+                    $item = new \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSetting($i, $var, $this->getRecipient(), $this, ($this->getSizeX() * 3 / 4 - 3));
                     $this->pagerFrame->addItem($item);
                     $this->items[] = $item;
                     $i++;

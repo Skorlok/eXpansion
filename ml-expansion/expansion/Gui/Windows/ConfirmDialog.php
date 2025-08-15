@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Windows;
 
 use ManiaLib\Gui\Elements\Label;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as OkButton;
 
 class ConfirmDialog extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
@@ -31,23 +30,16 @@ class ConfirmDialog extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->mainFrame->addComponent($this->label);
 
-        $this->ok = new OkButton();
-        $this->ok->colorize("0d0");
-        $this->ok->setPosition(4, -6);
-        $this->ok->setText(__("Yes", $login));
-        $this->ok->setAction($this->actionOk);
+        $this->ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->ok->setContent('<frame posn="4 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Yes", $login), null, null, "0D0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
 
-        $this->cancel = new OkButton();
-        $this->cancel->setPosition(30, -6);
-        $this->cancel->setText(__("No", $login));
-        $this->cancel->colorize("d00");
-        $this->cancel->setAction($this->actionCancel);
+        $this->cancel = new \ManiaLive\Gui\Elements\Xml();
+        $this->cancel->setContent('<frame posn="30 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("No", $login), null, null, "D00", null, null, $this->actionCancel, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->cancel);
 
         $this->setSize(57, 16);
         $this->setTitle(__("Really do this ?", $login));
-
     }
 
     protected function onResize($oldX, $oldY)
@@ -81,8 +73,6 @@ class ConfirmDialog extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function destroy()
     {
-        $this->ok->destroy();
-        $this->cancel->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

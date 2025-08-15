@@ -9,7 +9,6 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Group;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\GroupItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -44,9 +43,8 @@ class Groups extends Window
         $this->group_add->setText("");
         $this->mainFrame->addComponent($this->group_add);
 
-        $this->button_add = new Button();
-        $this->button_add->setText(__(AdminGroups::$txt_add));
-        $this->button_add->setAction($this->createAction(array($this, 'clickAdd')));
+        $this->button_add = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_add->setContent('<frame posn="120 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __(AdminGroups::$txt_add, $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'clickAdd')), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->button_add);
     }
 
@@ -63,8 +61,6 @@ class Groups extends Window
 
         $this->group_add->setSize($this->sizeX - 45, 7);
         $this->group_add->setPosition(0, -3);
-
-        $this->button_add->setPosition($this->sizeX - 40, -3);
     }
 
     /**
@@ -80,7 +76,6 @@ class Groups extends Window
         $this->items = array();
 
         $this->group_add->setLabel(__(AdminGroups::$txt_nwGroupNameL, $this->getRecipient()));
-        $this->button_add->setText(__(AdminGroups::$txt_add, $this->getRecipient()));
 
         $this->populateList();
     }
@@ -255,7 +250,6 @@ class Groups extends Window
         $this->items = null;
         $this->pager->destroy();
         $this->group_add->destroy();
-        $this->button_add->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

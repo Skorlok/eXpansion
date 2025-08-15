@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton;
@@ -34,7 +33,6 @@ class GameOptions extends Window
     protected $buttonTeams;
     protected $buttonLaps;
     protected $buttonOK;
-    protected $buttonCancel;
 
     protected $frameTeam;
     protected $frameGameMode;
@@ -67,15 +65,9 @@ class GameOptions extends Window
         $this->nextGameInfo = $this->connection->getNextGameInfo();
         $this->nextMode = $this->nextGameInfo->gameMode;
 
-        $this->buttonOK = new myButton();
-        $this->buttonOK->setText(__("Apply", $this->getRecipient()));
-        $this->buttonOK->setAction($this->actionOK);
+        $this->buttonOK = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonOK->setContent('<frame posn="131 -83 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $this->getRecipient()), null, null, null, null, null, $this->actionOK, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->buttonOK);
-
-        $this->buttonCancel = new myButton();
-        $this->buttonCancel->setText(__("Cancel", $this->getRecipient()));
-        $this->buttonCancel->setAction($this->actionCancel);
-        $this->addComponent($this->buttonCancel);
 
         $this->genGameModes();
         $this->genGeneral();
@@ -366,11 +358,6 @@ class GameOptions extends Window
         parent::onResize($oldX, $oldY);
         $this->frameGameMode->setPosition($this->sizeX - 36, 0);
         $this->frameContainer->setPosition(0, -5);
-        $this->buttonOK->setPosition(
-            $this->sizeX - $this->buttonCancel->sizeX - $this->buttonOK->sizeX + 8,
-            -$this->sizeY + 2
-        );
-        $this->buttonCancel->setPosition($this->sizeX - $this->buttonCancel->sizeX + 5, -$this->sizeY + 2);
     }
 
     public function setGameMode($login, $gameMode)

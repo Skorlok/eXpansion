@@ -112,7 +112,7 @@ class LoadScreen extends ExpPlugin
         $this->startTime = time();
         $this->isActive = true;
 
-        /*$xml = '<manialink id="5" version="2" layer="LoadingScreen" name="loading Screen">
+        /*$xml = '<manialink id="ls" version="2" layer="LoadingScreen">
         <quad posn="-160 90 100" sizen="320 180" image="https://cdn.skorlok.com/image/fonde52.jpg"/>
         </manialink>';
         $this->connection->sendDisplayManialinkPage(null, $xml);*/
@@ -126,7 +126,6 @@ class LoadScreen extends ExpPlugin
 
     public function onBeginMatch()
     {
-
         $this->isActive = false;
         LScreen::EraseAll();
         Gui::preloadRemove($this->mxImage);
@@ -139,16 +138,12 @@ class LoadScreen extends ExpPlugin
 
     private function syncMxImage()
     {
+        $this->mxImage = "";
+
         $uid = urlencode($this->storage->nextMap->uId);
 
-        switch ($this->expStorage->simpleEnviTitle) {
-            case "SM":
-                $query = 'https://sm.mania-exchange.com/api/tracks/get_track_info/uid/' . $uid;
-                break;
-            case "TM":
-                $query = 'https://tm.mania-exchange.com/api/tracks/get_track_info/uid/' . $uid;
-                break;
-        }
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId,Images&uid=' . $uid;
+
         $options = array(CURLOPT_HTTPHEADER => array(
             "X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin,
             "Content-Type" => 'application/json',
@@ -160,31 +155,31 @@ class LoadScreen extends ExpPlugin
     {
         $info = $job->getCurlInfo();
         $code = $info['http_code'];
-        if ($code != 200) {
+        $data = $job->getResponse();
+
+        if ($data === false || $code !== 200) {
             return;
         }
-        try {
-            $json = json_decode($job->getResponse(), true);
-            if ($json === null) {
-                $this->mxImage = "";
-                return;
-            }
 
-            $map = MxMap::fromArray($json);
-            $game = strtolower($this->expStorage->simpleEnviTitle);
-
-            if ($map->hasScreenshot) {
-                $this->mxImage = "http://" . $game . ".mania-exchange.com/tracks/screenshot/normal/"
-                    . $map->trackID . "?.png";
-                Gui::preloadImage($this->mxImage);
-                Gui::preloadUpdate();
-            } else {
-                $this->mxImage = "";
-            }
-        } catch (Exception $e) {
-            Helper::logError("LoadScreen error: " . $e->getMessage() . " at line " . $e->getLine());
-            $this->mxImage = "";
+        $json = json_decode($data, true);
+        if ($json == false || !array_key_exists("Results", $json)) {
+            return;
         }
+
+        $map = MxMap::fromArray($json['Results'][0]);
+
+        if (!$map->images || !isset($map->images[0])) {
+            return;
+        }
+
+        if ($map->images[0]['Width'] > 0 && $map->images[0]['Height'] > 0) {
+            $this->mxImage = "https://" . strtolower($this->expStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . $map->mapId . "/1?hq=true&.webp";
+        } else {
+            $this->mxImage = "https://" . strtolower($this->expStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . $map->mapId . "/1?hq=true&.png";
+        }
+
+        Gui::preloadImage($this->mxImage);
+        Gui::preloadUpdate();
     }
 
     public function eXpOnUnload()

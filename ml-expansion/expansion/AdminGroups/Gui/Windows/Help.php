@@ -8,7 +8,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\HelpItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -61,12 +60,8 @@ class Help extends Window
         $this->inputName->setPositionX(0);
         $this->mainFrame->addComponent($this->inputName);
 
-        $this->buttonSearch = new Button(20);
-        $this->buttonSearch->setPositionX(62);
-        $this->buttonSearch->setPositionY(0);
-        $this->buttonSearch->setText(__("Search", $login));
-        $this->buttonSearch->colorize('0a0');
-        $this->buttonSearch->setAction($this->createAction(array($this, "doSearch")));
+        $this->buttonSearch = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonSearch->setContent('<frame posn="62 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, __("Search", $login), null, null, '0a0', null, null, $this->createAction(array($this, "doSearch")), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonSearch);
 
         $frame = new Frame();

@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 
 /**
@@ -49,69 +48,57 @@ class ServerControlMain extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->actions->pluginManagement = $this->createAction(array(self::$mainPlugin, "showPluginManagement"));
 
 
-        $btn = new myButton($btnX, $btnY);
-        $btn->setText(__("Deciated Control", $login));
-        $btn->setAction($this->actions->serverManagement);
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="0 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Deciated Control", $login), null, null, null, null, null, $this->actions->serverManagement, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($btn);
 
-        $btn = new myButton($btnX, $btnY);
-        $btn->setText(__("Server options", $login));
-        $btn->setAction($this->actions->serverOptions);
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="33.5 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Server options", $login), null, null, null, null, null, $this->actions->serverOptions, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($btn);
 
         if (!$this->eXpIsRelay()) {
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("Game options", $login));
-            $btn->setAction($this->actions->gameOptions);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="67 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Game options", $login), null, null, null, null, null, $this->actions->gameOptions, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
         }
 
-        $btn = new myButton($btnX, $btnY);
-        $btn->setText(__("Admin Groups", $login));
-        $btn->setAction($this->actions->adminGroups);
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="100.5 0 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Admin Groups", $login), null, null, null, null, null, $this->actions->adminGroups, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($btn);
 
         if (!$this->eXpIsRelay()) {
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("Match settings", $login));
-            $btn->setAction($this->actions->matchSettings);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="0 -6.625 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Match settings", $login), null, null, null, null, null, $this->actions->matchSettings, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
 
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("ScriptMode settings", $login));
-            $btn->setAction($this->actions->scriptSettings);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="33.5 -6.625 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("ScriptMode settings", $login), null, null, null, null, null, $this->actions->scriptSettings, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
 
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("Force Scores", $login));
-            $btn->setAction($this->actions->forceScores);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="67 -6.625 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Force Scores", $login), null, null, null, null, null, $this->actions->forceScores, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
 
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("Round points", $login));
-            $btn->setAction($this->actions->roundPoints);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="100.5 -6.625 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Round points", $login), null, null, null, null, null, $this->actions->roundPoints, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
         }
 
-        $btnDb = new myButton($btnX, $btnY);
-        $btnDb->setText(__("Database tools", $login));
-        $btnDb->setAction($this->actions->dbTools);
-        $this->frame->addComponent($btnDb);
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="0 -13.25 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Database tools", $login), null, null, null, null, null, $this->actions->dbTools, null, null, null, null, null, null) . '</frame>');
+        $this->frame->addComponent($btn);
 
-        $btnDb = new myButton($btnX, $btnY);
-        $btnDb->setText(__("eXpansion Settings", $login));
-        $btnDb->setAction($this->actions->expSettings);
-        $this->frame->addComponent($btnDb);
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="33.5 -13.25 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("eXpansion Settings", $login), null, null, null, null, null, $this->actions->expSettings, null, null, null, null, null, null) . '</frame>');
+        $this->frame->addComponent($btn);
 
-        $btnDb = new myButton($btnX, $btnY);
-        $btnDb->setText(__("Plugin Management", $login));
-        $btnDb->setAction($this->actions->pluginManagement);
-        $this->frame->addComponent($btnDb);
-
+        $btn = new \ManiaLive\Gui\Elements\Xml();
+        $btn->setContent('<frame posn="67 -13.25 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Plugin Management", $login), null, null, null, null, null, $this->actions->pluginManagement, null, null, null, null, null, null) . '</frame>');
+        $this->frame->addComponent($btn);
+        
         if (!$this->eXpIsRelay()) {
-            $btn = new myButton($btnX, $btnY);
-            $btn->setText(__("Configure Votes", $login));
-            $btn->setAction($this->actions->votesConfig);
+            $btn = new \ManiaLive\Gui\Elements\Xml();
+            $btn->setContent('<frame posn="100.5 -13.25 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML($btnX, $btnY, __("Configure Votes", $login), null, null, null, null, null, $this->actions->votesConfig, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($btn);
         }
 
@@ -126,7 +113,6 @@ class ServerControlMain extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function destroy()
     {
-
         $this->frame->clearComponents();
         $this->connection = null;
         $this->storage = null;

@@ -8,7 +8,6 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Quiz\Structures\QuizPlayer;
 
@@ -80,20 +79,12 @@ class Playeritem extends Control
 
         // admin additions
         if ($this->isAdmin) {
-            $this->removepointButton = new Button(15, 5);
-            $this->removepointButton->setText("-1");
-            $this->removepointButton->setTextColor("fff");
-            $this->removepointButton->colorize("a22");
-            $this->removepointButton->setAction($this->removeAction);
-            $this->removepointButton->setScale(0.5);
+            $this->removepointButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->removepointButton->setContent('<frame posn="53.6 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 5, "-1", null, null, "a22", "fff", null, $this->removeAction, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($this->removepointButton);
 
-            $this->addpointButton = new Button(15, 5);
-            $this->addpointButton->setText("+1");
-            $this->addpointButton->setTextColor("fff");
-            $this->addpointButton->colorize("2a2");
-            $this->addpointButton->setScale(0.5);
-            $this->addpointButton->setAction($this->addpointAction);
+            $this->addpointButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->addpointButton->setContent('<frame posn="62.1 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 5, "+1", null, null, "2a2", "fff", null, $this->addpointAction, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($this->addpointButton);
         }
 
@@ -123,13 +114,6 @@ class Playeritem extends Control
 
     public function erase()
     {
-        if (is_object($this->addpointButton)) {
-            $this->addpointButton->destroy();
-        }
-        if (is_object($this->removepointButton)) {
-            $this->removepointButton->destroy();
-        }
-
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

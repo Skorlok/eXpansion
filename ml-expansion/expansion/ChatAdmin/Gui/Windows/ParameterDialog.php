@@ -7,7 +7,6 @@ use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -17,10 +16,7 @@ class ParameterDialog extends Window
 
     /** @var  Inputbox */
     protected $inputbox;
-    /** @var  Button */
     protected $btn_ok;
-    /** @var  Button */
-    protected $btn_cancel;
     /** @var  Frame */
     protected $frame;
     /** @var  Frame */
@@ -71,17 +67,6 @@ class ParameterDialog extends Window
         $this->frame->setPosition("right", "top");
         $this->addComponent($this->frame);
 
-        $action = $this->createAction(array($this, "ok"));
-        $this->btn_ok = new Button();
-        $this->btn_ok->setText(__("Ok", $login));
-        $this->btn_ok->setAction($action);
-        $this->frame->addComponent($this->btn_ok);
-
-        $action = $this->createAction(array($this, "cancel"));
-        $this->btn_cancel = new Button();
-        $this->btn_cancel->setText(__("Cancel", $login));
-        $this->btn_cancel->setAction($action);
-        $this->frame->addComponent($this->btn_cancel);
         $this->setSize(110, 20);
     }
 
@@ -104,7 +89,11 @@ class ParameterDialog extends Window
         $login = $this->getRecipient();
         $this->adminAction = $action;
         $this->adminParams = $params;
-        $this->btn_ok->setText(__($action, $login));
+        
+        $actionA = $this->createAction(array($this, "ok"));
+        $this->btn_ok = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_ok->setContent('<frame posn="25.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __($action, $login), null, null, null, null, null, $actionA, null, null, null, null, null, null) . '</frame>');
+        $this->frame->addComponent($this->btn_ok);
     }
 
     public function ok($login, $inputbox)
@@ -126,16 +115,9 @@ class ParameterDialog extends Window
         $this->Erase($login);
     }
 
-    public function cancel($login)
-    {
-        $this->Erase($login);
-    }
-
     public function destroy()
     {
-        $this->btn_ok->destroy();
         $this->inputbox->destroy();
-        $this->btn_cancel->destroy();
         parent::destroy();
     }
 }

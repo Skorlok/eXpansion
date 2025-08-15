@@ -65,7 +65,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                 $pass = ":" . $storage->server->password;
             }
             $link = '$h[https://skorlok.com/r.php?login=' . $storage->serverLogin . $pass . '&tp=' . $eXpStorage->titleId . '&mx=t&replay=' . $rec->ReplayId . ']';
-            $frame->addComponent(new RecItem($rec_nb, $rec->Username, $rec->ReplayTime, $this->handleSpecialChars($link)));
+            $frame->addComponent(new RecItem($rec_nb, $this->handleSpecialChars($rec->Username), $rec->ReplayTime, $this->handleSpecialChars($link)));
         }
         $this->mainFrame->addComponent($frame);
 
@@ -77,30 +77,26 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $quadImage = new \ManiaLib\Gui\Elements\Quad(60, 37);
         $quadImage->setPosition(-4, 0);
-        if (ManiaExchange::$mxInfo->HasScreenshot) {
-            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.webp", true); //TODO fix when image is PNG
+        if (ManiaExchange::$mxInfo->images && isset(ManiaExchange::$mxInfo->images[0]) && ManiaExchange::$mxInfo->images[0]['Width'] > 0 && ManiaExchange::$mxInfo->images[0]['Height'] > 0) {
+            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->mapId . "/1?hq=true&.webp", true);
         } else {
-            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->TrackID . "/1?hq=true&.png", true);
+            $quadImage->setImage("https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapimage/" . ManiaExchange::$mxInfo->mapId . "/1?hq=true&.png", true);
         }
         $this->mainFrame->addComponent($quadImage);
 
 
-        $button_visit = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-        $button_visit->setText(__("Visit the map page", $login));
-        $button_visit->setPosition(58, -2.6);
-        $action = $this->createAction(array($this, 'handleButtonVisit'));
-        $button_visit->setAction($action);
+        $link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapshow/" . ManiaExchange::$mxInfo->mapId;
+        $button_visit = new \ManiaLive\Gui\Elements\Xml();
+        $button_visit->setContent('<frame posn="58 -2.6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Visit the map page", $login), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($button_visit);
 
-        /*$button_award = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-        $button_award->setText(__("Award this map", $login));
-        $button_award->setPosition(88, -2.6);
-        $action = $this->createAction(array($this, 'handleButtonAward'));
-        $button_award->setAction($action);
+        /*$link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/awards/add/" . ManiaExchange::$mxInfo->mapId;
+        $button_award = new \ManiaLive\Gui\Elements\Xml();
+        $button_award->setContent('<frame posn="88 -2.6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Award this map", $login), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($button_award);*/
 
 
-        $mapData = array("Name" => "Name:", "Username" => "Author:", "UploadedAt" => "Uploaded:", "UpdatedAt" => "Updated:", "AwardCount" => "Awards:", "DifficultyName" => "Difficulty:", "LengthName" => "Length:", "Mood" => "Mood:", "StyleName" => "Style:", "TitlePack" => "TitlePack:", "RouteName" => "Routes:", "MapType" => "MapType:");
+        $mapData = array("name" => "Name:", "uploader" => "Author:", "uploadedAt" => "Uploaded:", "updatedAt" => "Updated:", "awardCount" => "Awards:", "difficulty" => "Difficulty:", "length" => "Length:", "moodFull" => "Mood:", "tags" => "Style:", "titlePack" => "TitlePack:", "routes" => "Routes:", "mapType" => "MapType:");
         $y = -39;
         foreach ($mapData as $field => $descr) {
 
@@ -111,6 +107,16 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $lbl = new \ManiaLive\Gui\Elements\Xml();
             if ($descr == "Uploaded:" || $descr == "Updated:") {
                 $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . substr(str_replace('T', " ", ManiaExchange::$mxInfo->{$field}), 0, 16) . '"/>');
+            } else if ($descr == "Author:") {
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->getUploader()) . '"/>');
+            } else if ($descr == "Difficulty:") {
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->getDifficulty()) . '"/>');
+            } else if ($descr == "Length:") {
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->getLength()) . '"/>');
+            } else if ($descr == "Style:") {
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->getStyle()) . '"/>');
+            } else if ($descr == "Routes:") {
+                $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->getRouteType()) . '"/>');
             } else {
                 $lbl->setContent('<label posn="20 ' . $y . ' 0" sizen="35 6" style="TextStaticSmall" text="' . $this->handleSpecialChars(ManiaExchange::$mxInfo->{$field}) . '"/>');
             }
@@ -121,7 +127,8 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
 
 
-        $text = $this->handleSpecialChars(ManiaExchange::$mxInfo->Comments);
+        // FUCK MANIAEXCHANGE
+        /*$text = $this->handleSpecialChars(ManiaExchange::$mxInfo->Comments);
 
         $text = preg_replace('#\[url=#i', '$L[', $text);
         $text = preg_replace('#\[/url\]#i', '$L', $text);
@@ -132,7 +139,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         
         $lbl = new \ManiaLive\Gui\Elements\Xml();
         $lbl->setContent('<label posn="58 -9.5 0" sizen="150 0" scale="0.8" style="TextStaticSmall" autonewline="1" maxline="9" text="' . $text . '"/>');
-        $this->mainFrame->addComponent($lbl);
+        $this->mainFrame->addComponent($lbl);*/
 
 
 
@@ -182,7 +189,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $lbl = new Inputbox("");
             $lbl->setPosition(80, -45);
             $lbl->setSize(45, 6);
-            $lbl->setText($map->fileName);
+            $lbl->setText($this->handleSpecialChars($map->fileName));
             $this->mainFrame->addComponent($lbl);
 
 
@@ -260,52 +267,20 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
             // Mod file
             if ($gbxInfo->modUrl) {
-                $button_mod = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-                $button_mod->setText(__("Download Mod", $login));
-                $button_mod->setPosition(118, -2.6);
-                $action = $this->createAction(array($this, 'handleButtonMod'));
-                $button_mod->setAction($action);
+                $link = $this->handleSpecialChars($this->gbxInfo->modUrl);
+                $button_mod = new \ManiaLive\Gui\Elements\Xml();
+                $button_mod->setContent('<frame posn="118 -2.6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Mod", $login), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
                 $this->mainFrame->addComponent($button_mod);
             }
 
             // Song file
             if ($gbxInfo->songUrl) {
-                $button_song = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(37.5, 6.25);
-                $button_song->setText(__("Download Song", $login));
-                $button_song->setPosition(148, -2.6);
-                $action = $this->createAction(array($this, 'handleButtonSong'));
-                $button_song->setAction($action);
+                $link = $this->handleSpecialChars($this->gbxInfo->songUrl);
+                $button_song = new \ManiaLive\Gui\Elements\Xml();
+                $button_song->setContent('<frame posn="148 -2.6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Song", $login), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
                 $this->mainFrame->addComponent($button_song);
             }
         }
-    }
-
-    public function handleButtonVisit($login)
-    {
-        /** @var eXpStorage @eXpStorage */
-        $eXpStorage = eXpStorage::getInstance();
-
-        $link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/mapshow/" . ManiaExchange::$mxInfo->TrackID;
-        $this->connection->sendOpenLink($login, $link, 0);
-    }
-
-    public function handleButtonAward($login)
-    {
-        /** @var eXpStorage @eXpStorage */
-        $eXpStorage = eXpStorage::getInstance();
-
-        $link = "https://" . strtolower($eXpStorage->simpleEnviTitle) . ".mania.exchange/awards/add/" . ManiaExchange::$mxInfo->TrackID;
-        $this->connection->sendOpenLink($login, $link, 0);
-    }
-
-    public function handleButtonMod($login)
-    {
-        $this->connection->sendOpenLink($login, $this->gbxInfo->modUrl, 0);
-    }
-
-    public function handleButtonSong($login)
-    {
-        $this->connection->sendOpenLink($login, $this->gbxInfo->songUrl, 0);
     }
 
     public function destroy()

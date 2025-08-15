@@ -146,21 +146,16 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $spacer = new \ManiaLib\Gui\Elements\Spacer(3, 4);
         $this->searchframe->addComponent($spacer);
 
-        $this->btn_search = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(40);
-        $this->btn_search->setAction($this->createAction(array($this, "doSearchMap")));
-        $this->btn_search->setText(__("Search Map", $login));
-        $this->btn_search->colorize('0a0');
+        $this->btn_search = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_search->setContent('<frame posn="38 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, __("Search Map", $login), null, null, '0a0', null, null, $this->createAction(array($this, "doSearchMap")), null, null, null, null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->btn_search);
 
-        $this->btn_search2 = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(40);
-        $this->btn_search2->setAction($this->createAction(array($this, "doSearchAuthor")));
-        $this->btn_search2->setText(__("Search Author", $login));
-        $this->btn_search2->colorize('0a0');
+        $this->btn_search2 = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_search2->setContent('<frame posn="69.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, __("Search Author", $login), null, null, '0a0', null, null, $this->createAction(array($this, "doSearchAuthor")), null, null, null, null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->btn_search2);
 
-        $this->btn_sortNewest = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(40);
-        $this->btn_sortNewest->setAction($this->createAction(array($this, "updateList"), "addTime"));
-        $this->btn_sortNewest->setText(__("Sort By Add Date", $login));
+        $this->btn_sortNewest = new \ManiaLive\Gui\Elements\Xml();
+        $this->btn_sortNewest->setContent('<frame posn="101 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, __("Sort By Add Date", $login), null, null, null, null, null, $this->createAction(array($this, "updateList"), "addTime"), null, null, null, null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->btn_sortNewest);
 
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\OptimizedPager();
@@ -173,23 +168,18 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
             $this->actionRemoveAllf = $this->createAction(array($this, "removeAllMaps"));
             $this->actionRemoveAll = Gui::createConfirm($this->actionRemoveAllf);
-            $this->btnRemoveAll = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(35);
-            $this->btnRemoveAll->setAction($this->actionRemoveAll);
-            $this->btnRemoveAll->setText('$d00' . __("Clear Maplist", $login));
-            $this->btnRemoveAll->setScale(0.5);
+
+            $this->btnRemoveAll = new \ManiaLive\Gui\Elements\Xml();
+            $this->btnRemoveAll->setContent('<frame posn="175 2 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(35, 6, '$d00' . __("Clear Maplist", $login), null, null, null, null, null, $this->actionRemoveAll, null, null, null, null, null, null) . '</frame>');
             $this->mainFrame->addComponent($this->btnRemoveAll);
         }
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     static function Initialize($mapsPlugin)
     {
         self::$mapsPlugin = $mapsPlugin;
-    }
-
-    public function gotoMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
-    {
-        self::$mapsPlugin->gotoMap($login, $map);
-        $this->Erase($this->getRecipient());
     }
 
     public function removeMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
@@ -207,7 +197,6 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function jumpMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
     {
         self::$mapsPlugin->gotoMap($login, $map);
-        $this->RedrawAll();
     }
 
     public function queueMap($login, \Maniaplanet\DedicatedServer\Structures\Map $map)
@@ -244,9 +233,6 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->title_rank->setSizeX($scaledSizes[4]);
         $this->title_rating->setSizeX($scaledSizes[5]);
         $this->title_actions->setSizeX($scaledSizes[6]);
-
-
-        if (is_object($this->btnRemoveAll)) $this->btnRemoveAll->setPosition($this->getSizeX() - 25, 2);
     }
 
     public function removeAllMaps($login)
@@ -481,9 +467,6 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->erase();
         }
         $this->items = null;
-        if (is_object($this->btnRemoveAll)) {
-            $this->btnRemoveAll->destroy();
-        }
         $this->pager->destroy();
         $this->destroyComponents();
 

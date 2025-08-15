@@ -12,10 +12,6 @@ use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
-    /**
-     *
-     * @var \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingsMenu
-     */
     public $pagerFrame = null;
 
     public $insertFrame = null;
@@ -51,11 +47,11 @@ class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->input_value->setPosY(-5);
         $this->mainFrame->addComponent($this->input_value);
 
-        $this->buttonAdd = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->buttonAdd->setText("Add");
-        $this->buttonAdd->setPosY(-5);
-        $this->buttonAdd->setAction($this->createAction(array($this, "addValue")));
+        $this->buttonAdd = new \ManiaLive\Gui\Elements\Xml();
+        $this->buttonAdd->setContent('<frame posn="117 -5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Add", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, "addValue")), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonAdd);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
     }
 
     public function onResize($oldX, $oldY)
@@ -65,7 +61,6 @@ class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pagerFrame->setPosX(0);
         $this->pagerFrame->setSize($this->getSizeX() - 3, $this->getSizeY() - 16);
 
-        $this->buttonAdd->setPosX($this->getSizeX() - 23);
         if ($this->input_key == null) {
             $this->input_value->setSizeX($this->getSizeX() - 25);
         } else {

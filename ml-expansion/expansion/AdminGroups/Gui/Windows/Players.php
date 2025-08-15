@@ -7,7 +7,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Group;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\AdminItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
@@ -24,9 +23,7 @@ class Players extends Window
     protected $pager;
     /** @var  Group */
     protected $group;
-    /** @var  Button */
     protected $button_add;
-    /** @var  Button */
     protected $button_select;
     /** @var Inputbox */
     protected $login_add;
@@ -55,16 +52,16 @@ class Players extends Window
         $this->login_add->setText("");
         $line->addComponent($this->login_add);
 
-        $this->button_add = new Button(20, 5);
-        $this->button_add->setText(__("Add", $login));
         $this->action_add = $this->createAction(array($this, 'clickAdd'));
-        $this->button_add->setAction($this->action_add);
+
+        $this->button_add = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_add->setContent('<frame posn="42 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 5, __(AdminGroups::$txt_add, $this->getRecipient()), null, null, null, null, null, $this->action_add, null, null, null, null, null, null) . '</frame>');
         $line->addComponent($this->button_add);
 
-        $this->button_select = new Button(20, 5);
-        $this->button_select->setText(__("Select", $login));
         $this->action_select = $this->createAction(array($this, 'clickSelect'));
-        $this->button_select->setAction($this->action_select);
+
+        $this->button_select = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_select->setContent('<frame posn="60.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 5, __("Select", $login), null, null, null, null, null, $this->action_select, null, null, null, null, null, null) . '</frame>');
         $line->addComponent($this->button_select);
 
         $this->mainFrame->addComponent($line);
@@ -113,7 +110,6 @@ class Players extends Window
         $this->pager->clearItems();
         $this->items = array();
 
-        $this->button_add->setText(__(AdminGroups::$txt_add, $this->getRecipient()));
         $this->populateList();
     }
 
@@ -203,7 +199,6 @@ class Players extends Window
     public function destroy()
     {
         $this->login_add->destroy();
-        $this->button_add->destroy();
         foreach ($this->items as $item) {
             $item->erase();
         }

@@ -54,10 +54,10 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->actionAddAll = $this->createAction(array($this, "addAllMaps"));
 
-        $this->btnAddAll = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button();
-        $this->btnAddAll->setText(__("Add all", $this->getRecipient()));
-        $this->btnAddAll->setAction($this->actionAddAll);
+        $this->btnAddAll = new \ManiaLive\Gui\Elements\Xml();
+        $this->btnAddAll->setContent('<frame posn="4 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Add all", $this->getRecipient()), null, null, null, null, null, $this->actionAddAll, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->btnAddAll);
+
         $this->allMapsPath = Helper::getPaths()->getMapPath();
     }
 
@@ -78,7 +78,6 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->setSize($this->sizeX, $this->sizeY);
         }
         $this->pager->setSize($this->sizeX, $this->sizeY - 12);
-        $this->btnAddAll->setPosition(4, -$this->sizeY + 6);
         parent::onResize($oldX, $oldY);
     }
 
@@ -189,7 +188,6 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->erase();
         }
         $this->items = array();
-        $this->btnAddAll->destroy();
         $this->connection = null;
         $this->storage = null;
         $this->pager->destroy();

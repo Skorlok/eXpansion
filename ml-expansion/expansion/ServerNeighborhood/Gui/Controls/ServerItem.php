@@ -51,15 +51,6 @@ class ServerItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $YSpace = 0.2;
         $bsize = $sizeY / 2;
 
-        $this->bg_main = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button($this->getSizeX(), $sizeY);
-        $this->bg_main->setIcon("Bgs1", "BgCardOnline");
-        $this->bg_main->setDescription("Click to Join server", 40);
-        $this->bg_main->setManialink(
-            'maniaplanet://#qjoin=' . $server->getServer_data()->server->login
-            . '@' . $server->getServer_data()->server->title
-        );
-        $this->addComponent($this->bg_main);
-
         $this->frame_main = new \ManiaLive\Gui\Controls\Frame();
         $this->addComponent($this->frame_main);
 
@@ -70,10 +61,13 @@ class ServerItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         if ($ctr != null) {
             $action = $this->createAction(array($ctr, 'showServerPlayers'), $server);
-            $this->bg_main->setAction($action, $server);
-            $this->bg_main->setManialink(null);
-            $this->bg_main->setDescription("Click to show more info", 40);
+            $this->bg_main = new \ManiaLive\Gui\Elements\Xml();
+            $this->bg_main->setContent('<frame scale="1.333333333">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(108, 11.5, null, array("Click to show more info", 40), null, null, null, null, $action, null, null, array("Bgs1", "BgCardOnline"), null, null, null) . '</frame>');
+        } else {
+            $this->bg_main = new \ManiaLive\Gui\Elements\Xml();
+            $this->bg_main->setContent('<frame scale="1.333333333">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(116, 11.5, null, array("Click to Join server", 40), null, null, null, null, null, 'maniaplanet://#qjoin=' . $server->getServer_data()->server->login . '@' . $server->getServer_data()->server->title, null, array("Bgs1", "BgCardOnline"), null, null, null) . '</frame>');
         }
+        $this->addComponent($this->bg_main);
         $this->sizeY = $sizeY;
 
         foreach ($this->getComponents() as $cmp) {
@@ -89,10 +83,6 @@ class ServerItem extends \ManiaLivePlugins\eXpansion\Gui\Control
     {
         $sizeY = 14;
 
-        $this->bg_main->setSize($this->getSizeX(), $sizeY - 0.5);
-        $this->bg_main->setAlign("left", "top");
-        $this->bg_main->setScale(1);
-        $this->bg_main->setPosY(0);
         $this->map_frame->setPosX($this->getSizeX() - 2);
 
         parent::onResize($oldX, $oldY);
@@ -205,31 +195,5 @@ class ServerItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->map_frame = $map_frame;
         $this->addComponent($this->map_frame);
-    }
-
-    public function createInfos($server, $sizeY)
-    {
-        $this->frame_info = new \ManiaLive\Gui\Controls\Frame();
-        $this->frame_info->setSize(32, 14);
-        $this->frame_info->setLayout(new \ManiaLib\Gui\Layouts\Column());
-
-        $this->frame_main->addComponent($this->frame_info);
-
-        $join = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(24, 6);
-        $join->setScale(0.6);
-        $join->setText("Join");
-        $this->frame_info->addComponent($join);
-
-        $spec = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(24, 6);
-        $spec->setScale(0.6);
-        $spec->setText("Spec");
-        $this->frame_info->addComponent($spec);
-
-
-        $fav = new \ManiaLivePlugins\eXpansion\Gui\Elements\Button(24, 6);
-        $fav->setScale(0.6);
-
-        $fav->setText("Fav");
-        $this->frame_info->addComponent($fav);
     }
 }

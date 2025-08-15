@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Maps\Gui\Controls;
 
 use ManiaLib\Utils\Formatting;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 
@@ -81,11 +80,8 @@ class Wishitem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->frame->addComponent($spacer);
 
         if ($this->isAdmin || $map->player->login == $login) {
-            $this->removeButton = new MyButton(26, 5);
-            $this->removeButton->setText('$fff' . __("Drop", $login));
-            $this->removeButton->setAction($this->removeMap);
-            $this->removeButton->colorize('a22');
-            $this->removeButton->setScale(0.5);
+            $this->removeButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->removeButton->setContent('<frame posn="110 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(26, 5, '$fff' . __("Drop", $login), null, null, 'a22', null, null, $this->removeMap, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($this->removeButton);
         }
 
@@ -114,10 +110,6 @@ class Wishitem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function erase()
     {
-        if (is_object($this->removeButton)) {
-            $this->removeButton->destroy();
-        }
-
         $this->destroyComponents();
         parent::destroy();
     }

@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Quiz\Gui\Controls;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
-
 class AddPointItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
@@ -63,30 +61,20 @@ class AddPointItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         // admin additions
         if ($isAdmin) {
-            $this->removepointButton = new MyButton(15, 5);
-            $this->removepointButton->setText("-1");
-            $this->removepointButton->setTextColor("fff");
-            $this->removepointButton->colorize("a00");
-            $this->removepointButton->setScale(0.5);
-            $this->removepointButton->setAction($this->removepointAction);
+            $this->removepointButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->removepointButton->setContent('<frame posn="44 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 5, "-1", null, null, "a00", "fff", null, $this->removepointAction, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($this->removepointButton);
 
             $this->pointsLabel = new \ManiaLib\Gui\Elements\Label(10, 5);
             $this->pointsLabel->setTextSize(1);
-            $this->pointsLabel->setPosX(5);
+            $this->pointsLabel->setPosX(13.5);
             $this->pointsLabel->setAlign("center", "center");
             $this->pointsLabel->setText("0");
             $this->frame->addComponent($this->pointsLabel);
 
-            $this->addpointButton = new MyButton(15, 5);
-            $this->addpointButton->setText("+1");
-            $this->addpointButton->setTextColor("fff");
-            $this->addpointButton->colorize("2a2");
-            $this->addpointButton->setScale(0.5);
-            $this->addpointButton->setAction($this->addpointAction);
+            $this->addpointButton = new \ManiaLive\Gui\Elements\Xml();
+            $this->addpointButton->setContent('<frame posn="62.5 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 5, "+1", null, null, "2a2", "fff", null, $this->addpointAction, null, null, null, null, null, null) . '</frame>');
             $this->frame->addComponent($this->addpointButton);
-
-
         }
 
         $this->addComponent($this->frame);
@@ -121,14 +109,6 @@ class AddPointItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function erase()
     {
-        if (is_object($this->addpointButton)) {
-            $this->addpointButton->destroy();
-        }
-
-        if (is_object($this->removepointButton)) {
-            $this->removepointButton->destroy();
-        }
-
         $this->frame->destroy();
         $this->destroyComponents();
         parent::destroy();

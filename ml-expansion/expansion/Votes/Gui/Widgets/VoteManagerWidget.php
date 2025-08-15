@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Votes\Gui\Widgets;
 use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
@@ -57,25 +56,13 @@ class VoteManagerWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->frame->addComponent($this->timeLeft);
 
         $actionYes = $this->createAction(array(self::$parentPlugin, "handlePlayerVote"), "yes");
-        $this->button_yes = new Button(14, 7);
-        $this->button_yes->setAction($actionYes);
-        $this->button_yes->setText("F1");
-        $this->button_yes->colorize("0D0");
-        $this->button_yes->setPosX(1);
-        $this->button_yes->setPosY(-11);
-        $this->button_yes->setId("button_yes");
-        $this->button_yes->setHidden(1);
+        $this->button_yes = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_yes->setContent('<frame posn="1 -11 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F1", null, null, "0D0", null, null, $actionYes, null, null, null, "button_yes", null, null) . '</frame>');
         $this->addComponent($this->button_yes);
 
         $actionNo = $this->createAction(array(self::$parentPlugin, "handlePlayerVote"), "no");
-        $this->button_no = new Button(14, 7);
-        $this->button_no->setAction($actionNo);
-        $this->button_no->setText("F2");
-        $this->button_no->colorize("F00");
-        $this->button_no->setPosX(77);
-        $this->button_no->setPosY(-11);
-        $this->button_no->setId("button_no");
-        $this->button_no->setHidden(1);
+        $this->button_no = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_no->setContent('<frame posn="77 -11 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F2", null, null, "F00", null, null, $actionNo, null, null, null, "button_no", null, null) . '</frame>');
         $this->addComponent($this->button_no);
 
 

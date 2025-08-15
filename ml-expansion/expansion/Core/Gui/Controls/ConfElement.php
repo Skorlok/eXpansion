@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Core\Gui\Controls;
 
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\MetaData;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
 class ConfElement extends \ManiaLivePlugins\eXpansion\Gui\Control
@@ -13,9 +12,6 @@ class ConfElement extends \ManiaLivePlugins\eXpansion\Gui\Control
     protected $bg;
     protected $label_name;
 
-    /**
-     * @var \ManiaLivePlugins\eXpansion\Gui\Elements\Button | null
-     */
     protected $button_save = null;
     protected $button_load = null;
     protected $button_select = null;
@@ -38,25 +34,19 @@ class ConfElement extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->addComponent($this->bg);
 
 
-        $this->button_load = new Button(15, 6);
-        $this->button_load->setText(__('Load', $login));
-        $this->button_load->setDescription(__('Wiil load this configuration into current one', $login), 40);
-        $this->button_load->setAction($this->createAction(array($this, "loadAction"), $name));
+        $this->button_load = new \ManiaLive\Gui\Elements\Xml();
+        $this->button_load->setContent('<frame posn="97.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 6, __('Load', $login), array(__('Wiil load this configuration into current one', $login), 40), null, null, null, null, $this->createAction(array($this, "loadAction"), $name), null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->button_load);
 
         if ($modify) {
-            $this->button_save = new Button(15, 6);
-            $this->button_save->setText(__('Save', $login));
-            $this->button_save->setDescription(__('Will save current configuration', $login), 40);
-            $this->button_save->setAction($this->createAction(array($this, "saveAction"), $name));
+            $this->button_save = new \ManiaLive\Gui\Elements\Xml();
+            $this->button_save->setContent('<frame posn="84.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 6, __('Save', $login), array(__('Will save current configuration', $login), 40), null, null, null, null, $this->createAction(array($this, "saveAction"), $name), null, null, null, null, null, null) . '</frame>');
             $this->addComponent($this->button_save);
         }
 
         if (!$isCurrent && $modify) {
-            $this->button_select = new Button(15, 6);
-            $this->button_select->setText(__('Choose', $login));
-            $this->button_select->setDescription(__('Will load this configuration and use it', $login), 40);
-            $this->button_select->setAction($this->createAction(array($this, "selectAction"), $name));
+            $this->button_select = new \ManiaLive\Gui\Elements\Xml();
+            $this->button_select->setContent('<frame posn="72.25 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(15, 6, __('Choose', $login), array(__('Will load this configuration and use it', $login), 40), null, null, null, null, $this->createAction(array($this, "selectAction"), $name), null, null, null, null, null, null) . '</frame>');
             $this->addComponent($this->button_select);
         }
 
@@ -69,16 +59,6 @@ class ConfElement extends \ManiaLivePlugins\eXpansion\Gui\Control
         parent::onResize($oldX, $oldY);
         $this->label_name->setSizeX($this->getSizeX() - 27);
         $this->bg->setSize($this->getSizeX(), $this->getSizeY() + 2);
-
-        $this->button_load->setPosition(($this->getSizeX() - $this->button_load->getSizeX()) + 1, 0);
-
-        if ($this->button_save != null) {
-            $this->button_save->setPosition(($this->getSizeX() - $this->button_save->getSizeX() * 2) + 5, 0);
-        }
-
-        if ($this->button_select != null) {
-            $this->button_select->setPosition(($this->getSizeX() - $this->button_select->getSizeX() * 3) + 10, 0);
-        }
     }
 
     public function saveAction($login, $name)

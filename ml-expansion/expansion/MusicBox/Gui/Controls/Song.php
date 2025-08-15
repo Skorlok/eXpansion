@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\MusicBox\Gui\Controls;
 
 use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Button as myButton;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Structures\OptimizedPagerElement;
 
@@ -53,14 +52,8 @@ class Song extends Control implements OptimizedPagerElement
         $this->genre->setAttribute("class", "eXpOptimizedPagerAction");
         $this->frame->addComponent($this->genre);
 
-        $this->queueButton = new MyButton();
-        $this->queueButton->setText(__("Queue", $login));
-        $this->queueButton->setAction($action);
-        $this->queueButton->setId('column_' . $indexNumber . '_3');
-        $this->queueButton->setAttribute("class", "eXpOptimizedPagerAction");
-        $this->queueButton->colorize('2a2');
-        $this->queueButton->setScriptEvents();
-        $this->queueButton->setScale(0.5);
+        $this->queueButton = new \ManiaLive\Gui\Elements\Xml();
+        $this->queueButton->setContent('<frame posn="102 0 1" scale="0.666666667">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Queue", $login), null, null, '2a2', null, null, $action, null, null, null, 'column_' . $indexNumber . '_3', "eXpOptimizedPagerAction", null) . '</frame>');
         $this->frame->addComponent($this->queueButton);
 
         $this->addComponent($this->frame);
@@ -81,7 +74,6 @@ class Song extends Control implements OptimizedPagerElement
      */
     public function erase()
     {
-        $this->queueButton->destroy();
         $this->destroyComponents();
         parent::destroy();
     }
