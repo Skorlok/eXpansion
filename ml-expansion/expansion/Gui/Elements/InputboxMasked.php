@@ -8,12 +8,11 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLive\Gui\Container;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 
-class InputboxMasked extends Control
+class InputboxMasked extends Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
 {
     protected $label;
     protected $button;
 
-    /** @var Button */
     protected $nonHidden;
     protected $name;
     protected $bgleft;
@@ -57,6 +56,11 @@ class InputboxMasked extends Control
         $this->label->setPosition(1, 0);
 
         parent::onResize($oldX, $oldY);
+    }
+
+    public function getScript()
+    {
+        return Button::getScriptML();
     }
 
     protected function createButton($editable)
@@ -105,11 +109,8 @@ class InputboxMasked extends Control
     public function setShowClearText()
     {
         if ($this->nonHidden == null) {
-            $this->nonHidden = new Button(3, 3);
-            $this->nonHidden->setIcon("Icons64x64_1", "ClipPause");
-            $this->nonHidden->setPosition(-4, 0);
-            $this->nonHidden->setId($this->name . "_1");
-            $this->nonHidden->setDescription($this->getText());
+            $this->nonHidden = new \ManiaLive\Gui\Elements\Xml();
+            $this->nonHidden->setContent('<frame posn="-4 0 1">' . Button::getXML(3, 3, null, array($this->getText()), null, null, null, null, null, null, null, array("Icons64x64_1", "ClipPause"), $this->name . "_1", null, null) . '</frame>');
             $this->addComponent($this->nonHidden);
         }
     }
