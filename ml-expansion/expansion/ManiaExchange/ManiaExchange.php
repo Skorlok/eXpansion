@@ -206,7 +206,7 @@ class ManiaExchange extends ExpPlugin
 
     public function onPlayerConnect($login, $isSpectator)
     {
-        if ($this->expStorage->simpleEnviTitle == "TM" && count(self::$mxReplays) > 0 && $this->config->announceMxRecord) {
+        if ($this->expStorage->simpleEnviTitle == "TM" && self::$mxReplays != null && count(self::$mxReplays) > 0 && $this->config->announceMxRecord) {
             $this->eXpChatSendServerMessage($this->msg_worldRec, $login, array(Time::fromTM(self::$mxReplays[0]->ReplayTime), self::$mxReplays[0]->Username));
         }
     }
