@@ -1,0 +1,1 @@
+btLabel_<?php echo $this->btName ?>.SetText(passwordEntry_<?php echo $this->btName ?>.Value);

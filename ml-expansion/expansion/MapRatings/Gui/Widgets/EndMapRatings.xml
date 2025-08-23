@@ -4,7 +4,7 @@
 <frame posn="0 0 3.0">
     <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(90, 4, $this->addLang("Did you like the map ?")); ?>
 </frame>
-<label posn="45 -6 6.0" sizen="80 9" halign="center" valign="top" style="TextCardSmallScores2" textsize="3" textemboss="1" text="<?php echo $this->getParam('mapName')  ?>"/>
+<label posn="45 -6 6.0" sizen="80 9" halign="center" valign="top" style="TextCardSmallScores2" textsize="3" textemboss="1" text="<?php echo $this->handleSpecialChars($this->getParam('mapName'))  ?>"/>
 <frame posn="27 -16 7.0">
     <frame>
         <frame>

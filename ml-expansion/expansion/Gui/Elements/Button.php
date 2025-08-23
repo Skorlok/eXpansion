@@ -84,7 +84,7 @@ class Button
             $sizeXDesc = (isset($description[1]) ? $description[1] : 30);
             $sizeYDesc = (isset($description[2]) ? $description[2] : 5 * $maxLine);
             $xml .='<frame posn="0 0 10" class="exp_button">';
-            $xml .='<label id="eXp_ButtonDescText_' . ($id ? $id : "Icon_" . $buttonId) . '" posn="7 3 5" sizen="' . $sizeXDesc . ' ' . $sizeYDesc . '" halign="left" valign="center2" style="TextStaticSmall" hidden="1" text="$000' . $description[0] . '" maxline="' . $maxLine . '"/>';
+            $xml .='<label id="eXp_ButtonDescText_' . ($id ? $id : "Icon_" . $buttonId) . '" posn="7 3 5" sizen="' . $sizeXDesc . ' ' . $sizeYDesc . '" halign="left" valign="center2" style="TextStaticSmall" hidden="1" textcolor="000" text="' . $description[0] . '" maxline="' . $maxLine . '"/>';
             $xml .='<quad id="eXp_ButtonDescBg_' . ($id ? $id : "Icon_" . $buttonId) . '" posn="5 3 1" sizen="' . ($sizeXDesc+4) . ' ' . $sizeYDesc . '" halign="left" valign="center" style="Bgs1" substyle="BgMetalBar" hidden="1" colorize="fff"/>';
             $xml .='</frame>';
         }

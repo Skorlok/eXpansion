@@ -52,8 +52,8 @@ class PlayerScore extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->frame->addComponent($spacer);
 
-        $this->inputbox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox($player->login, 20);
-        $this->inputbox->setText("");
+        $this->inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputbox->setContent('<frame posn="104 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($player->login, 20, true, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->inputbox);
 
         $this->addComponent($this->frame);
@@ -74,7 +74,6 @@ class PlayerScore extends \ManiaLivePlugins\eXpansion\Gui\Control
      */
     public function erase()
     {
-        $this->inputbox->destroy();
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

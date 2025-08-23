@@ -14,8 +14,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-use ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use Maniaplanet\DedicatedServer\Connection;
@@ -23,18 +21,6 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions as Dedicated_ServerOpti
 
 class ServerOptions extends Window
 {
-
-    protected $serverName;
-    protected $serverComment;
-    protected $serverCommentE;
-    protected $maxPlayers;
-    protected $maxSpec;
-    protected $minLadder;
-    protected $maxLadder;
-    protected $serverPass;
-    protected $serverSpecPass;
-    protected $refereePass;
-
     protected $cbPublicServer;
     protected $cbLadderServer;
     protected $cbAllowMapDl;
@@ -43,9 +29,6 @@ class ServerOptions extends Window
     protected $cbReferee;
 
     protected $frameCb;
-
-    protected $frameInputbox;
-    protected $frameLadder;
 
     protected $buttonOK;
 
@@ -69,108 +52,43 @@ class ServerOptions extends Window
         $this->checkboxes();
 
         $this->registerScript(new Script("Adm/Gui/Scripts"));
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
 
         $this->addComponent($this->frameCb);
-        $this->addComponent($this->frameInputbox);
+    }
+
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
     }
 
     // Generate all inputboxes
     private function inputboxes()
     {
+        $login = $this->getRecipient();
 
-        /** @var ServerOptions */
+        /** @var Dedicated_ServerOptions @server */
         $server = $this->connection->getServerOptions();
 
-        $this->frameInputbox = new Frame();
-        $this->frameInputbox->setAlign("left", "top");
-        $column = new Column();
-        $column->setMargin(2, 1);
-        $this->frameInputbox->setLayout($column);
+        $content = '<frame posn="0 -6 0">';
+        $content .= '<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverName", 152, AdminGroups::hasPermission($login, Permission::SERVER_NAME), __("Server Name", $this->getRecipient()), $this->handleSpecialChars($this->connection->getServerName()), null, null) . '</frame>';
+        $content .= '<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . $this->handleSpecialChars($this->connection->getServerComment()) . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>';
+        $content .= '<frame posn="900 900 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverComment", 60, AdminGroups::hasPermission($login, Permission::SERVER_COMMENT), null, null, null, null) . '</frame>';
+        $content .= '<frame posn="0 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxPlayers", 12, AdminGroups::hasPermission($login, Permission::SERVER_MAXPLAYER), __("Players", $this->getRecipient()), $server->nextMaxPlayers, null, null) . '</frame>';
+        $content .= '<frame posn="15 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxSpec", 12, AdminGroups::hasPermission($login, Permission::SERVER_MAXSPEC), __("Spectators", $this->getRecipient()), $server->nextMaxSpectators, null, null) . '</frame>';
+        $content .= '<frame posn="0 -48 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMin", 35, false, __("Ladderpoints minimum", $this->getRecipient()), $server->ladderServerLimitMin, null, null) . '</frame>';
+        $content .= '<frame posn="38 -48 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMax", 35, false, __("Ladderpoints Maximum", $this->getRecipient()), $server->ladderServerLimitMax, null, null) . '</frame>';
+        $content .= '<frame posn="0 -60 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML($this, "serverPass", 76, AdminGroups::hasPermission($login, Permission::SERVER_PASSWORD), __("Password for server", $this->getRecipient()), $this->handleSpecialChars($this->connection->getServerPassword()), true, null, null) . '</frame>';
+        $content .= '<frame posn="0 -73 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML($this, "serverSpecPass", 76, AdminGroups::hasPermission($login, Permission::SERVER_SPECPWD), __("Password for spectators", $this->getRecipient()), $this->handleSpecialChars($this->connection->getServerPasswordForSpectator()), true, null, null) . '</frame>';
+        $content .= '<frame posn="0 -86 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML($this, "refereePass", 76, AdminGroups::hasPermission($login, Permission::SERVER_REFPWD), __("Referee password", $this->getRecipient()), $this->handleSpecialChars($this->connection->getRefereePassword()), true, null, null) . '</frame>';
+        $content .= '</frame>';
 
-        $this->serverName = new Inputbox("serverName");
-        $this->serverName->setLabel(__("Server Name", $this->getRecipient()));
-        $this->serverName->setText($this->connection->getServerName());
-        $this->frameInputbox->addComponent($this->serverName);
-
-
-        $this->serverCommentE = new \Manialive\Gui\Elements\Xml();
-        $this->serverCommentE->setContent('<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . str_replace("\n", "&#10;", $this->connection->getServerComment()) . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>');
-        $this->frameInputbox->addComponent($this->serverCommentE);
-
-        $spacer = new Quad(3, 26);
-        $spacer->setStyle(Icons64x64_1::EmptyIcon);
-        $this->frameInputbox->addComponent($spacer);
-
-        $this->serverComment = new Inputbox("serverComment", 60, 26);
-        $this->serverComment->setPosition(900, 900);
-        $this->addComponent($this->serverComment);
-
-
-        // Players Min & Max goes to same row
-        $this->framePlayers = new Frame();
-        $this->framePlayers->setLayout(new Line());
-        $this->framePlayers->setSize(100, 11);
-
-        $this->maxPlayers = new Inputbox("maxPlayers", 12);
-        $this->maxPlayers->setLabel(__("Players", $this->getRecipient()));
-        $this->maxPlayers->setText($server->nextMaxPlayers);
-        $this->framePlayers->addComponent($this->maxPlayers);
-
-        $spacer = new Quad(3, 6);
-        $spacer->setStyle(Icons64x64_1::EmptyIcon);
-        $this->framePlayers->addComponent($spacer);
-
-        $this->maxSpec = new Inputbox("maxSpec", 12);
-        $this->maxSpec->setLabel(__("Spectators", $this->getRecipient()));
-        $this->maxSpec->setText($server->nextMaxSpectators);
-        $this->framePlayers->addComponent($this->maxSpec);
-
-        $this->frameInputbox->addComponent($this->framePlayers);
-        // end of players
-        // Ladder Points goes to same row
-        $this->frameLadder = new Frame();
-        $this->frameLadder->setLayout(new Line());
-        $this->frameLadder->setSize(100, 11);
-
-        $this->minLadder = new Inputbox("ladderMin");
-        $this->minLadder->setLabel(__("Ladderpoints minimum", $this->getRecipient()));
-        $this->minLadder->setText($server->ladderServerLimitMin);
-        $this->minLadder->setEditable(false);
-        $this->frameLadder->addComponent($this->minLadder);
-
-        $spacer = new Quad(3, 6);
-        $spacer->setStyle(Icons64x64_1::EmptyIcon);
-        $this->frameLadder->addComponent($spacer);
-
-        $this->maxLadder = new Inputbox("ladderMax");
-        $this->maxLadder->setLabel(__("Ladderpoints Maximum", $this->getRecipient()));
-        $this->maxLadder->setText($server->ladderServerLimitMax);
-        $this->maxLadder->setEditable(false);
-        $this->frameLadder->addComponent($this->maxLadder);
-
-        $this->frameInputbox->addComponent($this->frameLadder);
-        // end of ladder points
-
-        // server password
-        $this->serverPass = new InputboxMasked("serverPass");
-        $this->serverPass->setLabel(__("Password for server", $this->getRecipient()));
-        $this->serverPass->setText($this->connection->getServerPassword());
-        $this->serverPass->setShowClearText();
-        $this->frameInputbox->addComponent($this->serverPass);
-
-        // spectator password
-        $this->serverSpecPass = new InputboxMasked("serverSpecPass");
-        $this->serverSpecPass->setLabel(__("Password for spectators", $this->getRecipient()));
-        $this->serverSpecPass->setText($this->connection->getServerPasswordForSpectator());
-        $this->serverSpecPass->setShowClearText();
-        $this->frameInputbox->addComponent($this->serverSpecPass);
-
-        // referee password
-        $this->refereePass = new InputboxMasked("refereePass");
-        $this->refereePass->setLabel(__("Referee password", $this->getRecipient()));
-        $this->refereePass->setText($this->connection->getRefereePassword());
-        $this->refereePass->setShowClearText();
-        $this->frameInputbox->addComponent($this->refereePass);
+        $input = new \ManiaLive\Gui\Elements\Xml();
+        $input->setContent($content);
+        $this->addComponent($input);
     }
 
     // Generate all checkboxes
@@ -249,11 +167,6 @@ class ServerOptions extends Window
         $this->e['KeepPlayerSlots']->setText(__("Keep Player Slots", $login));
         $this->frameCb->addComponent($this->e['KeepPlayerSlots']);
 
-        // spacer
-        $quad = new Quad(20, 16);
-        $quad->setStyle(Bgs1::BgEmpty);
-        $this->frameCb->addComponent($quad);
-
         $this->buttonOK = new \ManiaLive\Gui\Elements\Xml();
         $this->buttonOK->setContent('<frame posn="126 -100 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $this->getRecipient()), null, null, null, null, null, $this->actionOK, null, null, null, null, null, null) . '</frame>');
         $this->addComponent($this->buttonOK);
@@ -263,15 +176,6 @@ class ServerOptions extends Window
     {
         $login = $this->getRecipient();
 
-        $this->serverName->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_NAME));
-        $this->serverComment->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_COMMENT));
-        $this->maxPlayers->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_MAXPLAYER));
-        $this->maxSpec->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_MAXSPEC));
-        $this->minLadder->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_LADDER));
-        $this->maxLadder->setEditable(AdminGroups::hasPermission($login, Permission::SERVER_LADDER));
-        $this->serverPass->setVisibility(AdminGroups::hasPermission($login, Permission::SERVER_PASSWORD));
-        $this->serverSpecPass->setVisibility(AdminGroups::hasPermission($login, Permission::SERVER_SPECPWD));
-        $this->refereePass->setVisibility(AdminGroups::hasPermission($login, Permission::SERVER_REFPWD));
         $this->cbPublicServer->SetIsWorking(AdminGroups::hasPermission($login, Permission::SERVER_GENERIC_OPTIONS));
         $this->cbLadderServer->SetIsWorking(AdminGroups::hasPermission($login, Permission::SERVER_GENERIC_OPTIONS));
         $this->cbAllowMapDl->SetIsWorking(AdminGroups::hasPermission($login, Permission::SERVER_GENERIC_OPTIONS));
@@ -285,20 +189,12 @@ class ServerOptions extends Window
     public function destroy()
     {
         $this->connection = null;
-        $this->storage = null;
         parent::destroy();
     }
 
     protected function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
-        //   $this->pager->setSize($this->sizeX - 4, $this->sizeY -12);
-        $this->serverName->setSize($this->sizeX - 8, 8);
-        $this->serverComment->setSizeX($this->sizeX - 70);
-        $this->serverPass->setSizeX(($this->sizeX - 8) / 2);
-        $this->serverSpecPass->setSizeX(($this->sizeX - 8) / 2);
-        $this->refereePass->setSizeX(($this->sizeX - 8) / 2);
-        $this->frameInputbox->setPosition(0, -6);
         $this->frameCb->setPosition($this->sizeX / 2 + 20, -25);
     }
 

@@ -19,10 +19,7 @@
 
 namespace ManiaLivePlugins\eXpansion\MapSuggestion\Gui\Windows;
 
-use ManiaLib\Gui\Layouts\Column;
-use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Data\Storage;
-use ManiaLive\Gui\Controls\Frame;
 use ManiaLive\Utilities\Validation;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\MapSuggestion\MapSuggestion;
@@ -34,16 +31,8 @@ use ManiaLivePlugins\eXpansion\MapSuggestion\MapSuggestion;
  */
 class MapWish extends Window
 {
-
-    protected $frame;
-
     /** @var string $mxid */
     protected $mxid = "";
-    protected $inputbox_mxid;
-    protected $inputbox_description;
-    protected $button_send;
-    protected $button_cancel;
-    protected $fromText = "";
 
     /**
      * @var MapSuggestion
@@ -56,40 +45,22 @@ class MapWish extends Window
 
         $login = $this->getRecipient();
         $player = Storage::getInstance()->getPlayerObject($login);
-        $this->fromText = $player->nickName . '$z$s$fff (' . $login . ')';
+        $fromText = $player->nickName . '$z$s$fff (' . $login . ')';
+
         $this->setName("MapSuggestion window");
         $this->setTitle(__("Wish a map", $login));
         $this->setSize(90, 60);
 
-        $this->frame = new Frame(2, -6);
-        $this->frame->setLayout(new Column());
-        $this->mainFrame->addComponent($this->frame);
+        $content = '<frame posn="2 -6 0">';
+        $content .= \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("from", 60, false, __('From', $login), $fromText, null, null);
+        $content .= '<frame posn="0 -12 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("mxid", 60, true, __('Mania-Exchange ID-number for map wish', $login), $this->mxid, null, null) . '</frame>';
+        $content .= '<frame posn="0 -24 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("description", 60, true, mb_convert_encoding(__('Why you would like this map to be added ?', $login), "UTF-8", 'ISO-8859-1'), null, null, null) . '</frame>';
+        $content .= '<frame posn="0 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->createAction(array($this, "apply")), null, null, null, null, null, null) . '</frame>';
+        $content .= '</frame>';
 
-        // frame with line layout, used for row template;
-        $row = new Frame();
-        $row->setLayout(new Line());
-
-        $lbl_login = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("from", 60, false);
-        $lbl_login->setLabel(__('From', $login));
-        $lbl_login->setText($this->fromText);
-
-
-        $this->frame->addComponent($lbl_login);
-
-        $this->inputbox_mxid = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("mxid", 60);
-        $this->inputbox_mxid->setLabel(__("Mania-Exchange ID-number for map wish", $login));
-        $this->inputbox_mxid->setText($this->mxid);
-        $this->frame->addComponent($this->inputbox_mxid);
-
-        $this->inputbox_description = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("description", 60);
-        $this->inputbox_description->setLabel(__("Why you would like this map to be added ?", $login));
-        $this->frame->addComponent($this->inputbox_description);
-
-        $this->button_send = new \ManiaLive\Gui\Elements\Xml();
-        $this->button_send->setContent(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->createAction(array($this, "apply")), null, null, null, null, null, null));
-        $row->addComponent($this->button_send);
-
-        $this->frame->addComponent($row);
+        $xml = new \ManiaLive\Gui\Elements\Xml();
+        $xml->setContent($content);
+        $this->mainFrame->addComponent($xml);
     }
 
     /**
@@ -104,11 +75,6 @@ class MapWish extends Window
     {
         $mxid = $entries['mxid'];
         $this->plugin->addMapToWish($login, $mxid, $entries['description']);
-    }
-
-    public function cancel($login)
-    {
-        $this->Erase($login);
     }
 
     public function setMXid($mxid)

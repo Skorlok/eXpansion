@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Controls\MatchSettingsFile;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -42,8 +41,9 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
 
         $login = $this->getRecipient();
-        $this->inputboxSaveAs = new Inputbox("SaveAs", 40);
-        $this->inputboxSaveAs->setLabel(__("Save MatchSettings as", $login));
+
+        $this->inputboxSaveAs = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputboxSaveAs->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("SaveAs", 40, true, __("Save MatchSettings as", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->inputboxSaveAs);
 
         $this->actionSave = $this->createAction(array($this, "saveAs"));
@@ -53,9 +53,8 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->frame->addComponent($this->saveButton);
 
         // Load
-        $this->inputboxLoadAs = new Inputbox("LoadAs", 40);
-        $this->inputboxLoadAs->setLabel(__("Load MatchSettings by name", $login));
-        $this->inputboxLoadAs->setPosX(27.5);
+        $this->inputboxLoadAs = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputboxLoadAs->setContent('<frame posn="69.5 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("LoadAs", 40, true, __("Load MatchSettings by name", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->inputboxLoadAs);
 
         $this->actionLoad = $this->createAction(array($this, "loadAs"));
@@ -211,7 +210,6 @@ class MatchSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
 
-        $this->inputboxSaveAs->destroy();
         $this->frame->destroy();
 
         $this->pager->destroy();

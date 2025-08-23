@@ -53,8 +53,8 @@ class CustomPointEntry extends \ManiaLivePlugins\eXpansion\Gui\Control
 
         $this->frame->addComponent($spacer);
 
-        $this->label2 = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("customPoints", 90);
-        $this->label2->setText($points);
+        $this->label2 = new \ManiaLive\Gui\Elements\Xml();
+        $this->label2->setContent('<frame posn="40 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("customPoints", 90, true, null, $points, null, null) . '</frame>');
         $this->frame->addComponent($this->label2);
 
         $this->addComponent($this->frame);

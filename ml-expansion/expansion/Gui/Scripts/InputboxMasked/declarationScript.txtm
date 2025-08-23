@@ -1,0 +1,2 @@
+declare CMlLabel btLabel_<?php echo $this->btName ?> <=> (Page.GetFirstChild("eXp_ButtonDescText_<?php echo $this->btName ?>_bt") as CMlLabel);
+declare passwordEntry_<?php echo $this->btName ?> <=> (Page.GetFirstChild("<?php echo $this->btName ?>") as CMlEntry);
