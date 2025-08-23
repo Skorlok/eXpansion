@@ -19,7 +19,7 @@ class Checkbox extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     protected $toToggle = null;
 
-    public function __construct($sizeX = 5, $sizeY = 5, $textWidth = 25, Checkbox $toToggle)
+    public function __construct($sizeX = 5, $sizeY = 5, $textWidth = 25, $toToggle = null)
     {
         $this->textWidth = $textWidth;
         $this->action = $this->createAction(array($this, 'toggleActive'));
