@@ -212,7 +212,7 @@ class Menu extends ExpPlugin implements Listener
         return $items;
     }
 
-    private function buildMenuItems(Array $items, $group, $ML, bool $isMain = false)
+    private function buildMenuItems($items, $group, $ML, $isMain = false)
     {
         /** @var \ManiaLivePlugin\eXpansion\Gui\Config $config */
         $config = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
