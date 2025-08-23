@@ -79,7 +79,7 @@ class ConfigManager
      *
      * @return ConfigManager
      */
-    public static function getInstance(Core $eXpCore = null)
+    public static function getInstance(Core $eXpCore)
     {
         if (self::$_instance == null) {
             self::$_instance = new ConfigManager($eXpCore);
