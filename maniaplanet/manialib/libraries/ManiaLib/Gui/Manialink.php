@@ -115,8 +115,7 @@ abstract class Manialink
 	 * you pass a layout object, all the items inside the frame will be
 	 * positionned using constraints defined by the layout
 	 */
-	final public static function beginFrame($x = 0, $y = 0, $z = 0, $scale = null,
-		\ManiaLib\Gui\Layouts\AbstractLayout $layout = null)
+	final public static function beginFrame($x = 0, $y = 0, $z = 0, $scale = null, $layout = null)
 	{
 		$frame = new Elements\Frame();
 		$frame->setPosition($x, $y, $z);

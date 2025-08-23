@@ -353,8 +353,7 @@ class GBXBaseFetcher
     {
         // define a dedicated parser to handle the attributes
         $xml_parser = xml_parser_create();
-        xml_set_object($xml_parser, $this);
-        xml_set_element_handler($xml_parser, 'startTag', 'endTag');
+        xml_set_element_handler($xml_parser, array($this, 'startTag'), array($this, 'endTag'));
         xml_set_character_data_handler($xml_parser, 'charData');
 
         // escape '&' characters unless already a known entity
