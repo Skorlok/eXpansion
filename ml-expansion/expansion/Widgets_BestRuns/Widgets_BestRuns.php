@@ -52,7 +52,10 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         // Sort the runs by time
         usort($this->bestRuns, function ($a, $b) {
-            return $a->totalTime <=> $b->totalTime;
+            if ($a->totalTime == $b->totalTime) {
+                return 0;
+            }
+            return ($a->totalTime < $b->totalTime) ? -1 : 1;
         });
 
         $this->displayWidget();
