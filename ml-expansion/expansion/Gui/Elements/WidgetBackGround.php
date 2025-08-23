@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLib\Gui\Manialink;
-
 class WidgetBackGround extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
     public function __construct($sizeX, $sizeY, $action = null)
