@@ -39,6 +39,14 @@ class MapWish extends Window
      */
     protected $plugin;
 
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
+    }
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -52,7 +60,7 @@ class MapWish extends Window
         $this->setSize(90, 60);
 
         $content = '<frame posn="2 -6 0">';
-        $content .= \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("from", 60, false, __('From', $login), $fromText, null, null);
+        $content .= \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("from", 60, false, __('From', $login), $this->handleSpecialChars($fromText), null, null);
         $content .= '<frame posn="0 -12 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("mxid", 60, true, __('Mania-Exchange ID-number for map wish', $login), $this->mxid, null, null) . '</frame>';
         $content .= '<frame posn="0 -24 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("description", 60, true, mb_convert_encoding(__('Why you would like this map to be added ?', $login), "UTF-8", 'ISO-8859-1'), null, null, null) . '</frame>';
         $content .= '<frame posn="0 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->createAction(array($this, "apply")), null, null, null, null, null, null) . '</frame>';
