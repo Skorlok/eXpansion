@@ -87,8 +87,8 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             } else {
                 settype($settings[$item->settingName], $item->type);
 
-                if ($item->inputbox->getText() != $settings[$item->settingName]) {
-                    $diffParams[$item->settingName] = array(($item->inputbox->getText() ? $item->inputbox->getText() : '$iEmpty$i'), ($settings[$item->settingName] ? $settings[$item->settingName] : '$iEmpty$i'));
+                if ($item->inputbox != $settings[$item->settingName]) {
+                    $diffParams[$item->settingName] = array(($item->inputbox ? $item->inputbox : '$iEmpty$i'), ($settings[$item->settingName] ? $settings[$item->settingName] : '$iEmpty$i'));
                 }
             }
         }

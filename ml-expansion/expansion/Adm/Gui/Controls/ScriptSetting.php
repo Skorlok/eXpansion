@@ -64,9 +64,10 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
             $this->checkBox->setStatus($value);
             $this->frame->addComponent($this->checkBox);
         } else {
-            $this->inputbox = new \ManiaLive\Gui\Elements\Xml();
-            $this->inputbox->setContent('<frame posn="104 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($settingName, 20, true, null, $value, null, null) . '</frame>');
-            $this->frame->addComponent($this->inputbox);
+            $inputbox = new \ManiaLive\Gui\Elements\Xml();
+            $inputbox->setContent('<frame posn="104 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($settingName, 20, true, null, $value, null, null) . '</frame>');
+            $this->frame->addComponent($inputbox);
+            $this->inputbox = $value;
         }
         $this->addComponent($this->frame);
 

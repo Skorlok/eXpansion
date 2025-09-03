@@ -25,12 +25,17 @@ class Xml extends \ManiaLive\Gui\Element
 	
 	function __construct($xml = '')
 	{
-		$this->xml = $xml;
+		$this->xml = new \DOMDocument();
+		if ($xml) {
+			$this->setContent($xml);
+		}
 	}
 	
 	function setContent($xml)
 	{
-		$this->xml = $xml;
+		if (!$this->xml->loadXML($xml)) {
+			throw new \Exception("Error parsing xml: \n" . $xml, 2);
+		}
 	}
 
 	function getContent()
@@ -40,22 +45,9 @@ class Xml extends \ManiaLive\Gui\Element
 	
 	function save()
 	{
-		try
-		{
-			$doc = new \DOMDocument();
-			$doc->loadXML($this->xml);
-			$node = Manialink::$domDocument->importNode($doc->firstChild, true);
+		if ($this->xml->firstChild) {
+			$node = Manialink::$domDocument->importNode($this->xml->firstChild, true);
 			end(Manialink::$parentNodes)->appendChild($node);
-		}
-		catch (\Exception $e)
-		{
-			$doc = new \DOMDocument();
-			$doc->loadXML('<content>' . $this->xml . '</content>');
-			foreach ($doc->firstChild->childNodes as $child)
-			{
-				$node = Manialink::$domDocument->importNode($child, true);
-				end(Manialink::$parentNodes)->appendChild($node);
-			}
 		}
 	}
 }

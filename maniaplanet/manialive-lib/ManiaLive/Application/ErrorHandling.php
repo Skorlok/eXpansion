@@ -14,14 +14,10 @@ namespace ManiaLive\Application;
 use ManiaLib\Utils\Path;
 use ManiaLive\Utilities\Console;
 use ManiaLive\Utilities\Logger;
-use ManiaLivePlugins\eXpansion\Core\Analytics;
 
 abstract class ErrorHandling
 {
 	static $errorCount = 0;
-
-	/** @var null|Analytics */
-	static $errorReporter = null;
 
 	/**
 	 * Counts number of errors that have been thrown
@@ -54,7 +50,6 @@ abstract class ErrorHandling
 		if (strpos($errstr, "Creation of dynamic property") !== false)
 			return;
 
-		echo "[PHP Warning] $errstr on line $errline in file $errfile", PHP_EOL, PHP_EOL;
 		// We don't want to crash ML because of a silly notice or strict error.
 		static $ignores = array(2, 8, 32, 512, 1024, 2048);
 
@@ -62,11 +57,15 @@ abstract class ErrorHandling
 			$exception =  new \ErrorException($errstr, $errno, 0, $errfile, $errline);
 			if (in_array($errno, $ignores)) {
 				// Just log.
-				self::logError($exception);
+				self::displayAndLogError($exception);
 			} else {
 				// Propagate the error.
 				throw $exception;
 			}
+		} else {
+			echo "Suppressed error:\n";
+			$exception =  new \ErrorException($errstr, $errno, 0, $errfile, $errline);
+			self::displayAndLogError($exception);
 		}
 	}
 
@@ -77,16 +76,8 @@ abstract class ErrorHandling
 	 */
 	public static function processRuntimeException(\Exception $e)
 	{
-		self::logError($e);
-		self::displayAndLogError($e, "Runtime ");
+		self::displayAndLogError($e);
 		self::increaseErrorCount();
-	}
-
-	public static function logError(\Exception $e)
-	{
-		if (!is_null(self::$errorReporter)) {
-			self::$errorReporter->ping($e);
-		}
 	}
 
 	/**
@@ -96,14 +87,13 @@ abstract class ErrorHandling
 	 */
 	public static function processModuleException(\Exception $e)
 	{
-		self::logError($e);
 		// FatalException will cause program to quit in any case
 		// CriticalEventException can be caught by upper module exception handler
 		if ($e instanceof FatalException || $e instanceof CriticalEventException)
 			throw $e;
 		// display message and continue if possible
 		else {
-			self::displayAndLogError($e, "Module process ");
+			self::displayAndLogError($e);
 			self::increaseErrorCount();
 		}
 	}
@@ -119,8 +109,7 @@ abstract class ErrorHandling
 	{
 		if ($e instanceof CriticalEventException) {
 			if (!($e instanceof SilentCriticalEventException)) {
-				self::logError($e);
-				self::displayAndLogError($e, "Event process ");
+				self::displayAndLogError($e);
 				self::increaseErrorCount();
 			}
 		} // anything else, this normally should(!) be a fatalexception ...
@@ -134,7 +123,7 @@ abstract class ErrorHandling
 	 *
 	 * @param \Exception $e
 	 */
-	public static function displayAndLogError(\Exception $e, $type = "")
+	public static function displayAndLogError(\Exception $e)
 	{
 		$log = PHP_EOL . '    Occured on ' . date("d.m.Y") . ' at ' . date("H:i:s") . ' at process with ID #' . getmypid() . PHP_EOL
 			. '    ---------------------------------' . PHP_EOL;
