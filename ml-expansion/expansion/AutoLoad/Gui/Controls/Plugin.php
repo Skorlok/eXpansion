@@ -73,6 +73,14 @@ class Plugin extends \ManiaLivePlugins\eXpansion\Gui\Control
      */
     protected $configManger = null;
 
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
+    }
+
     public function __construct($indexNumber, AutoLoad $autoload, MetaData $plugin, $login, $isLoaded)
     {
 
@@ -139,7 +147,7 @@ class Plugin extends \ManiaLivePlugins\eXpansion\Gui\Control
         } else {
             $button_otherComp_colorize = 'f00';
         }
-        $otherCompatible = $this->getOtherDescriptionText($otherCompatible);
+        $otherCompatible = $this->handleSpecialChars($this->getOtherDescriptionText($otherCompatible));
         $this->button_otherComp = new \ManiaLive\Gui\Elements\Xml();
         $this->button_otherComp->setContent('<frame posn="114 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(7, 7, null, array(__($otherCompatible[0], $login), 100, 5*$otherCompatible[1], sizeof($otherCompatible) + 1), null, $button_otherComp_colorize, null, null, null, null, null, array('Icons64x64_1', 'GenericButton'), null, null, null) . '</frame>');
         $this->addComponent($this->button_otherComp);
@@ -208,7 +216,7 @@ class Plugin extends \ManiaLivePlugins\eXpansion\Gui\Control
         if (empty($otherCompatibility)) {
             return array("This plugin is is compatible with current installation", 1);
         } else {
-            return array("This plugin has a few compatibility issues : &#10;" . implode("&#10;", $otherCompatibility), count($otherCompatibility) + 1);
+            return array("This plugin has a few compatibility issues : \n" . implode("\n", $otherCompatibility), count($otherCompatibility) + 1);
         }
     }
 
