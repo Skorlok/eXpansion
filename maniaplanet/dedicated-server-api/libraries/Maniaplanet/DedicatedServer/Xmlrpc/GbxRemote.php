@@ -83,6 +83,10 @@ class GbxRemote
 			if ($this->socket || (microtime(true) - $init_time >= $timeout))
 				break;
 			else
+				if (!\ManiaLive\Application\Application::isRunning()) {
+					\ManiaLive\Utilities\Console::println('ManiaLive stopped during connection!');
+					exit(0);
+				}
 				sleep($init_timeout);
 		}
 
