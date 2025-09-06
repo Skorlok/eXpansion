@@ -23,7 +23,7 @@ class Application extends \ManiaLib\Utils\Singleton
 
 	static $startTime;
 	/** @var bool */
-	protected $running = true;
+	protected $running = false;
 	/** @var Connection */
 	protected $connection;
 
@@ -55,9 +55,6 @@ class Application extends \ManiaLib\Utils\Singleton
 				$manialiveConfig->logsPrefix = str_replace('%port%', $serverConfig->port, $manialiveConfig->logsPrefix);
 			}
 
-			// disable logging?
-			/*if(!$manialiveConfig->runtimeLog)
-				\ManiaLive\Utilities\Logger::getLog('runtime')->disableLog();*/
 		} catch(\Exception $e) {
 			// exception on startup ...
 			ErrorHandling::processStartupException($e);
@@ -96,6 +93,8 @@ class Application extends \ManiaLib\Utils\Singleton
 			ErrorHandling::processRuntimeException($e);
 		}
 
+		$this->running = true;
+
 		try {
 			while($this->running) {
 				Dispatcher::dispatch(new Event(Event::ON_PRE_LOOP));
@@ -132,9 +131,14 @@ class Application extends \ManiaLib\Utils\Singleton
 	function kill()
 	{
 		if($this->connection) $this->connection->manualFlowControlEnable(false);
-		$this->running = false;
-	}
 
+		if ($this->running) {
+			$this->running = false;
+		} else {
+			\ManiaLive\Utilities\Console::println('ManiaLive closed successfully!');
+			exit(0);
+		}
+	}
 }
 
 ?>
