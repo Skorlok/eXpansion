@@ -23,7 +23,7 @@ class Application extends \ManiaLib\Utils\Singleton
 
 	static $startTime;
 	/** @var bool */
-	protected static $running = false;
+	protected static $running = true;
 	/** @var Connection */
 	protected $connection;
 
@@ -93,8 +93,6 @@ class Application extends \ManiaLib\Utils\Singleton
 			ErrorHandling::processRuntimeException($e);
 		}
 
-		self::$running = true;
-
 		try {
 			while(self::$running) {
 				Dispatcher::dispatch(new Event(Event::ON_PRE_LOOP));
@@ -131,13 +129,7 @@ class Application extends \ManiaLib\Utils\Singleton
 	function kill()
 	{
 		if($this->connection) $this->connection->manualFlowControlEnable(false);
-
-		if (self::$running) {
-			self::$running = false;
-		} else {
-			\ManiaLive\Utilities\Console::println('ManiaLive closed successfully!');
-			exit(0);
-		}
+		self::$running = false;
 	}
 
 	public static function isRunning()
