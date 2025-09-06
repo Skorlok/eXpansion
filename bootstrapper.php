@@ -3,11 +3,13 @@
 require_once __DIR__.DIRECTORY_SEPARATOR.'libraries'.DIRECTORY_SEPARATOR.'autoload.php';
 
 $required = array('spl' => 'Standard PHP Library', 'json' => 'JSON', 'mbstring' => 'mbString', 'openssl' => 'openssl', 'curl' => 'cURL with SSL', 'xml' => 'xml', 'simplexml' => 'simplexml', 'dom' => 'dom', 'pcre' => 'pcre');
-$optional = array('gd' => 'gd', 'iconv' => 'iconv', 'phar' => 'phar', 'zlib' => 'zlib', 'pcntl' => 'pcntl', 'sockets' => 'sockets', 'zip' => 'zip', 'xmlrpc' => 'xmlrpc');
+$optional = array('gd' => 'gd', 'iconv' => 'iconv', 'phar' => 'phar', 'zlib' => 'zlib', 'sockets' => 'sockets', 'zip' => 'zip', 'xmlrpc' => 'xmlrpc');
 $atLastOne = array('sqlite3' => 'SQLite3', 'mysqli' => 'MySQLI');
 
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $required['com_dotnet'] = 'com_dotnet';
+} else {
+    $optional['pcntl'] = 'pcntl';
 }
 
 $phpOk = (function_exists('version_compare') && version_compare(phpversion(), '5.5.0', '>='));
