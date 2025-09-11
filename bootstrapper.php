@@ -2,8 +2,8 @@
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'libraries'.DIRECTORY_SEPARATOR.'autoload.php';
 
-$required = array('spl' => 'Standard PHP Library', 'json' => 'JSON', 'mbstring' => 'mbString', 'openssl' => 'openssl', 'curl' => 'cURL with SSL', 'xml' => 'xml', 'simplexml' => 'simplexml', 'dom' => 'dom', 'pcre' => 'pcre');
-$optional = array('gd' => 'gd', 'iconv' => 'iconv', 'phar' => 'phar', 'zlib' => 'zlib', 'sockets' => 'sockets', 'zip' => 'zip', 'xmlrpc' => 'xmlrpc');
+$required = array('spl' => 'Standard PHP Library', 'json' => 'JSON', 'mbstring' => 'mbString', 'curl' => 'cURL with SSL', 'xml' => 'xml', 'simplexml' => 'simplexml', 'dom' => 'dom', 'pcre' => 'pcre');
+$optional = array('gd' => 'gd', 'phar' => 'phar', 'openssl' => 'openssl', 'zlib' => 'zlib', 'sockets' => 'sockets', 'zip' => 'zip', 'xmlrpc' => 'xmlrpc');
 $atLastOne = array('sqlite3' => 'SQLite3', 'mysqli' => 'MySQLI');
 
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
