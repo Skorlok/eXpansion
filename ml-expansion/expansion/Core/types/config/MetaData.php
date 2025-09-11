@@ -100,7 +100,7 @@ abstract class MetaData
     /**
      * @var string[] List of incompatible plugin ids
      */
-    private $incompatiblePlugins = [];
+    private $incompatiblePlugins = array();
 
     /**
      * @param string $pluginId The Id of the plugin the meta data is working for
