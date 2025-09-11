@@ -17,7 +17,7 @@ class Widget extends ManiaLink
 
     public function __construct($path)
     {
-        Parent::__construct($path);
+        parent::__construct($path);
         $this->maniaLinkPath = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "Gui\ManiaLink\Widget.xml";
         $this->widgetScript = new Script("Gui\Scripts\PlainManialinkScript");
 
