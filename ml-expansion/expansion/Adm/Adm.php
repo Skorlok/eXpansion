@@ -321,7 +321,7 @@ class Adm extends ExpPlugin
             //enable custom points in team mode
             if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
                 try {
-                    $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
+                    $this->connection->setModeScriptSettings(array("S_UseCustomPointsRepartition" => true));
                 } catch (Exception $e) {
                     $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
                 }

@@ -413,7 +413,7 @@ EOT;
         //enable custom points in team mode
         if ($this->eXpGetCurrentCompatibilityGameMode()== \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM) {
             try {
-                $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
+                $this->connection->setModeScriptSettings(array("S_UseCustomPointsRepartition" => true));
             } catch (Exception $e) {
                 // Do nothing
             }
@@ -902,11 +902,11 @@ EOT;
         if (self::$isExtended) {
             
             if (self::$isTimeExtendable) {
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval(self::$initialTimelimit)]);
+                $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval(self::$initialTimelimit)));
             }
 
             if (self::$isPointExtendable) {
-                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval(self::$initialPoint)]);
+                $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval(self::$initialPoint)));
             }
         }
         self::$isTimeExtendable = false;
@@ -928,24 +928,24 @@ EOT;
         if ($timeOrPoint == null) {
 
             if (self::$isTimeExtendable) {
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + self::$initialTimelimit]);
+                $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + self::$initialTimelimit));
                 self::$isExtended = true;
             }
 
             if (self::$isPointExtendable) {
-                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + self::$initialPoint]);
+                $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + self::$initialPoint));
                 self::$isExtended = true;
             }
 
         } else {
 
             if (self::$isTimeExtendable) {
-                $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + $timeOrPoint]);
+                $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($ScriptSettings["S_TimeLimit"]) + $timeOrPoint));
                 self::$isExtended = true;
             }
 
             if (self::$isPointExtendable) {
-                $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + $timeOrPoint]);
+                $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($ScriptSettings["S_PointsLimit"]) + $timeOrPoint));
                 self::$isExtended = true;
             }
 
@@ -1120,7 +1120,7 @@ EOT;
         //enable custom points in team mode
         if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
             try {
-                $this->connection->setModeScriptSettings(["S_UseCustomPointsRepartition" => true]);
+                $this->connection->setModeScriptSettings(array("S_UseCustomPointsRepartition" => true));
             } catch (Exception $e) {
                 $this->console('[CustomPoints] Impossible to set S_UseCustomPointsRepartition to true, Incompatible mode ?');
             }

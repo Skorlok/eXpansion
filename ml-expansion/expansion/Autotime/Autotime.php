@@ -65,7 +65,7 @@ class Autotime extends ExpPlugin
             if ($this->config->message == true){
                 $this->eXpChatSendServerMessage('$ff0$iNew time limit: $fff%s $ff0seconds.',null,array(Time::fromTM($newLimit)));
             }
-            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($tatime)]);
+            $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($tatime)));
         }
     }
 }

@@ -1107,7 +1107,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_NbOfWinners" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_NbOfWinners" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets cup winners to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1127,7 +1127,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_RoundsPerMap" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_RoundsPerMap" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new rounds to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1147,7 +1147,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new cup points limit to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1167,7 +1167,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
+            $this->connection->setModeScriptSettings(array("S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new team rules to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1187,7 +1187,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_MaxPointsPerRound" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_MaxPointsPerRound" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team max points to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1207,7 +1207,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points limit to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1227,7 +1227,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_PointsGap" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_PointsGap" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points gap to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1249,7 +1249,7 @@ class ChatAdmin extends ExpPlugin
 
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_FinishTimeout" => intval($newLimit)]);
+            $this->connection->setModeScriptSettings(array("S_FinishTimeout" => intval($newLimit)));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new finish timeout to#variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1269,7 +1269,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_ForceLapsNb" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_ForceLapsNb" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new number of laps to#variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1291,7 +1291,7 @@ class ChatAdmin extends ExpPlugin
 
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($newLimit)]);
+            $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($newLimit)));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new laps timelimit to#variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1311,7 +1311,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_PointsLimit" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets rounds points limits to#variable# %s.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -1508,7 +1508,7 @@ class ChatAdmin extends ExpPlugin
             return;
         }
         try {
-            $this->connection->setModeScriptSettings(["S_WarmUpNb" => intval($params[0])]);
+            $this->connection->setModeScriptSettings(array("S_WarmUpNb" => intval($params[0])));
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets all game modes warmup number to#variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
@@ -1528,7 +1528,7 @@ class ChatAdmin extends ExpPlugin
             return;
         }
         try {
-            $this->connection->setModeScriptSettings(["S_DisplayTimeDiff" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
+            $this->connection->setModeScriptSettings(array("S_DisplayTimeDiff" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets the display time diff to#variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
@@ -1549,7 +1549,7 @@ class ChatAdmin extends ExpPlugin
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
-            $this->connection->setModeScriptSettings(["S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)]);
+            $this->connection->setModeScriptSettings(array("S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new round rules to#variable# %s', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
@@ -2106,7 +2106,7 @@ class ChatAdmin extends ExpPlugin
         }
 
         try {
-            $this->connection->setModeScriptSettings(["S_ChatTime" => intval($newLimit)]);
+            $this->connection->setModeScriptSettings(array("S_ChatTime" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z#admin_action#sets new chat time limit of #variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
@@ -2128,7 +2128,7 @@ class ChatAdmin extends ExpPlugin
         $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
 
         try {
-            $this->connection->setModeScriptSettings(["S_TimeLimit" => intval($newLimit)]);
+            $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new time limit of #variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
@@ -2411,7 +2411,7 @@ class ChatAdmin extends ExpPlugin
         $newLimit = TimeConversion::MStoTM($params[0]) / 1000;
 
         try {
-            $this->connection->setModeScriptSettings(["S_WarmUpDuration" => intval($newLimit)]);
+            $this->connection->setModeScriptSettings(array("S_WarmUpDuration" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes', null, array($admin->nickName, $params[0]));
         } catch (Exception $e) {
