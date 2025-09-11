@@ -9,7 +9,6 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Group;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\GroupItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
@@ -22,9 +21,7 @@ class Groups extends Window
 {
     /** @var  Pager */
     protected $pager;
-    /** @var  Inputbox */
     protected $group_add;
-    /** @var  Button */
     protected $button_add;
     protected $items = array();
 
@@ -38,9 +35,8 @@ class Groups extends Window
         $this->pager = new Pager();
         $this->mainFrame->addComponent($this->pager);
 
-        $this->group_add = new Inputbox("group_name");
-        $this->group_add->setLabel(__(AdminGroups::$txt_nwGroupNameL));
-        $this->group_add->setText("");
+        $this->group_add = new \ManiaLive\Gui\Elements\Xml();
+        $this->group_add->setContent('<frame posn="0 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("group_name", 115, true, __(AdminGroups::$txt_nwGroupNameL, $this->getRecipient()), null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->group_add);
 
         $this->button_add = new \ManiaLive\Gui\Elements\Xml();
@@ -58,9 +54,6 @@ class Groups extends Window
         $this->pager->setSize($this->sizeX, $this->sizeY - 12);
         $this->pager->setStretchContentX($this->sizeX);
         $this->pager->setPosition(0, -7);
-
-        $this->group_add->setSize($this->sizeX - 45, 7);
-        $this->group_add->setPosition(0, -3);
     }
 
     /**
@@ -74,8 +67,6 @@ class Groups extends Window
 
         $this->pager->clearItems();
         $this->items = array();
-
-        $this->group_add->setLabel(__(AdminGroups::$txt_nwGroupNameL, $this->getRecipient()));
 
         $this->populateList();
     }
@@ -125,7 +116,6 @@ class Groups extends Window
                 $adminGroups->addGroup($login2, $groupName);
             }
 
-            $this->group_add->setText("");
             $this->onShow();
             $this->redraw($login2);
 
@@ -249,7 +239,6 @@ class Groups extends Window
         }
         $this->items = null;
         $this->pager->destroy();
-        $this->group_add->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

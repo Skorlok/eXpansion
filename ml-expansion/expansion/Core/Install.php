@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Core;
 class Install
 {
 
+    // no used anymore
     public static function postUpdate()
     {
         $badWords = file_get_contents('https://github.com/shutterstock/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/archive/master.zip');

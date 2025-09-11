@@ -8,7 +8,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\HelpItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
@@ -38,10 +37,8 @@ class Help extends Window
     /** @var Label */
     protected $labelShortCmd;
 
-    /** @var Inputbox */
     protected $inputName;
 
-    /** @var Button */
     protected $buttonSearch;
 
     protected function onConstruct()
@@ -53,11 +50,8 @@ class Help extends Window
         $this->pager = new Pager();
         $this->mainFrame->addComponent($this->pager);
 
-        $this->inputName = new Inputbox('search');
-        $this->inputName->setSizeX(60);
-        $this->inputName->setPositionY(0);
-        $this->inputName->setLabel(__("Name/Description", $login));
-        $this->inputName->setPositionX(0);
+        $this->inputName = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputName->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("search", 60, true, __("Name/Description", $login), null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->inputName);
 
         $this->buttonSearch = new \ManiaLive\Gui\Elements\Xml();
@@ -159,8 +153,7 @@ class Help extends Window
 
     public function doSearch($login, $params)
     {
-        $this->inputName->setText($params['search']);
-
+        $this->inputName->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("search", 60, true, __("Name/Description", $login), $params['search'], null, null) . '</frame>');
         $this->populateList($params['search']);
         $this->redraw($login);
     }

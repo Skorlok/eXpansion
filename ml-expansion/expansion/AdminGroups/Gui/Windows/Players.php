@@ -7,7 +7,6 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Group;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Controls\AdminItem;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
@@ -25,7 +24,6 @@ class Players extends Window
     protected $group;
     protected $button_add;
     protected $button_select;
-    /** @var Inputbox */
     protected $login_add;
 
     protected $action_add;
@@ -47,9 +45,8 @@ class Players extends Window
         $layout->setMargin(2);
         $line->setLayout($layout);
 
-        $this->login_add = new Inputbox("login", 40);
-        $this->login_add->setLabel(__("Login : ", $login));
-        $this->login_add->setText("");
+        $this->login_add = new \ManiaLive\Gui\Elements\Xml();
+        $this->login_add->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("login", 40, true, __("Login : ", $login), null, null, null) . '</frame>');
         $line->addComponent($this->login_add);
 
         $this->action_add = $this->createAction(array($this, 'clickAdd'));
@@ -198,7 +195,6 @@ class Players extends Window
      */
     public function destroy()
     {
-        $this->login_add->destroy();
         foreach ($this->items as $item) {
             $item->erase();
         }

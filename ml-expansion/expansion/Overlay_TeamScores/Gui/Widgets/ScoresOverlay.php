@@ -12,7 +12,6 @@ class ScoresOverlay extends \ManiaLive\Gui\Window
     protected $team2;
     protected $score1;
     protected $score2;
-    protected $inputbox;
     protected $xml;
     protected $button;
     protected $reset;

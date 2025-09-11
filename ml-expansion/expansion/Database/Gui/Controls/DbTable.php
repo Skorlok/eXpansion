@@ -14,10 +14,6 @@ class DbTable extends Control
 
     private $label;
 
-    private $inputbox;
-
-    private $frame;
-
     public $checkBox = null;
 
     public $tableName;

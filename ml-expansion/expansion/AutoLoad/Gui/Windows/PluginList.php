@@ -30,19 +30,13 @@ use ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad;
 use ManiaLivePlugins\eXpansion\AutoLoad\Gui\Controls\Plugin;
 use ManiaLivePlugins\eXpansion\Core\types\config\MetaData;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 
 class PluginList extends Window
 {
 
-    /**
-     * @var Inputbox
-     */
     protected $input_name;
-
-    /** @var  Inputbox */
     protected $input_author;
 
     /** @var string /*
@@ -120,16 +114,16 @@ class PluginList extends Window
         $this->categories = new Frame();
         $this->mainFrame->addComponent($this->categories);
 
-        $this->input_name = new Inputbox('name');
-
-        $this->input_name->setLabel(__("Name", $login));
+        $this->input_name = new \ManiaLive\Gui\Elements\Xml();
+        $this->input_name->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("name", 35, true, __("Name", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->input_name);
 
-        $this->input_author = new Inputbox('author');
-        $this->input_author->setLabel(__("Author", $login));
+        $this->input_author = new \ManiaLive\Gui\Elements\Xml();
+        $this->input_author->setContent('<frame posn="37 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, __("Author", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->input_author);
 
         $this->select_group = new Dropdown("group", array('Select'), 0, 25);
+        $this->select_group->setPosX(74);
         $this->frame->addComponent($this->select_group);
 
         $this->button_search = new \ManiaLive\Gui\Elements\Xml();
@@ -157,7 +151,7 @@ class PluginList extends Window
      * @param AutoLoad $autoLoader
      * @param MetaData[] $availablePlugins
      */
-    public function populate(AutoLoad $autoLoader, $availablePlugins, $selectedGroup = null)
+    public function populate(AutoLoad $autoLoader, $availablePlugins, $selectedGroup = null, $pluginName = null, $authorName = null)
     {
 
         $this->pluginList = $availablePlugins;
@@ -212,13 +206,11 @@ class PluginList extends Window
         /** @var MetaData[] $metaData */
         foreach ($availablePlugins as $metaData) {
 
-            $text = $this->input_name->getText();
-            if (!empty($text) && strpos(strtoupper($metaData->getName()), strtoupper($text)) === false) {
+            if (!empty($pluginName) && strpos(strtoupper($metaData->getName()), strtoupper($pluginName)) === false) {
                 continue;
             }
 
-            $text = $this->input_author->getText();
-            if (!empty($text) && strpos(strtoupper($metaData->getAuthor()), strtoupper($text)) === false) {
+            if (!empty($authorName) && strpos(strtoupper($metaData->getAuthor()), strtoupper($authorName)) === false) {
                 continue;
             }
 
@@ -261,21 +253,23 @@ class PluginList extends Window
         parent::destroy();
     }
 
-    public function setGroup($login, $groupIndex)
+    public function setGroup($login, $groupIndex, $params)
     {
+        $this->input_name->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("name", 35, true, __("Name", $login), $params['name'], null, null) . '</frame>');
+        $this->input_author->setContent('<frame posn="37 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, __("Author", $login), $params['author'], null, null) . '</frame>');
         $this->value_group = $this->elements[$groupIndex];
-        $this->populate($this->autoLoad, $this->pluginList, $groupIndex);
+        $this->populate($this->autoLoad, $this->pluginList, $groupIndex, $params['name'], $params['author']);
         $this->select_group->setSelected($groupIndex);
         $this->redraw($login);
     }
 
     public function doSearch($login, $params)
     {
-        $this->input_name->setText($params['name']);
-        $this->input_author->setText($params['author']);
+        $this->input_name->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("name", 35, true, __("Name", $login), $params['name'], null, null) . '</frame>');
+        $this->input_author->setContent('<frame posn="37 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, __("Author", $login), $params['author'], null, null) . '</frame>');
         $this->value_group = $params['group'] == "" ? 0 : $this->elements[$params['group']];
 
-        $this->populate($this->autoLoad, $this->pluginList, $params['group']);
+        $this->populate($this->autoLoad, $this->pluginList, $params['group'], $params['name'], $params['author']);
         $this->select_group->setSelected($params['group']);   
         $this->redraw($login);
     }

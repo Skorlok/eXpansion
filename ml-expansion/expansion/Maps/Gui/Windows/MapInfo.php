@@ -144,7 +144,7 @@ class MapInfo extends Window
         if ($gbxInfo->songUrl) {
             $link = $this->handleSpecialChars($this->gbxInfo->songUrl);
             $button_song = new \ManiaLive\Gui\Elements\Xml();
-            $button_song->setContent('<frame posn="80 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Song", $this->getRecipient()), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
+            $button_song->setContent('<frame posn="110 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, __("Download Song", $this->getRecipient()), null, null, null, null, null, null, null, $link, null, null, null, null) . '</frame>');
             $this->frame->addComponent($button_song);
         }
 

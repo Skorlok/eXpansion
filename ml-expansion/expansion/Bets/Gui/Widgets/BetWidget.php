@@ -21,9 +21,7 @@ namespace ManiaLivePlugins\eXpansion\Bets\Gui\Widgets;
 use ManiaLib\Gui\Layouts\Flow;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\Bets\Bets;
-use ManiaLivePlugins\eXpansion\Bets\Config;
 use ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
@@ -128,8 +126,8 @@ class BetWidget extends Widget
             $x++;
         }
 
-        $inputbox = new Inputbox("betAmount", 18);
-        $inputbox->setPosition(33, -6);
+        $inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $inputbox->setContent('<frame posn="32 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("betAmount", 18, true, null, null, null, null) . '</frame>');
         $line->addComponent($inputbox);
 
         $button = new \ManiaLive\Gui\Elements\Xml();
