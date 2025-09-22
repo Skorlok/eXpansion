@@ -88,7 +88,7 @@ EOT;
         Console::out(Console::white . "Please enter dedicated password (SuperAdmin): ");
         $this->pass = $this->getInput("SuperAdmin");
         Console::out(Console::white . "Is the ManiaPlanet dedicated server on a different machine as eXpansion ? (false): ");
-        $this->pass = (bool)$this->getInput(false);
+        $this->isRemote = (bool)$this->getInput(false);
         $connection = null;
         try {
             Console::out("Trying to connect...", "Connect", Console::b_green);
