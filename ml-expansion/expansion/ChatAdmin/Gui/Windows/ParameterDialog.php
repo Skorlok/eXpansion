@@ -8,14 +8,11 @@ use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 class ParameterDialog extends Window
 {
 
-    /** @var  Inputbox */
-    protected $inputbox;
     protected $btn_ok;
     /** @var  Frame */
     protected $frame;
@@ -39,12 +36,9 @@ class ParameterDialog extends Window
         $this->frm->setLayout(new Column());
         $this->addComponent($this->frm);
 
-        $this->inputbox = new Inputbox("parameter", 100);
-        $this->inputbox->setLabel("Give a reason");
-        $this->inputbox->setText("Bad Behavior");
-        $this->inputbox->setAlign("left", "top");
-        $this->inputbox->setSize(100, 6);
-        $this->frm->addComponent($this->inputbox);
+        $inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $inputbox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("parameter", 100, true, "Give a reason", "Bad Behavior", null, null) . '</frame>');
+        $this->frm->addComponent($inputbox);
 
         $items = array(
             "permanent",
@@ -60,6 +54,7 @@ class ParameterDialog extends Window
             "month"
         );
         $this->compobox = new Dropdown("select", $items);
+        $this->compobox->setPosY(-6);
         $this->compobox->setAlign("left", "top");
 
 
@@ -117,7 +112,6 @@ class ParameterDialog extends Window
 
     public function destroy()
     {
-        $this->inputbox->destroy();
         parent::destroy();
     }
 }

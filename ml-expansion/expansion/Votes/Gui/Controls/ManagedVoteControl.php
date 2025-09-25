@@ -7,7 +7,6 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     private $bg;
     private $label;
-    private $inputbox;
     private $frame;
     private $ratio;
     private $timeout;
@@ -34,40 +33,19 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label->setText($vote->command);
         $this->frame->addComponent($this->label);
 
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(4, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-
-        $this->timeout = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox($vote->command . "_timeouts", 14);
-        $this->timeout->setPosY(-1);
-        $this->timeout->setLabel("Timeout");
-        $this->timeout->setText($vote->timeout);
+        $this->timeout = new \ManiaLive\Gui\Elements\Xml();
+        $this->timeout->setContent('<frame posn="50 -1 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($vote->command . "_timeouts", 14, true, "Timeout", $vote->timeout, null, null) . '</frame>');
         $this->frame->addComponent($this->timeout);
 
-        $this->frame->addComponent($spacer);
-
-        $this->ratio = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox($vote->command . "_ratios", 14);
-        $this->ratio->setLabel("Ratio");
-        $this->ratio->setPosY(-1);
-        $this->ratio->setText($vote->ratio);
+        $this->ratio = new \ManiaLive\Gui\Elements\Xml();
+        $this->ratio->setContent('<frame posn="68 -1 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($vote->command . "_ratios", 14, true, "Ratio", $vote->ratio, null, null) . '</frame>');
         $this->frame->addComponent($this->ratio);
 
-        $this->frame->addComponent(clone $spacer);
-
-        $this->voters = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown(
-            $vote->command . "_voters",
-            array("Select", "Active Players", "Players", "Everybody"),
-            ($vote->voters + 1),
-            20
-        );
+        $this->voters = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown($vote->command . "_voters", array("Select", "Active Players", "Players", "Everybody"), ($vote->voters + 1), 20);
+        $this->voters->setPosX(36);
         $this->voters->setPosY(-1);
         $this->frame->addComponent($this->voters);
 
-        $this->frame->addComponent(clone $spacer);
-
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(4, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
         $this->addComponent($this->frame);
 
         $this->sizeX = $sizeX;
@@ -77,8 +55,6 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function destroy()
     {
-        $this->ratio->destroy();
-        $this->timeout->destroy();
         $this->voters->destroy();
 
         $this->frame->clearComponents();

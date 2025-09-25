@@ -2,8 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Database\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
-
 class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
     public static $mainPlugin;
@@ -15,7 +13,6 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     private $items = array();
     private $ok;
-    private $inputbox;
     private $actionBackup;
 
     /** @var  \ManiaLive\Database\Connection */
@@ -32,10 +29,9 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->actionBackup = $this->createAction(array(self::$mainPlugin, "exportToSql"));
 
-        $this->inputbox = new Inputbox("filename", 60);
-        $this->inputbox->setLabel("Backup filename");
-        $this->inputbox->setPosition(0, -94);
-        $this->mainFrame->addComponent($this->inputbox);
+        $inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $inputbox->setContent('<frame posn="0 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("filename", 60, true, "Backup filename", null, null, null) . '</frame>');
+        $this->mainFrame->addComponent($inputbox);
 
         $this->ok = new \ManiaLive\Gui\Elements\Xml();
         $this->ok->setContent('<frame posn="62 -94 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Create Backup', null, null, "0d0", null, null, $this->actionBackup, null, null, null, null, null, null) . '</frame>');
@@ -129,7 +125,6 @@ class BackupRestore extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->db = null;
         $this->items = array();
         $this->pager->destroy();
-        $this->inputbox->destroy();
         $this->connection = null;
         $this->destroyComponents();
         parent::destroy();

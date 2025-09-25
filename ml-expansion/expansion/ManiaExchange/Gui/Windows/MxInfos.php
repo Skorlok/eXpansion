@@ -7,7 +7,6 @@ use ManiaLivePlugins\eXpansion\ManiaExchange\ManiaExchange;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
 use ManiaLive\Data\Storage;
 use ManiaLive\Utilities\Time;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
@@ -24,23 +23,7 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         if ($string == null) {
             return "";
         }
-        return str_replace(
-			array(
-				'&',
-				'"',
-				"'",
-				'>',
-				'<'
-			),
-			array(
-				'&amp;',
-				'&quot;',
-				'&apos;',
-				'&gt;',
-				'&lt;'
-			),
-			$string
-	    );
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
     }
 
     protected function onConstruct()
@@ -175,10 +158,8 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $lbl->setContent('<label posn="58 -39 0" sizen="35 6" style="TextStaticSmall" text="UID:"/>');
             $this->mainFrame->addComponent($lbl);
 
-            $lbl = new Inputbox("");
-            $lbl->setPosition(80, -39);
-            $lbl->setSize(45, 6);
-            $lbl->setText($map->uId);
+            $lbl = new \ManiaLive\Gui\Elements\Xml();
+            $lbl->setContent('<frame posn="80 -39 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 45, true, null, $map->uId, null, null) . '</frame>');
             $this->mainFrame->addComponent($lbl);
 
 
@@ -186,10 +167,8 @@ class mxInfos extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $lbl->setContent('<label posn="58 -44 0" sizen="35 6" style="TextStaticSmall" text="File Name:"/>');
             $this->mainFrame->addComponent($lbl);
 
-            $lbl = new Inputbox("");
-            $lbl->setPosition(80, -45);
-            $lbl->setSize(45, 6);
-            $lbl->setText($this->handleSpecialChars($map->fileName));
+            $lbl = new \ManiaLive\Gui\Elements\Xml();
+            $lbl->setContent('<frame posn="80 -45 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 45, true, null, $this->handleSpecialChars($map->fileName), null, null) . '</frame>');
             $this->mainFrame->addComponent($lbl);
 
 

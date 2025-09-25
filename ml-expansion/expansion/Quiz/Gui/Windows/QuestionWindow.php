@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Quiz\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 
 class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -35,19 +34,18 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->frame->setSize(90, 120);
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Column(90, 6));
 
-
-        $this->IBQuestion = new Inputbox("question", 80);
-        $this->IBQuestion->setLabel(__("Question", $login), $login);
+        $this->IBQuestion = new \ManiaLive\Gui\Elements\Xml();
+        $this->IBQuestion->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("question", 80, true, __("Question", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->IBQuestion);
 
         for ($x = 0; $x < $this->answerCount; $x++) {
-            $this->IBanswers[$x] = new Inputbox("answer." . $x, 80);
-            $this->IBanswers[$x]->setLabel(__("Answer", $login) . ($x + 1), $login);
+            $this->IBanswers[$x] = new \ManiaLive\Gui\Elements\Xml();
+            $this->IBanswers[$x]->setContent('<frame posn="0 -' . (12*($x+1)) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("answer." . $x, 80, true, __("Answer", $login) . ($x + 1), null, null, null) . '</frame>');
             $this->frame->addComponent($this->IBanswers[$x]);
         }
 
-        $this->IBimageUrl = new Inputbox("imageUrl", 80);
-        $this->IBimageUrl->setLabel(__("Url for image", $login), $login);
+        $this->IBimageUrl = new \ManiaLive\Gui\Elements\Xml();
+        $this->IBimageUrl->setContent('<frame posn="0 -96 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("imageUrl", 80, true, __("Url for image", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->IBimageUrl);
 
         $this->checkbox = new \ManiaLive\Gui\Elements\Xml();
@@ -64,10 +62,10 @@ class QuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function setQuestion(\ManiaLivePlugins\eXpansion\Quiz\Structures\Question $question)
     {
-        $this->IBQuestion->setText($question->getQuestion());
+        $this->IBQuestion->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("question", 80, true, __("Question", $this->getRecipient()), $question->getQuestion(), null, null) . '</frame>');
         for ($x = 0; $x < $this->answerCount; $x++) {
             if (isset($question->answer[$x])) {
-                $this->IBanswers[$x]->setText($question->answer[$x]->answer);
+                $this->IBanswers[$x]->setContent('<frame posn="0 -' . (12*($x+1)) . ' 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("answer." . $x, 80, true, __("Answer", $this->getRecipient()) . ($x + 1), $question->answer[$x]->answer, null, null) . '</frame>');
             }
         }
     }

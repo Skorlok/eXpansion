@@ -17,7 +17,7 @@ class CheckboxItem extends Control
 
     protected $frame;
 
-    public function __construct($counter, Checkbox $permission, CheckBox $inheritance = null)
+    public function __construct($counter, Checkbox $permission, $inheritance = null)
     {
         $inheritanceSizeX = !is_null($inheritance) ? $inheritance->getSizeX() : 0;
         $this->frame = new Frame();

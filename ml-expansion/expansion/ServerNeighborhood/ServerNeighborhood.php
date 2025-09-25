@@ -238,6 +238,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $xml = simplexml_load_string($data);
             if (!$xml) {
                 $this->console("Error loading : ". $serverPath . " invalid XML?");
+                return;
             }
 
             $cleanIndex = preg_replace("/[^a-zA-Z0-9]+/", "", $serverPath);

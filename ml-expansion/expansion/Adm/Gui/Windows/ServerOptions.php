@@ -3,18 +3,13 @@
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Windows;
 
 use Exception;
-use ManiaLib\Gui\Elements\Bgs1;
-use ManiaLib\Gui\Elements\Icons64x64_1;
-use ManiaLib\Gui\Elements\Quad;
 use ManiaLib\Gui\Layouts\Column;
-use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Data\Storage;
 use ManiaLive\DedicatedApi\Config;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
-use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use Maniaplanet\DedicatedServer\Connection;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions as Dedicated_ServerOptions;
@@ -51,7 +46,6 @@ class ServerOptions extends Window
         $this->inputboxes();
         $this->checkboxes();
 
-        $this->registerScript(new Script("Adm/Gui/Scripts"));
         $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
 
         $this->addComponent($this->frameCb);
@@ -75,8 +69,9 @@ class ServerOptions extends Window
 
         $content = '<frame posn="0 -6 0">';
         $content .= '<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverName", 152, AdminGroups::hasPermission($login, Permission::SERVER_NAME), __("Server Name", $this->getRecipient()), $this->handleSpecialChars($this->connection->getServerName()), null, null) . '</frame>';
-        $content .= '<textedit id="commentFrom" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . $this->handleSpecialChars($this->connection->getServerComment()) . '" textformat="default" name="serverCommentE" showlinenumbers="0" autonewline="0"/>';
-        $content .= '<frame posn="900 900 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverComment", 60, AdminGroups::hasPermission($login, Permission::SERVER_COMMENT), null, null, null, null) . '</frame>';
+        if (AdminGroups::hasPermission($login, Permission::SERVER_COMMENT)) {
+            $content .= '<textedit id="serverComment" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="' . $this->handleSpecialChars($this->connection->getServerComment()) . '" textformat="default" name="serverComment" showlinenumbers="0" autonewline="0"/>';
+        }
         $content .= '<frame posn="0 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxPlayers", 12, AdminGroups::hasPermission($login, Permission::SERVER_MAXPLAYER), __("Players", $this->getRecipient()), $server->nextMaxPlayers, null, null) . '</frame>';
         $content .= '<frame posn="15 -36 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxSpec", 12, AdminGroups::hasPermission($login, Permission::SERVER_MAXSPEC), __("Spectators", $this->getRecipient()), $server->nextMaxSpectators, null, null) . '</frame>';
         $content .= '<frame posn="0 -48 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMin", 35, false, __("Ladderpoints minimum", $this->getRecipient()), $server->ladderServerLimitMin, null, null) . '</frame>';

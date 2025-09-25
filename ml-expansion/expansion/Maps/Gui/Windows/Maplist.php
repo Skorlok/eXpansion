@@ -135,16 +135,11 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->frame->addComponent($this->title_actions);
 
         $this->searchframe = new \ManiaLive\Gui\Controls\Frame();
-        $this->searchframe->setLayout(new \ManiaLib\Gui\Layouts\Line());
-        $this->searchframe->setAlign("right", "top");
         $this->addComponent($this->searchframe);
 
-        $this->searchBox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("searchbox");
-        $this->searchBox->setLabel(__("Search maps", $login));
+        $this->searchBox = new \ManiaLive\Gui\Elements\Xml();
+        $this->searchBox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("searchbox", 35, true, __("Search maps", $login), null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->searchBox);
-
-        $spacer = new \ManiaLib\Gui\Elements\Spacer(3, 4);
-        $this->searchframe->addComponent($spacer);
 
         $this->btn_search = new \ManiaLive\Gui\Elements\Xml();
         $this->btn_search->setContent('<frame posn="38 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, __("Search Map", $login), null, null, '0a0', null, null, $this->createAction(array($this, "doSearchMap")), null, null, null, null, null, null) . '</frame>');
@@ -325,7 +320,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
         }
         if (isset(Maps::$searchTerm[$login])) {
-            $this->searchBox->setText(Maps::$searchTerm[$login]);
+            $this->searchBox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("searchbox", 35, true, __("Search maps", $login), Maps::$searchTerm[$login], null, null) . '</frame>');
         }
 
         if ($column !== null) {

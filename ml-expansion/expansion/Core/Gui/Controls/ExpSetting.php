@@ -13,7 +13,6 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\SortedList;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
 class ExpSetting extends Control
@@ -103,10 +102,8 @@ class ExpSetting extends Control
                 $this->input->setPosX(7);
                 $this->addComponent($this->input);
             } else {
-                $this->input = new Inputbox($var->getName());
-                $this->input->setText($var->getRawValue());
-                $this->input->setPosY(-2);
-                $this->input->setPosX(7);
+                $this->input = new \ManiaLive\Gui\Elements\Xml();
+                $this->input->setContent('<frame posn="7 -2 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($var->getName(), $sizeX - 28, true, null, $var->getRawValue(), null, null) . '</frame>');
                 $this->addComponent($this->input);
             }
         }
@@ -136,7 +133,7 @@ class ExpSetting extends Control
             $this->label_varValue->setPosition(7, -1);
         }
 
-        if ($this->input != null) {
+        if ($this->input != null && !$this->input instanceof \ManiaLive\Gui\Elements\Xml) {
             $this->input->setSizeX($this->getSizeX() - 20);
         }
         parent::onResize($oldX, $oldY);

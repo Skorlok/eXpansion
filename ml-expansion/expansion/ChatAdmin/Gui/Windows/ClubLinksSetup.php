@@ -2,41 +2,31 @@
 
 namespace ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows;
 
-use ManiaLib\Gui\Layouts\Column;
-use ManiaLive\Gui\Controls\Frame;
-use ManiaLib\Gui\Elements\Label;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 class ClubLinksSetup extends Window
 {
     public static $mainPlugin;
-    protected $frame;
     
     public function onConstruct()
     {
         parent::onConstruct();
 
-        $this->frame = new Frame(0, -8, new Column());
-        $this->addComponent($this->frame);
+        $input = new \ManiaLive\Gui\Elements\Xml();
+        $input->setContent('<frame posn="0 -8 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team1Clublink", 35, true, "Link to the Clublink for the first team", null, null, null) . '</frame>');
+        $this->addComponent($input);
 
-        $input = new Inputbox("team1Clublink");
-        $input->setLabel("Link to the Clublink for the first team");
-        $this->frame->addComponent($input);
-        
-        $input = new Inputbox("team2Clublink");
-        $input->setLabel("Link to the Clublink for the second team");
-        $this->frame->addComponent($input);
+        $input = new \ManiaLive\Gui\Elements\Xml();
+        $input->setContent('<frame posn="0 -20 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team2Clublink", 35, true, "Link to the Clublink for the second team", null, null, null) . '</frame>');
+        $this->addComponent($input);
 
-        $lbl = new Label(100, 30);
-        $lbl->setPosition(0, 6);
-        $lbl->setText("These settings will override\n the team colors settings !");
-        $lbl->setSize(50, 12);
-        $this->frame->addComponent($lbl);
+        $label = new \ManiaLive\Gui\Elements\Xml();
+        $label->setContent('<label posn="0 -26 1" sizen="50 12" style="TextStaticSmall" text="These settings will override&#10; the team colors settings !"/>');
+        $this->addComponent($label);
 
         $button = new \ManiaLive\Gui\Elements\Xml();
-        $button->setContent('<frame posn="5 -39 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Ok", null, null, null, null, null, $this->createAction(array($this, "Ok")), null, null, null, null, null, null) . '</frame>');
-        $this->frame->addComponent($button);
+        $button->setContent('<frame posn="5 -47 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Ok", null, null, null, null, null, $this->createAction(array($this, "Ok")), null, null, null, null, null, null) . '</frame>');
+        $this->addComponent($button);
     }
 
     public function Ok($login, $data)

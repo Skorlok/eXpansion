@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
@@ -10,18 +9,15 @@ class GenericPlayerList extends Window
 {
     /** @var  Pager */
     protected $pager;
-    /** @var  Inputbox */
-    protected $inputbox;
     protected $button;
 
     protected function onConstruct()
     {
         parent::onConstruct();
 
-        $this->inputbox = new Inputbox("login", 50);
-        $this->inputbox->setPosition(0, -6);
-        $this->inputbox->setLabel("Login to add");
-        $this->addComponent($this->inputbox);
+        $inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $inputbox->setContent('<frame posn="0 -6 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("login", 50, true, "Login to add", null, null, null) . '</frame>');
+        $this->addComponent($inputbox);
 
         $this->pager = new Pager();
         $this->addComponent($this->pager);

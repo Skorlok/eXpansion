@@ -27,7 +27,6 @@ use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Gui\Controls\ConfElement;
 use ManiaLivePlugins\eXpansion\Core\MetaData;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -62,8 +61,8 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->configManager = ConfigManager::getInstance();
 
-        $this->input = new Inputbox("name", 35, true);
-        $this->input->setScale(0.8);
+        $this->input = new \ManiaLive\Gui\Elements\Xml();
+        $this->input->setContent('<frame posn="0 -3 1" scale="0.8">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("name", 65, true, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->input);
 
         $this->buttonSave = new \ManiaLive\Gui\Elements\Xml();
@@ -77,9 +76,6 @@ class ConfSwitcher extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         parent::onResize($oldX, $oldY);
         $this->pagerFrame->setSize($this->getSizeX() - 3, $this->getSizeY() - 8);
-
-        $this->input->setSize($this->sizeX * (1 / 0.8) - 60, 7);
-        $this->input->setPosition(0, -3);
     }
 
 

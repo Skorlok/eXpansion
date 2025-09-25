@@ -86,10 +86,8 @@ class OptimizedPager extends \ManiaLivePlugins\eXpansion\Gui\Control implements 
 
         $this->xml = new \ManiaLive\Gui\Elements\Xml();
 
-        $entry = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("item");
-        $entry->setId("entry");
-        $entry->setScriptEvents();
-        $entry->setPosition(900, 900);
+        $entry = new \ManiaLive\Gui\Elements\Xml();
+        $entry->setContent('<entry posn="0 900 0" id="entry" scriptevents="1" class="isTabIndex isEditable" name="item" hidden="1"/>');
         $this->addComponent($entry);
 
         $this->myScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\OptimizedPager");

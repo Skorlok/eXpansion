@@ -12,7 +12,6 @@ use ManiaLib\Gui\Elements\Label;
 use ManiaLive\Data\Storage;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLive\Utilities\Time;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
@@ -67,17 +66,16 @@ class MapInfo extends Window
         $map->{"nick"} = "n/a";
 
         $this->setTitle("Map Info", $map->name);
+
         $lbl = new Label($x, 6);
         $lbl->setPosition($x, $y);
         $lbl->setText("Unique id");
         $this->frame->addComponent($lbl);
-        $lbl = new Inputbox("", $x, 5);
-        $lbl->setPosition($x * 2, $y);
-        $lbl->setText($map->uId);
 
+        $lbl = new \ManiaLive\Gui\Elements\Xml();
+        $lbl->setContent('<frame posn="70 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 35, true, null, $map->uId, null, null) . '</frame>');
         $this->frame->addComponent($lbl);
 
-        $model = "commonCar";
         try {
             $this->connection = Singletons::getInstance()->getDediConnection();
             $mapPath = $this->connection->getMapsDirectory();
@@ -115,10 +113,12 @@ class MapInfo extends Window
             $lbl->setPosition($x, $y);
             $lbl->setText($descr);
             $this->frame->addComponent($lbl);
+
             $lbl = new Label("", $x, 6);
             $lbl->setPosition($x * 2, $y);
             $lbl->setText($map->{$field});
             $this->frame->addComponent($lbl);
+
             $y -= 5;
         }
 
@@ -127,6 +127,7 @@ class MapInfo extends Window
         $lbl->setPosition($x, $y);
         $lbl->setText("Car type");
         $this->frame->addComponent($lbl);
+
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
         $lbl->setText($gbxInfo->vehicle);
@@ -160,11 +161,11 @@ class MapInfo extends Window
         $lbl->setPosition($x, $y);
         $lbl->setText("Add Date");
         $this->frame2->addComponent($lbl);
+
         $lbl = new Label("", $x, 6);
         $lbl->setPosition($x * 2, $y);
         $date = new \DateTime();
         $date->setTimestamp((int)$map->addTime);
-
         $lbl->setText($date->format("d.m.Y"));
         $this->frame2->addComponent($lbl);
         $y -= 5;
@@ -179,10 +180,12 @@ class MapInfo extends Window
             $lbl->setPosition($x, $y);
             $lbl->setText($descr);
             $this->frame2->addComponent($lbl);
+
             $lbl = new Label("", $x, 6);
             $lbl->setPosition($x * 2, $y);
             $lbl->setText(Time::fromTM($map->{$field}));
             $this->frame2->addComponent($lbl);
+
             $y -= 5;
         }
 
@@ -193,10 +196,12 @@ class MapInfo extends Window
             $lbl->setPosition($x, $y);
             $lbl->setText($descr);
             $this->frame2->addComponent($lbl);
+
             $lbl = new Label("", $x, 6);
             $lbl->setPosition($x * 2, $y);
             $lbl->setText(strval($map->{$field}));
             $this->frame2->addComponent($lbl);
+
             $y -= 5;
         }
 
@@ -208,23 +213,7 @@ class MapInfo extends Window
         if ($string == null) {
             return "";
         }
-        return str_replace(
-			array(
-				'&',
-				'"',
-				"'",
-				'>',
-				'<'
-			),
-			array(
-				'&amp;',
-				'&quot;',
-				'&apos;',
-				'&gt;',
-				'&lt;'
-			),
-			$string
-	    );
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
     }
 
     protected function onHide()

@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Controls\InfoLine;
 use ManiaLivePlugins\eXpansion\Core\Config as CoreConfig;
@@ -71,16 +70,12 @@ class InfoWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->frame->addComponent(new \ManiaLib\Gui\Elements\Label(10, 7));
 
-        $line = new Inputbox("join", 77);
-        $line->setScale(1.2);
-        $line->setLabel("Join link:");
-        $line->setText("maniaplanet://#join=" . $this->storage->serverLogin . "@" . $version->titleId);
+        $line = new \ManiaLive\Gui\Elements\Xml();
+        $line->setContent('<frame posn="0 -61 1" scale="1.2">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("join", 77, true, "Join link:", "maniaplanet://#join=" . $this->storage->serverLogin . "@" . $version->titleId, null, null) . '</frame>');
         $this->frame->addComponent($line);
 
-        $line = new Inputbox("fav", 77);
-        $line->setScale(1.2);
-        $line->setLabel("Favourite link:");
-        $line->setText("maniaplanet://#addfavourite=" . $this->storage->serverLogin . "@" . $version->titleId);
+        $line = new \ManiaLive\Gui\Elements\Xml();
+        $line->setContent('<frame posn="0 -75.4 1" scale="1.2">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("fav", 77, true, "Favourite link:", "maniaplanet://#addfavourite=" . $this->storage->serverLogin . "@" . $version->titleId, null, null) . '</frame>');
         $this->frame->addComponent($line);
 
         if (self::$statsAction > 0) {

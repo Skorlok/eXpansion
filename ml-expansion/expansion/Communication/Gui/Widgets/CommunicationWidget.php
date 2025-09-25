@@ -39,8 +39,6 @@ class CommunicationWidget extends Widget
     private $_mainWindow;
     private $tabs;
     private $inputbox;
-    private $replyTo;
-    private $sendAction;
     public static $action;
     public static $selectPlayer;
 
@@ -90,10 +88,8 @@ class CommunicationWidget extends Widget
             $this->frame->addComponent($label);
         }
 
-        $this->inputbox = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("chatEntry", 110);
-        $this->inputbox->setPosY(-3);
-        $this->inputbox->setId("chatEntry");
-        $this->inputbox->setScriptEvents();
+        $this->inputbox = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputbox->setContent('<frame posn="0 -28 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("chatEntry", 110, true, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->inputbox);
 
         $this->_mainWindow->addComponent($this->frame);
@@ -105,9 +101,8 @@ class CommunicationWidget extends Widget
         $quad->setAction(self::$action);
         $this->addComponent($quad);
 
-        $reply = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("replyTo", 30);
-        $reply->setPosition(0, 600);
-        $reply->setScriptEvents();
+        $reply = new \ManiaLive\Gui\Elements\Xml();
+        $reply->setContent('<frame posn="0 600 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("replyTo", 30, true, null, null, null, null) . '</frame>');
         $this->addComponent($reply);
 
         $add = new \ManiaLib\Gui\Elements\Icons64x64_1(6, 6);

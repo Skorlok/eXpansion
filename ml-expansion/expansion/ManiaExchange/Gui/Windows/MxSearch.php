@@ -6,7 +6,6 @@ use ManiaLib\Application\ErrorHandling;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
@@ -57,43 +56,28 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->searchframe = new \ManiaLive\Gui\Controls\Frame();
         $this->searchframe->setLayout(new \ManiaLib\Gui\Layouts\Line());
 
-        $this->inputMapName = new Inputbox("mapName");
-        $this->inputMapName->setLabel("Map name");
+        $this->inputMapName = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputMapName->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("mapName", 35, true, "Map name", null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->inputMapName);
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(3, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-        $this->searchframe->addComponent($spacer);
 
-        $this->inputAuthor = new Inputbox("author");
-        $this->inputAuthor->setLabel("Author name");
+        $this->inputAuthor = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputAuthor->setContent('<frame posn="38 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, "Author name", null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->inputAuthor);
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(3, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-        $this->searchframe->addComponent($spacer);
 
         $items = array("All", "Race", "Fullspeed", "Tech", "RPG", 'LOL', 'PressForward', 'SpeedTech', 'Multilap', 'Offroad');
         $this->style = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("style", $items);
+        $this->style->setPosX(76);
         $this->searchframe->addComponent($this->style);
-
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(3, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-        $this->searchframe->addComponent($spacer);
 
         $items = array("All", "0-15sec", "15-30sec", "30-45sec", "45-1min", "1min+");
         $this->lenght = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("length", $items);
+        $this->lenght->setPosX(79);
         $this->searchframe->addComponent($this->lenght);
 
         $this->filter = new CheckboxScripted();
         $this->filter->setText("Maps from all titles pack");
+        $this->filter->setPosX(79);
         $this->searchframe->addComponent($this->filter);
-
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(8, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-        $this->searchframe->addComponent($spacer);
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
@@ -362,8 +346,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->maps = null;
         $this->style->destroy();
         $this->lenght->destroy();
-        $this->inputMapName->destroy();
-        $this->inputAuthor->destroy();
         $this->pager->destroy();
         $this->pager = null;
         $this->connection = null;

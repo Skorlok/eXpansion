@@ -8,9 +8,7 @@ class ManagedVoteLimit extends \ManiaLivePlugins\eXpansion\Gui\Control
     private $bg;
     private $label;
     private $frame;
-    private $ratio;
     private $limit;
-    private $voters;
 
     /**
      * ManagedVoteLimit constructor.
@@ -35,21 +33,10 @@ class ManagedVoteLimit extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->label->setText($desc);
         $this->frame->addComponent($this->label);
 
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(4, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-
-        $this->limit = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("!_" . $name, 14);
-        $this->limit->setPosY(-1);
-        $this->limit->setLabel("Limit");
-        $this->limit->setText($value);
+        $this->limit = new \ManiaLive\Gui\Elements\Xml();
+        $this->limit->setContent('<frame posn="50 -1 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("!_" . $name, 14, true, "Limit", $value, null, null) . '</frame>');
         $this->frame->addComponent($this->limit);
-
-        $this->frame->addComponent($spacer);
-
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(4, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
+        
         $this->addComponent($this->frame);
 
         $this->sizeX = $sizeX;
@@ -59,8 +46,6 @@ class ManagedVoteLimit extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function destroy()
     {
-        $this->limit->destroy();
-
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

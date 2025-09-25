@@ -76,15 +76,8 @@ class MessagesPanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->labelPlayer->setContent('<frame posn="0 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Select...", array("Select player whom to send the message", 35), null, null, 'fff', null, $this->actionPlayers, null, null, null, null, null, null) . '</frame>');
         $frame->addComponent($this->labelPlayer);
 
-        $this->inputboxMessage = new \ManiaLib\Gui\Elements\Entry(78, 6);
-        $this->inputboxMessage->setAlign("left", "top");
-        $this->inputboxMessage->setId("messagebox");
-        $this->inputboxMessage->setName("message");
-        $this->inputboxMessage->setScale(0.8);
-        $this->inputboxMessage->setPosX(27.5);
-        $this->inputboxMessage->setPosY(-0.5);
-        $this->inputboxMessage->setTextColor('fff');
-        $this->inputboxMessage->setScriptEvents(true);
+        $this->inputboxMessage = new \ManiaLive\Gui\Elements\Xml();
+        $this->inputboxMessage->setContent('<entry id="messagebox" posn="27.5 -0.5 1.0E-5" sizen="78 6" scale="0.8" halign="left" valign="top" style="" scriptevents="1" textcolor="fff" name="message"/>');
         $frame->addComponent($this->inputboxMessage);
 
         $this->_windowFrame->addComponent($frame);

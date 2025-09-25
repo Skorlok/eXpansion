@@ -42,11 +42,6 @@ class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->label_help->setPosY(5);
         $this->mainFrame->addComponent($this->label_help);
 
-        $this->input_value = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("value");
-        $this->input_value->setLabel('Value');
-        $this->input_value->setPosY(-5);
-        $this->mainFrame->addComponent($this->input_value);
-
         $this->buttonAdd = new \ManiaLive\Gui\Elements\Xml();
         $this->buttonAdd->setContent('<frame posn="117 -5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Add", $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, "addValue")), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonAdd);
@@ -60,14 +55,6 @@ class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->pagerFrame->setPosX(0);
         $this->pagerFrame->setSize($this->getSizeX() - 3, $this->getSizeY() - 16);
-
-        if ($this->input_key == null) {
-            $this->input_value->setSizeX($this->getSizeX() - 25);
-        } else {
-            $this->input_value->setSizeX(($this->getSizeX() - 25) / 2);
-            $this->input_value->setPosX(($this->getSizeX() - 25) / 2 + 1);
-            $this->input_value->setSizeX(($this->getSizeX() - 25) / 2 - 1);
-        }
     }
 
     public function populate(Variable $var)
@@ -85,25 +72,21 @@ class ExpListSetting extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items = array();
 
         if ($var instanceof \ManiaLivePlugins\eXpansion\Core\types\config\types\HashList) {
-            if ($this->input_key == null) {
-                $this->input_key = new \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox("key", 50);
-                $this->input_key->setPosY(-5);
-                $this->input_key->setLabel('Key');
-                $this->mainFrame->addComponent($this->input_key);
-            }
 
-            $this->input_value->setPosX(($this->getSizeX() - 25) / 2 + 1);
-            $this->input_value->setSizeX(($this->getSizeX() - 25) / 2 - 1);
+            $this->input_key = new \ManiaLive\Gui\Elements\Xml();
+            $this->input_key->setContent('<frame posn="0 -5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("key", 50, true, "Key", null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->input_key);
+
+            $this->input_value = new \ManiaLive\Gui\Elements\Xml();
+            $this->input_value->setContent('<frame posn="58.5 -5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("value", 56.5, true, "Value", null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->input_value);
 
             \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingListElement::$large = true;
         } else {
-            if ($this->input_key != null) {
-                $this->removeComponent($this->input_key);
-                $this->input_key->destroy();
-                $this->input_key = null;
-            }
+            $this->input_value = new \ManiaLive\Gui\Elements\Xml();
+            $this->input_value->setContent('<frame posn="0 -5 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("value", 115, true, "Value", null, null, null) . '</frame>');
+            $this->mainFrame->addComponent($this->input_value);
 
-            $this->input_value->setSizeX($this->getSizeX() - 25);
             \ManiaLivePlugins\eXpansion\Core\Gui\Controls\ExpSettingListElement::$large = false;
         }
 

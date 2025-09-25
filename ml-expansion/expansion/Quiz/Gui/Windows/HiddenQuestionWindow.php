@@ -5,7 +5,6 @@ namespace ManiaLivePlugins\eXpansion\Quiz\Gui\Windows;
 use ManiaLib\Gui\Elements\Label;
 use ManiaLib\Gui\Elements\Quad;
 use ManiaLive\Gui\Controls\Frame;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox;
 use ManiaLivePlugins\eXpansion\Quiz\Structures\Question;
 
 class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
@@ -22,8 +21,6 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
     protected $checkbox;
     /** @var  Question */
     protected $question;
-
-    protected $entry;
 
     protected $script;
 
@@ -49,11 +46,9 @@ class HiddenQuestionWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Windo
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Quiz/Gui/Scripts/ClickScript");
         $this->registerScript($this->script);
 
-        $this->entry = new Inputbox("boxOrder");
-        $this->entry->setPosition(900, 900);
-        $this->entry->setId("boxOrder");
-        $this->addComponent($this->entry);
-
+        $entry = new \ManiaLive\Gui\Elements\Xml();
+        $entry->setContent('<entry posn="0 900 0" id="boxOrder" scriptevents="1" class="isTabIndex isEditable" name="boxOrder" hidden="1"/>');
+        $this->addComponent($entry);
     }
 
     public function onResize($oldX, $oldY)
