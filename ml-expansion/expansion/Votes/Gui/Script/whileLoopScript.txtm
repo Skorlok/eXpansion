@@ -1,9 +1,10 @@
 
 // REMAINING TIME
-remaining = (countdown - (TextLib::ToInteger(TimeLib::GetCurrent()) - startTime));
+remaining = Now - startTime;
+remainingSeconds = ML::NearestInteger(countdown - (remaining / 1000));
 
 if (remaining >= 0.0) {
-    declare ratio = ML::NearestReal(remaining) / ML::NearestReal(countdown);
+    declare ratio = 1 - (remaining / (countdown * 1000));
     if (ratio <= 1.0) {
         if (ratio < 0.0) {
             ratio = 0.0;
@@ -12,11 +13,10 @@ if (remaining >= 0.0) {
     } else {
         countdownBar.Ratio = 1.0;
     }
-    countdownText.Value = remaining ^ " seconds left";
+    countdownText.Value = remainingSeconds ^ " seconds left";
 } else {
     countdownBar.Ratio = 0.0;
     countdownText.Value = "Vote finished !";
-    Window.Hide();
 }
 
 // Handle the vote
@@ -43,14 +43,18 @@ foreach (Event in PendingEvents) {
 
 if ((Now - lastUpdateTime) >= 100) {
     nbYes = 0;
+    nbNo = 0;
     nbTotal = 0;
-    foreach (Login => Score in playersVote) {
+
+    declare confirmVoteYes = (Page.GetFirstChild("confirmVoteYes") as CMlQuad);
+    declare confirmVoteNo = (Page.GetFirstChild("confirmVoteNo") as CMlQuad);
+    foreach (Login => Score in votes_playerVotes) {
 
         if (Score == "yes") {
             if (LocalUser != Null) {
                 if (Login == LocalUser.Login) {
-                    declare confirmVoteYes = (Page.GetFirstChild("confirmVoteYes") as CMlQuad);
                     confirmVoteYes.Show();
+                    confirmVoteNo.Hide();
                 }
             }
             nbYes += 1;
@@ -59,14 +63,19 @@ if ((Now - lastUpdateTime) >= 100) {
         if (Score == "no") {
             if (LocalUser != Null) {
                 if (Login == LocalUser.Login) {
-                    declare confirmVoteNo = (Page.GetFirstChild("confirmVoteNo") as CMlQuad);
+                    confirmVoteYes.Hide();
                     confirmVoteNo.Show();
                 }
             }
-            
+            nbNo += 1;
         }
         nbTotal +=1;
     }
+    declare button_text_yes = (Page.GetFirstChild("eXp_ButtonLabel_button_yes") as CMlLabel);
+    declare button_text_no = (Page.GetFirstChild("eXp_ButtonLabel_button_no") as CMlLabel);
+    button_text_yes.Value = "F1 (" ^ nbYes ^ ")";
+    button_text_no.Value = "F2 (" ^ nbNo ^ ")";
+
     
     if (nbTotal > 0) {
         agreeSize = ((ML::NearestReal(nbYes) / ML::NearestReal(nbTotal)) * 58);
@@ -77,10 +86,10 @@ if ((Now - lastUpdateTime) >= 100) {
     declare bgNo = (Page.GetFirstChild("bgNo") as CMlQuad);
     declare bgNo2 = (Page.GetFirstChild("bgNo2") as CMlQuad);
     
-    bgYes.Size[0] = agreeSize + 0.1;
-    bgYes2.Size[0] = agreeSize + 0.1;
-    bgNo.Size[0] = 58.01 - agreeSize;
-    bgNo2.Size[0] = 58.01 - agreeSize;
+    bgYes.Size[0] = agreeSize + 0.25;
+    bgYes2.Size[0] = agreeSize + 0.25;
+    bgNo.Size[0] = 58 - (agreeSize - 0.25);
+    bgNo2.Size[0] = 58 - (agreeSize - 0.25);
     
     bgYes.Show();
     bgYes2.Show();

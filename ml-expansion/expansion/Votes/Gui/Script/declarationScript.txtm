@@ -2,9 +2,10 @@
 declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";
 
-declare Integer countdown = <?php echo $this->countdown;?>;
-declare Integer startTime = <?php echo $this->startTime;?>;
+declare Real countdown = ML::NearestReal(<?php echo $this->countdown;?>);
+declare Integer startTime = Now;
 declare Integer remaining;
+declare Integer remainingSeconds;
 
 declare countdownBar = (Page.GetFirstChild("CountdownBar") as CMlGauge);
 declare countdownText = (Page.GetFirstChild("CountdownText") as CMlLabel);
@@ -14,21 +15,11 @@ declare Boolean canVote = False;
 
 declare lastUpdateTime = -1;
 
-declare Text[Text] playersVote for UI = Text[Text];
-playersVote.clear();
-playersVote = <?php echo $this->votes;?>;
-
-
-// INTERFACE CONFIGURATION UNDER THIS LINE
-declare textLabel = (Page.GetFirstChild("textLabel") as CMlLabel);
-textLabel.Value = "<?php echo str_replace('"', '\\"', $this->voteText);?>";
-textLabel.Show();
-
-declare bgRatio = (Page.GetFirstChild("bgRatio") as CMlQuad);
-bgRatio.PosnX = <?php echo $this->ratio;?>;
-bgRatio.Show();
+declare Text[Text] votes_playerVotes for UI = Text[Text];
+votes_playerVotes = <?php echo $this->votes;?>;
 
 
 declare Integer nbYes = 0;
+declare Integer nbNo = 0;
 declare Integer nbTotal = 0;
 declare Real agreeSize = 29.0;

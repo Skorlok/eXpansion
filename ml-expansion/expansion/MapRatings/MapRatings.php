@@ -933,5 +933,11 @@ class MapRatings extends ExpPlugin
 
         \ManiaLive\Event\Dispatcher::unregister(MXKarmaEvent::getClass(), $this);
         unset($this->mxConnection);
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        $aH->deleteAction($this->action);
+        $aH->deleteAction($this->actionEndMap[0]);
+        $aH->deleteAction($this->actionEndMap[5]);
     }
 }

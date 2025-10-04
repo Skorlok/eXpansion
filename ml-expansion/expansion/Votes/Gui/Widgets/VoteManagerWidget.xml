@@ -1,0 +1,32 @@
+<frame>
+    <quad sizen="90 27" bgcolor="000" opacity=" 0.4" pos="0 0"/>
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(90, 27); ?>
+</frame>
+<frame posn="0 0 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(90, 4, $this->addLang("Current vote")); ?>
+</frame>
+
+<label id="textLabel" posn="45 -5.75 1" sizen="80 4" halign="center" valign="top" style="TextCardSmallScores2" textsize="2" textemboss="1" text="<?php echo $this->getParam('voteText') ?>"/>
+
+<frame posn="1 -14.5 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F1", null, null, "0D0", null, null, $this->getParam('actionYes'), null, null, null, "button_yes", null, null); ?>
+</frame>
+<frame posn="77 -14.5 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F2", null, null, "F00", null, null, $this->getParam('actionNo'), null, null, null, "button_no", null, null); ?>
+</frame>
+
+
+<frame posn="0 0 1">
+    <gauge id="CountdownBar" sizen="87 6" drawblockbg="1" style="ProgressBarSmall" color="3D5" drawbg="0" rotation="0" posn="1 -19" grading="1" centered="0" ratio="1"/>
+    <label id="CountdownText" posn="45 -22 1" sizen="20 7" valign="center" style="TextStaticSmall" scriptevents="1" textsize="1" textcolor="fff" text="" textemboss="1" halign="center"/>
+</frame>
+
+<frame posn="16 -14.5 0">
+    <quad id="bgYes" posn="0 0 0.001" sizen="29.25 6" halign="left" valign="center2" style="Bgs1InRace" substyle="BgCard" colorize="0D0"/>
+    <quad id="bgNo" posn="58 0 0.001" sizen="29.25 6" halign="right" valign="center2" style="Bgs1InRace" substyle="BgCard" colorize="F00"/>
+    <quad id="bgYes2" posn="0 0 0" sizen="29.25 6" halign="left" valign="center2" style="Bgs1InRace" substyle="BgColorContour" colorize="0A08"/>
+    <quad id="bgNo2" posn="58 0 0" sizen="29.25 6" halign="right" valign="center2" style="Bgs1InRace" substyle="BgColorContour" colorize="C008"/>
+</frame>
+<quad id="confirmVoteYes" posn="4.5 -9.5" sizen="5 5" halign="left" valign="center2" style="Icons64x64_1" substyle="ShowDown2" hidden="1"/>
+<quad id="confirmVoteNo" posn="80.6 -9.5" sizen="5 5" halign="left" valign="center2" style="Icons64x64_1" substyle="ShowDown2" hidden="1"/>
+<quad id="bgRatio" posn="<?php echo $this->getParam('ratioPos') ?> -14.5 10" sizen="0.5 8" halign="left" valign="center2" style="Bgs1InRace" substyle="BgCard" colorize="000F"/>

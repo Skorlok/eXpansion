@@ -8,11 +8,11 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
-use ManiaLivePlugins\eXpansion\Votes\Gui\Widgets\VoteManagerWidget;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
-
 
 class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -23,13 +23,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $resCount = 0;
     private $lastMapUid = "";
 
+    private $widget;
+    private $script;
+    private $actionYes;
+    private $actionNo;
+
     public $currentVote = null;
-    public $currentVoteWidget = null;
 
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
-        VoteManagerWidget::$parentPlugin = $this;
     }
 
     /**
@@ -138,6 +141,26 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         $this->syncSettings();
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+
+        $this->actionYes = $aH->createAction(array($this, "handlePlayerVote"), "yes");
+        $this->actionNo = $aH->createAction(array($this, "handlePlayerVote"), "no");
+
+        $this->script = new Script("Votes/Gui/Script");
+        $this->script->setParam("actionYes", $this->actionYes);
+        $this->script->setParam("actionNo", $this->actionNo);
+        $this->script->setParam("isTrackmania", ($this->expStorage->simpleEnviTitle == "TM"));
+        
+
+        $this->widget = new Widget("Votes\Gui\Widgets\VoteManagerWidget.xml");
+        $this->widget->setName("Vote Manager Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(90, 27);
+        $this->widget->setParam("actionYes", $this->actionYes);
+        $this->widget->setParam("actionNo", $this->actionNo);
+        $this->widget->registerScript($this->script);
     }
 
     public function syncSettings()
@@ -183,6 +206,22 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
+    public function displayWidget($vote)
+    {
+        $this->script->setParam("countdown", $vote->votingTime);
+        $this->script->setParam("votes", $vote->getManiaScriptVotes());
+        $this->script->setParam("voters", $vote->voters);
+
+        if ($this->expStorage->simpleEnviTitle == "SM") {
+            $this->widget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania, 0);
+        } else {
+            $this->widget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY, 0);
+        }
+        $this->widget->setParam("voteText", $vote->voteText);
+        $this->widget->setParam("ratioPos", sprintf("%0.1f", ($vote->voteRatio * 58) + 16));
+        $this->widget->show(null, true);
+    }
+
     public function handlePlayerVote($login, $vote)
     {
         $this->currentVote->playerVotes[$login] = $vote;
@@ -201,18 +240,27 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         if ($playerCount > 0 && ($this->currentVote->getYes() / $playerCount) > $this->currentVote->voteRatio) {
-            $this->handleEndVote(true);
-            return;
+            /*$this->handleEndVote(true);
+            return;*/
         }
 
-        $this->currentVoteWidget->setDatas($this->currentVote);
-        $this->currentVoteWidget->RedrawAll();
+        $script = "main () {
+            declare Text[Text] votes_playerVotes for UI = Text[Text];
+            votes_playerVotes = " . $this->currentVote->getManiaScriptVotes() . ";
+        }";
+
+        $xml = '<manialink id="votes_updater" version="2" name="votes_updater">';
+        $xml .= '<script><!--';
+        $xml .= $script;
+        $xml .= '--></script>';
+        $xml .= '</manialink>';
+
+        $this->connection->sendDisplayManialinkPage(null, $xml);
     }
 
     public function handleEndVote($state)
     {
-        VoteManagerWidget::EraseAll();
-        $this->currentVoteWidget = null;
+        $this->widget->erase();
 
         if ($state) {
 
@@ -295,6 +343,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 return;
             }
 
+            /** @var Config */
             $config = Config::getInstance();
 
             if ($config->restartLimit != 0 && $config->restartLimit <= $this->resCount) {
@@ -319,20 +368,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $vote = $managedVotes['RestartMap'];
 
-            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "RestartMap", "", Core::$players[$login] . '$z$z want to replay this map, you too ?', $vote->voters, time());
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "RestartMap", "", 'Replay This Map ?', $vote->voters, time());
 
             $this->debug("[exp\\Votes] Calling Restart (queue) vote..");
 
-            VoteManagerWidget::EraseAll();
-            $this->currentVoteWidget = VoteManagerWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-            } else {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-            }
-            $this->currentVoteWidget->setSize(90, 20);
-            $this->currentVoteWidget->setDatas($this->currentVote);
-            $this->currentVoteWidget->show();
+            $this->displayWidget($this->currentVote);
 
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#variable#%s #vote#initiated restart map vote..');
@@ -371,6 +411,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 return;
             }
 
+            /** @var Config */
             $config = Config::getInstance();
 
             if (!isset($this->counters["NextMap"])) {
@@ -390,20 +431,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $vote = $managedVotes['NextMap'];
 
-            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "NextMap", "", Core::$players[$login] . '$z$z want to skip this map, you too ?', $vote->voters, time());
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "NextMap", "", 'Skip This Map ?', $vote->voters, time());
 
             $this->debug("[exp\Votes] Calling Skip vote..");
 
-            VoteManagerWidget::EraseAll();
-            $this->currentVoteWidget = VoteManagerWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-            } else {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-            }
-            $this->currentVoteWidget->setSize(90, 20);
-            $this->currentVoteWidget->setDatas($this->currentVote);
-            $this->currentVoteWidget->show();
+            $this->displayWidget($this->currentVote);
 
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#variable#%1$s #vote#initiated skip map vote..');
@@ -443,6 +475,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
+                /** @var Config */
                 $config = Config::getInstance();
 
                 if (!isset($this->counters["Extend"])) {
@@ -463,20 +496,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     $vote = $managedVotes['ExtendTime'];
 
-                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", Core::$players[$login] . '$z$z want to extend the time limit, you too ?', $vote->voters, time());
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", 'Extend The Time Limit ?', $vote->voters, time());
 
                     $this->debug("[exp\Votes] Calling extend vote..");
 
-                    VoteManagerWidget::EraseAll();
-                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
-                    if ($this->expStorage->simpleEnviTitle == "SM") {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-                    } else {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-                    }
-                    $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
-                    $this->currentVoteWidget->show();
+                    $this->displayWidget($this->currentVote);
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend time vote..');
@@ -490,20 +514,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     $vote = $managedVotes['ExtendTime'];
 
-                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", Core::$players[$login] . '$z$z want to extend the point limit, you too ?', $vote->voters, time());
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Extend", "", 'Extend The Point Limit ?', $vote->voters, time());
 
                     $this->debug("[exp\Votes] Calling extend vote..");
 
-                    VoteManagerWidget::EraseAll();
-                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
-                    if ($this->expStorage->simpleEnviTitle == "SM") {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-                    } else {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-                    }
-                    $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
-                    $this->currentVoteWidget->show();
+                    $this->displayWidget($this->currentVote);
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend point vote..');
@@ -553,6 +568,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
+                /** @var Config */
                 $config = Config::getInstance();
 
                 if ($config->extendTimeLimit != -1 && $params > $config->extendTimeLimit) {
@@ -578,20 +594,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     $vote = $managedVotes['ExtendTime'];
 
-                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", Core::$players[$login] . "\$z\$z want to extend the time limit with $params minutes, you too ?", $vote->voters, time());
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", "Extend The Time Limit With $params Minutes ?", $vote->voters, time());
 
                     $this->debug("[exp\Votes] Calling extend vote..");
 
-                    VoteManagerWidget::EraseAll();
-                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
-                    if ($this->expStorage->simpleEnviTitle == "SM") {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-                    } else {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-                    }
-                    $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
-                    $this->currentVoteWidget->show();
+                    $this->displayWidget($this->currentVote);
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend time vote..');
@@ -605,20 +612,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                     $vote = $managedVotes['ExtendTime'];
 
-                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", Core::$players[$login] . "\$z\$z want to extend the time limit with $params points, you too ?", $vote->voters, time());
+                    $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "Add", "$params", "Extend The Time Limit With $params Points ?", $vote->voters, time());
 
                     $this->debug("[exp\Votes] Calling extend vote..");
 
-                    VoteManagerWidget::EraseAll();
-                    $this->currentVoteWidget = VoteManagerWidget::Create(null);
-                    if ($this->expStorage->simpleEnviTitle == "SM") {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-                    } else {
-                        $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-                    }
-                    $this->currentVoteWidget->setSize(90, 20);
-                    $this->currentVoteWidget->setDatas($this->currentVote);
-                    $this->currentVoteWidget->show();
+                    $this->displayWidget($this->currentVote);
 
                     $player = $this->storage->getPlayerObject($login);
                     $msg = eXpGetMessage('#variable#%1$s #vote#initiated extend point vote..');
@@ -663,6 +661,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     return;
                 }
 
+                /** @var Config */
                 $config = Config::getInstance();
 
                 if (!isset($this->counters["EndRound"])) {
@@ -682,20 +681,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
                 $vote = $managedVotes['EndRound'];
 
-                $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "EndRound", "", Core::$players[$login] . '$z$z want to end the round, you too ?', $vote->voters, time());
+                $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "EndRound", "", 'End The Round ?', $vote->voters, time());
 
                 $this->debug("[exp\Votes] Calling EndRound vote..");
 
-                VoteManagerWidget::EraseAll();
-                $this->currentVoteWidget = VoteManagerWidget::Create(null);
-                if ($this->expStorage->simpleEnviTitle == "SM") {
-                    $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-                } else {
-                    $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-                }
-                $this->currentVoteWidget->setSize(90, 20);
-                $this->currentVoteWidget->setDatas($this->currentVote);
-                $this->currentVoteWidget->show();
+                $this->displayWidget($this->currentVote);
 
                 $player = $this->storage->getPlayerObject($login);
                 $msg = eXpGetMessage('#variable#%1$s #vote#initiated endround vote..');
@@ -737,6 +727,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 return;
             }
 
+            /** @var Config */
             $config = Config::getInstance();
 
             if (!isset($this->counters["AutoTeamBalance"])) {
@@ -756,20 +747,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $vote = $managedVotes['AutoTeamBalance'];
 
-            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "AutoTeamBalance", "", Core::$players[$login] . '$z$z want to balance teams, you too ?', $vote->voters, time());
+            $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, array(), "AutoTeamBalance", "", 'Balance Teams ?', $vote->voters, time());
 
             $this->debug("[exp\Votes] Calling AutoTeamBalance vote..");
 
-            VoteManagerWidget::EraseAll();
-            $this->currentVoteWidget = VoteManagerWidget::Create(null);
-            if ($this->expStorage->simpleEnviTitle == "SM") {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX_Shootmania, $this->config->voteWidget_PosY_Shootmania);
-            } else {
-                $this->currentVoteWidget->setPosition($this->config->voteWidget_PosX, $this->config->voteWidget_PosY);
-            }
-            $this->currentVoteWidget->setSize(90, 20);
-            $this->currentVoteWidget->setDatas($this->currentVote);
-            $this->currentVoteWidget->show();
+            $this->displayWidget($this->currentVote);
 
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#variable#%1$s #vote#initiated AutoTeamBalance vote..');
@@ -785,6 +767,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onVoteUpdated($stateName, $login, $cmdName, $cmdParam)
     {
+        /** @var Config */
         $config = Config::getInstance();
 
         // check for our stuff...
@@ -851,6 +834,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showVotesConfig($login)
     {
+        /** @var Gui\Windows\VoteSettingsWindow */
         $window = Gui\Windows\VoteSettingsWindow::Create($login);
         $window->setSize(120, 96);
         $window->setTitle(__("Configure Votes", $login));
@@ -870,6 +854,9 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         VoteSettingsWindow::EraseAll();
-        VoteManagerWidget::EraseAll();
+        
+        $this->widget->erase();
+        $this->widget = null;
+        $this->script = null;
     }
 }

@@ -65,4 +65,25 @@ class Vote extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
         }
         return $no;
     }
+
+    public function getManiaScriptVotes()
+    {
+        $voteData = "";
+        $index = 1;
+        foreach ($this->playerVotes as $voteLogin => $voteValue) {
+            if ($index > 1) {
+                $voteData .= ', ';
+            }
+            $voteData .= '"' . $voteLogin . '"=>"' . $voteValue . '"';
+            $index++;
+        }
+
+        if (empty($voteData)) {
+            $voteData = 'Text[Text]';
+        } else {
+            $voteData = '[' . $voteData . ']';
+        }
+
+        return $voteData;
+    }
 }
