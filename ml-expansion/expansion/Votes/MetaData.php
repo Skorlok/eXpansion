@@ -35,18 +35,23 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new TypeInt("restartLimit", "Map limit for restart votes", $config, false, false);
         $var->setDescription("0 disable, othervice after x maps, votes are disabled");
-        $var->setDefaultValue(0);
+        $var->setDefaultValue(2);
         $this->registerVariable($var);
 
 
         $var = new TypeInt("limit_votes", "Limit voting for a player on map", $config, false, false);
         $var->setDescription("-1 to disable, othervice number of vote start");
-        $var->setDefaultValue(1);
+        $var->setDefaultValue(0);
         $this->registerVariable($var);
 
         $var = new TypeInt("extendTimeLimit", "The maximum time that can be added with /ext ##", $config, false, false);
         $var->setDescription("-1 to disable, othervice the maximum time that can be added");
         $var->setDefaultValue(15);
+        $this->registerVariable($var);
+
+        $var = new TypeInt("extendPointLimit", "The maximum points that can be added with /ext ##", $config, false, false);
+        $var->setDescription("-1 to disable, othervice the maximum points that can be added");
+        $var->setDefaultValue(200);
         $this->registerVariable($var);
 
         $var = new Boolean("autoVoteStarter", "Automatically vote yes for the vote starter", $config, false, false);

@@ -4,11 +4,12 @@ namespace ManiaLivePlugins\eXpansion\Votes;
 
 class Config extends \ManiaLib\Utils\Singleton
 {
-    public $restartLimit = 0;
+    public $restartLimit = 2;
     public $use_callvotes = false;
     public $global_timeout = 30;
-    public $limit_votes = 1;
+    public $limit_votes = 0;
     public $extendTimeLimit = 15;
+    public $extendPointLimit = 200;
     public $autoVoteStarter = true;
 
     /**
