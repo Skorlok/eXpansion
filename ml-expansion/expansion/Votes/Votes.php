@@ -217,7 +217,30 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->currentVote->playerVotes[$login] = $vote;
 
-        // Check if vote passes when we suppose that all players that didn't vote would vote NO.
+        if ($this->checkVoteAutoPass()) {
+            $this->handleEndVote(true);
+            return;
+        }
+
+        $xml  = '<manialink id="votes_updater" version="2" name="votes_updater">';
+        $xml .= '<script><!--';
+
+        $xml .= 'main () {';
+        $xml .= '   declare Text[Text] votes_playerVotes for UI = Text[Text];';
+        $xml .= '   votes_playerVotes = ' . $this->currentVote->getManiaScriptVotes() . ';';
+        $xml .= '}';
+
+        $xml .= '--></script>';
+        $xml .= '</manialink>';
+
+        $this->connection->sendDisplayManialinkPage(null, $xml);
+    }
+
+    /**
+     * Check if vote passes when we suppose that all players that didn't vote would vote NO.
+     */
+    public function checkVoteAutoPass()
+    {
         $playerCount = count($this->storage->players) + count($this->storage->spectators);
         if ($this->currentVote->voters == 0) {
             $playerCount = count($this->storage->players);
@@ -231,22 +254,10 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         if ($playerCount > 0 && ($this->currentVote->getYes() / $playerCount) > $this->currentVote->voteRatio) {
-            /*$this->handleEndVote(true);
-            return;*/
+            return true;
         }
 
-        $script = "main () {
-            declare Text[Text] votes_playerVotes for UI = Text[Text];
-            votes_playerVotes = " . $this->currentVote->getManiaScriptVotes() . ";
-        }";
-
-        $xml = '<manialink id="votes_updater" version="2" name="votes_updater">';
-        $xml .= '<script><!--';
-        $xml .= $script;
-        $xml .= '--></script>';
-        $xml .= '</manialink>';
-
-        $this->connection->sendDisplayManialinkPage(null, $xml);
+        return false;
     }
 
     public function handleEndVote($state)
@@ -376,8 +387,6 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->currentVote = new Vote($login, $vote->timeout, $vote->ratio, $votes, $caseName, $actionParams, $voteText, $vote->voters, time());
 
-        $this->displayWidget($this->currentVote);
-
         $player = $this->storage->getPlayerObject($login);
         switch ($caseName) {
             case "RestartMap":
@@ -400,6 +409,12 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 break;
         }
         $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+
+        if ($this->checkVoteAutoPass()) {
+            $this->handleEndVote(true);
+        } else {
+            $this->displayWidget($this->currentVote);
+        }
     }
 
     public function vote_Restart($login)
@@ -425,7 +440,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function vote_Extend_Custom($login, $params)
     {
-        if (!is_numeric($params)) {
+        if (!is_numeric($params) || $params > 0) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
             return;
         }
@@ -497,6 +512,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }
             }
         }
+        // @TODO need to cast callvotes into our own votes
     }
 
     public function cancelVote($login)
