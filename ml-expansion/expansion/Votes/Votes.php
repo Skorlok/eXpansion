@@ -440,7 +440,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function vote_Extend_Custom($login, $params)
     {
-        if (!is_numeric($params) || $params > 0) {
+        if (!is_numeric($params) || $params < 0) {
             $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
             return;
         }
@@ -489,6 +489,17 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         // check for our stuff...
         if ($stateName == "NewVote") {
 
+            if ($cmdName == "RestartMap") {
+                $this->connection->cancelVote();
+                $this->vote_Restart($login);
+                return;
+            }
+            if ($cmdName == "NextMap") {
+                $this->connection->cancelVote();
+                $this->vote_Skip($login);
+                return;
+            }
+
             foreach ($this->getVotes() as $cmd => $vote) {
                 if ($cmdName == $cmd) {
                     if ($vote->ratio == -1.) {
@@ -512,7 +523,6 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }
             }
         }
-        // @TODO need to cast callvotes into our own votes
     }
 
     public function cancelVote($login)
