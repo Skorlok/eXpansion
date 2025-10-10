@@ -85,9 +85,14 @@ class ExtendTime extends ExpPlugin
 
     public function vote($login, $vote)
     {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Votes\Votes')) {
+            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Votes\Votes', 'cancelAutoExtend');
+        }
         if (!array_key_exists($login, $this->voters)) {
             $this->voters[$login] = true;
             $this->votes[$vote] += 1;
+            $this->eXpChatSendServerMessage('%s$z#vote# voted #variable#%s #vote#for extending time.', null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $vote));
+            $this->eXpChatSendServerMessage("#vote#The vote will end at 15 seconds before the end of the map.", $login);
         }
     }
 

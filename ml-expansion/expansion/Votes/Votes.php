@@ -134,6 +134,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->setPublicMethod("vote_balance");
         $this->setPublicMethod("showVotesConfig");
         $this->setPublicMethod("cancelVote");
+        $this->setPublicMethod("cancelAutoExtend");
 
         $cmd = AdminGroups::addAdminCommand('votes', $this, 'showVotesConfig', 'server_votes');
         $cmd->setHelp('shows config window for managing votes');
@@ -676,6 +677,14 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));
         } else {
             $this->connection->chatSendServerMessage('Notice: Can\'t pass a vote, no vote in progress!', $login);
+        }
+    }
+
+    public function cancelAutoExtend()
+    {
+        if ($this->currentVote && $this->currentVote->action == "ExtendTime") {
+            $this->handleEndVote(false);
+            $this->eXpChatSendServerMessage(eXpGetMessage("#vote#The extend time vote was cancelled as the auto extend vote is active."));
         }
     }
 
