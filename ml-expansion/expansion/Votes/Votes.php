@@ -10,6 +10,7 @@ use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
@@ -26,6 +27,8 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $script;
     private $actionYes;
     private $actionNo;
+    private $actionPass;
+    private $actionCancel;
 
     public $currentVote = null;
 
@@ -82,6 +85,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd = $this->registerChatCommand("bal", "vote_balance", 0, true);
         $cmd->help = 'Start a vote to balance teams';
 
+        $cmd = $this->registerChatCommand("kick", "vote_kick", 0, true);
+        $cmd->help = 'Start a vote to kick a player';
+        $cmd = $this->registerChatCommand("kick", "vote_kick", 1, true);
+        $cmd->help = 'Start a vote to kick a player';
+
+        $cmd = $this->registerChatCommand("ban", "vote_ban", 0, true);
+        $cmd->help = 'Start a vote to ban a player';
+        $cmd = $this->registerChatCommand("ban", "vote_ban", 1, true);
+        $cmd->help = 'Start a vote to ban a player';
+
         $cmd = AdminGroups::addAdminCommand('cancel', $this, 'cancelVote', 'cancel_vote');
         $cmd->setHelp('Cancel current running vote');
         AdminGroups::addAlias($cmd, "can");
@@ -136,10 +149,14 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->actionYes = $aH->createAction(array($this, "handlePlayerVote"), "yes");
         $this->actionNo = $aH->createAction(array($this, "handlePlayerVote"), "no");
+        $this->actionPass = $aH->createAction(array($this, "passVote"));
+        $this->actionCancel = $aH->createAction(array($this, "cancelVote"));
 
         $this->script = new Script("Votes/Gui/Script");
         $this->script->setParam("actionYes", $this->actionYes);
         $this->script->setParam("actionNo", $this->actionNo);
+        $this->script->setParam("actionPass", $this->actionPass);
+        $this->script->setParam("actionCancel", $this->actionCancel);
         $this->script->setParam("isTrackmania", ($this->expStorage->simpleEnviTitle == "TM"));
         
 
@@ -303,6 +320,34 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $this->connection->autoTeamBalance();
             }
 
+            if ($this->currentVote->action == "Kick") {
+                $target = $this->currentVote->actionParams;
+                $player = $this->storage->getPlayerObject($target);
+                if ($player != null) {
+                    try {
+                        $this->connection->kick($player->login, "Kicked by vote");
+                    } catch (\Exception $e) {
+                        $this->eXpChatSendServerMessage(eXpGetMessage("#error#Could not kick player"), $this->currentVote->voteAuthor);
+                    }
+                } else {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#Player not found"), $this->currentVote->voteAuthor);
+                }
+            }
+
+            if ($this->currentVote->action == "Ban") {
+                $target = $this->currentVote->actionParams;
+                $player = $this->storage->getPlayerObject($target);
+                if ($player != null) {
+                    try {
+                        $this->connection->ban($player->login, "Banned by vote");
+                    } catch (\Exception $e) {
+                        $this->eXpChatSendServerMessage(eXpGetMessage("#error#Could not ban player"), $this->currentVote->voteAuthor);
+                    }
+                } else {
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#Player not found"), $this->currentVote->voteAuthor);
+                }
+            }
+
         } else {
             $msg = eXpGetMessage('#vote_failure# $iVote failed!');
             $this->eXpChatSendServerMessage($msg, null);
@@ -348,6 +393,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     break;
                 case "AutoTeamBalance":
                     $this->eXpChatSendServerMessage(eXpGetMessage("#error#AutoTeamBalance vote is disabled!"), $login);
+                    break;
+                case "Kick":
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#Kick vote is disabled!"), $login);
+                    break;
+                case "Ban":
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#Ban vote is disabled!"), $login);
+                    break;
+                default:
+                    $this->eXpChatSendServerMessage(eXpGetMessage("#error#This vote is disabled!"), $login);
                     break;
             }
             return;
@@ -406,6 +460,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 break;
             case "AutoTeamBalance":
                 $msg = eXpGetMessage('#variable#%1$s #vote#initiated AutoTeamBalance vote..');
+                break;
+            case "Kick":
+                $msg = eXpGetMessage('#variable#%1$s #vote#initiated kick vote..');
+                break;
+            case "Ban":
+                $msg = eXpGetMessage('#variable#%1$s #vote#initiated ban vote..');
+                break;
+            default:
+                $msg = eXpGetMessage('#variable#%1$s #vote#initiated a vote..');
                 break;
         }
         $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
@@ -484,6 +547,43 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->startNewVote($login, 'AutoTeamBalance', 'Balance Teams ?');
     }
 
+    public function vote_kick($login, $target = null)
+    {
+        if (!$target || !$player = $this->storage->getPlayerObject($target)) {
+            if ($target) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#Player not found"), $login);
+            }
+            $this->selectPlayers($login, "vote_kick");
+            return;
+        }
+        PlayerSelection::Erase($login);
+        $this->startNewVote($login, 'Kick', 'Kick ' . $this->widget->handleSpecialChars($player->nickName) . ' $z$z?', $target);
+    }
+
+    public function vote_ban($login, $target = null)
+    {
+        if (!$target || !$player = $this->storage->getPlayerObject($target)) {
+            if ($target) {
+                $this->eXpChatSendServerMessage(eXpGetMessage("#error#Player not found"), $login);
+            }
+            $this->selectPlayers($login, "vote_ban");
+            return;
+        }
+        PlayerSelection::Erase($login);
+        $this->startNewVote($login, 'Ban', 'Ban ' . $this->widget->handleSpecialChars($player->nickName) . ' $z$z?', $target);
+    }
+
+    public function selectPlayers($login, $callback)
+    {
+        /** @var PlayerSelection */
+        $win = PlayerSelection::Create($login);
+        $win->setTitle('Select Player');
+        $win->setSize(85, 100);
+        $win->populateList(array($this, $callback), 'select');
+        $win->centerOnScreen();
+        $win->show();
+    }
+
     public function onVoteUpdated($stateName, $login, $cmdName, $cmdParam)
     {
         // check for our stuff...
@@ -497,6 +597,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if ($cmdName == "NextMap") {
                 $this->connection->cancelVote();
                 $this->vote_Skip($login);
+                return;
+            }
+            if ($cmdName == "Kick") {
+                $this->connection->cancelVote();
+                $this->vote_kick($login, $cmdParam);
+                return;
+            }
+            if ($cmdName == "Ban") {
+                $this->connection->cancelVote();
+                $this->vote_ban($login, $cmdParam);
                 return;
             }
 
@@ -527,6 +637,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function cancelVote($login)
     {
+        if (!AdminGroups::hasPermission($login, 'cancel_vote')) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You don\'t have the permission to cancel a vote!'), $login);
+            return;
+        }
+
         $cancelled = false;
 
         if ($this->currentVote) {
@@ -550,6 +665,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function passVote($login)
     {
+        if (!AdminGroups::hasPermission($login, 'pass_vote')) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You don\'t have the permission to pass a vote!'), $login);
+            return;
+        }
+
         if ($this->currentVote) {
             $this->handleEndVote(true);
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# pass the vote!');
@@ -585,5 +705,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->widget->erase();
         $this->widget = null;
         $this->script = null;
+
+        $this->currentVote = null;
+        $this->counters = array();
+        $this->resCount = 0;
+        $this->lastMapUid = "";
+        $this->config = null;
+        $this->actionYes = null;
+        $this->actionNo = null;
+        $this->actionPass = null;
+        $this->actionCancel = null;
     }
 }

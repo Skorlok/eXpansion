@@ -1,6 +1,8 @@
 
 declare Text actionYes = "<?php echo $this->actionYes;?>";
 declare Text actionNo = "<?php echo $this->actionNo;?>";
+declare Text actionPass = "<?php echo $this->actionPass;?>";
+declare Text actionCancel = "<?php echo $this->actionCancel;?>";
 
 declare Real countdown = ML::NearestReal(<?php echo $this->countdown;?>);
 declare Integer startTime = Now;

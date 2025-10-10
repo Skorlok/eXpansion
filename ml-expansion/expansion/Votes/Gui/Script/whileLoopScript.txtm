@@ -33,6 +33,14 @@ foreach (Event in PendingEvents) {
             TriggerPageAction(actionNo);
         }
     }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F3") {
+        TriggerPageAction(actionPass);
+    }
+
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F4") {
+        TriggerPageAction(actionCancel);
+    }
 }
 
 
