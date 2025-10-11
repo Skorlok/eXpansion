@@ -1,13 +1,13 @@
 FROM alpine:3.19 AS base
 
-RUN apk add php81-dev build-base autoconf libxml2-dev git
-
 WORKDIR /xmlrpc
 
-RUN git clone https://github.com/php/pecl-networking-xmlrpc.git . &&\
+RUN apk add php81-dev build-base autoconf libxml2-dev
+
+RUN wget -qO- https://github.com/php/pecl-networking-xmlrpc/archive/refs/heads/master.tar.gz | tar -xz --strip-components=1 &&\
     /usr/bin/phpize81 &&\
     ./configure --with-php-config=/usr/bin/php-config81 &&\
-    make &&\
+    make -j16 &&\
     make install
 
 FROM alpine:3.19
@@ -22,7 +22,7 @@ COPY --from=base /usr/lib/php81/modules/xmlrpc.so /usr/lib/php81/modules/xmlrpc.
 RUN apk add libxml2-dev && echo extension=xmlrpc > /etc/php81/conf.d/00_xmlrpc.ini
 
 
-RUN wget -qO ./exp.zip https://github.com/Skorlok/eXpansion/archive/refs/heads/base-docker.zip && unzip -q ./exp.zip -d ./ && mv ./eXpansion-base-docker/* . && rm -r ./exp.zip ./eXpansion-base-docker/
+RUN wget -qO- https://github.com/Skorlok/eXpansion/archive/refs/heads/base-docker.tar.gz | tar xz --strip-components=1
 RUN wget https://getcomposer.org/download/latest-stable/composer.phar
 RUN php81 ./composer.phar require skorlok/expansion:dev-master
 RUN apk add tini
