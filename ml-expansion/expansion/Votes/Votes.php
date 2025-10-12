@@ -233,7 +233,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function handlePlayerVote($login, $vote)
     {
-        $this->currentVote->playerVotes[$login] = $vote;
+        if ($vote) {
+            $this->currentVote->playerVotes[$login] = $vote;
+        } else {
+            if (isset($this->currentVote->playerVotes[$login])) {
+                unset($this->currentVote->playerVotes[$login]);
+            } else {
+                return;
+            }
+        }
 
         if ($this->checkVoteAutoPass()) {
             $this->handleEndVote(true);
@@ -355,6 +363,20 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         $this->currentVote = null;
+    }
+
+    public function onPlayerDisconnect($login, $disconnectionReason)
+    {
+        if ($this->currentVote) {
+            if ($this->currentVote->action == "Kick" || $this->currentVote->action == "Ban") {
+                if ($this->currentVote->actionParams == $login) {
+                    // target of kick/ban left, cancel vote.
+                    $this->handleEndVote(false);
+                    return;
+                }
+            }
+            $this->handlePlayerVote($login, null);
+        }
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)

@@ -87,6 +87,8 @@ if ((Now - lastUpdateTime) >= 100) {
     
     if (nbTotal > 0) {
         agreeSize = ((ML::NearestReal(nbYes) / ML::NearestReal(nbTotal)) * 58);
+    } else {
+        agreeSize = 29.0;
     }
     
     declare bgYes = (Page.GetFirstChild("bgYes") as CMlQuad);
