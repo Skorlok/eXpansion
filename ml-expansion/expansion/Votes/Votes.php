@@ -233,6 +233,10 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function handlePlayerVote($login, $vote)
     {
+        if (!$this->currentVote) {
+            return;
+        }
+        
         if ($vote) {
             $this->currentVote->playerVotes[$login] = $vote;
         } else {

@@ -162,7 +162,7 @@ class LoadScreen extends ExpPlugin
         }
 
         $json = json_decode($data, true);
-        if ($json == false || !array_key_exists("Results", $json)) {
+        if ($json == false || !array_key_exists("Results", $json) || !isset($json['Results'][0])) {
             return;
         }
 
