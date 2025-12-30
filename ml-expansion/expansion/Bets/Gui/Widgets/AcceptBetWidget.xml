@@ -1,0 +1,11 @@
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(80, 19.75); ?>
+<frame posn="0 0 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(80, 4, $this->addLang("Accept Bet")); ?>
+</frame>
+<label posn="2 -10 0" sizen="50 7" style="TextStaticSmall" textid="<?php echo $this->addLang($this->getParam('text'), $this->getParam('textParam')); ?>"/>
+<frame posn="52 -15 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Close", null, null, null, null, null, null, null, null, null, "closeButton", null, null); ?>
+</frame>
+<frame posn="52 -8 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Accept", null, null, "0d0", null, null, $this->getParam('action'), null, null, null, null, null, null); ?>
+</frame>

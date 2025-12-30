@@ -204,6 +204,14 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         self::$mapsPlugin->showRec($login, $map);
     }
 
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
+    }
+
     public function onResize($oldX, $oldY)
     {
         parent::onResize($oldX, $oldY);
@@ -320,7 +328,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             }
         }
         if (isset(Maps::$searchTerm[$login])) {
-            $this->searchBox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("searchbox", 35, true, __("Search maps", $login), Maps::$searchTerm[$login], null, null) . '</frame>');
+            $this->searchBox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("searchbox", 35, true, __("Search maps", $login), $this->handleSpecialChars(Maps::$searchTerm[$login]), null, null) . '</frame>');
         }
 
         if ($column !== null) {

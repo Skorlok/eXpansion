@@ -260,6 +260,60 @@ class Menu extends ExpPlugin implements Listener
         return array($buff, $counter);
     }
 
+    private function buildMenuItems2($items, $group, $ML, $isMain = false)
+    {
+        /** @var \ManiaLivePlugin\eXpansion\Gui\Config $config */
+        $config = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+
+        $counter = 0;
+        $buff = '';
+        $stack = array();
+
+        $stack[] = $items;
+
+        while (!empty($stack)) {
+            $currentItems = array_pop($stack);
+
+            foreach ($currentItems as $itemName => $item) {
+                if (is_array($item)) {
+                    if ($group->hasPermission($item[0])) {
+                        if (is_array($item[1])) {
+                            $stack[] = $item[1];
+
+                            $buff .= '<frame posn="0 -' . ($counter*5) . ' 5">';
+                            $buff .= '<quad id="mQuad_' . ($counter+1) . '" sizen="30 5" halign="left" valign="center" bgcolor="' . $config->style_widget_bgColorize . '" bgcolorfocus="' . $config->style_widget_title_bgColorize . '" scriptevents="1" class="group menu item" data-label="' . $itemName . '"/>';
+                            $buff .= '<label id="item_' . ($counter+1) . '" posn="2 0 1" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" textid="' . $ML->addLang($itemName) . '"/>';
+                            $buff .= '<quad id="quad_' . ($counter+1) . '" posn="30 0 2" sizen="5 5" halign="right" valign="center" style="Icons64x64_1" substyle="ShowRight2"/>';
+                            $buff .= '<frame posn="30 0 5" id="' . $itemName . '">';
+                            $buff .= '<frame>';
+
+                            $buff .= '</frame>';
+                            $buff .= '</frame>';
+                            $buff .= '</frame>';
+
+                            $counter++;
+                        } else {
+                            if ($isMain) {
+                                $buff .= '<frame posn="0 -' . ($counter*5) . ' 5">';
+                                $buff .= '<quad id="mQuad_' . ($counter+1) . '" sizen="30 5" halign="left" valign="center" bgcolor="' . $config->style_widget_bgColorize . '" bgcolorfocus="' . $config->style_widget_title_bgColorize . '" action="' . $item[1] . '" scriptevents="1"/>';
+                                $buff .= '<label id="item_' . ($counter+1) . '" posn="2 0 1" sizen="30 5" halign="left" valign="center" style="TextRaceChat" class="menu item" textsize="1" textcolor="fff" textid="' . $ML->addLang($itemName) . '"/>';
+                                $buff .= '</frame>';
+                            } else {
+                                $buff .= '<frame posn="0 -' . ($counter*5) . ' 5">';
+                                $buff .= '<quad sizen="30 5" halign="left" valign="center" bgcolor="' . $config->style_widget_bgColorize . '" bgcolorfocus="' . $config->style_widget_title_bgColorize . '" opacity="0.75" action="' . $item[1] . '" scriptevents="1" class="sub item"/>';
+                                $buff .= '<label posn="2 0 1" sizen="30 5" halign="left" valign="center" style="TextRaceChat" class="sub item" textsize="1" textcolor="fff" textid="' . $ML->addLang($itemName) . '"/>';
+                                $buff .= '</frame>';
+                            }
+                            $counter++;
+                        }
+                    }
+                }
+            }
+        }
+        return array($buff, $counter);
+    }
+
+
     public function pluginLoaded($plugin)
     {
         return $this->isPluginLoaded($this->getPluginClass($plugin));

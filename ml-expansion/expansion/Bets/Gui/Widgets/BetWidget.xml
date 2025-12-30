@@ -1,0 +1,34 @@
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(80, 19.75); ?>
+<frame posn="0 0 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(80, 4, $this->addLang("Start Bet")); ?>
+</frame>
+<frame posn="1 -8 0">
+	<frame>
+		<frame>
+			<frame posn="0 0 1">
+                <?php $val = $this->getParam('values')[0]; echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $val, null, null, "3af", null, null, $this->getParam('actions')[0], null, null, null, null, null, null); ?>
+			</frame>
+			<frame posn="16.5 0 1">
+				<?php $val = $this->getParam('values')[1]; echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $val, null, null, "3af", null, null, $this->getParam('actions')[1], null, null, null, null, null, null); ?>
+			</frame>
+			<frame posn="33 0 1">
+				<?php $val = $this->getParam('values')[2]; echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $val, null, null, "3af", null, null, $this->getParam('actions')[2], null, null, null, null, null, null); ?>
+			</frame>
+			<frame posn="0 -6 1">
+				<?php $val = $this->getParam('values')[3]; echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $val, null, null, "3af", null, null, $this->getParam('actions')[3], null, null, null, null, null, null); ?>
+			</frame>
+			<frame posn="16.5 -6 1">
+				<?php $val = $this->getParam('values')[4]; echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $val, null, null, "3af", null, null, $this->getParam('actions')[4], null, null, null, null, null, null); ?>
+			</frame>
+			<frame posn="32 -6 1">
+                <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("betAmount", 18, true, null, null, null, null); ?>
+			</frame>
+		</frame>
+	</frame>
+</frame>
+<frame posn="52 -15 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Close", null, null, null, null, null, null, null, null, null, "closeButton", null, null); ?>
+</frame>
+<frame posn="52 -8 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Accept", null, null, "0d0", null, null, $this->getParam('action'), null, null, null, null, null, null); ?>
+</frame>

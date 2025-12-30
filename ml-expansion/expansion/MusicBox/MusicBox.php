@@ -171,10 +171,10 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if ($x == 1) {
                 $keys = array_map(function ($input) {
                     return ltrim($input, "\xEF\xBB\xBF");
-                }, str_getcsv($line, ";"));
+                }, str_getcsv($line, ";", '"', '\\'));
                 continue;
             }
-            $array[] = array_combine($keys, array_map('trim', str_getcsv($line, ";")));
+            $array[] = array_combine($keys, array_map('trim', str_getcsv($line, ";", '"', '\\')));
         }
 
         return $array;
@@ -196,7 +196,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        if (!$this->enabled || $this->ignore) {
+        if (!$this->enabled || $this->ignore || count($this->songs) == 0) {
             return;
         }
         $this->ignore = false;

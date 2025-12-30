@@ -120,12 +120,15 @@ class ManiaLink extends Singletons
         $this->parameters[$key] = $value;
     }
 
-    public function addLang($lang)
+    public function addLang($lang, $param = null)
     {
         if ($lang == "") {
             return "";
         }
         $this->dicoMessages[$lang] = eXpGetMessage($lang);
+        if ($param !== null) {
+            $this->dicoMessages[$lang]->setArgs($param);
+        }
         return "l" . $this->simpleHashName($lang);
     }
 

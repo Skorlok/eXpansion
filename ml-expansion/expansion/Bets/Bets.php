@@ -21,9 +21,10 @@ namespace ManiaLivePlugins\eXpansion\Bets;
 use ManiaLive\Data\Player;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Bets\Classes\BetCounter;
-use ManiaLivePlugins\eXpansion\Bets\Gui\Widgets\BetWidget;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 /**
  * Description of Bets
@@ -44,6 +45,14 @@ class Bets extends ExpPlugin
     private $msg_totalStake;
     private $msg_winner;
     private $msg_payFail;
+
+    private $widget;
+    private $widgetAccept;
+    private $script;
+    private $actions;
+    private $actionAccept;
+    private $action;
+
     public static $state = self::OFF;
     public static $betAmount = 0;
 
@@ -58,19 +67,11 @@ class Bets extends ExpPlugin
     public function eXpOnLoad()
     {
         $this->msg_fail = eXpGetMessage('#donate#No planets billed');
-        $this->msg_error = eXpGetMessage('#donate#Error: %1$s');
         $this->msg_payFail = eXpGetMessage('#donate#The server was unable to pay your winning bet. Sorry.');
         $this->msg_billSuccess = eXpGetMessage('#donate#Bet accepted for#variable# %1$s #donate#planets');
-        $this->msg_billPaySuccess = eXpGetMessage(
-            '#donate#You will recieve#variable# %1$s #donate#planets from the server soon.'
-        );
-        $this->msg_totalStake = eXpGetMessage(
-            '#donate#The game is on as#variable# %1$s #donate#joins! '
-            .'Win stake of the bet is now#variable# %2$s #donate#planets'
-        );
-        $this->msg_winner = eXpGetMessage(
-            '#variable# %1$s #donate#wins the bet with #variable# %2$s #donate#planets, congratulations'
-        );
+        $this->msg_billPaySuccess = eXpGetMessage('#donate#You will recieve#variable# %1$s #donate#planets from the server soon.');
+        $this->msg_totalStake = eXpGetMessage('#donate#The game is on as#variable# %1$s #donate#joins! Win stake of the bet is now#variable# %2$s #donate#planets');
+        $this->msg_winner = eXpGetMessage('#variable# %1$s #donate#wins the bet with #variable# %2$s #donate#planets, congratulations');
     }
 
     public function eXpOnReady()
@@ -80,14 +81,35 @@ class Bets extends ExpPlugin
 
         $this->config = Config::getInstance();
 
-        $ah = ActionHandler::getInstance();
-        BetWidget::$action_setAmount = $ah->createAction(array($this, "setBetAmount"), null);
-        BetWidget::$action_setAmount25 = $ah->createAction(array($this, "setBetAmount"), 25);
-        BetWidget::$action_setAmount50 = $ah->createAction(array($this, "setBetAmount"), 50);
-        BetWidget::$action_setAmount100 = $ah->createAction(array($this, "setBetAmount"), 100);
-        BetWidget::$action_setAmount250 = $ah->createAction(array($this, "setBetAmount"), 250);
-        BetWidget::$action_setAmount500 = $ah->createAction(array($this, "setBetAmount"), 500);
-        BetWidget::$action_acceptBet = $ah->createAction(array($this, "acceptBet"));
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        $this->actionAccept = $aH->createAction(array($this, "acceptBet"));
+        $this->action = $aH->createAction(array($this, "setBetAmount"), null);
+        $this->actions = array();
+        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 25);
+        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 50);
+        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 100);
+        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 250);
+        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 500);
+
+        $this->script = new Script("Bets/Gui/Scripts");
+
+        $this->widget = new Widget("Bets\Gui\Widgets\BetWidget.xml");
+        $this->widget->setName("Bet widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(80, 20);
+        $this->widget->setParam("actions", $this->actions);
+        $this->widget->setParam("action", $this->action);
+        $this->widget->setParam("values", array(25, 50, 100, 250, 500));
+        $this->widget->registerScript($this->script);
+
+        $this->widgetAccept = new Widget("Bets\Gui\Widgets\AcceptBetWidget.xml");
+        $this->widgetAccept->setName("Bet accept widget");
+        $this->widgetAccept->setLayer("normal");
+        $this->widgetAccept->setSize(80, 20);
+        $this->widgetAccept->setParam("action", $this->actionAccept);
+        $this->widgetAccept->registerScript($this->script);
+
         $this->reset();
     }
 
@@ -102,25 +124,20 @@ class Bets extends ExpPlugin
 
     public function onBeginMatch()
     {
-        if (!$this->connection->getWarmUp()) {
-            $this->start(Config::getInstance()->timeoutSetBet);
-        }
+        $this->start(Config::getInstance()->timeoutSetBet);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
         switch (self::$state) {
-
             case self::RUNNING:
-                if (!$this->connection->getWarmUp()) {
-                    $this->checkWinner();
-                }
+                $this->checkWinner();
                 break;
             case self::NOBETS:
                 break;
             default:
-                BetWidget::EraseAll();
+                $this->widget->erase();
+                $this->widgetAccept->erase();
                 $this->eXpChatSendServerMessage("#error#Map was skipped or replayed before bet was placed.");
                 break;
         }
@@ -153,30 +170,18 @@ class Bets extends ExpPlugin
         }
 
         if (!is_numeric($amount) || empty($amount) || $amount < 1) {
-            $this->eXpChatSendServerMessage(
-                '#error#Can\'t place a bet, the value: "#variable#%1$s#error#" is not numeric value!',
-                $login,
-                array($amount)
-            );
-
+            $this->eXpChatSendServerMessage('#error#Can\'t place a bet, the value: "#variable#%1$s#error#" is not numeric value!', $login, array($amount));
             return;
         }
 
         if ($amount < 20) {
             $this->eXpChatSendServerMessage('#error#Custom value must be over 20 planets!', $login);
-
             return;
         }
 
         self::$betAmount = intval($amount);
 
-        $bill = $this->eXpStartBill(
-            $login,
-            $this->storage->serverLogin,
-            $amount,
-            'Acccept Bet ?',
-            array($this, 'billSetSuccess')
-        );
+        $bill = $this->eXpStartBill($login, $this->storage->serverLogin, $amount, 'Acccept Bet ?', array($this, 'billSetSuccess'));
         $bill->setErrorCallback(5, array($this, 'billFail'));
         $bill->setErrorCallback(6, array($this, 'billFail'));
         $bill->setSubject('bets_plugin');
@@ -184,13 +189,7 @@ class Bets extends ExpPlugin
 
     public function acceptBet($login)
     {
-        $bill = $this->eXpStartBill(
-            $login,
-            $this->storage->serverLogin,
-            self::$betAmount,
-            'Acccept Bet ?',
-            array($this, 'billAcceptSuccess')
-        );
+        $bill = $this->eXpStartBill($login, $this->storage->serverLogin, self::$betAmount, 'Acccept Bet ?', array($this, 'billAcceptSuccess'));
         $bill->setErrorCallback(5, array($this, 'billFail'));
         $bill->setErrorCallback(6, array($this, 'billFail'));
         $bill->setSubject('bets_plugin');
@@ -237,7 +236,9 @@ class Bets extends ExpPlugin
         try {
             $this->players[$login] = $this->storage->getPlayerObject($login);
             $this->eXpChatSendServerMessage($this->msg_billSuccess, $login, array($bill->getAmount()));
-            BetWidget::EraseAll();
+
+            $this->widget->erase();
+
             $this->updateBetWidget();
             $this->announceTotal($login);
         } catch (\Exception $e) {
@@ -264,11 +265,24 @@ class Bets extends ExpPlugin
 
     public function updateBetWidget()
     {
-        $widget = BetWidget::Create(null, true);
-        $widget->setPosition($this->config->betWidget_PosX, $this->config->betWidget_PosY);
-        $widget->setSize(80, 20);
-        $widget->setToHide(array_keys($this->players));
-        $widget->show();
+        $out = \ManiaLivePlugins\eXpansion\Helpers\Maniascript::stringifyAsStringList(array_keys($this->players));
+        if (count($this->players) == 0) {
+            $out = "Text[]";
+        }
+        $this->script->setParam("hideFor", $out);
+
+        if (self::$state == self::SET) {
+            $this->widget->setPosition($this->config->betWidget_PosX, $this->config->betWidget_PosY, 0);
+            $this->widgetAccept->erase();
+            $this->widget->show(null, true);
+        }
+        if (self::$state == self::ACCEPT) {
+            $this->widgetAccept->setPosition($this->config->betWidget_PosX, $this->config->betWidget_PosY, 0);
+            $this->widget->erase();
+            $this->widgetAccept->setParam("text", 'Accept bet for %1$s planets ?');
+            $this->widgetAccept->setParam("textParam", array("" . self::$betAmount));
+            $this->widgetAccept->show(null, true);
+        }
     }
 
     public function start($timeout)
@@ -286,7 +300,9 @@ class Bets extends ExpPlugin
         } else {
             $this->setState(self::NOBETS);
         }
-        BetWidget::EraseAll();
+
+        $this->widget->erase();
+        $this->widgetAccept->erase();
     }
 
     private function reset()
@@ -295,15 +311,29 @@ class Bets extends ExpPlugin
         self::$betAmount = 0;
         $this->counters = array();
         $this->players = array();
-        BetWidget::EraseAll();
+        
+        $this->widget->erase();
+        $this->widgetAccept->erase();
     }
 
     public function eXpOnUnload()
     {
-        $ah = ActionHandler::getInstance();
-        $ah->deleteAction(BetWidget::$action_acceptBet);
-        $ah->deleteAction(BetWidget::$action_setAmount);
-        BetWidget::EraseAll();
+        $this->widget->erase();
+        $this->widgetAccept->erase();
+
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        $aH->deleteAction($this->action);
+        $aH->deleteAction($this->actionAccept);
+        foreach ($this->actions as $action) {
+            $aH->deleteAction($action);
+        }
+        $this->actions = array();
+        $this->action = null;
+        $this->script = null;
+        $this->widget = null;
+        $this->widgetAccept = null;
+
         parent::eXpOnUnload();
     }
 }

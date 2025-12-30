@@ -46,6 +46,11 @@ class Message
         $this->args = $args;
     }
 
+    public function getOriginalMessage()
+    {
+        return $this->originalMessage;
+    }
+
     /**
      * getMultiLangArray()
      * Returns a multilanguage message array to be used with Connection->ChatSendServerMessageToLanguage();

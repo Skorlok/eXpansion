@@ -51,7 +51,9 @@ class Widgets_MapSuggestion extends ExpPlugin
         $ahandler = ActionHandler::getInstance();
         $ahandler->deleteAction($this->action);
         $this->action = null;
-        $this->widget->erase();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
         $this->widget = null;
     }
 }

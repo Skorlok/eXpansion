@@ -741,11 +741,19 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->widget = null;
         $this->script = null;
 
+        /** @var ActionHandler @aH */
+        $aH = ActionHandler::getInstance();
+        $aH->deleteAction($this->actionYes);
+        $aH->deleteAction($this->actionNo);
+        $aH->deleteAction($this->actionPass);
+        $aH->deleteAction($this->actionCancel);
+
         $this->currentVote = null;
         $this->counters = array();
         $this->resCount = 0;
         $this->lastMapUid = "";
         $this->config = null;
+        
         $this->actionYes = null;
         $this->actionNo = null;
         $this->actionPass = null;

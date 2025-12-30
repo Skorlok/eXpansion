@@ -12,6 +12,9 @@ class Button
 
     public static function getScriptML()
     {
+        if (self::$script === null) {
+            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ButtonScript();
+        }
         return self::$script;
     }
 
@@ -33,10 +36,6 @@ class Button
         $attribute = null
     )
     {
-        if (self::$script === null) {
-            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ButtonScript();
-        }
-
         /** @var Config $config */
         $config = Config::getInstance();
         $buttonId = self::$counter++;

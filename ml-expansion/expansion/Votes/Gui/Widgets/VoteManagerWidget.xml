@@ -1,5 +1,4 @@
 <frame>
-    <quad sizen="90 27" bgcolor="000" opacity=" 0.4" pos="0 0"/>
     <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(90, 27); ?>
 </frame>
 <frame posn="0 0 1">

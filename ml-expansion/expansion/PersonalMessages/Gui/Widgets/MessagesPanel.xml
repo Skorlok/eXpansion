@@ -1,0 +1,12 @@
+<frame id="Frame">
+    <frame id="MainWindow">
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(102, 5.5); ?>
+    </frame>
+    <frame posn="6 0 2.0E-5">
+        <frame posn="0 -3 1">
+            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->handleSpecialChars($this->getParam('targetPlayer') ? $this->getParam('targetPlayer') : "Select..."), array("Select player whom to send the message", 35), null, null, 'fff', null, $this->getParam('actionPlayers'), null, null, null, null, null, null); ?>
+        </frame>
+        <entry id="messagebox" posn="27.5 -0.5 1.0E-5" sizen="78 6" scale="0.8" halign="left" valign="top" style="" scriptevents="1" textcolor="fff" name="message"/>
+    </frame>
+    <quad id="minimizeButton" posn="96 -2.5 4.0E-5" sizen="5 5" halign="left" valign="center" style="Icons64x64_1" substyle="Outbox" scriptevents="1"/>
+</frame>
