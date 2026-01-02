@@ -141,7 +141,7 @@ class Writer
     public function getHandle()
     {
         if (null === $this->handle) {
-            if (false === ($this->handle = @fopen($this->file, 'wb'))) {
+            if (false === ($this->handle = fopen($this->file, 'wb'))) {
                 throw FileException::createUsingLastError();
             }
         }
@@ -172,7 +172,7 @@ class Writer
             $length = strlen($string);
         }
 
-        if (false === ($actual = @fwrite($this->getHandle(), $string, $length))) {
+        if (false === ($actual = fwrite($this->getHandle(), $string, $length))) {
             throw FileException::createUsingLastError();
         }
 

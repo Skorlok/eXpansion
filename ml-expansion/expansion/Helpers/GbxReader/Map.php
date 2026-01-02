@@ -101,7 +101,7 @@ class Map extends FileStructure
 
     private static function fetchChunk005(Map $map, $fp)
     {
-        $header = @simplexml_load_string(self::fetchString($fp));
+        $header = simplexml_load_string(self::fetchString($fp));
         if (is_object($header)) {
             $map->uid = (string)$header->ident->attributes()->uid;
 

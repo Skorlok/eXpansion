@@ -22,7 +22,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $config = Config::getInstance();
 
         $var = new TypeFloat('messaging_PosX', 'Position of Messaging Widget X', $config, false, false);
-        $var->setDefaultValue(-278);
+        $var->setDefaultValue(-160);
         $var->setGroup('Widgets');
         $this->registerVariable($var);
 

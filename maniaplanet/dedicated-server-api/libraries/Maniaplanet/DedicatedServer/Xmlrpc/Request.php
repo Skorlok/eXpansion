@@ -143,7 +143,7 @@ else
 		 */
 		static function decode($message)
 		{
-			$xml = @simplexml_load_string($message);
+			$xml = simplexml_load_string($message);
 			if(!$xml)
 				throw new ParseException();
 
@@ -175,7 +175,7 @@ else
 				case 'int':
 					return (int) $elt;
 				case 'double':
-					return (double) $elt;
+					return (float) $elt;
 				case 'string':
 					return (string) $elt;
 				case 'base64':

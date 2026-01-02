@@ -1,0 +1,46 @@
+<frame id="Frame" posn="0 0 1">
+    <quad sizen="120 39" halign="left" valign="top" style="Bgs1InRace" substyle="BgWindow4" colorize="aaa"/>
+    <quad id="minimizeButton" posn="120 0 1" sizen="6 6" style="Icons64x64_1" substyle="NewMessage" scriptevents="1"/>
+    <frame posn="2 0 2">
+        <frame>
+            <quad id="tabBg_0" sizen="22 5" style="Bgs1" substyle="BgCard3" scriptevents="1"/>
+            <label id="tablabel_0" posn="1 -0.5 1" sizen="20 5" style="TextCardScores2" textsize="1" textcolor="fff" text="Tab 0"/>
+            <quad id="closeButton_0" posn="18 0 5" sizen="4 4" style="Icons128x32_1" substyle="Close" scriptevents="1"/>
+        </frame>
+        <frame posn="22 0 3.0E-5">
+            <quad id="tabBg_1" sizen="22 5" style="Bgs1" substyle="BgCard3" scriptevents="1"/>
+            <label id="tablabel_1" posn="1 -0.5 1" sizen="20 5" style="TextCardScores2" textsize="1" textcolor="fff" text="Tab 1"/>
+            <quad id="closeButton_1" posn="18 0 5" sizen="4 4" style="Icons128x32_1" substyle="Close" scriptevents="1"/>
+        </frame>
+        <frame posn="44 0 6.0E-5">
+            <quad id="tabBg_2" sizen="22 5" style="Bgs1" substyle="BgCard3" scriptevents="1"/>
+            <label id="tablabel_2" posn="1 -0.5 1" sizen="20 5" style="TextCardScores2" textsize="1" textcolor="fff" text="Tab 2"/>
+            <quad id="closeButton_2" posn="18 0 5" sizen="4 4" style="Icons128x32_1" substyle="Close" scriptevents="1"/>
+        </frame>
+        <frame posn="66 0 9.0E-5">
+            <quad id="tabBg_3" sizen="22 5" style="Bgs1" substyle="BgCard3" scriptevents="1"/>
+            <label id="tablabel_3" posn="1 -0.5 1" sizen="20 5" style="TextCardScores2" textsize="1" textcolor="fff" text="Tab 3"/>
+            <quad id="closeButton_3" posn="18 0 5" sizen="4 4" style="Icons128x32_1" substyle="Close" scriptevents="1"/>
+        </frame>
+        <frame posn="88 0 0.00012">
+            <quad id="tabBg_4" sizen="22 5" style="Bgs1" substyle="BgCard3" scriptevents="1"/>
+            <label id="tablabel_4" posn="1 -0.5 1" sizen="20 5" style="TextCardScores2" textsize="1" textcolor="fff" text="Tab 4"/>
+            <quad id="closeButton_4" posn="18 0 5" sizen="4 4" style="Icons128x32_1" substyle="Close" scriptevents="1"/>
+        </frame>
+    </frame>
+    <frame posn="2 -6 2">
+        <label id="line_0" posn="0 0 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
+        <label id="line_1" posn="0 -5 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
+        <label id="line_2" posn="0 -10 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
+        <label id="line_3" posn="0 -15 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
+        <label id="line_4" posn="0 -20 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
+        <frame posn="0 -28 1">
+            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("chatEntry", 110, true, null, null, null, null); ?>
+        </frame>
+    </frame>
+    <quad id="addTab" posn="0 -0.5 0.00023" sizen="6 6" style="Icons64x64_1" substyle="Add" action="<?php echo $this->getParam("actionPlayers"); ?>"/>
+</frame>
+<quad posn="0 600 0" sizen="5 5" bgcolor="000" action="<?php echo $this->getParam("actionSend"); ?>"/>
+<frame posn="0 600 1">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("replyTo", 30, true, null, null, null, null); ?>
+</frame>

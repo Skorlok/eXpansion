@@ -61,7 +61,7 @@ class StreamHandler extends AbstractProcessingHandler
             if (!$this->url) {
                 throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
             }
-            $this->stream = @fopen($this->url, 'a');
+            $this->stream = fopen($this->url, 'a');
             if (!is_resource($this->stream)) {
                 $this->stream = null;
                 throw new \UnexpectedValueException(sprintf('The stream or file "%s" could not be opened; it may be invalid or not writable.', $this->url));

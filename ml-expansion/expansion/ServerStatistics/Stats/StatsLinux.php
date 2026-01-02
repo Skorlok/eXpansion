@@ -37,7 +37,7 @@ class StatsLinux implements AbstractStat
     {
         $matches = array();
         $memVals = array();
-        @preg_match_all(
+        preg_match_all(
             '/^([^:]+)\:\s+(\d+)\s*(?:k[bB])?\s*/m',
             file_get_contents('/proc/meminfo'),
             $matches,

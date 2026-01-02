@@ -485,7 +485,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
 
         $meta = array();
-        list($width, $height, $type, $attr) = @getimagesizefromstring($data, $meta);
+        list($width, $height, $type, $attr) = getimagesizefromstring($data, $meta);
 
         if (($type == IMAGETYPE_JPEG) || ($type == IMAGETYPE_PNG)) {
             $xRatio = $maxWidth / $width;
@@ -541,7 +541,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $maxHeight = 60;
 
         $meta = array();
-        list($width, $height, $type, $attr) = @getimagesizefromstring($data, $meta);
+        list($width, $height, $type, $attr) = getimagesizefromstring($data, $meta);
 
         if (($type == IMAGETYPE_JPEG) || ($type == IMAGETYPE_PNG)) {
             $xRatio = $maxWidth / $width;

@@ -117,7 +117,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $data = curl_exec($ch);
         $status = curl_getinfo($ch);
-        curl_close($ch);
+        unset($ch);
 
         $ag = AdminGroups::getInstance();
 

@@ -13,7 +13,7 @@ class MapRating extends \Maniaplanet\DedicatedServer\Structures\AbstractStructur
     /** @var Map */
     public $map;
 
-    public function __construct(Rating $rating = null, Map $map = null)
+    public function __construct($rating = null, $map = null)
     {
         if ($rating != null) {
             $this->rating = round(($rating->rating / 5) * 100);

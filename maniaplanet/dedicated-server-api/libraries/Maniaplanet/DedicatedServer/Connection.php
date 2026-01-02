@@ -22,7 +22,7 @@ class Connection
 	protected static $instances = array();
 	/** @var int[] */
 	private static $levels = array(
-		null => -1,
+		"" => -1,
 		'User' => 0,
 		'Admin' => 1,
 		'SuperAdmin' => 2
@@ -33,7 +33,7 @@ class Connection
 	/** @var Xmlrpc\GbxRemote */
 	protected $xmlrpcClient;
 	/** @var string */
-	protected $user;
+	protected $user = "";
 
 	/**
 	 * @param string $host

@@ -84,7 +84,7 @@ class Group implements \Iterator
                     return false;
             return true;
         }
-        return isset($this->logins[$logins]);
+        return isset($this->logins[(string)$logins]);
     }
 
     function count()

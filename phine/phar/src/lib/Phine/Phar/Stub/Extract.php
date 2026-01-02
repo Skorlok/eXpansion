@@ -153,7 +153,7 @@ final class Extract
      */
     public static function getSource()
     {
-        if (false === ($code = @file(__FILE__))) {
+        if (false === ($code = file(__FILE__))) {
             $error = error_get_last();
 
             throw new RuntimeException($error['message']);
@@ -213,21 +213,21 @@ final class Extract
             $base = dirname($path);
 
             if (!is_dir($base)) {
-                if (!@mkdir($base, 0755, true)) {
+                if (!mkdir($base, 0755, true)) {
                     $error = error_get_last();
 
                     throw new RuntimeException($error['message']);
                 }
             }
 
-            if (!@file_put_contents($path, $this->extractFile($file))) {
+            if (!file_put_contents($path, $this->extractFile($file))) {
                 $error = error_get_last();
 
                 throw new RuntimeException($error['message']);
             }
         }
 
-        if (!@touch($check)) {
+        if (!touch($check)) {
             $error = error_get_last();
 
             throw new RuntimeException($error['message']);
@@ -367,7 +367,7 @@ final class Extract
     private function getHandle()
     {
         if (null === $this->handle) {
-            if (false === ($this->handle = @fopen($this->file, 'rb'))) {
+            if (false === ($this->handle = fopen($this->file, 'rb'))) {
                 $error = error_get_last();
 
                 throw new RuntimeException($error['message']);
@@ -398,7 +398,7 @@ final class Extract
      */
     private function getPosition()
     {
-        if (false === ($position = @ftell($this->getHandle()))) {
+        if (false === ($position = ftell($this->getHandle()))) {
             $error = error_get_last();
 
             throw new RuntimeException($error['message']);
@@ -435,7 +435,7 @@ final class Extract
     {
         $handle = $this->getHandle();
 
-        if (false === @fgetc($handle)) {
+        if (false === fgetc($handle)) {
 
             return feof($handle);
         } else {
@@ -460,7 +460,7 @@ final class Extract
         $total = $bytes;
 
         while (!$this->isEndOfFile() && $bytes) {
-            if (false === ($chunk = @fread($this->getHandle(), $bytes))) {
+            if (false === ($chunk = fread($this->getHandle(), $bytes))) {
                 $error = error_get_last();
 
                 throw new RuntimeException($error['message']);
@@ -551,7 +551,7 @@ final class Extract
      */
     private function seek($offset, $whence = SEEK_SET)
     {
-        if (-1 === @fseek($this->getHandle(), $offset, $whence)) {
+        if (-1 === fseek($this->getHandle(), $offset, $whence)) {
             throw new RuntimeException(
                 "Could not seek to $offset in \"{$this->file}\"."
             );

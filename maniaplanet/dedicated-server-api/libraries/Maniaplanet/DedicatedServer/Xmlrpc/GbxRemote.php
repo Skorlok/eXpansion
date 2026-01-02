@@ -79,7 +79,7 @@ class GbxRemote
 		$init_timeout = 5; // retry every 5s
 
 		while (true) {
-			$this->socket = @fsockopen($host, $port, $errno, $errstr, $init_timeout);
+			$this->socket = fsockopen($host, $port, $errno, $errstr, $init_timeout);
 			if ($this->socket || (microtime(true) - $init_time >= $timeout))
 				break;
 			else
@@ -211,7 +211,7 @@ class GbxRemote
 	private function flush($waitResponse=false)
 	{
 		$r = array($this->socket);
-		while($waitResponse || @stream_select($r, $w, $e, 0) > 0)
+		while($waitResponse || stream_select($r, $w, $e, 0) > 0)
 		{
 			list($handle, $xml) = $this->readMessage();
 			list($type, $value) = Request::decode($xml);
@@ -278,12 +278,12 @@ class GbxRemote
 	 */
 	private function read($size)
 	{
-		@stream_set_timeout($this->socket, $this->readTimeout['sec'], $this->readTimeout['usec']);
+		stream_set_timeout($this->socket, $this->readTimeout['sec'], $this->readTimeout['usec']);
 
 		$data = '';
 		while(strlen($data) < $size)
 		{
-			$buf = @fread($this->socket, $size - strlen($data));
+			$buf = fread($this->socket, $size - strlen($data));
 			if($buf === '' || $buf === false)
 				return false;
 			$data .= $buf;
@@ -299,12 +299,12 @@ class GbxRemote
 	 */
 	private function write($data)
 	{
-		@stream_set_timeout($this->socket, $this->writeTimeout['sec'], $this->writeTimeout['usec']);
+		stream_set_timeout($this->socket, $this->writeTimeout['sec'], $this->writeTimeout['usec']);
 		self::$sent += strlen($data);
 
 		while(strlen($data) > 0)
 		{
-			$written = @fwrite($this->socket, $data);
+			$written = fwrite($this->socket, $data);
 			if($written === 0 || $written === false)
 				return false;
 

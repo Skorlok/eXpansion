@@ -176,7 +176,7 @@ class Extract
             $base = dirname($path);
 
             if (!is_dir($base)) {
-                if (!@mkdir($base, 0755, true)) {
+                if (!mkdir($base, 0755, true)) {
                     throw FileException::createUsingLastError();
                 }
             }

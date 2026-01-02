@@ -63,17 +63,17 @@ class Path
                 return $count;
             }
 
-            if (!@copy($from, $to)) {
+            if (!copy($from, $to)) {
                 throw PathException::createUsingLastError();
             }
 
             $count++;
         } else {
-            if (!file_exists($to) && !@mkdir($to)) {
+            if (!file_exists($to) && !mkdir($to)) {
                 throw PathException::createUsingLastError();
             }
 
-            if (!($handle = @opendir($from))) {
+            if (!($handle = opendir($from))) {
                 throw PathException::createUsingLastError();
             }
 
@@ -187,7 +187,7 @@ class Path
 
         if (file_exists($path)) {
             if (is_dir($path)) {
-                if (false === ($handle = @opendir($path))) {
+                if (false === ($handle = opendir($path))) {
                     throw PathException::createUsingLastError();
                 }
 
@@ -201,10 +201,10 @@ class Path
 
                 closedir($handle);
 
-                if (!@rmdir($path)) {
+                if (!rmdir($path)) {
                     throw PathException::createUsingLastError();
                 }
-            } elseif (!@unlink($path)) {
+            } elseif (!unlink($path)) {
                 throw PathException::createUsingLastError();
             }
 

@@ -132,7 +132,7 @@ class IrcBot
 
     private function processRead($socket)
     {
-        $data = @socket_read($socket, 4096, PHP_NORMAL_READ);
+        $data = socket_read($socket, 4096, PHP_NORMAL_READ);
 
         if ($data === false) {
             $this->throwError();

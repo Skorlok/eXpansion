@@ -131,7 +131,7 @@ class Reader
     public function getHandle()
     {
         if (null === $this->handle) {
-            if (false === ($this->handle = @fopen($this->file, 'rb'))) {
+            if (false === ($this->handle = fopen($this->file, 'rb'))) {
                 throw FileException::createUsingLastError();
             }
         }
@@ -155,7 +155,7 @@ class Reader
      */
     public function getPosition()
     {
-        if (false === ($position = @ftell($this->getHandle()))) {
+        if (false === ($position = ftell($this->getHandle()))) {
             throw FileException::createUsingLastError();
         }
 
@@ -178,7 +178,7 @@ class Reader
      */
     public function getSize()
     {
-        if (false === ($size = @filesize($this->file))) {
+        if (false === ($size = filesize($this->file))) {
             throw FileException::createUsingLastError();
         }
 
@@ -207,7 +207,7 @@ class Reader
     {
         $handle = $this->getHandle();
 
-        if (false === @fgetc($handle)) {
+        if (false === fgetc($handle)) {
 
             return feof($handle);
         } else {
@@ -241,7 +241,7 @@ class Reader
         $total = $bytes;
 
         while (!$this->isEndOfFile() && $bytes) {
-            if (false === ($chunk = @fread($this->getHandle(), $bytes))) {
+            if (false === ($chunk = fread($this->getHandle(), $bytes))) {
                 throw FileException::createUsingLastError();
             }
 
@@ -278,7 +278,7 @@ class Reader
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if (-1 === @fseek($this->getHandle(), $offset, $whence)) {
+        if (-1 === fseek($this->getHandle(), $offset, $whence)) {
             throw FileException::createUsingFormat(
                 'Could not seek to %d in "%s".',
                 $offset,

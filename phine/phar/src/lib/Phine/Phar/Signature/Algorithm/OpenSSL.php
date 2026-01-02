@@ -137,7 +137,7 @@ class OpenSSL implements AlgorithmInterface
             );
         }
 
-        if (false === ($key = @file_get_contents($file))) {
+        if (false === ($key = file_get_contents($file))) {
             throw FileException::createUsingLastError();
         }
 

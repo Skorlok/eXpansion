@@ -114,8 +114,8 @@ class Application extends \ManiaLib\Utils\Singleton
 				do {
 					$nextCycleStart += $cycleTime;
 				} while($nextCycleStart < $endCycleTime);
-				if ($nextCycleStart >= time()) {
-					@time_sleep_until($nextCycleStart);
+				if ($nextCycleStart >= microtime(true)) {
+					time_sleep_until($nextCycleStart);
 				}
 			}
 		} catch(\Exception $e) {

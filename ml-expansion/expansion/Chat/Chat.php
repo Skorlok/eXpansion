@@ -56,8 +56,10 @@ class Chat extends ExpPlugin
      */
     public function eXpOnLoad()
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
         $this->loadProfanityList();
-        self::$channels = array_merge(array("Public"), Config::getInstance()->channels);
+        self::$channels = array_merge(array("Public"), $config->channels);
     }
 
     /**
@@ -92,10 +94,12 @@ class Chat extends ExpPlugin
      */
     public function initChat()
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
         $all = $this->storage->players + $this->storage->spectators;
         foreach ($all as $login => $player) {
             self::$playerChannels[$login] = "Public";
-            if (Config::getInstance()->useChannels) {
+            if ($config->useChannels) {
                 $this->displayWidget($login);
             }
         }
@@ -129,6 +133,8 @@ class Chat extends ExpPlugin
      */
     public function onSettingsChanged(Variable $var)
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
 
         if ($var->getConfigInstance() instanceof Config) {
             if ($var->getName() == "useChannels") {
@@ -140,7 +146,7 @@ class Chat extends ExpPlugin
             }
             if ($var->getName() == "channels") {
                 self::$channels = array_merge(array("Public"), $var->getRawValue());
-                if (Config::getInstance()->useChannels) {
+                if ($config->useChannels) {
                     ChatSelect::EraseAll();
                     $this->initChat();
                 }
@@ -225,8 +231,10 @@ class Chat extends ExpPlugin
      */
     public function onPlayerConnect($login, $isSpectator)
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
         self::$playerChannels[$login] = "Public";
-        if (Config::getInstance()->useChannels) {
+        if ($config->useChannels) {
             $this->displayWidget($login);
         }
         $player = $this->storage->getPlayerObject($login);
@@ -324,6 +332,7 @@ class Chat extends ExpPlugin
         }
 
         if ($playerUid != 0 && substr($text, 0, 1) != "/" && $this->enabled) {
+            /** @var Config $config */
             $config = Config::getInstance();
             $force = "";
             $source_player = $this->storage->getPlayerObject($login);
@@ -368,7 +377,7 @@ class Chat extends ExpPlugin
                 $receivers = null;
                 $channel = "";
 
-                if (Config::getInstance()->useChannels) {
+                if ($config->useChannels) {
                     // if group
                     if (self::$playerChannels[$login] != "Public") {
                         $channel = "[" . ucfirst($currentChannel) . "] ";

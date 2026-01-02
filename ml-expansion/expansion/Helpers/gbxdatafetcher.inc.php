@@ -132,7 +132,7 @@ class GBXBaseFetcher
     // read in raw GBX data
     protected function loadGBXdata($filename)
     {
-        $gbxdata = @file_get_contents($filename, false, null, 0, self::LOAD_LIMIT * 1024);
+        $gbxdata = file_get_contents($filename, false, null, 0, self::LOAD_LIMIT * 1024);
         if ($gbxdata !== false) {
             $this->storeGBXdata($gbxdata);
         } else {
@@ -1272,11 +1272,11 @@ class GBXChallMapFetcher extends GBXBaseFetcher
                 ) {
                     // flip thumbnail via temporary file
                     $tmp = tempnam(sys_get_temp_dir(), 'gbxflip');
-                    if (@file_put_contents($tmp, $this->thumbnail) !== false) {
-                        if ($tn = @imagecreatefromjpeg($tmp)) {
+                    if (file_put_contents($tmp, $this->thumbnail) !== false) {
+                        if ($tn = imagecreatefromjpeg($tmp)) {
                             $tn = $this->imageFlip($tn, self::IMAGE_FLIP_HORIZONTAL);
-                            if (@imagejpeg($tn, $tmp)) {
-                                if (($tn = @file_get_contents($tmp)) !== false) {
+                            if (imagejpeg($tn, $tmp)) {
+                                if (($tn = file_get_contents($tmp)) !== false) {
                                     $this->thumbnail = $tn;
                                 }
                             }

@@ -220,7 +220,7 @@ main () {
                             declare Real winX = 0.;
                             declare Real winY = 0.;
                             declare Text pos = winX ^ " " ^ winY;
-                           // LibManialink_Anim("<frame posn=\"" ^ pos ^ "\" scale=\"0\" id=\"" ^ windowId ^ "\" />", 250, "EaseOutLinear");
+                            
                             closeWindow = True;
                             lastAction = Now;
                           }
@@ -263,6 +263,5 @@ main () {
 
 	}
 
-	// LibManialink_AnimLoop();
 }  //end of window
 --></script>
