@@ -7,7 +7,6 @@ use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\ChatAdmin\ChatAdmin;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 
 class ParameterDialog extends Window
@@ -18,11 +17,26 @@ class ParameterDialog extends Window
     protected $frame;
     /** @var  Frame */
     protected $frm;
-    /** @var  Dropdown */
+    
     protected $compobox;
+    protected $compoboxScript;
 
     protected $adminAction;
     protected $adminParams;
+
+    protected static $dropdownItems = array(
+        "permanent",
+        "30 seconds",
+        "5 min",
+        "10 min",
+        "15 min",
+        "30 min",
+        "1 hour",
+        "1 day",
+        "5 day",
+        "week",
+        "month"
+    );
 
     /** @var ChatAdmin */
     public static $mainPlugin;
@@ -40,22 +54,10 @@ class ParameterDialog extends Window
         $inputbox->setContent('<frame posn="0 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("parameter", 100, true, "Give a reason", "Bad Behavior", null, null) . '</frame>');
         $this->frm->addComponent($inputbox);
 
-        $items = array(
-            "permanent",
-            "30 seconds",
-            "5 min",
-            "10 min",
-            "15 min",
-            "30 min",
-            "1 hour",
-            "1 day",
-            "5 day",
-            "week",
-            "month"
-        );
-        $this->compobox = new Dropdown("select", $items);
-        $this->compobox->setPosY(-6);
-        $this->compobox->setAlign("left", "top");
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "select", self::$dropdownItems);
+        $this->compobox = new \ManiaLive\Gui\Elements\Xml();
+        $this->compobox->setContent('<frame posn="0 -6 1">' . $dropDown[0] . '</frame>');
+        $this->compoboxScript = $dropDown[1];
 
 
         $this->frame = new Frame(0, 0, new Line());
@@ -75,6 +77,7 @@ class ParameterDialog extends Window
     protected function onShow()
     {
         if ($this->adminAction != "kick") {
+            $this->registerScript($this->compoboxScript);
             $this->frm->addComponent($this->compobox);
         }
     }
@@ -99,12 +102,9 @@ class ParameterDialog extends Window
             if (empty($inputbox['select'])) {
                 $inputbox['select'] = 0;
             }
-            $items = $this->compobox->getDropdownItems();
-            $params = $this->adminAction
-                . " " . $this->adminParams . " " . $inputbox['parameter']
-                . ", duration: " . $items[$inputbox['select']];
+            $params = $this->adminAction . " " . $this->adminParams . " " . $inputbox['parameter'] . ", duration: " . self::$dropdownItems[$inputbox['select']];
             $prms = explode(" ", $this->adminParams);
-            self::$mainPlugin->addActionDuration($prms[0], $this->adminAction, $items[$inputbox['select']]);
+            self::$mainPlugin->addActionDuration($prms[0], $this->adminAction, self::$dropdownItems[$inputbox['select']]);
         }
         AdminGroups::getInstance()->adminCmd($login, $params);
         $this->Erase($login);

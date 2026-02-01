@@ -18,7 +18,7 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
      * @param \ManiaLivePlugins\eXpansion\Votes\Structures\ManagedVote $vote
      * @param type $sizeX
      */
-    public function __construct($indexNumber, \ManiaLivePlugins\eXpansion\Votes\Structures\ManagedVote $vote, $sizeX)
+    public function __construct($indexNumber, \ManiaLivePlugins\eXpansion\Votes\Structures\ManagedVote $vote, $sizeX, $parentClass = null)
     {
         $sizeY = 10;
         $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround($indexNumber, $sizeX, $sizeY);
@@ -41,11 +41,14 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->ratio->setContent('<frame posn="68 -1 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($vote->command . "_ratios", 14, true, "Ratio", $vote->ratio, null, null) . '</frame>');
         $this->frame->addComponent($this->ratio);
 
-        $this->voters = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown($vote->command . "_voters", array("Select", "Active Players", "Players", "Everybody"), ($vote->voters + 1), 20);
-        $this->voters->setPosX(36);
-        $this->voters->setPosY(-1);
+        $this->voters = new \ManiaLive\Gui\Elements\Xml();
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, $vote->command . "_voters", array("Select", "Active Players", "Players", "Everybody"), ($vote->voters + 1), 20);
+        $this->voters->setContent('<frame posn="86 -1 1">' . $dropDown[0] . '</frame>');
         $this->frame->addComponent($this->voters);
-
+        if ($parentClass != null) {
+            $parentClass->registerScript($dropDown[1]);
+        }
+        
         $this->addComponent($this->frame);
 
         $this->sizeX = $sizeX;
@@ -55,8 +58,6 @@ class ManagedVoteControl extends \ManiaLivePlugins\eXpansion\Gui\Control
 
     public function destroy()
     {
-        $this->voters->destroy();
-
         $this->frame->clearComponents();
         $this->frame->destroy();
         $this->destroyComponents();

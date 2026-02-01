@@ -62,12 +62,41 @@ class Database extends ExpPlugin
     public function onTick()
     {
         if ($this->config->enableBackup) {
-            $interval = (intval($this->config->backupInterval * 60));
-            if ($interval < 1) {
-                $interval = 1;
-            }
-            if (time() % $interval == 0) {
-                $this->exportToSql(null, array("filename" => $this->storage->serverLogin . "_" . date("d-m-Y")));
+            if (time() % (60 * 15) == 0) { // check every 15 minutes
+                $var = MetaData::getInstance()->getVariable('autoBackupFiles');
+                $params = $var->getRawValue();
+
+                // check if we need to do a backup
+                $lastBackupTime = 0;
+                if (!empty($params)) {
+                    $lastBackupTime = array_keys($params)[count($params) - 1];
+                }
+                if (time() - $lastBackupTime < ($this->config->backupInterval * 60 * 60)) {
+                    return;
+                }
+
+                $date = date("Y-m-d_H-i");
+                $this->exportToSql(null, array("filename" => $this->storage->serverLogin . "_" . $date));
+
+                $params[time()] = $this->storage->serverLogin . "_" . $date . ".sql";
+
+                $retention = intval($this->config->backupRetention);
+                if ($retention < 1) {
+                    $retention = 1;
+                }
+                $cutoff = time() - ($retention * 24 * 60 * 60); // in days
+                foreach ($params as $time => $filename) {
+                    if ($time < $cutoff) {
+                        unset($params[$time]);
+                        $filePath = "./backup/" . $filename;
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                }
+
+                $var->setRawValue($params);
+                \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
             }
         }
     }

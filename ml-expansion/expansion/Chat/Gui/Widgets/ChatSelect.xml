@@ -1,0 +1,6 @@
+<frame scale="0.9">
+    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "channel", $this->getParam("channels"), 0); ?>
+    <frame posn="35 0 1">
+        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, "Change", null, null, null, null, null, $this->getParam("action"), null, null, null, null, null, null); ?>
+    </frame>
+</frame>

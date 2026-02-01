@@ -46,9 +46,6 @@ class PluginList extends Window
      */
     protected $value_author;
 
-    /**
-     * @var Dropdown
-     */
     protected $select_group;
 
     /**

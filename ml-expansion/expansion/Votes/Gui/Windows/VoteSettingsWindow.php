@@ -66,7 +66,8 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->items[$x] = new \ManiaLivePlugins\eXpansion\Votes\Gui\Controls\ManagedVoteControl(
                 $x,
                 $vote,
-                $this->sizeX - 11
+                $this->sizeX - 11,
+                $this
             );
             $this->pager->addItem($this->items[$x]);
             $x++;
@@ -89,7 +90,8 @@ class VoteSettingsWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->items[$x] = new \ManiaLivePlugins\eXpansion\Votes\Gui\Controls\ManagedVoteControl(
             $x,
             $vote,
-            $this->sizeX - 11
+            $this->sizeX - 11,
+            $this
         );
         $this->pager->addItem($this->items[$x]);
 

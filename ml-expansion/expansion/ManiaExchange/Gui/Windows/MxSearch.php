@@ -47,7 +47,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         parent::onConstruct();
 
-        $config = \ManiaLive\DedicatedApi\Config::getInstance();
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
         $this->storage = \ManiaLive\Data\Storage::getInstance();
 
@@ -185,6 +184,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $query = "https://tm.mania.exchange/api/maps?" . $this->fields . "&" . $out . '&order1=0&count=100';
         }
 
+        /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess $access */
         $access = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
@@ -195,6 +195,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $this->style->setSelected(intval($style));
         }
         $key = "";
+        /** @var Config $config */
         $config = Config::getInstance();
 
         if ($config->key) {
@@ -288,6 +289,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         $buttons = array();
 
+        /** @var Config $config */
         $config = Config::getInstance();
 
         if ($isadmin) {
@@ -344,8 +346,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $this->items = array();
         $this->maps = null;
-        $this->style->destroy();
-        $this->lenght->destroy();
         $this->pager->destroy();
         $this->pager = null;
         $this->connection = null;

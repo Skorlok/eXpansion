@@ -61,7 +61,20 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->displayWidget();
     }
 
+    public function onBeginMap($map, $warmUp, $matchContinuation)
+    {
+        $this->bestRuns = array();
+    }
+
     public function onEndMatch($rankings, $winnerTeamOrMap)
+    {
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->bestRuns = array();
+    }
+
+    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
         if ($this->widget instanceof Widget) {
             $this->widget->erase();

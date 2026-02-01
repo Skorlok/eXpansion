@@ -235,6 +235,10 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         try {
             $data = file_get_contents($serverPath);
+            if ($data === false) {
+                $this->console('Error loading : ' . $serverPath . ' could not read file?');
+                return;
+            }
             $xml = simplexml_load_string($data);
             if (!$xml) {
                 $this->console("Error loading : ". $serverPath . " invalid XML?");

@@ -41,7 +41,7 @@ class ManiaExchange extends ExpPlugin
 
     /** @var StdClass $mxInfo */
     public static $mxInfo = null;
-    public static $mxReplays = null;
+    public static $mxReplays = array();
     public static $openInfosAction = null;
 
     public function eXpOnInit()
@@ -141,7 +141,7 @@ class ManiaExchange extends ExpPlugin
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         self::$mxInfo = null;
-        self::$mxReplays = null;
+        self::$mxReplays = array();
 
         $fields = "fields=MapId,MapUid,Name,GbxMapName,UploadedAt,UpdatedAt,Uploader.Name,Tags,Images,MapType,MoodFull,Routes,Difficulty,Length,AwardCount,TitlePack,ReplayCount,Feature.Comment";
 

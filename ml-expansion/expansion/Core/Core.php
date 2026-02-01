@@ -661,7 +661,7 @@ EOT;
 						$scores[] = array(
 							'rank'		=> intval($rank[1]),
 							'login'		=> $rank[0],
-							'nickName'	=> self::$players[$rank[0]],
+							'nickName'	=> (isset(self::$players[$rank[0]]) ? self::$players[$rank[0]] : $rank[0]),
 							'bestTime'		=> intval($rank[6]),
 							'score'		=> intval($rank[9]),
 							'bestCheckpoints'		=> $cps,

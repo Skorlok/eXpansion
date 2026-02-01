@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+
 class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
 {
 
@@ -27,7 +29,6 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\DropDownScript();
         $this->script->setParam("name", $name);
 
-        $this->values = array();
         $this->name = $name;
         $this->setSize($sizeX, 10);
 
@@ -60,7 +61,7 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $this->frame->setAlign("center", "center");
         $this->frame->setSizeY((sizeof($items) + 1) * 6);
         $this->frame->setScale(0.9);
-        $this->values = array();
+
         $this->addItems($items);
         $this->addComponent($this->frame);
         $this->setSelected($selectedIndex);
@@ -71,43 +72,26 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $this->values = array();
         $this->items = array();
         foreach ($items as $item) {
-            $this->addEntry($item);
+            $x = count($this->items);
+            $obj = new \ManiaLib\Gui\Elements\Label($this->sizeX);
+            $obj->setText($item);
+            $obj->setAlign("left", "center");
+            $obj->setStyle("TextValueMedium");
+            $obj->setScriptEvents(true);
+            $obj->setTextSize(1);
+            $obj->setFocusAreaColor1('000');
+            $obj->setFocusAreaColor2('3af');
+            $obj->setBgcolor("000");
+            $obj->setBgcolorFocus("3af");
+            $obj->setId($this->name . $x);
+            $obj->setPosZ($this->getPosZ() + 5);
+            $this->items[$x] = $obj;
+            $this->frame->addComponent($this->items[$x]);
+            $this->values[$x] = $item;
+            $x++;
+
+            $this->script->setParam("values", $this->values);
         }
-    }
-
-    public function addEntry($item)
-    {
-        $x = count($this->items);
-        $obj = new \ManiaLib\Gui\Elements\Label($this->sizeX);
-        $obj->setText($item);
-        $obj->setAlign("left", "center");
-        $obj->setStyle("TextValueMedium");
-        $obj->setScriptEvents(true);
-        $obj->setTextSize(1);
-        $obj->setFocusAreaColor1('000');
-        $obj->setFocusAreaColor2('3af');
-        $obj->setBgcolor("000");
-        $obj->setBgcolorFocus("3af");
-        $obj->setId($this->name . $x);
-        $obj->setPosZ($this->getPosZ() + 5);
-        $this->items[$x] = $obj;
-        $this->frame->addComponent($this->items[$x]);
-        $this->values[$x] = $item;
-        $x++;
-
-        $this->script->setParam("values", $this->values);
-        
-    }
-
-    public function getValueByIndex($index)
-    {
-        if (array_key_exists($index, $this->values))
-            return $this->values[$index];
-    }
-
-    public function getDropdownItems()
-    {
-        return $this->values;
     }
 
     public function setSelected($index)
@@ -115,11 +99,6 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
         $this->selectedIndex = $index;
         $this->label->setText($this->values[intval($index)]);
         $this->script->setParam("selected", intval($index));
-    }
-
-    public function getSelected()
-    {
-        return $this->selectedIndex;
     }
 
     public function onIsRemoved(\ManiaLive\Gui\Container $target)
@@ -131,5 +110,32 @@ class Dropdown extends \ManiaLivePlugins\eXpansion\Gui\Control implements \Mania
     public function getScript()
     {
         return $this->script;
+    }
+
+    public static function getXML($callerClass, $name, $items = array("initial"), $selectedIndex = 0, $sizeX = 35)
+    {
+        $xml = '<frame>
+            <entry id="' . $name . 'e" posn="1000 1000 0" sizen="' . $sizeX . ' 6" style="" scriptevents="1" textsize="1" textcolor="000" name="' . $name . '"/>
+            <label id="' . $name . 'l" posn="0 0 4" sizen="' . $sizeX . ' 4" halign="left" valign="center" bgcolor="000" bgcolorfocus="3af" scriptevents="1" textsize="1" text="' . $items[$selectedIndex] . '" focusareacolor1="000" focusareacolor2="3af"/>
+            <frame posn="0 5.4 2" scale="0.9" id="' . $name . 'f">';
+
+        foreach ($items as $index => $item) {
+            $xml .= '<label id="' . $name . $index . '" posn="0 -' . ($index*7) . ' 5" sizen="' . $sizeX . ' 7" halign="left" valign="center" bgcolor="000" bgcolorfocus="3af" scriptevents="1" textsize="1" text="' . $item . '" focusareacolor1="000" focusareacolor2="3af"/>';
+        }
+
+        $xml .='</frame>
+        </frame>';
+
+        $script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\DropDownScript();
+        $script->setParam("name", $name);
+        $script->setParam("values", $items);
+        $script->setParam("selected", $selectedIndex);
+        if ($callerClass instanceof Widget) {
+            $callerClass->registerScript($script);
+        } else {
+            return array($xml, $script);
+        }
+
+        return $xml;
     }
 }
