@@ -43,6 +43,11 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public $mxPlugin;
     public $fields = "fields=MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name";
 
+    public $styleOptions = array("All", "Race", "Fullspeed", "Tech", "RPG", 'LOL', 'PressForward', 'SpeedTech', 'Multilap', 'Offroad');
+    public $lenghtOptions = array("All", "0-15sec", "15-30sec", "30-45sec", "45-1min", "1min+");
+    public $styleScript;
+    public $lenghtScript;
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -63,19 +68,25 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->inputAuthor->setContent('<frame posn="38 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, "Author name", null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->inputAuthor);
 
-        $items = array("All", "Race", "Fullspeed", "Tech", "RPG", 'LOL', 'PressForward', 'SpeedTech', 'Multilap', 'Offroad');
-        $this->style = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("style", $items);
-        $this->style->setPosX(76);
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "style", $this->styleOptions);
+        $this->style = new \ManiaLive\Gui\Elements\Xml();
+        $this->style->setContent('<frame posn="76 0 1">' . $dropDown[0] . '</frame>');
         $this->searchframe->addComponent($this->style);
 
-        $items = array("All", "0-15sec", "15-30sec", "30-45sec", "45-1min", "1min+");
-        $this->lenght = new \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown("length", $items);
-        $this->lenght->setPosX(79);
+        $this->styleScript = $dropDown[1];
+        $this->registerScript($this->styleScript);
+
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "length", $this->lenghtOptions);
+        $this->lenght = new \ManiaLive\Gui\Elements\Xml();
+        $this->lenght->setContent('<frame posn="114 0 1">' . $dropDown[0] . '</frame>');
         $this->searchframe->addComponent($this->lenght);
+
+        $this->lenghtScript = $dropDown[1];
+        $this->registerScript($this->lenghtScript);
 
         $this->filter = new CheckboxScripted();
         $this->filter->setText("Maps from all titles pack");
-        $this->filter->setPosX(79);
+        $this->filter->setPosX(149);
         $this->searchframe->addComponent($this->filter);
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
@@ -136,7 +147,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($author != null) {
                 $out .= "&author=" . rawurlencode($author);
             }
-            if ($style != null) {
+            if ($style !== null) {
                 $out .= "&tag=" . $style;
             }
             if (!$filter) {
@@ -153,10 +164,10 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             if ($author != null) {
                 $out .= "&author=" . rawurlencode($author);
             }
-            if ($style != null) {
+            if ($style !== null) {
                 $out .= "&tag=" . $style;
             }
-            if ($length != null) {
+            if ($length !== null) {
                 switch ($length) {
                     case 0:
                         $out .= "&lengthmin=0&lengthmax=15000";
@@ -188,12 +199,21 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $access = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
-        if ($length !== null) {
-            $this->lenght->setSelected(intval($length) + 1);
-        }
-        if ($style !== null) {
-            $this->style->setSelected(intval($style));
-        }
+
+
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "length", $this->lenghtOptions, ($length !== null) ? intval($length) + 1 : 0);
+        $this->lenght->setContent('<frame posn="114 0 1">' . $dropDown[0] . '</frame>');
+        $this->unregisterScript($this->lenghtScript);
+        $this->lenghtScript = $dropDown[1];
+        $this->registerScript($this->lenghtScript);
+
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "style", $this->styleOptions, intval($style));
+        $this->style->setContent('<frame posn="76 0 1">' . $dropDown[0] . '</frame>');
+        $this->unregisterScript($this->styleScript);
+        $this->styleScript = $dropDown[1];
+        $this->registerScript($this->styleScript);
+
+
         $key = "";
         /** @var Config $config */
         $config = Config::getInstance();

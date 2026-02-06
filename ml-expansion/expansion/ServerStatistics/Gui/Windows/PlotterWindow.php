@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Windows;
 
+use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
+
 class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
@@ -47,14 +49,22 @@ class PlotterWindow extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         $i = 0;
         foreach ($plots as $u => $plot) {
-            $plotterData .= '<curve color="' . ($i == 0 ? $color0 : $color1) . '" style="thin">';
+            if (substr(eXpStorage::getInstance()->version->build, 0, 4) >= 2017) {
+                $plotterData .= '<curve color="' . ($i == 0 ? $color0 : $color1) . '" style="thin">';
+            } else {
+                $plotterData .= '<curve color="' . ($i == 0 ? $color0 : $color1) . '">';
+            }
             foreach ($plot as $i => $vals) {
                 $plotterData .= '<point coords="' . $plots[$u][$i][0] . ' ' . $plots[$u][$i][1] . '" />' . "\n";
             }
             $plotterData .= '</curve>';
         }
 
-        $plotterData .= '<curve color="000" width="0.5" style="thin">';
+        if (substr(eXpStorage::getInstance()->version->build, 0, 4) >= 2017) {
+            $plotterData .= '<curve color="000" width="0.5" style="thin">';
+        } else {
+            $plotterData .= '<curve color="000" width="0.5">';
+        }
         $plotterData .= '<point coords="0.00 0.00" />';
         $plotterData .= '<point coords="0.001 ' . $limitY . '" />';
         $plotterData .= '</curve>';

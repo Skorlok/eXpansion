@@ -305,4 +305,11 @@ abstract class Window extends \ManiaLive\Gui\Window
     {
         $this->_scripts[] = $script;
     }
+
+    public function unregisterScript(\ManiaLivePlugins\eXpansion\Gui\Structures\Script $script)
+    {
+        if (($key = array_search($script, $this->_scripts)) !== false) {
+            unset($this->_scripts[$key]);
+        }
+    }
 }

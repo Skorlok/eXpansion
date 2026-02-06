@@ -29,7 +29,6 @@ use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad;
 use ManiaLivePlugins\eXpansion\AutoLoad\Gui\Controls\Plugin;
 use ManiaLivePlugins\eXpansion\Core\types\config\MetaData;
-use ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 
@@ -47,6 +46,7 @@ class PluginList extends Window
     protected $value_author;
 
     protected $select_group;
+    protected $select_groupScript;
 
     /**
      * @var Label
@@ -119,8 +119,7 @@ class PluginList extends Window
         $this->input_author->setContent('<frame posn="37 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, __("Author", $login), null, null, null) . '</frame>');
         $this->frame->addComponent($this->input_author);
 
-        $this->select_group = new Dropdown("group", array('Select'), 0, 25);
-        $this->select_group->setPosX(74);
+        $this->select_group = new \ManiaLive\Gui\Elements\Xml();
         $this->frame->addComponent($this->select_group);
 
         $this->button_search = new \ManiaLive\Gui\Elements\Xml();
@@ -185,9 +184,12 @@ class PluginList extends Window
             $groups2 = array_keys($groups);
             sort($groups2, SORT_STRING);
             $this->elements = $groups2;
-            $this->select_group->addItems($groups2);
-            $this->select_group->setSelected(0);
             $this->value_group = $this->elements[0];
+
+            $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "group", $this->elements, 0, 25);
+            $this->select_group->setContent('<frame posn="74 0 1">' . $dropDown[0] . '</frame>');
+            $this->select_groupScript = $dropDown[1];
+            $this->registerScript($this->select_groupScript);
         }
 
         $x = 0;
@@ -256,7 +258,14 @@ class PluginList extends Window
         $this->input_author->setContent('<frame posn="37 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, __("Author", $login), $params['author'], null, null) . '</frame>');
         $this->value_group = $this->elements[$groupIndex];
         $this->populate($this->autoLoad, $this->pluginList, $groupIndex, $params['name'], $params['author']);
-        $this->select_group->setSelected($groupIndex);
+
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "group", $this->elements, $groupIndex, 25);
+        $this->select_group->setContent('<frame posn="74 0 1">' . $dropDown[0] . '</frame>');
+        
+        $this->unregisterScript($this->select_groupScript);
+        $this->select_groupScript = $dropDown[1];
+        $this->registerScript($this->select_groupScript);
+
         $this->redraw($login);
     }
 
@@ -267,7 +276,14 @@ class PluginList extends Window
         $this->value_group = $params['group'] == "" ? 0 : $this->elements[$params['group']];
 
         $this->populate($this->autoLoad, $this->pluginList, $params['group'], $params['name'], $params['author']);
-        $this->select_group->setSelected($params['group']);   
+
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "group", $this->elements, $params['group'], 25);
+        $this->select_group->setContent('<frame posn="74 0 1">' . $dropDown[0] . '</frame>');
+        
+        $this->unregisterScript($this->select_groupScript);
+        $this->select_groupScript = $dropDown[1];
+        $this->registerScript($this->select_groupScript);
+
         $this->redraw($login);
     }
 }
