@@ -33,10 +33,19 @@ class JobRunner
 
     protected static $_tmpPath;
 
-    private $pendingJobs = [];
+    private $pendingJobs = array();
 
+    /**
+     * runningJobs:
+     * [
+     *   jobHash => [
+     *       'process' => resource,
+     *       'jobData' => JobData
+     *   ]
+     * ]
+     */
     /** @var JobData[] */
-    private $runningJobs = [];
+    private $runningJobs = array();
 
     private $exec = false;
 
@@ -51,15 +60,10 @@ class JobRunner
             self::$_phpExecutable = $phpExecutable;
             self::$_tmpPath = $tmpPath;
 
-            $jobRunner = new JobRunner($id);
-            self::$_instance = $jobRunner;
+            self::$_instance = new JobRunner($id);
         }
 
         return self::$_instance;
-    }
-
-    protected function getCmd($cmd) {        
-        return '"'. PHP_BINARY .'" '. $cmd;
     }
 
     /**
@@ -67,24 +71,10 @@ class JobRunner
      */
     protected function __construct($id)
     {
-        if ($id) {
-            $this->_id = $id;
-        } else {
-            $this->_id = md5(spl_object_hash($this) . microtime());
-        }
-        // Check if exec is enabled on this server.
-        if (substr(php_uname(), 0, 7) == "Windows") {
-            try {                
-                $WshShell = new \COM("WScript.Shell");
-                $WshShell->Run($this->getCmd('-v /C dir /S %windir%'), 0, false);
-                $this->exec = true;
-            } catch (\Exception $e) {
-                // nothing exec is disabled.
-                throw $e;
-            }
-        } else if(exec('echo EXEC') == 'EXEC'){
-            $this->exec = true;
-        }
+        $this->_id = $id ?: md5(spl_object_hash($this) . microtime(true));
+
+        // proc_open require shell before 7.4, so if php < 7.4, we check if shell is available, otherwise we fallback to direct execution.
+        $this->exec = function_exists('proc_open') && (version_compare(PHP_VERSION, '7.4', '>=') || (file_exists('/bin/sh') && is_executable('/bin/sh')));
     }
 
     /**
@@ -110,9 +100,8 @@ class JobRunner
         $fp = fopen("$jobDir/lock", "w+");
         if (flock($fp, LOCK_EX)) {
             return $fp;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -158,39 +147,73 @@ class JobRunner
     {
         $jobData = new JobData();
 
-        if ($this->exec) {
-            $jobDir = $this->_getJobDirectory($job);
-            $logFile = realpath($this->getDirectory()) . '/run.log';
-            $lockFile = $this->_lockJob($jobDir);
-
-            if ($lockFile) {
-                // $jobdir = str_replace("/", DIRECTORY_SEPARATOR, $jobDir);
-
-                $jobData->lockFile = $lockFile;
-                $jobData->job = $job;
-                $jobData->jobDir = $jobDir;
-
-                $this->runningJobs[spl_object_hash($job)] = $jobData;
-
-                $data = $job->getData();
-                $data['___class'] = get_class($job);
-
-                file_put_contents("$jobDir/in.serialize", serialize($data));
-
-                $cmd = $this->getCmd('"'.realpath(__DIR__ . "/../../bin/AsynchronousJobsRun.php") . "\" $jobDir >> $logFile");
-                if (substr(php_uname(), 0, 7) == "Windows") {
-                    $WshShell = new \COM("WScript.Shell");
-                    $WshShell->Run("$cmd /C dir /S %windir%", 0, false);
-                } else {
-                    exec($cmd . " &");
-                }
-
-            } else {
-                $this->pendingJobs[] = $job;
-            }
-        }else {
+        if (!$this->exec) {
             $job->run();
             $job->end($jobData);
+            return;
+        }
+
+        $jobDir = $this->_getJobDirectory($job);
+        $this->_prepareDirectory($this->getDirectory());
+
+        $logFile = $this->getDirectory() . '/run.log';
+        $lockFile = $this->_lockJob($jobDir);
+
+        if (!$lockFile) {
+            $this->pendingJobs[] = $job;
+            return;
+        }
+
+        $jobData->lockFile = $lockFile;
+        $jobData->job = $job;
+        $jobData->jobDir = $jobDir;
+
+        $data = $job->getData();
+        $data['___class'] = get_class($job);
+
+        file_put_contents("$jobDir/in.serialize", serialize($data));
+
+        $phpBinary = PHP_BINARY;
+        $script = realpath(__DIR__ . "/../../bin/AsynchronousJobsRun.php");
+
+        $descriptorSpec = array(
+            0 => array("pipe", "r"),
+            1 => array("file", $logFile, "a"),
+            2 => array("file", $logFile, "a"),
+        );
+
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        if ($isWindows) {
+            // start /B "" is used to start a process without opening a new window, and it works on Windows.
+            $command = 'start /B "" ' . escapeshellarg($phpBinary) . ' ' . escapeshellarg($script) . ' ' . escapeshellarg($jobDir);
+        } else if (version_compare(PHP_VERSION, '7.4', '>=')) {
+            // Linux >= 7.4, shell not needed, proc_open can execute directly
+            $command = array($phpBinary, $script, $jobDir);
+        } else {
+            // Linux <7.4, shell needed
+            $command = escapeshellarg($phpBinary) . ' ' . escapeshellarg($script) . ' ' . escapeshellarg($jobDir);
+        }
+
+        $process = proc_open(
+            $command,
+            $descriptorSpec,
+            $pipes
+        );
+
+        if (is_resource($process)) {
+
+            foreach ($pipes as $pipe) {
+                fclose($pipe);
+            }
+
+            $jobHash = spl_object_hash($job);
+
+            $this->runningJobs[$jobHash] = array(
+                'process' => $process,
+                'jobData' => $jobData
+            );
+        } else {
+            $this->pendingJobs[] = $job;
         }
     }
 
@@ -215,29 +238,40 @@ class JobRunner
     protected function _getJobResult(Job $job)
     {
         $jobHash = spl_object_hash($job);
-        if (isset($this->runningJobs[$jobHash])) {
-            $jobDir = $this->_getJobDirectory($job);
-            if (file_exists("$jobDir/out.serialize")) {
-                $data = unserialize(file_get_contents("$jobDir/out.serialize"));
 
-                $jobData = $this->runningJobs[$jobHash];
-
-                $job->setData($data);
-                $job->end($jobData);
-
-                // Delete data on this job.
-                flock($jobData->lockFile, LOCK_UN);
-                fclose($jobData->lockFile);
-                $this->rm($jobData->jobDir);
-
-                unset($this->runningJobs[$jobHash]);
-                return true;
-            } else {
-                return false;
-            }
+        if (!isset($this->runningJobs[$jobHash])) {
+            return true;
         }
 
-        return true;
+        $entry = $this->runningJobs[$jobHash];
+        $process = $entry['process'];
+        $jobData = $entry['jobData'];
+
+        $status = proc_get_status($process);
+
+        // reap zombie process, so not need Tini anymore
+        if (!$status['running']) {
+            proc_close($process);
+        }
+
+        $jobDir = $jobData->jobDir;
+
+        if (file_exists("$jobDir/out.serialize")) {
+            $data = unserialize(file_get_contents("$jobDir/out.serialize"));
+
+            $job->setData($data);
+            $job->end($jobData);
+
+            // Delete data on this job.
+            flock($jobData->lockFile, LOCK_UN);
+            fclose($jobData->lockFile);
+            $this->rm($jobData->jobDir);
+
+            unset($this->runningJobs[$jobHash]);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -247,7 +281,8 @@ class JobRunner
      *
      * @return bool
      */
-    protected function rm($dir) {
+    protected function rm($dir)
+    {
         if (!file_exists($dir)) {
             return true;
         }
@@ -264,7 +299,6 @@ class JobRunner
             if (!$this->rm($dir . DIRECTORY_SEPARATOR . $item)) {
                 return false;
             }
-
         }
 
         return rmdir($dir);
@@ -288,18 +322,21 @@ class JobRunner
      */
     public function proccess()
     {
-        foreach ($this->runningJobs as $jobData) {
-            $this->isRunning($jobData->job);
+        foreach ($this->runningJobs as $entry) {
+            $this->isRunning($entry['jobData']->job);
         }
 
         foreach ($this->pendingJobs as $job) {
             $this->start($job);
         }
+
+        $this->pendingJobs = array();
     }
 
+    
     public function wait(Job $job, $sleepTime = 1)
     {
-        while ($job->isRunning()){
+        while ($this->isRunning($job)) {
             $this->sleep($sleepTime);
         }
     }
@@ -317,7 +354,8 @@ class JobRunner
         }
     }
 
-    protected function sleep($sleepTime) {
+    protected function sleep($sleepTime)
+    {
         if (is_float($sleepTime)) {
             usleep((int) ($sleepTime * 1000000));
         } else {
@@ -330,6 +368,4 @@ class JobRunner
         $this->waitForAll();
         $this->rm($this->getDirectory());
     }
-
-
 }

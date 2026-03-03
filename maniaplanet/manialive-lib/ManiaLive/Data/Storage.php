@@ -504,6 +504,8 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 	 */
 	function getPlayerObject($login)
 	{
+		if (!is_string($login))
+			return null;
 		if (isset($this->players[$login]))
 			return $this->players[$login];
 		elseif (isset($this->spectators[$login]))

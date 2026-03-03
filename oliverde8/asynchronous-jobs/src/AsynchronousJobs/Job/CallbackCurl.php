@@ -2,8 +2,6 @@
 
 namespace oliverde8\AsynchronousJobs\Job;
 use oliverde8\AsynchronousJobs\Callback;
-use oliverde8\AsynchronousJobs\Job;
-use oliverde8\AsynchronousJobs\JobData;
 
 /**
  * @author      Oliver de Cramer (oliverde8 at gmail.com)

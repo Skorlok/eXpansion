@@ -6,6 +6,7 @@ use Exception;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows\MusicListWindow;
 use ManiaLivePlugins\eXpansion\MusicBox\Structures\Song;
@@ -20,6 +21,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $music = null;
     private $ignore = false;
     private $counter = 0;
+    private $dataAccess;
     private $widget;
     private $action;
 
@@ -35,10 +37,10 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->config = Config::getInstance();
         Gui\Windows\MusicListWindow::$musicPlugin = $this;
 
-        $command = $this->registerChatCommand("music", "mbox", 0, true);
-        $command = $this->registerChatCommand("music", "mbox", 1, true);
-        $command = $this->registerChatCommand("mlist", "mbox", 0, true); // xaseco
-        $command = $this->registerChatCommand("mlist", "mbox", 1, true); // xaseco
+        $this->registerChatCommand("music", "mbox", 0, true);
+        $this->registerChatCommand("music", "mbox", 1, true);
+        $this->registerChatCommand("mlist", "mbox", 0, true); // xaseco
+        $this->registerChatCommand("mlist", "mbox", 1, true); // xaseco
 
         /** @var ActionHandler @aH */
         $aH = ActionHandler::getInstance();
@@ -60,20 +62,9 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     public function eXpOnReady()
     {
-        try {
-            foreach ($this->getMusicCsv() as $music) {
-                $this->songs[] = Structures\Song::fromArray($music);
-            }
-            if ($this->config->shuffle) {
-                shuffle($this->songs);
-            }
-        } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . $e->getMessage());
-            $this->enabled = false;
-        }
+        $this->dataAccess = DataAccess::getInstance();
 
-        $this->music = $this->connection->getForcedMusic();
-        $this->showWidget();
+        $this->initMusic();
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -81,18 +72,21 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         /** @var Config $config */
         $this->config = Config::getInstance();
 
-        $this->songs = array();
-        try {
-            foreach ($this->getMusicCsv() as $music) {
-                $this->songs[] = Structures\Song::fromArray($music);
-            }
-            if ($this->config->shuffle) {
-                shuffle($this->songs);
-            }
-        } catch (\Exception $e) {
-            $this->eXpChatSendServerMessage('MusicBox $fff»» #error#' . $e->getMessage());
-            $this->enabled = false;
+        if ($var->getName() == "url") {
+            $this->initMusic();
         }
+    }
+
+    public function initMusic()
+    {
+        $this->enabled = false;
+        $this->connection->setForcedMusic(false, "");
+        $this->songs = array();
+        $this->wishes = array();
+        $this->ignore = false;
+        $this->widget->erase();
+
+        $this->download(rtrim($this->config->url, "/") . "/index.csv");
     }
 
     public function eXpOnUnload()
@@ -104,6 +98,9 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             Gui\Windows\MusicListWindow::$musicPlugin = null;
 			$this->connection->setForcedMusic(false, "");
+            $this->songs = array();
+            $this->wishes = array();
+            $this->music = null;
 		} catch (Exception $e) {
 			return;
 		}
@@ -111,44 +108,37 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function download($url)
     {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Manialive/eXpansion MusicBox [getter] ver 0.1");
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $data = curl_exec($ch);
-        $status = curl_getinfo($ch);
-        unset($ch);
+        $options = array(CURLOPT_CONNECTTIMEOUT => 30, CURLOPT_TIMEOUT => 300);
+        $this->dataAccess->httpCurl($url, array($this, "getMusicCsv"), null, $options);
+    }
+
+    public function getMusicCsv($job, $jobData)
+    {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
+        $data = $job->getResponse();
 
         $ag = AdminGroups::getInstance();
 
         if ($data === false) {
             $this->console("Server is down");
             $ag->announceToPermission(Permission::SERVER_ADMIN, "Musicbox error: server is unreachable.");
-            return false;
+            return;
         }
 
-        if ($status["http_code"] !== 200) {
-            if ($status["http_code"] == 301) {
+        if ($code !== 200) {
+            if ($code == 301 || $code == 302) {
                 $this->console("Link has moved");
                 $ag->announceToPermission(Permission::SERVER_ADMIN, "MusicBox error: link is moved!");
-                return false;
+                return;
             }
-            $this->console("Http status : " . $status["http_code"]);
+            $this->console("Http status : " . $code);
             $msg = eXpGetMessage("MusicBox error http-code: %s");
-            $ag->announceToPermission(
-                Permission::SERVER_ADMIN,
-                $msg,
-                array($status["http_code"])
-            );
-            return false;
+            $ag->announceToPermission(Permission::SERVER_ADMIN, $msg, array($code));
+            return;
         }
 
-        return $data;
-    }
-
-    public function getMusicCsv()
-    {
-        $data = $this->download(rtrim($this->config->url, "/") . "/index.csv");
+        $this->songs = array();
         if (!$data) {
             $this->enabled = false;
             $this->connection->setForcedMusic(false, "");
@@ -161,7 +151,6 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $x = 0;
         $keys = array();
-        $array = array();
 
         foreach ($data as $line) {
             $x++;
@@ -174,10 +163,11 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 }, str_getcsv($line, ";", '"', '\\'));
                 continue;
             }
-            $array[] = array_combine($keys, array_map('trim', str_getcsv($line, ";", '"', '\\')));
+            $this->songs[] = Structures\Song::fromArray(array_combine($keys, array_map('trim', str_getcsv($line, ";", '"', '\\'))));
         }
 
-        return $array;
+        $this->onEndMatch(null, null);
+        $this->onBeginMap(null, null, null);
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)

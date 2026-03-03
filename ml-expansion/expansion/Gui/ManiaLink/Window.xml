@@ -1,0 +1,18 @@
+<manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="normal" name="<?php echo $this->getWidgetName() ?>">
+<?php echo $this->getLanguages() ?>
+	<frame posn="0 0 -60" id="<?php echo $this->getWidgetName() ?>">
+		<frame posn="0 0 -0.1" id="windowFrame">
+			<quad posn="-6 0 0" sizen="152 31" halign="left" valign="top" bgcolor="471A58" opacity="0.9"/>
+			<quad id="MainWindow" posn="-6 -29 1.0E-5" sizen="152 6" halign="right" valign="bottom" opacity="0.9" image="file://Media/Manialinks/Common/Home/maniahome-title.dds" rot="-180"/>
+			<quad id="MainWindow" posn="-6 6 2.0E-5" sizen="152 37" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="7575CA"/>
+			<quad posn="-6 6 3.0E-5" sizen="152 6" halign="left" valign="top" bgcolor="7575CA" opacity="0.8"/>
+			<label id="TitlebarText" posn="0 1 4.0E-5" sizen="60 4" halign="left" valign="bottom" style="TextRaceMessageBig" textsize="1" textcolor="fff" text="Panneau de contrôle "/>
+			<quad id="Titlebar" posn="-6 6 5.0E-5" sizen="152 6" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="7575CA"/>
+			<quad id="Close" posn="144 1 5" sizen="4 4" halign="right" valign="bottom" image="file://Media/Manialinks/Common/Chat/buddy-buddy-deny-focus.dds" imagefocus="file://Media/Manialinks/Common/Chat/buddy-buddy-deny.dds" scriptevents="1"/>
+			<frame posn="0 -7 7.0E-5"></frame>
+		</frame>
+		<frame posn="0 -7 7.0E-5">
+			<!-- contenue de la fenetre -->
+		</frame>
+	</frame>
+</manialink>
