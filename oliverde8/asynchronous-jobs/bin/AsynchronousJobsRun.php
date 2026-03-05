@@ -48,15 +48,15 @@ $class = $data['___class'];
 
 try {
     /** @var \oliverde8\AsynchronousJobs\Job $job */
-    echo "[" . date('Y-m-d H:i:s') . "] Starting Job with class : $class\n";
+    echo "[" . date('Y-m-d H:i:s') . "] Starting Job with PID : " . getmypid() . " and class : $class\n";
     $job = new $class();
     $job->setData($data);
     $job->run();
     $data = $job->getData();
-    echo "[" . date('Y-m-d H:i:s') . "] Ended Sucessfully Job with class : $class\n";
+    echo "[" . date('Y-m-d H:i:s') . "] Ended Sucessfully Job with PID : " . getmypid() . " and class : $class\n";
 } catch (Exception $e) {
     $job->setException($e);
-    echo "[" . date('Y-m-d H:i:s') . "] Error with job with class : $class\n";
+    echo "[" . date('Y-m-d H:i:s') . "] Error with job with PID : " . getmypid() . " and class : $class\n";
     echo $e->getTraceAsString();
     echo "\n";
 }

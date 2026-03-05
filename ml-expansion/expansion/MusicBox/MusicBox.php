@@ -166,6 +166,10 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->songs[] = Structures\Song::fromArray(array_combine($keys, array_map('trim', str_getcsv($line, ";", '"', '\\'))));
         }
 
+        if ($this->config->shuffle) {
+            shuffle($this->songs);
+        }
+
         $this->onEndMatch(null, null);
         $this->onBeginMap(null, null, null);
     }
