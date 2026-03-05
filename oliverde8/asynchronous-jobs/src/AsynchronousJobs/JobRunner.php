@@ -248,18 +248,28 @@ class JobRunner
         $jobData = $entry['jobData'];
 
         $status = proc_get_status($process);
-
-        // reap zombie process, so not need Tini anymore
-        if (!$status['running']) {
-            proc_close($process);
-        }
-
         $jobDir = $jobData->jobDir;
 
         if (file_exists("$jobDir/out.serialize")) {
             $data = unserialize(file_get_contents("$jobDir/out.serialize"));
 
+            // reap zombie process, so not need Tini anymore
+            proc_close($process);
+
             $job->setData($data);
+            $job->end($jobData);
+
+            // Delete data on this job.
+            flock($jobData->lockFile, LOCK_UN);
+            fclose($jobData->lockFile);
+            $this->rm($jobData->jobDir);
+
+            unset($this->runningJobs[$jobHash]);
+            return true;
+        } else if ($status['exitcode'] > 0) {
+            // Job finished with error
+            proc_close($process);
+
             $job->end($jobData);
 
             // Delete data on this job.
