@@ -11,6 +11,7 @@ use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
@@ -498,7 +499,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $msg = eXpGetMessage('#variable#%1$s #vote#initiated a vote..');
                 break;
         }
-        $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, 'wosnm')));
+        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm')));
 
         if ($this->checkVoteAutoPass()) {
             $this->handleEndVote(true);
@@ -584,7 +585,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
         PlayerSelection::Erase($login);
-        $this->startNewVote($login, 'Kick', 'Kick ' . $this->widget->handleSpecialChars($player->nickName) . ' $z$z?', $target);
+        $this->startNewVote($login, 'Kick', 'Kick ' . $this->widget->handleSpecialChars($player->cleanNickName) . ' $z$z?', $target);
     }
 
     public function vote_ban($login, $target = null)
@@ -597,7 +598,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
         PlayerSelection::Erase($login);
-        $this->startNewVote($login, 'Ban', 'Ban ' . $this->widget->handleSpecialChars($player->nickName) . ' $z$z?', $target);
+        $this->startNewVote($login, 'Ban', 'Ban ' . $this->widget->handleSpecialChars($player->cleanNickName) . ' $z$z?', $target);
     }
 
     public function selectPlayers($login, $callback)
@@ -684,7 +685,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         if ($cancelled) {
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# cancelled the vote!');
-            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($this->storage->getPlayerObject($login)->cleanNickName, 'wosnm'), $login));
         } else {
             $this->connection->chatSendServerMessage('Notice: Can\'t cancel a vote, no vote in progress!', $login);
         }
@@ -700,7 +701,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($this->currentVote) {
             $this->handleEndVote(true);
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action# pass the vote!');
-            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), $login));
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($this->storage->getPlayerObject($login)->cleanNickName, 'wosnm'), $login));
         } else {
             $this->connection->chatSendServerMessage('Notice: Can\'t pass a vote, no vote in progress!', $login);
         }

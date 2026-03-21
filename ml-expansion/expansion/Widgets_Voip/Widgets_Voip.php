@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_Voip;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -102,7 +102,7 @@ class Widgets_Voip extends ExpPlugin
     public function getNick($login)
     {
         $player = $this->storage->getPlayerObject($login);
-        $nick = Formatting::stripStyles($player->nickName);
+        $nick = Formatting::stripStyles($player->cleanNickName);
 
         return $nick;
     }

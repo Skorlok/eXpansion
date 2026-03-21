@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Endurance;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Time;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;

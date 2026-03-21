@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Maps\Gui\Controls;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 

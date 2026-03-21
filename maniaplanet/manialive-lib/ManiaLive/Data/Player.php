@@ -21,6 +21,8 @@ class Player extends \Maniaplanet\DedicatedServer\Structures\Player
 	////////////////////////////////////////
 	/** @var string */
 	public $nickName;
+	/** @var string */
+	public $cleanNickName;
 	/** @var int */
 	public $playerId;
 	/** @var int */

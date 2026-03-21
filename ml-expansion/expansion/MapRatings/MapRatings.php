@@ -3,11 +3,11 @@
 namespace ManiaLivePlugins\eXpansion\MapRatings;
 
 use ManiaLive\Gui\ActionHandler;
-use ManiaLib\Utils\Formatting;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\MapRatings\Gui\Windows\MapRatingsManager;
@@ -291,7 +291,7 @@ class MapRatings extends ExpPlugin
             //send msg
             if ($this->config->sendBeginMapNotices) {
                 if ($this->ratingTotal == 0 && $this->mxRatings->votecount == 0) {
-                    $this->eXpChatSendServerMessage($this->msg_noRating, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+                    $this->eXpChatSendServerMessage($this->msg_noRating, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
                 } else {
                     foreach ($this->storage->players as $login => $player) {
                         $this->sendRatingMsg($login, null);
@@ -569,7 +569,7 @@ class MapRatings extends ExpPlugin
             if ($this->config->mxKarmaEnabled && $this->mxRatings != null) {
 
                 if ($this->ratingTotal == 0 && $this->mxRatings->votecount == 0) {
-                    $this->eXpChatSendServerMessage($this->msg_noRating, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+                    $this->eXpChatSendServerMessage($this->msg_noRating, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
                     return;
                 }
                 if ($playerRating === null) {
@@ -602,19 +602,19 @@ class MapRatings extends ExpPlugin
                 }
 
                 if ($this->ratingTotal == 0) {
-                    $this->eXpChatSendServerMessage($this->msg_rating_only_mx, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $mxAverage, $this->mxRatings->votecount+$x, $playerRating));
+                    $this->eXpChatSendServerMessage($this->msg_rating_only_mx, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $mxAverage, $this->mxRatings->votecount+$x, $playerRating));
                 } else {
                     if ($this->mxRatings->votecount + $x == 0) {
-                        $this->eXpChatSendServerMessage($this->msg_rating_mx_no_votes, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $playerRating));
+                        $this->eXpChatSendServerMessage($this->msg_rating_mx_no_votes, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $playerRating));
                     } else {
-                        $this->eXpChatSendServerMessage($this->msg_rating_mx, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $mxAverage, $this->mxRatings->votecount+$x, $playerRating));
+                        $this->eXpChatSendServerMessage($this->msg_rating_mx, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $mxAverage, $this->mxRatings->votecount+$x, $playerRating));
                     }
                 }
 
             } else {
 
                 if ($this->ratingTotal == 0) {
-                    $this->eXpChatSendServerMessage($this->msg_noRating, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+                    $this->eXpChatSendServerMessage($this->msg_noRating, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
                     return;
                 }
                 if ($playerRating === null) {
@@ -628,7 +628,7 @@ class MapRatings extends ExpPlugin
 
                 $rating = ($this->rating / 5) * 100;
                 $rating = round($rating) . "%";
-                $this->eXpChatSendServerMessage($this->msg_rating, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $playerRating));
+                $this->eXpChatSendServerMessage($this->msg_rating, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $rating, $this->ratingTotal, $playerRating));
 
             }
         }
@@ -734,7 +734,7 @@ class MapRatings extends ExpPlugin
         //send msg
         if ($this->config->sendBeginMapNotices && !$this->config->mxKarmaEnabled) {
             if ($this->ratingTotal == 0) {
-                $this->eXpChatSendServerMessage($this->msg_noRating, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+                $this->eXpChatSendServerMessage($this->msg_noRating, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
             } else {
                 foreach ($this->storage->players as $login => $player) {
                     $this->sendRatingMsg($login, null);

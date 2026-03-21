@@ -10,6 +10,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Events\GameSettingsEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\ServerSettingsEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
@@ -536,6 +537,7 @@ EOT;
 							$scores[] = array(
                                 'login'				=> isset($item['login']) ? $item['login'] : "",
 								'nickName'			=> isset($item['name']) ? $item['name'] : "",
+                                'cleanNickName'     => isset($item['name']) ? Formatting::fixTags(Formatting::completeColorCode($item['name'])) : "",
 								'rank'				=> isset($item['rank']) ? $item['rank'] : 0,
 								'round_points'			=> isset($item['roundpoints']) ? $item['roundpoints'] : 0,
 								'map_points'			=> isset($item['mappoints']) ? $item['mappoints'] : 0,

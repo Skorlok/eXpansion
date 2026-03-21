@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Maps\Structures;
 
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+
 /**
  * Structure mapWish
  *
@@ -19,7 +21,7 @@ class SortableMap
     public $style;
 
     /** @var int */
-    public $goldtime;
+    public $goldTime;
     public $localrecord;
     public $localmax;
 
@@ -41,7 +43,7 @@ class SortableMap
         \ManiaLivePlugins\eXpansion\MapRatings\Structures\Rating $rating
     ) {
         $this->map = $map;
-        $this->name = \ManiaLib\Utils\Formatting::stripStyles($map->name);
+        $this->name = Formatting::stripStyles($map->name);
         $this->author = $map->author;
         $this->goldTime = $map->goldTime;
         $this->style = $map->mapStyle; // for future use

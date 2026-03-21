@@ -724,7 +724,7 @@ class Connection extends Singleton implements AppListener, TickListener
             try {
                 $player = $this->storage->getPlayerObject($dediplayer->login);
                 $this->connection->chatSendServerMessage(
-                    "Player".$player->nickName.'$z$s$fff['.$player->login.'] is $f00BANNED$fff from dedimania.'
+                    "Player".$player->cleanNickName.'$z$s$fff['.$player->login.'] is $f00BANNED$fff from dedimania.'
                 );
             } catch (Exception $e) {
 
@@ -747,7 +747,7 @@ class Connection extends Singleton implements AppListener, TickListener
                 try {
                     $pla = $this->storage->getPlayerObject($dediPlayer->login);
                     $this->connection->chatSendServerMessage(
-                        "Player".$pla->nickName.'$z$s$fff['.$pla->login.'] is $f00BANNED$fff from dedimania.'
+                        "Player".$pla->cleanNickName.'$z$s$fff['.$pla->login.'] is $f00BANNED$fff from dedimania.'
                     );
                 } catch (Exception $e) {
 

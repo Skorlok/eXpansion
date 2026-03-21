@@ -34,9 +34,9 @@ class DocGen extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 ";
         foreach ($adminGr->getAdminCommands() as $cmd) {
             $help = __($cmd->getHelp());
-            $help = \ManiaLib\Utils\Formatting::stripStyles($help);
+            $help = \ManiaLivePlugins\eXpansion\Helpers\Formatting::stripStyles($help);
             $helpmore = __($cmd->getHelpMore());
-            $helpmore = \ManiaLib\Utils\Formatting::stripStyles($helpmore);
+            $helpmore = \ManiaLivePlugins\eXpansion\Helpers\Formatting::stripStyles($helpmore);
             $buffer .= '<tr><td>/admin ' . $cmd->getCmd() . '</td><td>' . implode("<br/>", $cmd->getAliases())
                 . '</td><td>' . $help . '<br/><div id="morehelp">' . $helpmore . '</div></td></tr>';
         }

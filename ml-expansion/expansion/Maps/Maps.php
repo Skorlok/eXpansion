@@ -3,7 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Maps;
 
 use Exception;
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
@@ -429,7 +429,7 @@ class Maps extends ExpPlugin
                 while (!isset($this->storage->players[$queue->player->login]) && !isset($this->storage->spectators[$queue->player->login])) {
 
                     if ($this->config->skipRight || !AdminGroups::hasPermission($queue->player->login, Permission::MAP_JUKEBOX_ADMIN)) {
-                        $this->eXpChatSendServerMessage($this->msg_skipleft, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), Formatting::stripCodes($queue->player->nickName, 'wosnm')));
+                        $this->eXpChatSendServerMessage($this->msg_skipleft, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), Formatting::stripCodes($queue->player->cleanNickName, 'wosnm')));
                         array_shift($this->queue);
                     } else {
                         break;
@@ -458,12 +458,12 @@ class Maps extends ExpPlugin
                         try {
                             $gbxInfo = new GBXChallMapFetcher(true, false, false);
                             $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
-                            $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+                            $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
                         } catch (Exception $e) {
-                            $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+                            $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
                         }
                     } else {
-                        $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
+                        $this->eXpChatSendServerMessage($this->msg_nextQueue, null, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login, $queue->map->environnement));
                     }
                 }
             } catch (Exception $e) {
@@ -824,7 +824,7 @@ class Maps extends ExpPlugin
                 }
             }
 
-            $this->eXpChatSendServerMessage($this->msg_addQueue, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->nickName, 'wosnm'), $player->login, $queueCount));
+            $this->eXpChatSendServerMessage($this->msg_addQueue, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->cleanNickName, 'wosnm'), $player->login, $queueCount));
         } catch (Exception $e) {
             $this->eXpChatSendServerMessage(__('Error: %s', $login, $e->getMessage()));
         }
@@ -850,7 +850,7 @@ class Maps extends ExpPlugin
                 $queueCount = date('jS', strtotime('2007-01-' . $queueCount));
             }
 
-            $this->eXpChatSendServerMessage($this->msg_addQueue, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->nickName, 'wosnm'), $player->login, $queueCount));
+            $this->eXpChatSendServerMessage($this->msg_addQueue, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->cleanNickName, 'wosnm'), $player->login, $queueCount));
         } catch (Exception $e) {
             $this->eXpChatSendServerMessage(__('Error: %s', $login, $e->getMessage()));
         }
@@ -886,12 +886,12 @@ class Maps extends ExpPlugin
                 try {
                     $gbxInfo = new GBXChallMapFetcher(true, false, false);
                     $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $map->fileName);
-                    $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+                    $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
                 } catch (Exception $e) {
-                    $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+                    $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
                 }
             } else {
-                $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+                $this->eXpChatSendServerMessage($this->msg_queueNow, null, array(Formatting::stripCodes($map->name, 'wosnm'), $map->author, Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
             }
 
         } catch (Exception $e) {
@@ -916,7 +916,7 @@ class Maps extends ExpPlugin
         try {
             $player = $this->storage->getPlayerObject($login);
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action#removed the map #variable#%3$s #admin_action# from the playlist');
-            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->nickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
             $this->connection->removeMap($map->fileName);
         } catch (Exception $e) {
             $this->eXpChatSendServerMessage(__("Error: %s", $login, $e->getMessage()));
@@ -956,7 +956,7 @@ class Maps extends ExpPlugin
                     $msg = eXpGetMessage('#admin_error#Map #variable#%3$s #admin_error# not found at playlist, perhaps it was already removed ?');
                     $recievers = $login;
                 }
-                $this->eXpChatSendServerMessage($msg, $recievers, array(Formatting::stripCodes($player->nickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
+                $this->eXpChatSendServerMessage($msg, $recievers, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
                 return;
             } else {
 
@@ -977,7 +977,7 @@ class Maps extends ExpPlugin
                 }
                 if ($additions != "") {
                     $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action#erased the map #variable#%3$s by %4$s #admin_action# from %5$s');
-                    $this->eXpChatSendServerMessage($msg, $recievers, array(Formatting::stripCodes($player->nickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author, $additions));
+                    $this->eXpChatSendServerMessage($msg, $recievers, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author, $additions));
                 } else {
                     $msg = eXpGetMessage('#admin_error#Nothing to do, the map has been removed already from playlist and from disk!');
                     $this->eXpChatSendServerMessage($msg, $login);
@@ -1104,12 +1104,12 @@ class Maps extends ExpPlugin
                     try {
                         $gbxInfo = new GBXChallMapFetcher(true, false, false);
                         $gbxInfo->processFile($this->connection->getMapsDirectory() . DIRECTORY_SEPARATOR . $queue->map->fileName);
-                        $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+                        $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $gbxInfo->authorNick, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login));
                     } catch (Exception $e) {
-                        $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+                        $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login));
                     }
                 } else {
-                    $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->nickName, 'wosnm'), $queue->player->login));
+                    $this->eXpChatSendServerMessage($this->msg_nextQueue, $login, array(Formatting::stripCodes($queue->map->name, 'wosnm'), $queue->map->author, Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), $queue->player->login));
                 }
 
             } else {
@@ -1142,7 +1142,7 @@ class Maps extends ExpPlugin
             if ($queue->map->uId == $map->uId) {
                 array_splice($this->queue, $i, 1);
                 $msg = eXpGetMessage('#variable#%1$s #queue#removed #variable#%2$s #queue#from the queue..');
-                $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($this->storage->getPlayerObject($login)->nickName, 'wosnm'), Formatting::stripCodes($queue->map->name, 'wosnm')));
+                $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($this->storage->getPlayerObject($login)->cleanNickName, 'wosnm'), Formatting::stripCodes($queue->map->name, 'wosnm')));
                 $this->showJukeList($login);
                 break;
             }
@@ -1178,7 +1178,7 @@ class Maps extends ExpPlugin
                 if ($queue->player == $player) {
                     array_splice($this->queue, $i, 1);
                     $msg = eXpGetMessage('#variable#%1$s #queue#removed #variable#%2$s #queue#from the queue..');
-                    $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($queue->player->nickName, 'wosnm'), Formatting::stripCodes($queue->map->name, 'wosnm')));
+                    $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($queue->player->cleanNickName, 'wosnm'), Formatting::stripCodes($queue->map->name, 'wosnm')));
                     break;
                 }
                 $i++;
@@ -1229,7 +1229,7 @@ class Maps extends ExpPlugin
         }
 
         $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action#emptied the map queue list');
-        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
     }
 
     /**
@@ -1268,7 +1268,7 @@ class Maps extends ExpPlugin
             $queue = current($this->queue);
             if ($queue->map->uId == $this->storage->currentMap->uId) {
                 $msg = eXpGetMessage('#admin_error# $iChallenge already set to be replayed!');
-                $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+                $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
                 return;
             }
         }
@@ -1280,7 +1280,7 @@ class Maps extends ExpPlugin
         }
 
         $msg = eXpGetMessage('#queue#Challenge set to be replayed!');
-        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
 
         if ($this->config->showNextMapWidget && !$this->is_onEndMatch) {
             $this->nextMap = $this->storage->currentMap;
@@ -1297,7 +1297,7 @@ class Maps extends ExpPlugin
             $queue = current($this->queue);
             if ($queue->map->uId == $this->storage->currentMap->uId) {
                 $msg = eXpGetMessage('#admin_error# $iChallenge already set to be replayed!');
-                $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+                $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
                 return;
             }
         }
@@ -1307,13 +1307,13 @@ class Maps extends ExpPlugin
             array_unshift($this->queue, new MapWish($player, $map, false));
 
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s #admin_action#added previous map #variable#%3$s #admin_action# to the playlist');
-            $this->eXpChatSendServerMessage( $msg, null, array(Formatting::stripCodes($player->nickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
+            $this->eXpChatSendServerMessage( $msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), null, Formatting::stripCodes($map->name, 'wosnm'), $map->author));
             if ($this->config->showNextMapWidget) {
                 $this->showNextMapWidget();
             }
         } else {
             $msg = eXpGetMessage('#admin_error# $iThere are no previously played challenge!');
-            $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->nickName, 'wosnm'), $login));
+            $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $login));
         }
     }
 

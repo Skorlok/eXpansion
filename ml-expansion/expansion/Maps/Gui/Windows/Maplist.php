@@ -5,6 +5,7 @@ namespace ManiaLivePlugins\eXpansion\Maps\Gui\Windows;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Controls\Mapitem;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 
@@ -287,7 +288,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
         foreach ($maps as $map) {
             if (!isset($map->strippedName)) {
-                $map->strippedName = \ManiaLib\Utils\Formatting::stripStyles($map->name);
+                $map->strippedName = Formatting::stripStyles($map->name);
             }
 
             if (!empty(Maps::$searchTerm[$login])) {
@@ -304,7 +305,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                         $field = "strippedName";
                     }
 
-                    $substring = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->{$field})));
+                    $substring = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(Formatting::stripStyles($map->{$field})));
                     $dist = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring);
                     if (!empty($substring) && $dist < 2) {
                         $this->maps[] = $map;
@@ -312,10 +313,10 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
                     
                 } else {
 
-                    $substring_name = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->strippedName)));
+                    $substring_name = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(Formatting::stripStyles($map->strippedName)));
                     $dist_name = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring_name);
 
-                    $substring_author = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(\ManiaLib\Utils\Formatting::stripStyles($map->author)));
+                    $substring_author = $this->shortest_edit_substring(strtolower(Maps::$searchTerm[$login]), strtolower(Formatting::stripStyles($map->author)));
                     $dist_author = $this->edit_distance(strtolower(Maps::$searchTerm[$login]), $substring_author);
 
                     if ((!empty($substring_name) && $dist_name < 2) || (!empty($substring_author) && $dist_author < 2)) {

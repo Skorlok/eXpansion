@@ -53,7 +53,7 @@ class Minigame1 extends ExpPlugin
             $this->eXpChatSendServerMessage(
                 '%1$s $z$s#game1# wins #variable#%2$s #game1#planets',
                 null,
-                array($player->nickName, $amount)
+                array($player->cleanNickName, $amount)
             );
         } catch (Exception $e) {
             $ac = AdminGroups::getInstance();

@@ -24,6 +24,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\KnockOut\Structures\KOplayer;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Phine\Exception\Exception;
@@ -113,7 +114,7 @@ class KnockOut extends ExpPlugin
                     break;
                 case "res":
                     $this->delay = true;
-                    $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($this->storage->getPlayerObject($login)->nickName));
+                    $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($this->storage->getPlayerObject($login)->cleanNickName));
 
                     \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_RESTART));
                     if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Maps\Maps')) {
@@ -126,7 +127,7 @@ class KnockOut extends ExpPlugin
                     $this->delay = true;
                     \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_SKIP));
                     $this->connection->nextMap($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_CUP);
-                    $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($this->storage->getPlayerObject($login)->nickName));
+                    $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($this->storage->getPlayerObject($login)->cleanNickName));
                     break;
                 case "er":
                 case "end":
@@ -137,7 +138,7 @@ class KnockOut extends ExpPlugin
                         $admin = $this->storage->getPlayerObject($login);
                         $this->connection->triggerModeScriptEventArray('Trackmania.ForceEndRound', array());
                         $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
-                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the ko round to end.', null, array($admin->nickName));
+                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the ko round to end.', null, array($admin->cleanNickName));
                     } else {
                         $this->eXpChatSendServerMessage('#admin_error#You can only force end round when ko is running!', $login);
                     }
@@ -150,7 +151,7 @@ class KnockOut extends ExpPlugin
                         $admin = $this->storage->getPlayerObject($login);
                         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("true"));
                         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
-                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to pause.', null, array($admin->nickName));
+                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to pause.', null, array($admin->cleanNickName));
                     } else {
                         $this->eXpChatSendServerMessage('#admin_error#You can only pause the game when ko is running!', $login);
                     }
@@ -163,7 +164,7 @@ class KnockOut extends ExpPlugin
                         $admin = $this->storage->getPlayerObject($login);
                         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("false"));
                         $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
-                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to play.', null, array($admin->nickName));
+                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to play.', null, array($admin->cleanNickName));
                     } else {
                         $this->eXpChatSendServerMessage('#admin_error#You can only resume the game when ko is running!', $login);
                     }
@@ -173,7 +174,7 @@ class KnockOut extends ExpPlugin
                         $this->delay = true;
 
                         $admin = $this->storage->getPlayerObject($login);
-                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to ignore the next finish.', null, array($admin->nickName));
+                        $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to ignore the next finish.', null, array($admin->cleanNickName));
                     } else {
                         $this->eXpChatSendServerMessage('#admin_error#You can only ignore the next finish when ko is running!', $login);
                     }
@@ -290,7 +291,7 @@ class KnockOut extends ExpPlugin
         $out = array();
         foreach ($this->players as $player) {
             if (!isset($this->storage->players[$player->login])) {
-                $out[] = $player->nickName;
+                $out[] = Formatting::fixTags($player->nickName);
                 unset($this->players[$player->login]);
             }
         }
@@ -303,7 +304,7 @@ class KnockOut extends ExpPlugin
         if (count($this->players) == 1) {
             reset($this->players);
             $player = current($this->players);
-            $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
+            $this->eXpChatSendServerMessage($this->msg_champ, null, array(Formatting::fixTags($player->nickName)));
             $this->koStop();
             return;
         } else if (count($this->players) <= 0) {
@@ -320,7 +321,7 @@ class KnockOut extends ExpPlugin
             $out = array();
             foreach ($dnf as $login => $player) {
                 if (array_key_exists($login, $this->players)) {
-                    $out[] = $player->nickName;
+                    $out[] = Formatting::fixTags($player->nickName);
                     unset($this->players[$login]);
                     $knockedOut++;
                     $this->connection->forceSpectator($login, 1);
@@ -343,7 +344,7 @@ class KnockOut extends ExpPlugin
             }
             if ($knockedOut < $this->nbKo) {
                 if (array_key_exists($player->login, $this->players)) {
-                    $out[] = $player->nickName;
+                    $out[] = Formatting::fixTags($player->nickName);
                     unset($this->players[$player->login]);
                     $knockedOut++;
                     $this->connection->forceSpectator($player->login, 1);
@@ -357,7 +358,7 @@ class KnockOut extends ExpPlugin
         if (count($this->players) == 1) {
             reset($this->players);
             $player = current($this->players);
-            $this->eXpChatSendServerMessage($this->msg_champ, null, array($player->nickName));
+            $this->eXpChatSendServerMessage($this->msg_champ, null, array(Formatting::fixTags($player->nickName)));
             $this->koStop();
             return;
         } else if (count($this->players) <= 0) {

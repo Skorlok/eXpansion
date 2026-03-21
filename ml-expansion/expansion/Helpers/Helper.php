@@ -23,7 +23,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Helpers;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Data\Storage as MlStorage;
 use ManiaLive\Utilities\Console;
 use ManiaLive\Utilities\Logger;

@@ -19,7 +19,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Communication;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
@@ -184,7 +184,7 @@ class Communication extends ExpPlugin
 
         $fromPlayer = $this->storage->getPlayerObject($login);
         $this->send($login, $target, '$z$fffMe: ' . $text);
-        $this->send($target, $login, '$z$222' . Formatting::stripWideFonts($fromPlayer->nickName) . '$z$222: ' . $text);
+        $this->send($target, $login, '$z$222' . Formatting::stripWideFonts($fromPlayer->cleanNickName) . '$z$222: ' . $text);
     }
 
     /**

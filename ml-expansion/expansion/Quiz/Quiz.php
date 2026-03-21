@@ -8,6 +8,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\AddPoint;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\HiddenQuestionWindow;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\QuestionWindow;
@@ -238,7 +239,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         switch ($this->currentQuestion->checkAnswer($text)) {
             case Structures\Question::Correct:
                 $player = $this->storage->getPlayerObject($login);
-                $nicklen = strlen(\ManiaLib\Utils\Formatting::stripColors($player->nickName));
+                $nicklen = strlen(Formatting::stripColors($player->nickName));
                 $header = '#quiz#$o' . str_repeat("*", 45);
                 $this->connection->chatSendServerMessage($this->colorParser->parseColors($header));
                 $answer = "";

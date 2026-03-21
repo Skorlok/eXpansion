@@ -24,6 +24,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Irc;
 
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+
 class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Classes\IrcListener
 {
 
@@ -113,7 +115,7 @@ class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Cl
             $player = $this->storage->getPlayerObject($login);
             $nick = $player->nickName;
             $country = explode("|", $player->path);
-            $message = "Player " . \ManiaLib\Utils\Formatting::stripStyles($nick) . " (" . $login . ") Connected from " . $country[2];
+            $message = "Player " . Formatting::stripStyles($nick) . " (" . $login . ") Connected from " . $country[2];
             $this->irc->sendChat($message);
         } catch (\Exception $e) {
             $this->console("irc onplayerdisconnect:" . $e->getMessage());
@@ -125,7 +127,7 @@ class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Cl
         try {
             $player = $this->storage->getPlayerObject($login);
             $nick = $player->nickName;
-            $message = "Player " . \ManiaLib\Utils\Formatting::stripStyles($nick) . " (" . $login . ") Leaves the server.";
+            $message = "Player " . Formatting::stripStyles($nick) . " (" . $login . ") Leaves the server.";
             $this->irc->sendChat($message);
         } catch (\Exception $e) {
             $this->console("irc onplayerdisconnect:" . $e->getMessage());
@@ -144,7 +146,7 @@ class Irc extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements Cl
         
         $nick = $this->storage->getPlayerObject($login);
         $nick = $nick->nickName;
-        $message = \ManiaLib\Utils\Formatting::stripStyles($nick) . ": " . \ManiaLib\Utils\Formatting::stripStyles($text);
+        $message = Formatting::stripStyles($nick) . ": " . Formatting::stripStyles($text);
         $this->irc->sendChat($message);
     }
 }

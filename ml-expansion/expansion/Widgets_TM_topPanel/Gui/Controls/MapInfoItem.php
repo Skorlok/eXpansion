@@ -28,6 +28,7 @@ use ManiaLib\Gui\Elements\Quad;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class MapInfoItem extends Control implements ScriptedContainer
 {
@@ -76,7 +77,7 @@ class MapInfoItem extends Control implements ScriptedContainer
 
     public function setMap(\Maniaplanet\DedicatedServer\Structures\Map $map)
     {
-        $this->map->setText(\ManiaLib\Utils\Formatting::stripCodes($map->name, "wosn"));
-        $this->author->setText(\ManiaLib\Utils\Formatting::stripCodes($map->author, "wosn"));
+        $this->map->setText(Formatting::stripCodes($map->name, "wosn"));
+        $this->author->setText(Formatting::stripCodes($map->author, "wosn"));
     }
 }

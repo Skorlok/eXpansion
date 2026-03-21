@@ -8,6 +8,7 @@ use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Cps;
 use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\SecCps;
@@ -289,11 +290,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $messages2 = array($this->msg_equals_top1, $this->msg_equals_top5, $this->msg_equals, $this->msg_new_top1, $this->msg_new_top5, $this->msg_new);
 
         foreach ($messages as $msg) {
-            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
         }
 
         foreach ($messages2 as $msg) {
-            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes("test", 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes("test", 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
         }
     }
 
@@ -412,12 +413,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         //Sending begin map messages
         if (sizeof($this->currentChallengeRecords) == 0 && $this->config->sendBeginMapNotices) {
-            $this->eXpChatSendServerMessage($this->msg_newMap, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+            $this->eXpChatSendServerMessage($this->msg_newMap, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
         } else {
             if ($this->config->sendBeginMapNotices) {
                 $time = $this->formatScore($this->currentChallengeRecords[0]->time);
 
-                $this->eXpChatSendServerMessage($this->msg_BeginMap, null, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, \ManiaLib\Utils\Formatting::stripCodes($this->currentChallengeRecords[0]->nickName, 'wosnm')));
+                $this->eXpChatSendServerMessage($this->msg_BeginMap, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, Formatting::stripCodes(Formatting::fixTags($this->currentChallengeRecords[0]->nickName), 'wosnm')));
                 foreach ($this->storage->players as $login => $player) {
                     $this->chat_personalBest($login, null);
                 }
@@ -477,12 +478,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         //Send a message telling him about records on this map
         if (sizeof($this->currentChallengeRecords) == 0 && $this->config->sendBeginMapNotices) {
-            $this->eXpChatSendServerMessage($this->msg_newMap, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
+            $this->eXpChatSendServerMessage($this->msg_newMap, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
         } else {
             if ($this->config->sendBeginMapNotices) {
                 $time = $this->formatScore($this->currentChallengeRecords[0]->time);
 
-                $this->eXpChatSendServerMessage( $this->msg_BeginMap, $login, array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, \ManiaLib\Utils\Formatting::stripCodes($this->currentChallengeRecords[0]->nickName, 'wosnm')));
+                $this->eXpChatSendServerMessage( $this->msg_BeginMap, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, Formatting::stripCodes(Formatting::fixTags($this->currentChallengeRecords[0]->nickName), 'wosnm')));
             }
         }
 
@@ -639,9 +640,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                         }
                     }
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                        $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage($msg, $login, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                     }
 
                 // improves time
@@ -654,9 +655,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                         }
                     }
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                        $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage($msg, $login, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     }
                 }
 
@@ -675,9 +676,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                     }
 
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                        $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage($msg, $login, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     }
 
                     \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
@@ -692,9 +693,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                             }
                         }
                         if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                            $this->eXpChatSendServerMessage($msg, null, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
+                            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                         } else {
-                            $this->eXpChatSendServerMessage($msg, $login, array(\ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
+                            $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                         }
 
                         \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));

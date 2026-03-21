@@ -9,6 +9,7 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
@@ -479,7 +480,7 @@ class ManiaExchange extends ExpPlugin
     public function getDownloadedMapFilePath(GBXChallMapFetcher $gbxReader, $mxId)
     {
         $authorName = $this->cleanMapName($gbxReader->authorLogin);
-        $mapName = $this->cleanMapName(trim(mb_convert_encoding(substr(\ManiaLib\Utils\Formatting::stripStyles($gbxReader->name), 0, 40), "7bit", "UTF-8")));
+        $mapName = $this->cleanMapName(trim(mb_convert_encoding(substr(Formatting::stripStyles($gbxReader->name), 0, 40), "7bit", "UTF-8")));
 
         $replacements = array(
             '{map_author}' => $authorName,

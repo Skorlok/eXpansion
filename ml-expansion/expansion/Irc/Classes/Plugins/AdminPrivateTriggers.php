@@ -18,6 +18,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Irc\Classes\Plugins;
 
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Irc\Classes\IrcBot;
 use ManiaLivePlugins\eXpansion\Irc\Config;
 
@@ -174,12 +175,12 @@ class AdminPrivateTriggers implements \ManiaLivePlugins\eXpansion\Irc\Classes\Ir
         $speccount = 0;
         foreach ($this->storage->players as $login => $player) {
             $placount++;
-            $pla .= \ManiaLib\Utils\Formatting::stripStyles($player->nickName) . " ($login) |  ";
+            $pla .= Formatting::stripStyles($player->nickName) . " ($login) |  ";
         }
         $spec = "Spectators:  ";
         foreach ($this->storage->spectators as $login => $player) {
             $speccount++;
-            $spec .= \ManiaLib\Utils\Formatting::stripStyles($player->nickName) . " ($login) |  ";
+            $spec .= Formatting::stripStyles($player->nickName) . " ($login) |  ";
         }
         $this->irc->sendPrivateMessage($to, "Players at server: " . $placount . " (spec: $speccount)");
         $this->irc->sendPrivateMessage($to, $pla);

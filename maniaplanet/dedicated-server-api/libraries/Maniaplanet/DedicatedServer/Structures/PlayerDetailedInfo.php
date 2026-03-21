@@ -7,10 +7,14 @@
 
 namespace Maniaplanet\DedicatedServer\Structures;
 
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+
 class PlayerDetailedInfo extends Player
 {
 	/** @var string */
 	public $nickName;
+	/** @var string */
+	public $cleanNickName;
 	/** @var int */
 	public $playerId;
 	/** @var int */
@@ -67,6 +71,7 @@ class PlayerDetailedInfo extends Player
 		$object->avatar = FileDesc::fromArray($object->avatar);
 		$object->skins = Skin::fromArrayOfArray($object->skins);
 		$object->ladderStats = LadderStats::fromArray($object->ladderStats);
+		$object->cleanNickName = Formatting::fixTags(Formatting::completeColorCode($object->nickName));
 		return $object;
 	}
 }

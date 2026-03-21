@@ -25,6 +25,7 @@ use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 /**
  * Description of Bets
@@ -150,7 +151,7 @@ class Bets extends ExpPlugin
 
         foreach ($rankings as $index => $player) {
             if (array_key_exists($player->login, $this->players)) {
-                $this->eXpChatSendServerMessage($this->msg_winner, null, array($player->nickName . '$z$s', $total));
+                $this->eXpChatSendServerMessage($this->msg_winner, null, array(Formatting::fixTags($player->nickName) . '$z$s', $total));
                 $this->connection->pay($player->login, intval($total), 'Winner of the bet!');
                 $this->players = array();
                 return;
@@ -249,7 +250,7 @@ class Bets extends ExpPlugin
     public function announceTotal($login)
     {
         $total = (count($this->players) * self::$betAmount);
-        $nick = $this->players[$login]->nickName . '$z$s';
+        $nick = $this->players[$login]->cleanNickName . '$z$s';
         $this->eXpChatSendServerMessage($this->msg_totalStake, null, array($nick, $total));
     }
 

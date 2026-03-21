@@ -7,10 +7,14 @@
 
 namespace Maniaplanet\DedicatedServer\Structures;
 
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+
 class PlayerInfo extends Player
 {
 	/** @var string */
 	public $nickName;
+	/** @var string */
+	public $cleanNickName;
 	/** @var int */
 	public $playerId;
 	/** @var int */
@@ -64,6 +68,7 @@ class PlayerInfo extends Player
 	static public function fromArray($array)
 	{
 		$object = parent::fromArray($array);
+		$object->cleanNickName = Formatting::fixTags(Formatting::completeColorCode($object->nickName));
 
 		//Detail flags
 		$object->forceSpectator           = $object->flags % 10; // 0, 1 or 2

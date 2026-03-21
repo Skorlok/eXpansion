@@ -95,7 +95,7 @@ class AutoQueue extends ExpPlugin
                     
                     // for debug purposes
                     $msg = eXpGetMessage('$z$s$fffPlayer %s $z$s$fff have been released from queue');
-                    $this->eXpChatSendServerMessage($msg, null, array($player->nickName));
+                    $this->eXpChatSendServerMessage($msg, null, array($player->cleanNickName));
                 }
                 $this->widgetSyncList();
             }
@@ -187,7 +187,7 @@ class AutoQueue extends ExpPlugin
             if (in_array($target, $this->queue->getLogins())) {
                 $this->queue->remove($target);
                 $this->eXpChatSendServerMessage(eXpGetMessage("Admin has removed you from queue!", $target));
-                $this->eXpChatSendServerMessage(eXpGetMessage('Removed player %s $z$ffffrom queue'), $login,  array($this->storage->getPlayerObject($target)->nickName));
+                $this->eXpChatSendServerMessage(eXpGetMessage('Removed player %s $z$ffffrom queue'), $login,  array($this->storage->getPlayerObject($target)->cleanNickName));
             }
         }
         EnterQueueWidget::Erase($login);
@@ -261,7 +261,7 @@ class AutoQueue extends ExpPlugin
         $nickNames = array();
         foreach ($players as $login) {
             $this->connection->forceSpectator($login, 1);
-            $nickNames[] = $this->storage->getPlayerObject($login)->nickName;
+            $nickNames[] = $this->storage->getPlayerObject($login)->cleanNickName;
         }
 
         if (count($nickNames) > 0) {

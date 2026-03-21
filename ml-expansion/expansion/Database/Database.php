@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Database;
 
-use ManiaLib\Utils\Formatting as StringFormatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting as StringFormatting;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\Core;
@@ -412,9 +412,9 @@ class Database extends ExpPlugin
 
             $wins = $this->numberize($w);
             if ($w <= 100 && $w % 10 == 0) {
-                $this->eXpChatSendServerMessage($msg_pub, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins));
+                $this->eXpChatSendServerMessage($msg_pub, null, array(StringFormatting::stripCodes($player->cleanNickName, "wosnm"), $wins));
             } elseif ($w % 25 == 0) {
-                $this->eXpChatSendServerMessage($msg_pub, null, array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins));
+                $this->eXpChatSendServerMessage($msg_pub, null, array(StringFormatting::stripCodes($player->cleanNickName, "wosnm"), $wins));
             } else {
                 $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
             }

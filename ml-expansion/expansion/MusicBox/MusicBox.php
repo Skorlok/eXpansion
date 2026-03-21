@@ -8,6 +8,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows\MusicListWindow;
 use ManiaLivePlugins\eXpansion\MusicBox\Structures\Song;
 
@@ -214,7 +215,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->connection->setForcedMusic($this->config->override, $url);
             if ($wish) {
                 $text = eXpGetMessage('#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s');
-                $this->eXpChatSendServerMessage($text, null, array($song->title, $song->artist, \ManiaLib\Utils\Formatting::stripCodes($wish->player->nickName, "wos")));
+                $this->eXpChatSendServerMessage($text, null, array($song->title, $song->artist, Formatting::stripCodes($wish->player->cleanNickName, "wos")));
             }
         } catch (\Exception $e) {
             $this->console("On EndMatch Error : " . $e->getMessage());
@@ -329,7 +330,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     . " #music# by #variable#"
                     . $song->artist
                     . ' $z$s#music# is added to the MusicBox by #variable#'
-                    . \ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wos")
+                    . Formatting::stripCodes($player->cleanNickName, "wos")
                     . '.';
                 $this->eXpChatSendServerMessage($text, null);
 
@@ -342,7 +343,7 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . " #music# by #variable#"
             . $song->artist
             . '#music# is added to the MusicBox by #variable#'
-            . \ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wos") . '.';
+            . Formatting::stripCodes($player->cleanNickName, "wos") . '.';
         $this->eXpChatSendServerMessage($text, null);
     }
 

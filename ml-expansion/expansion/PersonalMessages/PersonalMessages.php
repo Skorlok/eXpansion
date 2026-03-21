@@ -135,8 +135,8 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $sourcePlayer = $this->storage->getPlayerObject($login);
             $this->reply[$target] = $login;
 
-            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $login);
-            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $target);
+            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $login);
+            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $target);
         } catch (\Exception $e) {
             $this->console("Error:" . $e->getMessage());
         }
@@ -156,12 +156,12 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         try {
             foreach ($this->storage->players as $reciever => $player) {
                 if (AdminGroups::hasPermission($reciever, Permission::CHAT_ADMINCHAT)) {
-                    $this->connection->chatSendServerMessage($color . 'Admin »» $fff' . $sourcePlayer->nickName . $color . " " . $message, $reciever);
+                    $this->connection->chatSendServerMessage($color . 'Admin »» $fff' . $sourcePlayer->cleanNickName . $color . " " . $message, $reciever);
                 }
             }
             foreach ($this->storage->spectators as $reciever => $player) {
                 if (AdminGroups::hasPermission($reciever, Permission::CHAT_ADMINCHAT)) {
-                    $this->connection->chatSendServerMessage($color . 'Admin »» $fff' . $sourcePlayer->nickName . $color . " " . $message, $reciever);
+                    $this->connection->chatSendServerMessage($color . 'Admin »» $fff' . $sourcePlayer->cleanNickName . $color . " " . $message, $reciever);
                 }
             }
         } catch (\Exception $e) {
@@ -181,8 +181,8 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $targetPlayer = $this->storage->getPlayerObject($this->reply[$login]);
                 $sourcePlayer = $this->storage->getPlayerObject($login);
                 $color = '$z$s' . $this->config->Colors_personalmessage;
-                $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $login);
-                $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $this->reply[$login]);
+                $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $login);
+                $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $this->reply[$login]);
             } else {
                 $this->eXpChatSendServerMessage($this->msg_noReply, $login);
             }
@@ -238,8 +238,8 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $sourcePlayer = $this->storage->getPlayerObject($login);
             $this->reply[$target] = $login;
             $color = '$z$s' . $this->config->Colors_personalmessage;
-            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $login);
-            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->nickName . $color . ' »» $fff' . $targetPlayer->nickName . $color . " " . $message, $target);
+            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $login);
+            $this->connection->chatSendServerMessage('$fff' . $sourcePlayer->cleanNickName . $color . ' »» $fff' . $targetPlayer->cleanNickName . $color . " " . $message, $target);
         } catch (\Exception $e) {
             $this->connection->chatSendServerMessage('$f00$oError $z$s$fff' . $e->getMessage(), $login);
         }

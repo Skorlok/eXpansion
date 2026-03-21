@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 
 use ManiaLive\Utilities\Time as TmTime;
 use Maniaplanet\DedicatedServer\Connection;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class Server
 {
@@ -43,7 +44,7 @@ class Server
     {
 
         $serverName = $storage->server->name;
-        $serverName = \ManiaLib\Utils\Formatting::stripCodes($serverName, 'l');
+        $serverName = Formatting::stripCodes($serverName, 'l');
         $serverName = $this->removespecials($serverName);
 
         $xml = '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
@@ -86,7 +87,7 @@ class Server
         $xml .= '  <players>' . "\n";
         foreach ($storage->players as $player) {
             $nickname = $this->removespecials($player->nickName);
-            $nickname = \ManiaLib\Utils\Formatting::stripCodes($nickname, 'l');
+            $nickname = Formatting::stripCodes($nickname, 'l');
 
             $xml .= '   <player>' . "\n";
             $xml .= '     <nickname>' . $nickname . '</nickname>' . "\n";
@@ -98,7 +99,7 @@ class Server
         }
         foreach ($storage->spectators as $player) {
             $nickname = $this->removespecials($player->nickName);
-            $nickname = \ManiaLib\Utils\Formatting::stripCodes($nickname, 'l');
+            $nickname = Formatting::stripCodes($nickname, 'l');
 
             $xml .= '   <player>' . "\n";
             $xml .= '     <nickname>' . $nickname . '</nickname>' . "\n";

@@ -3,7 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_AroundMe;
 
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;

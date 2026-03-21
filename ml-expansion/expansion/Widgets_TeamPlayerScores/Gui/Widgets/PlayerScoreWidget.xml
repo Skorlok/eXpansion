@@ -10,7 +10,7 @@
             foreach ($this->getParam('playerScores') as $playerScore) {
                 echo '<frame posn="0 '. (- $x*4.0 + 4.0) . ' 0">';
                     echo '<label posn="3 0 0" sizen="7 5" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="' . $playerScore->score . '"/>';
-                    echo '<label posn="4 0 1.0E-5" sizen="13 4" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . \ManiaLib\Utils\Formatting::stripCodes($this->handleSpecialChars($playerScore->nickName), 'hlpwoistn') . '"/>';
+                    echo '<label posn="4 0 1.0E-5" sizen="13 4" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . \ManiaLivePlugins\eXpansion\Helpers\Formatting::stripCodes($this->handleSpecialChars($playerScore->nickName), 'hlpwoistn') . '"/>';
                     echo '<label posn="23 0 2.0E-5" sizen="16 4" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . \ManiaLive\Utilities\Time::fromTM($playerScore->bestTime) . '"/>';
                     echo '<label posn="30 0 3.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="' . $playerScore->winScore[0] . '"/>';
                     echo '<label posn="34 0 4.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="aaa" text="' . $playerScore->winScore[1] . '"/>';

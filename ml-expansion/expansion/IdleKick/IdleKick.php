@@ -60,10 +60,10 @@ class IdleKick extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     $player = $this->storage->getPlayerObject($playerLogin);
 
                     if ($this->config->idleKickReally) {
-                        $this->eXpChatSendServerMessage('%s $z$s$fff is idle and is being idle kicked!', null, array($player->nickName));
+                        $this->eXpChatSendServerMessage('%s $z$s$fff is idle and is being idle kicked!', null, array($player->cleanNickName));
                         $this->connection->kick($playerLogin, "Idle Kick");
                     } else {
-                        $this->eXpChatSendServerMessage('%s $z$s$fff is idle and is being sent to spectate!', null, array($player->nickName));
+                        $this->eXpChatSendServerMessage('%s $z$s$fff is idle and is being sent to spectate!', null, array($player->cleanNickName));
                         unset($this->timeStamps[$playerLogin]);
                         $this->connection->forceSpectator($playerLogin, 3);
                     }

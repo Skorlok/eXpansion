@@ -141,7 +141,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
             }
             $this->setJoinTime($login);
 
-            $nick = $player->nickName;
+            $nick = $player->cleanNickName;
             $country = $this->getCountry($player);
 
             $spec = "";
@@ -204,7 +204,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
 
                 return;
             }
-            $nick = $player->nickName;
+            $nick = $player->cleanNickName;
 
             $playtime = $this->getSessionTime($login);
 

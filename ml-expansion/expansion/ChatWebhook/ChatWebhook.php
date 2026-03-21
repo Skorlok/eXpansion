@@ -4,7 +4,7 @@ namespace ManiaLivePlugins\eXpansion\ChatWebhook;
 
 use DateTime;
 use Exception;
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;

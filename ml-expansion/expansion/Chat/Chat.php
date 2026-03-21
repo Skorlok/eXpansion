@@ -15,7 +15,7 @@
 namespace ManiaLivePlugins\eXpansion\Chat;
 
 use Exception;
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Data\Player;
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
@@ -363,7 +363,7 @@ class Chat extends ExpPlugin
             $config = Config::getInstance();
             $force = "";
             $source_player = $this->storage->getPlayerObject($login);
-            $nick = $source_player->nickName;
+            $nick = $source_player->cleanNickName;
             if ($config->allowMPcolors) {
                 if (strstr($source_player->nickName, '$>')) {
                     $nick = $source_player->nickName;

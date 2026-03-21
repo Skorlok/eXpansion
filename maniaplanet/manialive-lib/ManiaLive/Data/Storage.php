@@ -12,7 +12,7 @@
 
 namespace ManiaLive\Data;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Application\Event as AppEvent;
 use ManiaLive\Application\Listener as AppListener;
 use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;

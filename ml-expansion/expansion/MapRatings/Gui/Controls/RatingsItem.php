@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\MapRatings\Gui\Controls;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class RatingsItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {

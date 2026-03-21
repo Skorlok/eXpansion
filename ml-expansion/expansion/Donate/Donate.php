@@ -87,7 +87,7 @@ class Donate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $this->eXpChatSendServerMessage('#donate#You donated #variable#' . $bill->getAmount() . '#donate# Planets to server$z$s#donate#, Thank You.', $bill->getSourceLogin());
             } else {
                 $fromPlayer = $this->storage->getPlayerObject($bill->getSourceLogin());
-                $this->eXpChatSendServerMessage('#donate#The server recieved a donation of #variable#' . $bill->getAmount() . '#donate# Planets from #variable#' . $fromPlayer->nickName . '$z$s#donate#, Thank You.', null);
+                $this->eXpChatSendServerMessage('#donate#The server recieved a donation of #variable#' . $bill->getAmount() . '#donate# Planets from #variable#' . $fromPlayer->cleanNickName . '$z$s#donate#, Thank You.', null);
             }
         }
     }
@@ -102,7 +102,7 @@ class Donate extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         if ($state == 6) {  // Error
             $fromPlayer = $this->storage->getPlayerObject($bill->getSourceLogin());
-            $this->eXpChatSendServerMessage('#error# There was error with player #variable#' . $fromPlayer->nickName . '$z$s#error# donation.');
+            $this->eXpChatSendServerMessage('#error# There was error with player #variable#' . $fromPlayer->cleanNickName . '$z$s#error# donation.');
             $this->eXpChatSendServerMessage('#error#' . $stateName, $bill->getSourceLogin());
         }
     }

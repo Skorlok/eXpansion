@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Overlay_Positions\Gui\Controls;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class PlayerItem extends \ManiaLivePlugins\eXpansion\Gui\Control
 {

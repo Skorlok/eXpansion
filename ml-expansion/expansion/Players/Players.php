@@ -66,7 +66,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function announceBroadcasting($login)
     {
         $player = $this->storage->getPlayerObject($login);
-        $this->eXpChatSendServerMessage($this->msg_broadcast, null, array($player->nickName));
+        $this->eXpChatSendServerMessage($this->msg_broadcast, null, array($player->cleanNickName));
     }
 
     public function showPlayerList($login)
@@ -98,10 +98,10 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
             if ($ignore) {
                 $this->connection->ignore($target);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# ignores the player#variable# %s', null, array($admin->nickName, $player->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# ignores the player#variable# %s', null, array($admin->cleanNickName, $player->cleanNickName));
             } else {
                 $this->connection->unignore($target);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unignores the player %s', null, array($admin->nickName, $player->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unignores the player %s', null, array($admin->cleanNickName, $player->cleanNickName));
             }
 
             $this->showPlayerList($login);
@@ -160,7 +160,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $admin = $this->storage->getPlayerObject($login);
 
             $this->connection->forceSpectator($target, 1);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the player#variable# %s #admin_action#to spectate.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the player#variable# %s #admin_action#to spectate.', null, array($admin->cleanNickName, $player->cleanNickName));
             $this->showPlayerList($login);
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage('#admin_error#' . $e->getMessage(), $login);
@@ -177,7 +177,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $admin = $this->storage->getPlayerObject($login);
 
             $this->connection->forceSpectator($target, 2);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the spectator#variable# %s #admin_action#to play.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the spectator#variable# %s #admin_action#to play.', null, array($admin->cleanNickName, $player->cleanNickName));
             $this->showPlayerList($login);
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage('#admin_error#' . $e->getMessage(), $login);
@@ -195,7 +195,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $this->connection->forceSpectator($target, 1);
             $this->connection->forceSpectator($target, 0);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Switchs the player#variable# %s #admin_action#to spectate.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Switchs the player#variable# %s #admin_action#to spectate.', null, array($admin->cleanNickName, $player->cleanNickName));
             $this->showPlayerList($login);
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage('#admin_error#' . $e->getMessage(), $login);
@@ -213,7 +213,7 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
             $this->connection->forceSpectator($target, 2);
             $this->connection->forceSpectator($target, 0);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Switchs the spectator#variable# %s #admin_action#to play.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Switchs the spectator#variable# %s #admin_action#to play.', null, array($admin->cleanNickName, $player->cleanNickName));
             $this->showPlayerList($login);
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage('#admin_error#' . $e->getMessage(), $login);
@@ -229,13 +229,13 @@ class Players extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             if ($player->teamId === 0) {
                 $this->connection->forcePlayerTeam($target, 1);
                 $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$f00Red');
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->cleanNickName, $player->cleanNickName));
             } else if ($player->teamId === 1) {
                 $this->connection->forcePlayerTeam($target, 0);
                 $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00fBlue');
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->cleanNickName, $player->cleanNickName));
             } else {
-                $this->connection->chatSendServerMessage(__('%s$z$s$fff is a spectator and can not be forced into a team', $login, $player->nickName), $login);
+                $this->connection->chatSendServerMessage(__('%s$z$s$fff is a spectator and can not be forced into a team', $login, $player->cleanNickName), $login);
             }
             $this->showPlayerList($login);
         }

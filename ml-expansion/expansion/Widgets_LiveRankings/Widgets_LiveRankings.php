@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_LiveRankings;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\ColorParser;

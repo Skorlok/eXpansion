@@ -4,7 +4,7 @@ namespace ManiaLivePlugins\eXpansion\ChatAdmin;
 
 use Exception;
 use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLib\Utils\Path;
 use ManiaLive\Application\Application;
 use ManiaLive\Event\Dispatcher;
@@ -831,7 +831,7 @@ class ChatAdmin extends ExpPlugin
         \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
         $this->connection->setTeamInfo($params["team1Name"], $params["team1ColorHSL"], '', $params["team2Name"], $params["team2ColorHSL"], '');
-        $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new teams name and color.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+        $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new teams name and color.', null, array($this->storage->getPlayerObject($fromLogin)->cleanNickName));
     }
 
     public function forceClubLinks($fromLogin, $params)
@@ -938,7 +938,7 @@ class ChatAdmin extends ExpPlugin
             \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
             if ($fromLogin != null) {
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->cleanNickName));
             }
         } else if (isset($params["team1"]["Link"])) {
             $this->connection->setForcedClubLinks($params["team1"]["Link"], "");
@@ -948,7 +948,7 @@ class ChatAdmin extends ExpPlugin
                 $var->setRawValue($stored);
                 \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->cleanNickName));
             }
         } else if (isset($params["team2"]["Link"])) {
             $this->connection->setForcedClubLinks("", $params["team2"]["Link"]);
@@ -958,7 +958,7 @@ class ChatAdmin extends ExpPlugin
                 $var->setRawValue($stored);
                 \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Sets new forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->cleanNickName));
             }
         } else {
             if ($fromLogin != null) {
@@ -968,7 +968,7 @@ class ChatAdmin extends ExpPlugin
                 $var->setRawValue($stored);
                 \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
 
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Removes forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s$z$s#admin_action# Removes forced clublinks.', null, array($this->storage->getPlayerObject($fromLogin)->cleanNickName));
             }
         }
 
@@ -1000,7 +1000,7 @@ class ChatAdmin extends ExpPlugin
             shuffle($mapsArray);
             $this->connection->addMapList($mapsArray);
             $msg = eXpGetMessage('#admin_action#Admin #variable#%1$s $z$s#admin_action#shuffles the maps list!');
-            $nick = $this->storage->getPlayerObject($login)->nickName;
+            $nick = $this->storage->getPlayerObject($login)->cleanNickName;
 
             $this->eXpChatSendServerMessage($msg, null, array($nick));
         } catch (\Exception $e) {
@@ -1016,7 +1016,7 @@ class ChatAdmin extends ExpPlugin
     public function setTeamBalance($fromLogin, $params)
     {
         try {
-            $adminNick = $this->storage->getPlayerObject($fromLogin)->nickName;
+            $adminNick = $this->storage->getPlayerObject($fromLogin)->cleanNickName;
             $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z$s#admin_action# AutoBalances the Teams!', null, array($adminNick));
             $this->connection->autoTeamBalance();
         } catch (\Exception $e) {
@@ -1067,7 +1067,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->forcePlayerTeam($params[0], 0);
             $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team1Color"] . $var["team1Name"] : '$00fBlue');
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->cleanNickName, $player->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1089,7 +1089,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->forcePlayerTeam($params[0], 1);
             $team = ((isset($var["team1Name"]) && isset($var["team2Name"]) && isset($var["team1ColorHSL"]) && isset($var["team2ColorHSL"]) && isset($var["team1Color"]) && isset($var["team2Color"])) ? '$'.$var["team2Color"] . $var["team2Name"] : '$f00Red');
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sends player#variable# %s #admin_action#to team '. $team . '.', null, array($admin->cleanNickName, $player->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1108,7 +1108,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_NbOfWinners" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets cup winners to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets cup winners to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1128,7 +1128,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_RoundsPerMap" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new rounds to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new rounds to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1148,7 +1148,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new cup points limit to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new cup points limit to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1168,7 +1168,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new team rules to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets use new team rules to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1188,7 +1188,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_MaxPointsPerRound" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team max points to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team max points to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1208,7 +1208,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points limit to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points limit to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1228,7 +1228,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_PointsGap" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points gap to#variable# %s #admin_action#.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets Team points gap to#variable# %s #admin_action#.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1250,7 +1250,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_FinishTimeout" => intval($newLimit)));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new finish timeout to#variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new finish timeout to#variable# %s #admin_action#minutes.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1270,7 +1270,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_ForceLapsNb" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new number of laps to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new number of laps to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1292,7 +1292,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($newLimit)));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new laps timelimit to#variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new laps timelimit to#variable# %s #admin_action#minutes.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1312,7 +1312,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_PointsLimit" => intval($params[0])));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets rounds points limits to#variable# %s.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets rounds points limits to#variable# %s.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1332,7 +1332,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Trackmania.Chase.ForceStopRound', array());
             $this->connection->triggerModeScriptEvent('Rounds_ForceEndRound');
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the round to end.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the round to end.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1345,7 +1345,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStop', array());
             $this->connection->triggerModeScriptEventArray('Shootmania.WarmUp.ForceStop', array());
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp to end.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1358,7 +1358,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Trackmania.WarmUp.ForceStopRound', array());
             $this->connection->triggerModeScriptEventArray('Shootmania.WarmUp.ForceStopRound', array());
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the WarmUp Round to end.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1389,7 +1389,7 @@ class ChatAdmin extends ExpPlugin
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
                 $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$teampts", "", "$params[1]", "$params[1]"));
 
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $params[0], $params[1]));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the points of the team $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->cleanNickName, $params[0], $params[1]));
             } catch (Exception $e) {
                 $this->sendErrorChat($fromLogin, $e->getMessage());
             }
@@ -1410,7 +1410,7 @@ class ChatAdmin extends ExpPlugin
                 $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
                 $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$params[0]", "", "", "$params[1]"));
 
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->nickName, $player->nickName, $params[1]));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the Roundpoints of $fff%s #admin_action#to $fff%s#admin_action#.', null, array($admin->cleanNickName, $player->cleanNickName, $params[1]));
             } catch (Exception $e) {
                 $this->sendErrorChat($fromLogin, $e->getMessage());
             }
@@ -1425,7 +1425,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("true"));
             $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to pause.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to pause.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1438,7 +1438,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.SetActive', array("false"));
             $this->connection->triggerModeScriptEventArray('Maniaplanet.Pause.GetStatus', array());
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to play.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#forces the game to play.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1452,7 +1452,7 @@ class ChatAdmin extends ExpPlugin
             if (!isset($params[0]) || !$params[0]) {
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit.', null, array($admin->cleanNickName));
                 return;
 
             } else {
@@ -1465,7 +1465,7 @@ class ChatAdmin extends ExpPlugin
                 $timeToAdd = intval($params[0]*60);
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $timeToAdd);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit with #variable#%s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the time limit with #variable#%s #admin_action#minutes.', null, array($admin->cleanNickName, $params[0]));
                 return;
             }
         }
@@ -1474,7 +1474,7 @@ class ChatAdmin extends ExpPlugin
             if (!isset($params[0]) || !$params[0]) {
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', null);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit.', null, array($admin->cleanNickName));
                 return;
 
             } else {
@@ -1487,7 +1487,7 @@ class ChatAdmin extends ExpPlugin
                 $pointsToAdd = intval($params[0]);
 
                 $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'extendTime', $pointsToAdd);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit with #variable#%s #admin_action#points.', null, array($admin->nickName, $pointsToAdd));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#extended the points limit with #variable#%s #admin_action#points.', null, array($admin->cleanNickName, $pointsToAdd));
                 return;
             }
         }
@@ -1510,7 +1510,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(array("S_WarmUpNb" => intval($params[0])));
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets all game modes warmup number to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets all game modes warmup number to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1530,7 +1530,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(array("S_DisplayTimeDiff" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets the display time diff to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets the display time diff to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1550,7 +1550,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->setModeScriptSettings(array("S_UseAlternateRules" => filter_var($params[0], FILTER_VALIDATE_BOOLEAN)));
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new round rules to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new round rules to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -1568,7 +1568,7 @@ class ChatAdmin extends ExpPlugin
         $reason = implode(" ", $params);
         $player = $this->storage->getPlayerObject($target);
         if (is_object($player)) {
-            $nickname = $player->nickName;
+            $nickname = $player->cleanNickName;
         } else {
             $nickname = $target;
         }
@@ -1593,7 +1593,7 @@ class ChatAdmin extends ExpPlugin
 
             $this->expStorage->saveBlackList();
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#blacklists the player #variable# %s reason: #admin_error#%s', null, array($admin->nickName, $nickname, $reason));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#blacklists the player #variable# %s reason: #admin_error#%s', null, array($admin->cleanNickName, $nickname, $reason));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1613,7 +1613,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->cleanBlackList();
             $this->expStorage->saveBlackList();
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the blacklist.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the blacklist.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1628,7 +1628,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->cleanBanList();
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the banlist.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the banlist.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1643,7 +1643,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->cleanIgnoreList();
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the ignorelist.', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cleans the ignorelist.', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1671,7 +1671,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->connection->setScriptName($scriptName);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets game mode to#variable# %s', null, array($admin->nickName, $scriptName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets game mode to#variable# %s', null, array($admin->cleanNickName, $scriptName));
         } catch (\Exception $e) {
             $this->eXpChatSendServerMessage("#admin_error#" . $e->getMessage(), $fromLogin);
         }
@@ -1690,7 +1690,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->unBlackList($params[0]);
             $this->expStorage->saveBlackList();
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unblacklists the player %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unblacklists the player %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1716,7 +1716,7 @@ class ChatAdmin extends ExpPlugin
         $reason = implode(" ", $params);
         $player = $this->storage->getPlayerObject($target);
         if (is_object($player)) {
-            $nickname = $player->nickName;
+            $nickname = $player->cleanNickName;
         } else {
             $nickname = $target;
         }
@@ -1731,7 +1731,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->ban($target, $reason);
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# bans the player#variable# %s reason: #admin_error# %s', null, array($admin->nickName, $nickname, $reason));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# bans the player#variable# %s reason: #admin_error# %s', null, array($admin->cleanNickName, $nickname, $reason));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1745,7 +1745,7 @@ class ChatAdmin extends ExpPlugin
     {
         $player = $this->storage->getPlayerObject($params[0]);
         if (is_object($player)) {
-            $nickname = $player->nickName;
+            $nickname = $player->cleanNickName;
         } else {
             $nickname = $params[0];
         }
@@ -1753,7 +1753,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->ignore($params[0]);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# ignores the player#variable# %s', null, array($admin->nickName, $nickname));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# ignores the player#variable# %s', null, array($admin->cleanNickName, $nickname));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1790,13 +1790,13 @@ class ChatAdmin extends ExpPlugin
 
         try {
             if (is_object($player)) {
-                $nickname = $player->nickName;
+                $nickname = $player->cleanNickName;
             } else {
                 $nickname = $params[0];
             }
 
             $this->connection->unBan($params[0]);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unbans the player %s', null, array($admin->nickName, $nickname));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unbans the player %s', null, array($admin->cleanNickName, $nickname));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1812,7 +1812,7 @@ class ChatAdmin extends ExpPlugin
 
         try {
             $this->connection->unIgnore($params[0]);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unignores the player %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unignores the player %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1844,7 +1844,7 @@ class ChatAdmin extends ExpPlugin
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
             $this->connection->kick($player, $reason);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %1$s #admin_action#kicks the player#variable# %2$s (%3$s) #variable#Reason: #admin_error#%4$s', null, array($admin->nickName, $player->nickName, $target, $reason));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %1$s #admin_action#kicks the player#variable# %2$s (%3$s) #variable#Reason: #admin_error#%4$s', null, array($admin->cleanNickName, $player->cleanNickName, $target, $reason));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1861,7 +1861,7 @@ class ChatAdmin extends ExpPlugin
         $player = $this->storage->getPlayerObject($target);
         $nick = $target;
         if ($player != null) {
-            $nick = $player->nickName;
+            $nick = $player->cleanNickName;
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
         try {
@@ -1869,7 +1869,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->addGuest($target);
             $this->expStorage->saveGuestList();
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#add as guest the player#variable# %s', null, array($admin->nickName, $nick));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#add as guest the player#variable# %s', null, array($admin->cleanNickName, $nick));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1884,7 +1884,7 @@ class ChatAdmin extends ExpPlugin
         $target = array_shift($params);
         $player = $this->storage->getPlayerObject($target);
         if (is_object($player)) {
-            $nickname = $player->nickName;
+            $nickname = $player->cleanNickName;
         } else {
             $nickname = $target;
         }
@@ -1895,7 +1895,7 @@ class ChatAdmin extends ExpPlugin
             $this->connection->removeGuest($target);
             $this->expStorage->saveGuestList();
 
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#removed guest status of the player#variable# %s', null, array($admin->nickName, $nickname));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#removed guest status of the player#variable# %s', null, array($admin->cleanNickName, $nickname));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1926,7 +1926,7 @@ class ChatAdmin extends ExpPlugin
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->connection->forceSpectator($player, 1);
             $this->connection->forceSpectator($player, 0);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the player#variable# %s #admin_action#to spectate.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the player#variable# %s #admin_action#to spectate.', null, array($admin->cleanNickName, $player->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1947,7 +1947,7 @@ class ChatAdmin extends ExpPlugin
             $admin = $this->storage->getPlayerObject($fromLogin);
             $this->connection->forceSpectator($player, 2);
             $this->connection->forceSpectator($player, 0);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the spectator#variable# %s #admin_action#to play.', null, array($admin->nickName, $player->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#Forces the spectator#variable# %s #admin_action#to play.', null, array($admin->cleanNickName, $player->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1973,7 +1973,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setServerName($name);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# sets new server name:#variable# %s', null, array($admin->nickName, $name));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action# sets new server name:#variable# %s', null, array($admin->cleanNickName, $name));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -1989,7 +1989,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setServerComment($comment);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new server comment:#variable# %s', null, array($admin->nickName, $comment));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new server comment:#variable# %s', null, array($admin->cleanNickName, $comment));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2005,7 +2005,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setMaxPlayers($params[0]);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets server maximum players to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets server maximum players to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2021,7 +2021,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setMaxSpectators($params[0]);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets server maximum spectators to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets server maximum spectators to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2037,12 +2037,12 @@ class ChatAdmin extends ExpPlugin
             if (isset($params[0]) && $params[0]) {
                 $this->connection->setServerPassword($params[0]);
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# sets new server password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# sets new server password.', null, array($admin->cleanNickName));
                 $this->eXpChatSendServerMessage('#admin_action#New server password:#variable# %s', null,array($params[0]), $fromLogin);
             } else {
                 $this->connection->setServerPassword("");
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# unsets server password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action# unsets server password.', null, array($admin->cleanNickName));
             }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
@@ -2059,12 +2059,12 @@ class ChatAdmin extends ExpPlugin
             if (isset($params[0]) && $params[0]) {
                 $this->connection->setServerPasswordForSpectator($params[0]);
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new spectator password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new spectator password.', null, array($admin->cleanNickName));
                 $this->eXpChatSendServerMessage('#admin_action#New spectator password:#variable# %s', null, array($params[0]), $fromLogin);
             } else {
                 $this->connection->setServerPasswordForSpectator("");
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets spectator password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets spectator password.', null, array($admin->cleanNickName));
             }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
@@ -2081,12 +2081,12 @@ class ChatAdmin extends ExpPlugin
             if (isset($params[0]) && $params[0]) {
                 $this->connection->setRefereePassword($params[0]);
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new referee password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new referee password.', null, array($admin->cleanNickName));
                 $this->eXpChatSendServerMessage('#admin_action#New referee password:#variable# %s', null, array($params[0]), $fromLogin);
             } else {
                 $this->connection->setRefereePassword("");
                 $admin = $this->storage->getPlayerObject($fromLogin);
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets referee password.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#unsets referee password.', null, array($admin->cleanNickName));
             }
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
@@ -2108,7 +2108,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(array("S_ChatTime" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z#admin_action#sets new chat time limit of #variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s $z#admin_action#sets new chat time limit of #variable# %s #admin_action#minutes.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -2130,7 +2130,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(array("S_TimeLimit" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new time limit of #variable# %s #admin_action#minutes.', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#sets new time limit of #variable# %s #admin_action#minutes.', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -2160,7 +2160,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->allowMapDownload($bool);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set allow download maps to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set allow download maps to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2194,7 +2194,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setHideServer($output);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set Hide Server to#variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set Hide Server to#variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2293,7 +2293,7 @@ class ChatAdmin extends ExpPlugin
             \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_SKIP));
             $this->connection->nextMap($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_CUP);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2307,7 +2307,7 @@ class ChatAdmin extends ExpPlugin
     {
         try {
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($admin->cleanNickName));
 
             if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Maps\Maps')) {
                 \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_RESTART));
@@ -2332,7 +2332,7 @@ class ChatAdmin extends ExpPlugin
             \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_SKIP));
             $this->connection->nextMap(false);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#skips the challenge!', null, array($admin->cleanNickName));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }
@@ -2346,7 +2346,7 @@ class ChatAdmin extends ExpPlugin
     {
         try {
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($admin->nickName));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#restarts the challenge!', null, array($admin->cleanNickName));
 
             if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Maps\Maps')) {
                 \ManiaLive\Event\Dispatcher::dispatch(new GlobalEvent(GlobalEvent::ON_ADMIN_RESTART));
@@ -2413,7 +2413,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setModeScriptSettings(array("S_WarmUpDuration" => intval($newLimit)));
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable# %s #admin_action#sets warmup duration to#variable# %s #admin_action#minutes', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, 'Incompatible game mode');
             return;
@@ -2435,7 +2435,7 @@ class ChatAdmin extends ExpPlugin
         if (!empty($vote->cmdName)) {
             try {
                 $this->connection->cancelVote();
-                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cancels the vote.', null, array($admin->nickName));
+                $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#cancels the vote.', null, array($admin->cleanNickName));
                 return;
             } catch (Exception $e) {
                 $this->eXpChatSendServerMessage('#admin_error#Error: Server said %1$s', $admin->login, array($e->getMessage()));
@@ -2467,7 +2467,7 @@ class ChatAdmin extends ExpPlugin
         try {
             $this->connection->setDisableRespawn($bool);
             $admin = $this->storage->getPlayerObject($fromLogin);
-            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set allow respawn to #variable# %s', null, array($admin->nickName, $params[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %s #admin_action#set allow respawn to #variable# %s', null, array($admin->cleanNickName, $params[0]));
         } catch (Exception $e) {
             $this->sendErrorChat($fromLogin, $e->getMessage());
         }

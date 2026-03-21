@@ -1,7 +1,7 @@
 <?php
 namespace ManiaLivePlugins\eXpansion\Helpers;
 
-use ManiaLib\Utils\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class Console
 {

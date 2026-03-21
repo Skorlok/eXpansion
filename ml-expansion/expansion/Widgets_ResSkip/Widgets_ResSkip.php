@@ -144,7 +144,7 @@ class Widgets_ResSkip extends ExpPlugin
     public function publicRestartMap(Bill $bill)
     {
         $player = $this->storage->getPlayerObject($bill->getSourceLogin());
-        $this->eXpChatSendServerMessage($this->msg_prestart, null, array($player->nickName));
+        $this->eXpChatSendServerMessage($this->msg_prestart, null, array($player->cleanNickName));
 
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\Maps\\Maps')) {
             $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\Maps\\Maps", "replayMap", $bill->getSourceLogin());
@@ -164,7 +164,7 @@ class Widgets_ResSkip extends ExpPlugin
         $this->skipActive = true;
         $this->connection->nextMap($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_CUP);
         $player = $this->storage->getPlayerObject($bill->getSourceLogin());
-        $this->eXpChatSendServerMessage($this->msg_pskip, null, array($player->nickName));
+        $this->eXpChatSendServerMessage($this->msg_pskip, null, array($player->cleanNickName));
     }
 
     public function skipMap($login)

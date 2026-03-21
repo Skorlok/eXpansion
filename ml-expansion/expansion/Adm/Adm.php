@@ -250,7 +250,7 @@ class Adm extends ExpPlugin
     {
         $admin = $this->storage->getPlayerObject($login);
         foreach ($diffPameters as $key => $value) {
-            $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s#admin_action# changes script parameter #variable#%s#admin_action# to #variable#%s #admin_action#(#admin_action#Was #variable#%s#admin_action#)', null, array($admin->nickName, $key, $value[1], $value[0]));
+            $this->eXpChatSendServerMessage('#admin_action#Admin #variable#%s#admin_action# changes script parameter #variable#%s#admin_action# to #variable#%s #admin_action#(#admin_action#Was #variable#%s#admin_action#)', null, array($admin->cleanNickName, $key, $value[1], $value[0]));
         }
     }
 
@@ -289,7 +289,7 @@ class Adm extends ExpPlugin
     public function setPoints($login, $points)
     {
         try {
-            $nick = $this->storage->getPlayerObject($login)->nickName;
+            $nick = $this->storage->getPlayerObject($login)->cleanNickName;
             $config = \ManiaLivePlugins\eXpansion\Core\Config::getInstance();
             foreach ($points as $p) {
                 $intPoints[] = intval($p);
