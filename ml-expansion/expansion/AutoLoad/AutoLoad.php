@@ -428,6 +428,9 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                     $this->loadAvailablePluginMetaDataFromPath($path);
                 } else {
                     foreach ($subFiles as $file) {
+                        if ($file === '.' || $file === '..') {
+                            continue;
+                        }
                         if (is_dir($path . '/' . $file)) {
                             $this->findAvailablePluginsInPath($path . '/' . $file, $depth - 1);
                         }
