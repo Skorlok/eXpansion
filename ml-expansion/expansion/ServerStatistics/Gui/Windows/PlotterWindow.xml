@@ -1,0 +1,79 @@
+<?php
+$datas   = $this->getParam("datas");
+$limitY  = (float)$this->getParam("limitY");
+$labelsX = $this->getParam("labelsX");
+$labelsY = $this->getParam("labelsY");
+$color0  = $this->getParam("color0");
+$color1  = $this->getParam("color1");
+
+if (!is_array($datas))   { $datas   = array(); }
+if (!is_array($labelsX)) { $labelsX = array(); }
+
+$useStyle = (substr($this->eXpStorage->version->build, 0, 4) >= 2017);
+$nbX = count($labelsX);
+?>
+<?php foreach ($labelsX as $i => $label): ?>
+<label posn="<?php echo ($nbX > 0 ? ($i * 195 / $nbX) + 5 : 5); ?> -99 1.0" sizen="15 7" halign="left" valign="right" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($label); ?>"/>
+<?php endforeach; ?>
+<?php if (is_array($labelsY) && count($labelsY) > 0):
+	$nbY = count($labelsY);
+	foreach ($labelsY as $i => $labelY):
+?>
+<label posn="7 <?php echo (-$i * 95 / $nbY) - 1; ?> 5.0" sizen="8 7" halign="right" valign="right" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($labelY); ?>"/>
+<?php
+	endforeach;
+else:
+	for ($i = 0; $i < 5; $i++):
+?>
+<label posn="7 <?php echo (-$i * 95 / 5) - 1; ?> 5.0" sizen="8 7" halign="right" valign="right" style="TextStaticSmall" text="<?php echo (int)((5 - $i) * ($limitY / 5)); ?>"/>
+<?php
+	endfor;
+endif;
+?>
+<graph id="graph" min="0 0" max="720 <?php echo $limitY; ?>" posn="8 -3 10" sizen="152 96" halign="left" valign="top" scriptevents="1">
+<?php
+$plots = array();
+foreach ($datas as $seriesIdx => $series) {
+	foreach ($series as $x => $val) {
+		$plots[$seriesIdx][] = array($x, $val);
+	}
+}
+$plotIdx = 0;
+foreach ($plots as $seriesIdx => $plot):
+	$color = ($plotIdx === 0) ? $color0 : $color1;
+	if ($useStyle):
+?>
+<curve color="<?php echo $color; ?>" style="thin">
+<?php else: ?>
+<curve color="<?php echo $color; ?>">
+<?php endif; ?>
+<?php foreach ($plot as $point): ?><point coords="<?php echo $point[0]; ?> <?php echo $point[1]; ?>"/>
+<?php endforeach; ?>
+</curve>
+<?php
+	$plotIdx++;
+endforeach;
+
+if ($useStyle):
+?>
+<curve color="000" width="0.5" style="thin">
+<?php else: ?>
+<curve color="000" width="0.5">
+<?php endif; ?>
+<point coords="0.00 0.00"/>
+<point coords="0.001 <?php echo $limitY; ?>"/>
+</curve>
+<?php
+$index  = 0;
+$step   = ($limitY > 0) ? (pow(10, round(log($limitY) / 2.303)) / 5) : 1;
+while ($index < $limitY):
+?>
+<curve color="000" width="0.5">
+<point coords="0.00 <?php echo $index; ?>"/>
+<point coords="720.00 <?php echo $index; ?>"/>
+</curve>
+<?php
+	$index += $step;
+endwhile;
+?>
+</graph>

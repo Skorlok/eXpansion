@@ -33,7 +33,8 @@ class Button
         $icon = null,
         $id = null,
         $class = null,
-        $attribute = null
+        $attribute = null,
+        $isTextId = false
     )
     {
         /** @var Config $config */
@@ -70,7 +71,11 @@ class Button
             $xml .= '<quad posn="-0.5 0 1" sizen="' . ($sizeX+3) . ' ' . ($sizeY+2.5) . '" halign="left" valign="center" style="Icons128x128_Blink" substyle="ShareBlink"/>';
         }
         if (!empty($text)) {
-            $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" text="' . $text . '"/>';
+            if ($isTextId) {
+                $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" textid="' . $text . '"/>';
+            } else {
+                $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" text="' . $text . '"/>';
+            }
         }
 
         if (is_array($description)) {

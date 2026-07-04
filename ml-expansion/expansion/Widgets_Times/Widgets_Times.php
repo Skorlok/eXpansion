@@ -23,6 +23,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
+        $this->enableStorageEvents();
         $this->config = Config::getInstance();
     }
 
@@ -58,11 +59,19 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->showPanel($login, $this->storage->getPlayerObject($login));
     }
 
-    public function onPlayerInfoChanged($playerInfo)
+    public function onPlayerChangeSide($player, $oldSide)
     {
-        $player = \Maniaplanet\DedicatedServer\Structures\PlayerInfo::fromArray($playerInfo);
-        if ($player) {
+        $this->showPanel($player->login, $player);
+    }
+
+    public function onSpectatorChangeTarget($player, $targetId)
+    {
+        if ($targetId) {
             $this->showPanel($player->login, $player);
+        } else {
+            $widget = new Widget("Widgets_Times\Gui\Widgets\TimePanel.xml");
+            $widget->setName("Player Time Panel");
+            $widget->erase($player->login);
         }
     }
 
@@ -248,7 +257,7 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $target = "";
         $spectatorTarget = $login;
 
-        if (isset($playerObject->currentTargetId)) {
+        if (isset($playerObject->spectator) && $playerObject->spectator && isset($playerObject->currentTargetId)) {
             if ($playerObject->currentTargetId) {
                 $spec = $this->getPlayerObjectById($playerObject->currentTargetId);
                 if ($spec->login) {
@@ -286,6 +295,13 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function onPlayerConnect($login, $isSpectator)
     {
         $this->showPanel($login, $this->storage->getPlayerObject($login));
+    }
+
+    public function onPlayerDisconnect($login, $disconnectionReason = null)
+    {
+        if (array_key_exists($login, $this->references)) {
+            unset($this->references[$login]);
+        }
     }
 
     public function onRecordsLoaded($data)

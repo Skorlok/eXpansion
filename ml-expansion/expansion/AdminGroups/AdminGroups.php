@@ -8,6 +8,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\Groups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\Help;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 /**
  * Admin Groups for eXpansion
@@ -114,6 +115,9 @@ class AdminGroups extends ExpPlugin
     private $msg_pRemoveFa;
     private $msg_masterMasterE;
     private $adminIps = array();
+
+    /** @var Window */
+    protected $cmdMoreWindow;
     public static $txt_msg_cmdDontEx;
     public static $txt_groupsTitle;
     public static $txt_helpTitle;
@@ -211,6 +215,14 @@ class AdminGroups extends ExpPlugin
         $cmd->setHelp("Show the list of all available admin commands and alliases.");
 
         Dispatcher::register(ServerEvent::getClass(), $this, ServerEvent::ON_PLAYER_CHAT);
+    }
+
+    public function eXpOnReady()
+    {
+        $this->cmdMoreWindow = new Window("AdminGroups\Gui\Windows\CmdMore.xml");
+        $this->cmdMoreWindow->setName("CmdMore");
+        $this->cmdMoreWindow->setSize(120, 100);
+        $this->cmdMoreWindow->setTitle('Admin Commands Extended Help');
     }
 
     /**
@@ -1351,10 +1363,26 @@ class AdminGroups extends ExpPlugin
     }
 
     /**
+     * Show the CmdMore window for a specific command.
+     *
+     * @param string   $login
+     * @param AdminCmd $cmd
+     */
+    public function showCmdMore($login, AdminCmd $cmd)
+    {
+        $this->cmdMoreWindow->setParam("cmd",   $cmd);
+        $this->cmdMoreWindow->show($login);
+    }
+
+    /**
      * @inheritdoc
      */
     public function eXpOnUnload()
     {
+        if ($this->cmdMoreWindow instanceof Window) {
+            $this->cmdMoreWindow->erase();
+        }
+        $this->cmdMoreWindow = null;
         self::$admins = array();
         self::$commands = array();
         self::$commandsList = array();

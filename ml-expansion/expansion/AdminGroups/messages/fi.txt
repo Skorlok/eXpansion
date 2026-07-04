@@ -79,17 +79,17 @@ Tämä komento edellyttää vähintään yhtä valitsinta
 Admin Commands Help
 Ylläpitokomentojen ohje
 
-Command
-Komento
+$wCommand
+$wKomento
 
-Description
-Kuvaus
+$wDescription
+$wKuvaus
 
-More
-Lisää...
+$wMore
+$wLisää...
 
-Aliases
-aliakset
+$wAliases
+$waliakset
 
 OK
 OK

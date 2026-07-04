@@ -67,17 +67,17 @@ Gruppe löschen
 Remove Player
 Spieler entfernen
 
-Command
-Befehl
+$wCommand
+$wBefehl
 
-Description
-Beschreibung
+$wDescription
+$wBeschreibung
 
-More
-Weiter
+$wMore
+$wWeiter
 
-Aliases
-Pseudonyme
+$wAliases
+$wPseudonyme
 
 OK
 OK

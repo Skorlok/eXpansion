@@ -24,8 +24,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     protected $backup;
 
-    protected $cancel;
-
     protected $truncate;
 
     protected $actionRepair;
@@ -33,8 +31,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $actionOptimize;
 
     protected $actionBackup;
-
-    protected $actionConfirmTruncate;
 
     protected $actionTruncate;
 
@@ -44,14 +40,13 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected function onConstruct()
     {
         parent::onConstruct();
-        $config = \ManiaLive\DedicatedApi\Config::getInstance();
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
         $this->pager = new \ManiaLivePlugins\eXpansion\Gui\Elements\Pager();
         $this->addComponent($this->pager);
 
-        $this->actionRepair = $this->createAction(array($this, "Repair"));
+        $this->actionRepair   = $this->createAction(array($this, "Repair"));
         $this->actionOptimize = $this->createAction(array($this, "Optimize"));
-        $this->actionBackup = $this->createAction(array($this, "Backup"));
+        $this->actionBackup   = $this->createAction(array($this, "Backup"));
         $this->actionTruncate = $this->createAction(array($this, "Truncate"));
 
         $this->frame = new \ManiaLive\Gui\Controls\Frame();
@@ -73,6 +68,8 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->backup = new \ManiaLive\Gui\Elements\Xml();
         $this->backup->setContent('<frame posn="102 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, 'Access Backups', null, null, "0d0", null, null, $this->actionBackup, null, null, null, null, null, null) . '</frame>');
         $this->frame->addComponent($this->backup);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getScriptML());
     }
 
     protected function onResize($oldX, $oldY)
@@ -96,7 +93,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->pager->clearItems();
         $this->items = array();
 
-        $login = $this->getRecipient();
         $x = 0;
         $dbconfig = \ManiaLive\Database\Config::getInstance();
         $dbName = $dbconfig->database;
@@ -120,7 +116,6 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function Backup($login)
     {
-
         $window = BackupRestore::Create($login);
         $window->init($this->db);
         $window->setTitle(__('Database Backup and Restore'));
@@ -132,13 +127,8 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function Repair($login, $args)
     {
-
         foreach ($this->items as $item) {
-            // if checkbox checked
-
-            $this->syncCheckboxItem($item, $args);
-            if ($item->checkBox->getStatus()) {
-                // repair table
+            if (isset($args['cb_' . $item->tableName]) && $args['cb_' . $item->tableName] == '1') {
                 $status = $this->db->execute("REPAIR TABLE " . $item->tableName . ";")->fetchObject();
                 $this->connection->chatSendServerMessage(
                     "Table " . $status->Table . " repaired with " . $status->Msg_type . ":" . $status->Msg_text,
@@ -151,11 +141,8 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     public function Truncate($login, $args)
     {
         foreach ($this->items as $item) {
-            // if checkbox checked
-            $this->syncCheckboxItem($item, $args);
-            if ($item->checkBox->getStatus()) {
-                // repair table
-                $status = $this->db->execute("TRUNCATE TABLE " . $item->tableName . ";");
+            if (isset($args['cb_' . $item->tableName]) && $args['cb_' . $item->tableName] == '1') {
+                $this->db->execute("TRUNCATE TABLE " . $item->tableName . ";");
                 $this->connection->chatSendServerMessage('Table \'$0d0' . $item->tableName . '$fff\' contents is now $d00CLEARED$fff!', $login);
             }
         }
@@ -163,12 +150,8 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function Optimize($login, $args)
     {
-
         foreach ($this->items as $item) {
-            // if checkbox checked
-            $this->syncCheckboxItem($item, $args);
-            if ($item->checkBox->getStatus()) {
-                // repair table
+            if (isset($args['cb_' . $item->tableName]) && $args['cb_' . $item->tableName] == '1') {
                 $status = $this->db->execute("OPTIMIZE TABLE `" . $item->tableName . "`;")->fetchObject();
                 $this->connection->chatSendServerMessage("Table " . $status->Table . " Optimized with " . $status->Msg_type . ":" . $status->Msg_text, $login);
             }
@@ -186,15 +169,5 @@ class Maintainance extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->storage = null;
 
         parent::destroy();
-    }
-
-    public function syncCheckboxItem(&$item, $args)
-    {
-        $components = $item->getComponents();
-        foreach ($components as &$component) {
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted) {
-                $component->setArgs($args);
-            }
-        }
     }
 }

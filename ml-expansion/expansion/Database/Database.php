@@ -416,7 +416,9 @@ class Database extends ExpPlugin
             } elseif ($w % 25 == 0) {
                 $this->eXpChatSendServerMessage($msg_pub, null, array(StringFormatting::stripCodes($player->cleanNickName, "wosnm"), $wins));
             } else {
-                $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
+                if (isset($this->storage->players[$player->login]) || isset($this->storage->spectators[$player->login])) {
+                    $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
+                }
             }
         }
     }

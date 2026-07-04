@@ -67,17 +67,17 @@ Delete Group
 Remove Player
 #translate# Remove Player
 
-Command
-#translate# Command
+$wCommand
+#translate# $wCommand
 
-Description
-#translate# Description
+$wDescription
+#translate# $wDescription
 
-More
-#translate# More
+$wMore
+#translate# $wMore
 
-Aliases
-#translate# Aliases
+$wAliases
+#translate# $wAliases
 
 OK
 #translate# OK

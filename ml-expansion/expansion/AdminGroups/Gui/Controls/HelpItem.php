@@ -7,7 +7,6 @@ use ManiaLib\Gui\Layouts\Line;
 use ManiaLive\Gui\Controls\Frame;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminCmd;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\CmdMore;
 use ManiaLivePlugins\eXpansion\Gui\Control;
 use ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround;
 
@@ -81,13 +80,6 @@ class HelpItem extends Control
 
     public function cmdMore($login, $cmd)
     {
-        CmdMore::Erase($login);
-        /** @var CmdMore $window */
-        $window = CmdMore::Create($login);
-        $window->setCommand($cmd);
-        $window->setTitle(__(\eXpGetMessage("Admin Commands Extended Help"), $login));
-        $window->setSize(120, 100);
-        $window->centerOnScreen();
-        $window->show();
+        AdminGroups::getInstance()->showCmdMore($login, $cmd);
     }
 }

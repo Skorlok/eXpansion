@@ -23,14 +23,14 @@ use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\BlacklistPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\GuestPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\IgnoredPlayeritem;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\GenericPlayerList;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\ParameterDialog;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\TeamSetup;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\ClubLinksSetup;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Structures\ActionDuration;
 use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser;
+use ManiaLivePlugins\eXpansion\Gui\Scripts\DropDownScript;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
@@ -56,6 +56,17 @@ class ChatAdmin extends ExpPlugin
     protected $clubLinksGet = 0;
     protected $clubLinksExpected = 0;
 
+    protected $actions = array("clubLinks" => array(), "paramDialog" => array(), "teamSetup" => array());
+
+    /** @var Window */
+    protected $clubLinksWindow;
+    /** @var Window */
+    protected $paramDialogWindow;
+    /** @var Window */
+    protected $teamSetupWindow;
+    
+    protected $paramDialogDropdownItems = array("permanent", "30 seconds", "5 min", "10 min", "15 min", "30 min", "1 hour", "1 day", "5 day", "week", "month");
+
     public static $showActions = array();
 
     /**
@@ -63,7 +74,6 @@ class ChatAdmin extends ExpPlugin
      */
     public function eXpOnInit()
     {
-        ParameterDialog::$mainPlugin = $this;
         $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups'));
 
         $this->setPublicMethod("restartMap");
@@ -410,8 +420,37 @@ class ChatAdmin extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        TeamSetup::$mainPlugin = $this;
-        ClubLinksSetup::$mainPlugin = $this;
+
+        /** @var ActionHandler $ah */
+        $ah = ActionHandler::getInstance();
+        $this->actions["clubLinks"]["ok"] = $ah->createAction(array($this, 'clubLinksOk'));
+        $this->actions["paramDialog"]["ok"] = $ah->createAction(array($this, 'parameterDialogOk'));
+        $this->actions["teamSetup"]["ok"] = $ah->createAction(array($this, 'teamSetupOk'));
+
+        $this->paramDialogWindow = new Window("ChatAdmin\Gui\Windows\ParameterDialog.xml");
+        $this->paramDialogWindow->setName("ParameterDialog");
+        $this->paramDialogWindow->setSize(110, 20);
+        $this->paramDialogWindow->setParam("okAction",      $this->actions["paramDialog"]["ok"]);
+        $this->paramDialogWindow->setParam("dropdownItems", $this->paramDialogDropdownItems);
+        $dropScript = new DropDownScript();
+        $dropScript->setParam("name",     "select");
+        $dropScript->setParam("values",   $this->paramDialogDropdownItems);
+        $dropScript->setParam("selected", 0);
+        $this->paramDialogWindow->registerScript($dropScript);
+
+        $this->clubLinksWindow = new Window("ChatAdmin\Gui\Windows\ClubLinksSetup.xml");
+        $this->clubLinksWindow->setName("ClubLinksSetup");
+        $this->clubLinksWindow->setSize(38, 60);
+        $this->clubLinksWindow->setTitle('Team clublinks');
+        $this->clubLinksWindow->setParam("action", $this->actions["clubLinks"]["ok"]);
+
+        
+        $this->teamSetupWindow = new Window("ChatAdmin\Gui\Windows\TeamSetup.xml");
+        $this->teamSetupWindow->setName("TeamSetup");
+        $this->teamSetupWindow->setSize(38, 60);
+        $this->teamSetupWindow->setTitle('Team names and colors');
+        $this->teamSetupWindow->setParam("okAction", $this->actions["teamSetup"]["ok"]);
+        $this->teamSetupWindow->registerScript(ColorChooser::getScriptML());
 
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
@@ -807,10 +846,13 @@ class ChatAdmin extends ExpPlugin
 
     public function setTeamDisplay($fromLogin, $params = null)
     {
-        $window = TeamSetup::Create($fromLogin);
-        $window->setSize(38, 60);
-        $window->setTitle("Team names and colors");
-        $window->show();
+        $this->teamSetupWindow->show($fromLogin);
+    }
+
+    public function teamSetupOk($login, $data)
+    {
+        $this->teamSetupWindow->erase($login);
+        $this->setTeamDisplayAfterWindow($login, $data);
     }
 
     public function setTeamDisplayAfterWindow($fromLogin, $params)
@@ -836,10 +878,30 @@ class ChatAdmin extends ExpPlugin
 
     public function forceClubLinks($fromLogin, $params)
     {
-        $window = ClubLinksSetup::Create($fromLogin);
-        $window->setSize(38, 60);
-        $window->setTitle("Team clublinks");
-        $window->show();
+        $this->clubLinksWindow->show($fromLogin);
+    }
+
+    public function clubLinksOk($login, $data)
+    {
+        $this->clubLinksWindow->erase($login);
+        $this->getClubLinks($login, $data);
+    }
+
+    public function parameterDialogOk($login, $inputbox)
+    {
+        $action = isset($inputbox['adminAction']) ? $inputbox['adminAction'] : '';
+        $target = isset($inputbox['adminTarget']) ? $inputbox['adminTarget'] : '';
+
+        if ($action === "kick") {
+            $cmd = $action . " " . $target . " " . $inputbox['parameter'];
+        } else {
+            $select   = isset($inputbox['select']) ? intval($inputbox['select']) : 0;
+            $duration = isset($this->paramDialogDropdownItems[$select]) ? $this->paramDialogDropdownItems[$select] : "permanent";
+            $cmd      = $action . " " . $target . " " . $inputbox['parameter'] . ", duration: " . $duration;
+            $this->addActionDuration($target, $action, $duration);
+        }
+        AdminGroups::getInstance()->adminCmd($login, $cmd);
+        $this->paramDialogWindow->erase($login);
     }
 
     public function getClubLinks($login, $data)
@@ -1574,11 +1636,10 @@ class ChatAdmin extends ExpPlugin
         }
 
         if (empty($reason)) {
-            /** @var ParameterDialog $dialog */
-            $dialog = ParameterDialog::Create($fromLogin);
-            $dialog->setTitle(__("blacklist", $fromLogin), Formatting::stripStyles($nickname));
-            $dialog->setData("black", $target);
-            $dialog->show($fromLogin);
+            $this->paramDialogWindow->setTitle("blacklist %s", array($nickname));
+            $this->paramDialogWindow->setParam("adminAction", "black");
+            $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->show($fromLogin);
 
             return;
         }
@@ -1721,11 +1782,10 @@ class ChatAdmin extends ExpPlugin
             $nickname = $target;
         }
         if (empty($reason)) {
-            /** @var ParameterDialog $dialog */
-            $dialog = ParameterDialog::Create($fromLogin);
-            $dialog->setTitle(__("ban", $fromLogin), Formatting::stripStyles($nickname));
-            $dialog->setData("ban", $target);
-            $dialog->show($fromLogin);
+            $this->paramDialogWindow->setTitle("ban %s", array($nickname));
+            $this->paramDialogWindow->setParam("adminAction", "ban");
+            $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->show($fromLogin);
             return;
         }
         $admin = $this->storage->getPlayerObject($fromLogin);
@@ -1833,11 +1893,10 @@ class ChatAdmin extends ExpPlugin
             return;
         }
         if (empty($reason)) {
-            /** @var ParameterDialog $dialog */
-            $dialog = ParameterDialog::Create($fromLogin);
-            $dialog->setTitle(__("kick", $fromLogin), Formatting::stripStyles($player->nickName));
-            $dialog->setData("kick", $target);
-            $dialog->show($fromLogin);
+            $this->paramDialogWindow->setTitle("kick %s", array($player->cleanNickName));
+            $this->paramDialogWindow->setParam("adminAction", "kick");
+            $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->show($fromLogin);
 
             return;
         }
@@ -2639,8 +2698,29 @@ class ChatAdmin extends ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
-        ParameterDialog::EraseAll();
         GenericPlayerList::EraseAll();
         self::$showActions = null;
+
+        if ($this->teamSetupWindow instanceof Window) {
+            $this->teamSetupWindow->erase();
+        }
+        $this->teamSetupWindow = null;
+        if ($this->clubLinksWindow instanceof Window) {
+            $this->clubLinksWindow->erase();
+        }
+        $this->clubLinksWindow = null;
+        if ($this->paramDialogWindow instanceof Window) {
+            $this->paramDialogWindow->erase();
+        }
+        $this->paramDialogWindow = null;
+        
+        /** @var ActionHandler $aH */
+        $aH = ActionHandler::getInstance();
+        foreach ($this->actions as $actions) {
+            foreach ($actions as $action) {
+                $aH->deleteAction($action);
+            }
+        }
+        $this->actions = array();
     }
 }

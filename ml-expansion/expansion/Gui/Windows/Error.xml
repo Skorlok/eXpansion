@@ -1,0 +1,4 @@
+<?php
+$message = $this->getParam("message");
+?>
+<label sizen="120 90" halign="left" valign="top" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($message); ?>" maxline="25"/>

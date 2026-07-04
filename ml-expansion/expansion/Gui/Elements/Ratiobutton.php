@@ -2,93 +2,42 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLivePlugins\eXpansion\Gui\Config;
-
-class Ratiobutton extends \ManiaLivePlugins\eXpansion\Gui\Control
+class Ratiobutton
 {
 
-    protected $label;
-    protected $button;
-    protected $active = false;
-    protected $textWidth;
-    protected $action;
-    protected $buttonac;
+    private static $script = null;
 
-    public function __construct($sizeX = 3, $sizeY = 3, $textWidth = 25)
+    /**
+     * @param string $group      Group name — no underscores allowed
+     * @param int    $index      0-based index within the group
+     * @param string $entryName  Name attribute of the hidden entry (read by PHP in $options)
+     * @param bool   $active     Initial selected state
+     * @param int    $textWidth  Label width
+     * @param string $text       Display text
+     */
+    public static function getXML($group, $index, $entryName, $active = false, $textWidth = 25, $text = "", $isTextId = false)
     {
-        $this->textWidth = $textWidth;
-        $this->action = $this->createAction(array($this, 'toggleActive'));
+        $colorize      = $active ? '0f0' : 'f00';
+        $default       = $active ? '1'   : '0';
 
-        $this->button = new \ManiaLib\Gui\Elements\Quad(12, 6);
-        $this->button->setAlign('center', 'center');
-        $this->button->setAction($this->action);
-        $this->button->setScriptEvents(true);
-
-        $this->addComponent($this->button);
-
-
-        $this->label = new \ManiaLib\Gui\Elements\Label($textWidth, 4);
-        $this->label->setAlign('left', 'center');
-        $this->label->setTextSize(1);
-        $this->addComponent($this->label);
-        $this->setSize(10 + $textWidth, 5);
-    }
-
-    protected function onResize($oldX, $oldY)
-    {
-        parent::onResize($this->textWidth + 10, 5);
-
-        $this->button->setSize(5, 5);
-        $this->button->setPosition(0, -0.5);
-        $this->button->setStyle('Icons64x64_1');
-        $this->button->setSubStyle('GenericButton');
-        $this->label->setSize($this->textWidth, 6);
-        $this->label->setPosition(4, 0);
-    }
-
-    protected function onDraw()
-    {
-        if ($this->active) {
-            $this->button->setColorize("0f0");
+        $xml  = '<frame>';
+        $xml .= '<quad id="eXp_RatioQ_' . $group . '_' . intval($index) . '" posn="0 -0.5 0" sizen="5 5" halign="center" valign="center" style="Icons64x64_1" substyle="GenericButton" scriptevents="1" colorize="' . $colorize . '"/>';
+        $xml .= '<entry id="eXp_RatioE_' . $group . '_' . intval($index) . '" posn="4000 0 1.0E-5" sizen="20 4" style="" name="' . $entryName . '" default="' . $default . '"/>';
+        if ($isTextId) {
+            $xml .= '<label posn="4 0 2.0E-5" sizen="' . $textWidth . ' 6" halign="left" valign="center" style="TextCardInfoSmall" textsize="1" textid="' . $text . '"/>';
         } else {
-            $this->button->setColorize("f00");
+            $xml .= '<label posn="4 0 2.0E-5" sizen="' . $textWidth . ' 6" halign="left" valign="center" style="TextCardInfoSmall" textsize="1" text="' . $text . '"/>';
         }
+        $xml .= '</frame>';
+
+        return $xml;
     }
 
-    public function setStatus($boolean)
+    public static function getScriptML()
     {
-        $this->active = $boolean;
-    }
-
-    public function getStatus()
-    {
-        return $this->active;
-    }
-
-    public function getText()
-    {
-        return $this->label->getText();
-    }
-
-    public function setText($text)
-    {
-        $this->label->setText('$fff' . $text);
-    }
-
-    public function toggleActive($login)
-    {
-        $this->active = !$this->active;
-        $this->redraw();
-    }
-
-    public function setAction($action)
-    {
-        $this->button->setAction($action);
-    }
-
-    public function onIsRemoved(\ManiaLive\Gui\Container $target)
-    {
-        parent::onIsRemoved($target);
-        parent::destroy();
+        if (self::$script === null) {
+            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\RatiobuttonScript();
+        }
+        return self::$script;
     }
 }

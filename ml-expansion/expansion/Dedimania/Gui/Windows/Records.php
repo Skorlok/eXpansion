@@ -23,6 +23,8 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $button_cps;
     protected $button_seccps;
 
+    public static $parentPlugin;
+
     protected function onConstruct()
     {
         parent::onConstruct();
@@ -107,7 +109,7 @@ class Records extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $x = 0;
         $login = $this->getRecipient();
         foreach ($recs as $rec) {
-            $this->items[$x] = new RecItem($x, $login, $rec, $this->widths);
+            $this->items[$x] = new RecItem($x, $login, $rec, $this->widths, self::$parentPlugin);
             $this->pager->addItem($this->items[$x]);
             $x++;
         }

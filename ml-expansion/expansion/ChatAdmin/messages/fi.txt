@@ -28,14 +28,14 @@ possible parameters: limit, rounds, nbwin, wu, wunb, dtd, fto, skip, res
 possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res, display
 #translate# possible parameters: limit, maxpoint, newrules, wu, wunb, dtd, fto, blue, red, gap, balance, skip, res, display
 
-blacklist
-#translate# blacklist
+blacklist %s
+#translate# blacklist %s
 
-ban
-#translate# ban
+ban %s
+#translate# ban %s
 
-kick
-#translate# kick
+kick %s
+#translate# kick %s
 
 Ok
 Ok

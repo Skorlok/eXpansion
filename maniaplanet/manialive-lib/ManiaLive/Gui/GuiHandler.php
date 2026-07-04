@@ -795,6 +795,11 @@ final class GuiHandler extends \ManiaLib\Utils\Singleton implements AppListener,
     {
 
     }
+
+    function onSpectatorChangeTarget($player, $targetId)
+    {
+
+    }
 }
 
 ?>

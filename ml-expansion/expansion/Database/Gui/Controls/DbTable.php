@@ -14,11 +14,7 @@ class DbTable extends Control
 
     private $label;
 
-    public $checkBox = null;
-
     public $tableName;
-
-    public $type = null;
 
     /**
      *
@@ -31,12 +27,12 @@ class DbTable extends Control
         $sizeY = 6;
         $this->tableName = $tableName;
 
-
         $this->bg = new ListBackGround($indexNumber, $sizeX - 8, $sizeY);
         $this->addComponent($this->bg);
 
-        $this->checkBox = new CheckboxScripted(4, 4, 1);
-        $this->addComponent($this->checkBox);
+        $cbXml = new \ManiaLive\Gui\Elements\Xml();
+        $cbXml->setContent('<frame posn="0 0 1">' . CheckboxScripted::getXML('cb_' . $tableName, false, 1, true, '') . '</frame>');
+        $this->addComponent($cbXml);
 
         $this->label = new Label(120, 4);
         $this->label->setPosX(6);
@@ -56,13 +52,8 @@ class DbTable extends Control
 
     }
 
-    /*
-     * custom function to remove contents.
-     */
-
     public function erase()
     {
-        $this->checkBox->destroy();
         $this->destroyComponents();
         parent::destroy();
     }

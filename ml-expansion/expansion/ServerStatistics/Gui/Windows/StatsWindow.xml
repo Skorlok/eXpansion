@@ -1,0 +1,69 @@
+<?php
+$playerAction  = $this->getParam("serverPlayerAction");
+$memAction     = $this->getParam("serverMemAction");
+$cpuAction     = $this->getParam("serverCpuAction");
+$comment       = $this->getParam("comment");
+$upTimeDedi    = $this->getParam("upTimeDedi");
+$upTime        = $this->getParam("upTime");
+$mapCount      = $this->getParam("mapCount");
+$maxPlayers    = $this->getParam("maxPlayers");
+$avgPlayer     = $this->getParam("avgPlayer");
+$maxSpectators = $this->getParam("maxSpectators");
+$avgSpec       = $this->getParam("avgSpec");
+$ladderLimit   = $this->getParam("ladderLimit");
+$nbPlayer      = $this->getParam("nbPlayer");
+$nbNation      = $this->getParam("nbNation");
+$totalTime     = $this->getParam("totalPlayersTimes");
+
+$infoRows = array(
+	array('key' => 'Dedicated Up Time',  'value' => $upTimeDedi,    'y' => -26),
+	array('key' => 'eXpansaion Up Time', 'value' => $upTime,        'y' => -32),
+	array('key' => 'Map Count',          'value' => $mapCount,      'y' => -38),
+	array('key' => 'Max Players',        'value' => $maxPlayers,    'y' => -44),
+	array('key' => 'Average Players',    'value' => $avgPlayer,     'y' => -50),
+	array('key' => 'Max Spectators',     'value' => $maxSpectators, 'y' => -56),
+	array('key' => 'Average Spectators', 'value' => $avgSpec,       'y' => -62),
+	array('key' => 'Ladder Limit',       'value' => $ladderLimit,   'y' => -68),
+);
+?>
+<frame posn="2 -66 0">
+	<frame>
+		<frame posn="0 0 1" scale="1.066666667">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array("Number of Players statistics", 30), null, null, null, null, $playerAction, null, null, array("Icons128x128_1", "Rankings"), null, null, null) ?>
+		</frame>
+		<frame posn="6.4 0 1" scale="1.066666667">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array("Memory usage statistics", 30), null, null, null, null, $memAction, null, null, "http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/ramStat.png", null, null, null) ?>
+		</frame>
+		<frame posn="12.8 0 1" scale="1.066666667">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(6, 6, null, array("Cpu  usage statistic", 30), null, null, null, null, $cpuAction, null, null, "http://files.oliver-decramer.com/data/maniaplanet/images/eXpansion/cpuStat.png", null, null, null) ?>
+		</frame>
+	</frame>
+</frame>
+<frame posn="0 5 3.0E-5" scale="0.8">
+	<frame>
+		<frame>
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang("Comment"); ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($comment); ?>" autonewline="1"/>
+			<frame posn="33 -12 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 24.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<?php foreach ($infoRows as $row): ?>
+		<frame posn="0 <?php echo $row['y']; ?> 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang($row['key']); ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($row['value']); ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<?php endforeach; ?>
+		<label posn="0 -74 0" sizen="70 12" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars('Visited by ' . $nbPlayer . ' players from ' . $nbNation . ' zones'); ?>"/>
+		<label posn="0 -78.5 0" sizen="70 12" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars('Who together played ' . $totalTime); ?>"/>
+	</frame>
+</frame>

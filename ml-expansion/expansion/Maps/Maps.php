@@ -12,13 +12,13 @@ use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Donate\Config as Donate;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\AddMaps;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Jukelist;
 use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Maplist;
-use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\MapInfo;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapSortMode;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapWish;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapInfos;
@@ -57,6 +57,7 @@ class Maps extends ExpPlugin
     private $msg_skipleft;
     private $actionShowMapList;
     private $actionShowJukeList;
+    private $mapInfoWindow;
 
     /** @var MapSortMode[] */
     public static $playerSortModes = array();
@@ -90,8 +91,8 @@ class Maps extends ExpPlugin
         $this->setPublicMethod("replayScoreReset");
         $this->setPublicMethod("returnQueue");
         $this->setPublicMethod("showMapList");
-        $this->setPublicMethod("showMapList_menu");
         $this->setPublicMethod("showJukeList");
+        $this->setPublicMethod("showMapInfo");
         if ($this->expStorage->isRemoteControlled == false) {
             $this->setPublicMethod("addMaps");
         }
@@ -182,8 +183,11 @@ class Maps extends ExpPlugin
         AddMaps::$mapsPlugin = $this;
         /** @var \ManiaLive\Gui\ActionHandler */
         $action = \ManiaLive\Gui\ActionHandler::getInstance();
-        $this->actionShowMapList = $action->createAction(array($this, "showMapList_menu"));
+        $this->actionShowMapList = $action->createAction(array($this, "showMapList"));
         $this->actionShowJukeList = $action->createAction(array($this, "showJukeList"));
+
+        $this->mapInfoWindow = new Window("Maps\Gui\Windows\MapInfo.xml");
+        $this->mapInfoWindow->setSize(160, 90);
 
         $this->showCurrentMapWidget();
         $this->showNextMapWidget();
@@ -525,11 +529,6 @@ class Maps extends ExpPlugin
         $window->setTitle(__("Jukebox", $login));
         $window->setSize(180, 100);
         $window->show();
-    }
-
-    public function showMapList_menu($login)
-    {
-        $this->showMapList($login); // Fail safe for the exp menu who add "\ManiaLivePlugins\eXpansion\Menu\Menu" as params
     }
 
     public function showBestMapList($login)
@@ -1344,11 +1343,76 @@ class Maps extends ExpPlugin
         if ($uid == null) {
             $uid = $this->storage->currentMap->uId;
         }
-        $window = MapInfo::create($login);
-        $window->setMap($uid);
-        $window->setTitle("Map Info", $this->storage->currentMap->name);
-        $window->setSize(160, 90);
-        $window->show($login);
+
+        $map = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $uid);
+        if ($map === false) {
+            return;
+        }
+
+        $authorNick  = "n/a";
+        $mood        = isset($map->mood) ? $map->mood : "";
+        $nbLap       = isset($map->nbLap) ? $map->nbLap : 0;
+        $nbCheck     = isset($map->nbCheckpoint) ? $map->nbCheckpoint : 0;
+        $authorTime  = isset($map->authorTime) ? $map->authorTime : 0;
+        $silverTime  = isset($map->silverTime) ? $map->silverTime : 0;
+        $bronzeTime  = isset($map->bronzeTime) ? $map->bronzeTime : 0;
+        $songFile    = isset($map->songFile) ? $map->songFile : "";
+        $modName     = isset($map->modName) ? $map->modName : "";
+        $carType     = "";
+        $modUrl      = "";
+        $songUrl     = "";
+
+        try {
+            $mapPath = $this->connection->getMapsDirectory();
+            if (file_exists($mapPath . DIRECTORY_SEPARATOR . $map->fileName)) {
+                $gbxInfo = new GBXChallMapFetcher(true, false, false);
+                $gbxInfo->processFile($mapPath . DIRECTORY_SEPARATOR . $map->fileName);
+                if ($gbxInfo) {
+                    $mood       = $gbxInfo->mood;
+                    $nbLap      = $gbxInfo->nbLaps;
+                    $nbCheck    = $gbxInfo->nbChecks;
+                    $authorTime = $gbxInfo->authorTime;
+                    $silverTime = $gbxInfo->silverTime;
+                    $bronzeTime = $gbxInfo->bronzeTime;
+                    $songFile   = $gbxInfo->songFile;
+                    $modName    = $gbxInfo->modName;
+                    $authorNick = $gbxInfo->authorNick;
+                    $carType    = $gbxInfo->vehicle;
+                    $modUrl     = $gbxInfo->modUrl ? $gbxInfo->modUrl : "";
+                    $songUrl    = $gbxInfo->songUrl ? $gbxInfo->songUrl : "";
+                }
+            }
+        } catch (\Exception $ex) {
+            $this->console("Info: Map not found or error while reading gbx info for map.");
+        }
+
+        $date = new \DateTime();
+        $date->setTimestamp((int)$map->addTime);
+
+        $this->mapInfoWindow->setTitle("Map Info %s", array($map->name));
+        $this->mapInfoWindow->setParam("uid",         $map->uId);
+        $this->mapInfoWindow->setParam("fileName",    $map->fileName);
+        $this->mapInfoWindow->setParam("mapName",     $map->name);
+        $this->mapInfoWindow->setParam("author",      $map->author);
+        $this->mapInfoWindow->setParam("authorNick",  $authorNick);
+        $this->mapInfoWindow->setParam("mood",        $mood);
+        $this->mapInfoWindow->setParam("mapStyle",    $map->mapStyle);
+        $this->mapInfoWindow->setParam("mapType",     $map->mapType);
+        $this->mapInfoWindow->setParam("environment", $map->environnement);
+        $this->mapInfoWindow->setParam("carType",     $carType);
+        $this->mapInfoWindow->setParam("addDate",     $date->format("d.m.Y"));
+        $this->mapInfoWindow->setParam("authorTime",  \ManiaLive\Utilities\Time::fromTM($authorTime));
+        $this->mapInfoWindow->setParam("goldTime",    \ManiaLive\Utilities\Time::fromTM($map->goldTime));
+        $this->mapInfoWindow->setParam("silverTime",  \ManiaLive\Utilities\Time::fromTM($silverTime));
+        $this->mapInfoWindow->setParam("bronzeTime",  \ManiaLive\Utilities\Time::fromTM($bronzeTime));
+        $this->mapInfoWindow->setParam("checkpoints", strval($nbCheck));
+        $this->mapInfoWindow->setParam("laps",        strval($nbLap));
+        $this->mapInfoWindow->setParam("displayCost", strval($map->copperPrice));
+        $this->mapInfoWindow->setParam("songName",    $songFile);
+        $this->mapInfoWindow->setParam("modName",     $modName);
+        $this->mapInfoWindow->setParam("modUrl",      $modUrl);
+        $this->mapInfoWindow->setParam("songUrl",     $songUrl);
+        $this->mapInfoWindow->show($login);
     }
 
     public function onMapRestart()
@@ -1378,7 +1442,11 @@ class Maps extends ExpPlugin
         Maplist::EraseAll();
         AddMaps::EraseAll();
         Jukelist::EraseAll();
-        MapInfo::EraseAll();
+
+        if ($this->mapInfoWindow instanceof Window) {
+            $this->mapInfoWindow->erase();
+        }
+        $this->mapInfoWindow = null;
 
         AdminGroups::removeAdminCommand($this->cmd_replay);
         AdminGroups::removeAdminCommand($this->cmd_erease);

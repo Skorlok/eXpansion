@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\ManiaExchange;
 
 use ManiaLive\Gui\ActionHandler;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -39,6 +40,9 @@ class ManiaExchange extends ExpPlugin
     private $cmd_update;
     private $cmd_random;
     private $cmd_pack;
+
+    /** @var Window */
+    private $mxInfosWindow;
 
     /** @var StdClass $mxInfo */
     public static $mxInfo = null;
@@ -109,6 +113,11 @@ class ManiaExchange extends ExpPlugin
 
         ManiaExchange::$openInfosAction = array($this, 'showMxInfos');
 
+        $this->mxInfosWindow = new Window("ManiaExchange\Gui\Windows\MxInfos.xml");
+        $this->mxInfosWindow->setName("MX Infos");
+        $this->mxInfosWindow->setSize(220, 100);
+        $this->mxInfosWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
+
         $this->onBeginMap(null, null, null);
     }
 
@@ -144,7 +153,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = null;
         self::$mxReplays = array();
 
-        $fields = "fields=MapId,MapUid,Name,GbxMapName,UploadedAt,UpdatedAt,Uploader.Name,Tags,Images,MapType,MoodFull,Routes,Difficulty,Length,AwardCount,TitlePack,ReplayCount,Feature.Comment";
+        $fields = "fields=MapId,MapUid,Name,GbxMapName,UploadedAt,UpdatedAt,Uploader.Name,Tags,Images,MapType,MoodFull,Routes,Difficulty,Length,AwardCount,TitlePack,ReplayCount,AuthorComments";
 
         $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?' . $fields . "&uid=" . $this->storage->currentMap->uId;
 
@@ -223,11 +232,132 @@ class ManiaExchange extends ExpPlugin
             $this->eXpChatSendServerMessage($this->msg_not_found, $login);
             return;
         }
-        $window = Gui\Windows\MxInfos::Create($login);
-        $window->setTitle('ManiaExchange Map Infos');
-        $window->setSize(220, 100);
-        $window->centerOnScreen();
-        $window->show();
+
+        $replays = array();
+        foreach (self::$mxReplays as $rec_nb => $rec) {
+            $pass = $this->storage->server->password ? ":" . $this->storage->server->password : "";
+            $link = '$h[https://skorlok.com/r.php?login=' . $this->storage->serverLogin . $pass
+                . '&tp=' . $this->expStorage->titleId . '&mx=t&replay=' . $rec->ReplayId . ']';
+            $replays[] = array(
+                'name' => $rec->Username,
+                'time' => Time::fromTM($rec->ReplayTime),
+                'link' => $link,
+            );
+        }
+
+        $baseUrl = "https://" . strtolower($this->expStorage->simpleEnviTitle) . ".mania.exchange/";
+        if (self::$mxInfo->images && isset(self::$mxInfo->images[0])
+            && self::$mxInfo->images[0]['Width'] > 0 && self::$mxInfo->images[0]['Height'] > 0) {
+            $imageUrl = $baseUrl . "mapimage/" . self::$mxInfo->mapId . "/1?hq=true&.webp";
+        } else {
+            $imageUrl = $baseUrl . "mapimage/" . self::$mxInfo->mapId . "/1?hq=true&.png";
+        }
+        $mxPageUrl = $baseUrl . "mapshow/" . self::$mxInfo->mapId;
+
+        $mxRows = array(
+            array('key' => 'Name:',       'value' => strval(self::$mxInfo->name)),
+            array('key' => 'Author:',     'value' => strval(self::$mxInfo->getUploader())),
+            array('key' => 'Uploaded:',   'value' => substr(str_replace('T', " ", self::$mxInfo->uploadedAt), 0, 16)),
+            array('key' => 'Updated:',    'value' => substr(str_replace('T', " ", self::$mxInfo->updatedAt), 0, 16)),
+            array('key' => 'Awards:',     'value' => strval(self::$mxInfo->awardCount)),
+            array('key' => 'Difficulty:', 'value' => strval(self::$mxInfo->getDifficulty())),
+            array('key' => 'Length:',     'value' => strval(self::$mxInfo->getLength())),
+            array('key' => 'Mood:',       'value' => strval(self::$mxInfo->moodFull)),
+            array('key' => 'Style:',      'value' => strval(self::$mxInfo->getStyle())),
+            array('key' => 'TitlePack:',  'value' => strval(self::$mxInfo->titlePack)),
+            array('key' => 'Routes:',     'value' => strval(self::$mxInfo->getRouteType())),
+            array('key' => 'MapType:',    'value' => strval(self::$mxInfo->mapType)),
+        );
+
+        $rawText = self::$mxInfo->authorComments !== null ? self::$mxInfo->authorComments : '';
+        $description = $this->mxInfosWindow->handleSpecialChars($rawText);
+        $description = preg_replace('#\[url=#i', '$L[', $description);
+        $description = preg_replace('#\[/url\]#i', '$L', $description);
+        $description = preg_replace('#\[[a-z=]+\]#Ui', '', $description);
+        $description = preg_replace('#\[/[a-z]+\]#Ui', '', $description);
+        $description = preg_replace('#<.*>#Ui', '', $description);
+        $description = preg_replace('#</.*>#Ui', '', $description);
+
+        $hasLocalMap = false;
+        $uid         = '';
+        $fileName    = '';
+        $localRows   = array();
+        $rightRows   = array();
+        $modUrl      = null;
+        $songUrl     = null;
+
+        $map     = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $this->storage->currentMap->uId);
+        $mapPath = $this->connection->getMapsDirectory();
+
+        if ($map !== false && file_exists($mapPath . DIRECTORY_SEPARATOR . $map->fileName)) {
+            $hasLocalMap      = true;
+            $map->{"nick"}    = "n/a";
+            $gbxInfo          = null;
+
+            try {
+                $fetcher = new GBXChallMapFetcher(true, false, false);
+                $fetcher->processFile($mapPath . DIRECTORY_SEPARATOR . $map->fileName);
+                $gbxInfo           = $fetcher;
+                $map->mood         = $gbxInfo->mood;
+                $map->nbLap        = $gbxInfo->nbLaps;
+                $map->nbCheckpoint = $gbxInfo->nbChecks;
+                $map->authorTime   = $gbxInfo->authorTime;
+                $map->silverTime   = $gbxInfo->silverTime;
+                $map->bronzeTime   = $gbxInfo->bronzeTime;
+                $map->songFile     = $gbxInfo->songFile;
+                $map->modName      = $gbxInfo->modName;
+                $map->{"nick"}     = $gbxInfo->authorNick;
+                $modUrl            = $gbxInfo->modUrl ? $gbxInfo->modUrl : null;
+                $songUrl           = $gbxInfo->songUrl ? $gbxInfo->songUrl : null;
+            } catch (\Exception $ex) {
+                \ManiaLive\Utilities\Console::println("Info: Map not found or error while reading gbx info for map.");
+            }
+
+            $uid      = $map->uId;
+            $fileName = $map->fileName;
+
+            $date = new \DateTime();
+            $date->setTimestamp((int)$map->addTime);
+
+            $localRows = array(
+                array('key' => 'Name:',        'value' => strval($map->name)),
+                array('key' => 'Author:',      'value' => strval($map->author)),
+                array('key' => 'Author Nick:', 'value' => strval($map->nick)),
+                array('key' => 'Mood:',        'value' => strval($map->mood)),
+                array('key' => 'Map Style:',   'value' => strval($map->mapStyle)),
+                array('key' => 'Map Type:',    'value' => strval($map->mapType)),
+                array('key' => 'Environment:', 'value' => strval($map->environnement)),
+                array('key' => 'Car type:',    'value' => $gbxInfo ? strval($gbxInfo->vehicle) : ''),
+            );
+
+            $rightRows = array(
+                array('key' => 'Add Date:',     'value' => $date->format("d.m.Y")),
+                array('key' => 'Author Time:',  'value' => Time::fromTM($map->authorTime)),
+                array('key' => 'Gold Time:',    'value' => Time::fromTM($map->goldTime)),
+                array('key' => 'Silver Time:',  'value' => Time::fromTM($map->silverTime)),
+                array('key' => 'Bronze Time:',  'value' => Time::fromTM($map->bronzeTime)),
+                array('key' => 'Checkpoints:',  'value' => strval($map->nbCheckpoint)),
+                array('key' => 'Laps:',         'value' => strval($map->nbLap)),
+                array('key' => 'Display Cost:', 'value' => strval($map->copperPrice)),
+                array('key' => 'Song Name:',    'value' => strval($map->songFile)),
+                array('key' => 'Mod Name:',     'value' => strval($map->modName)),
+            );
+        }
+
+        $this->mxInfosWindow->setTitle('ManiaExchange Map Infos');
+        $this->mxInfosWindow->setParam("replays",     $replays);
+        $this->mxInfosWindow->setParam("imageUrl",    $imageUrl);
+        $this->mxInfosWindow->setParam("mxPageUrl",   $mxPageUrl);
+        $this->mxInfosWindow->setParam("description", $description);
+        $this->mxInfosWindow->setParam("mxRows",      $mxRows);
+        $this->mxInfosWindow->setParam("hasLocalMap", $hasLocalMap);
+        $this->mxInfosWindow->setParam("uid",         $uid);
+        $this->mxInfosWindow->setParam("fileName",    $fileName);
+        $this->mxInfosWindow->setParam("localRows",   $localRows);
+        $this->mxInfosWindow->setParam("rightRows",   $rightRows);
+        $this->mxInfosWindow->setParam("modUrl",      $modUrl);
+        $this->mxInfosWindow->setParam("songUrl",     $songUrl);
+        $this->mxInfosWindow->show($login);
     }
 
     public function mxPack($login, $packId)
@@ -748,6 +878,10 @@ class ManiaExchange extends ExpPlugin
     public function eXpOnUnload()
     {
         MxSearch::EraseAll();
+        if ($this->mxInfosWindow instanceof Window) {
+            $this->mxInfosWindow->erase();
+        }
+        $this->mxInfosWindow = null;
         AdminGroups::removeAdminCommand($this->cmd_add);
         AdminGroups::removeAdminCommand($this->cmd_update);
         AdminGroups::removeAdminCommand($this->cmd_random);

@@ -11,6 +11,7 @@ use ManiaLivePlugins\eXpansion\Core\Events\GameSettingsEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\ServerSettingsEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions;
@@ -25,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.2.5";
+    const EXP_VERSION = "1.2.2.6";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -107,6 +108,15 @@ class Core extends types\ExpPlugin
     private $guestListLastRead = 0;
 
     public static $action_serverInfo = -1;
+
+    /** @var Window */
+    protected $infoWindow;
+
+    /** @var Window */
+    protected $netStatWindow;
+
+    /** @var string[] */
+    protected $netStatViewers = array();
 
     /** @var Config */
     private $config;
@@ -459,6 +469,17 @@ EOT;
         }
 
         self::$useTeams = false;
+
+        $this->infoWindow = new Window("Core\Gui\Windows\InfoWindow.xml");
+        $this->infoWindow->setName("InfoWindow");
+        $this->infoWindow->setSize(100, 75);
+        $this->infoWindow->setTitle('Server info');
+
+        $this->netStatWindow = new Window("Core\Gui\Windows\NetStat.xml");
+        $this->netStatWindow->setName("NetStat");
+        $this->netStatWindow->setSize(140, 100);
+        $this->netStatWindow->setTitle('Network Status');
+        $this->netStatWindow->registerCloseCallback(array($this, 'onNetStatWindowCloseCallback'));
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -1259,17 +1280,12 @@ EOT;
      */
     public function showInfo($login)
     {
-        //If server statistics are loaded put an action so that we can have a button to show them.
+        $statsAction = -1;
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics')) {
-            Gui\Windows\InfoWindow::$statsAction = \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverStatAction;
-        } else {
-            Gui\Windows\InfoWindow::$statsAction = -1;
+            $statsAction = \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverStatAction;
         }
-        $info = Gui\Windows\InfoWindow::Create($login);
-        $info->setTitle("Server info");
-        $info->centerOnScreen();
-        $info->setSize(100, 75);
-        $info->show();
+        $this->infoWindow->setParam("statsAction", $statsAction);
+        $this->infoWindow->show($login);
     }
 
     public function onTick()
@@ -1316,6 +1332,10 @@ EOT;
 
             $this->netLostBuffer = $outPlayers;
 
+            if (!empty($this->netStatViewers)) {
+                $this->netStatWindow->show(array_values($this->netStatViewers));
+            }
+
             $this->debug("Memory usage: " . $this->echo_memory_usage());
         }
     }
@@ -1328,12 +1348,15 @@ EOT;
     public function showNetStats($login)
     {
         if (AdminGroups::hasPermission($login, Permission::CHAT_ADMINCHAT)) {
-            Gui\Windows\NetStat::Erase($login);
-            $win = Gui\Windows\NetStat::Create($login);
-            $win->setTitle("Network Status");
-            $win->setPosition($this->config->netStats_PosX, $this->config->netStats_PosY);
-            $win->setSize(140, 100);
-            $win->show();
+            $this->netStatViewers[$login] = $login;
+            $this->netStatWindow->show($login);
+        }
+    }
+
+    public function onNetStatWindowCloseCallback($login)
+    {
+        if (array_key_exists($login, $this->netStatViewers)) {
+            unset($this->netStatViewers[$login]);
         }
     }
 
@@ -1446,6 +1469,9 @@ EOT;
         $this->update = true;
         if (array_key_exists($login, self::$netStat)) {
             unset(self::$netStat[$login]);
+        }
+        if (array_key_exists($login, $this->netStatViewers)) {
+            unset($this->netStatViewers[$login]);
         }
         if (array_key_exists($login, $this->expPlayers)) {
             $this->expPlayers[$login]->hasRetired = true;

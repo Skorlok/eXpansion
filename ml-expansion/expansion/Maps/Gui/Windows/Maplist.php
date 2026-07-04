@@ -433,12 +433,7 @@ class Maplist extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function showInfo($login, $uid)
     {
-        $window = MapInfo::create($login);
-        if (!$window->setMap($uid)) {
-            return;
-        }
-        $window->setSize(160, 90);
-        $window->show($login);
+        self::$mapsPlugin->showMapInfo($login, $uid);
     }
 
     public function setRecords($records)

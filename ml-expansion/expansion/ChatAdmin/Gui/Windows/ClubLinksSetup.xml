@@ -1,0 +1,13 @@
+<?php
+$action = $this->getParam("action");
+?>
+<frame posn="0 -1 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team1Clublink", 35, true, $this->addLang("Link to the Clublink for the first team"), null, null, null, true) ?>
+</frame>
+<frame posn="0 -13 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team2Clublink", 35, true, $this->addLang("Link to the Clublink for the second team"), null, null, null, true) ?>
+</frame>
+<label posn="0 -19 1" sizen="50 12" style="TextStaticSmall" textid="<?php echo $this->addLang("These settings will override&#10; the team colors settings !") ?>"/>
+<frame posn="5 -40 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Ok"), null, null, null, null, null, $action, null, null, null, null, null, null, true) ?>
+</frame>

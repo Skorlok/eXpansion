@@ -1,0 +1,26 @@
+<?php
+$storage = \ManiaLive\Data\Storage::getInstance();
+$netstat = \ManiaLivePlugins\eXpansion\Core\Core::$netStat;
+\ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc($netstat, "login");
+$i = 0;
+?>
+<frame posn="5 5 7.0E-5">
+	<?php foreach ($netstat as $login => $stat): ?>
+	<?php if ($i >= 50) { break; } ?>
+	<?php
+	if (isset($storage->players[$login])) {
+		$nick = $this->handleSpecialChars(($i + 1) . ". " . $storage->players[$login]->nickName);
+	} elseif (isset($storage->spectators[$login])) {
+		$nick = $this->handleSpecialChars(($i + 1) . ". " . $storage->spectators[$login]->nickName);
+	} else {
+		$nick = $this->handleSpecialChars(($i + 1) . ". " . $login);
+	}
+	$color = ($stat->updateLatency < 300) ? '$0f0' : '$f00';
+	?>
+	<frame posn="0 <?php echo -$i * 6 ?> 0">
+		<label sizen="35 6" style="TextStaticSmall" text="<?php echo $nick ?>"/>
+		<label posn="35 0 1.0E-5" sizen="16 6" style="TextStaticSmall" text="<?php echo $color . $stat->updateLatency ?>ms"/>
+		<label posn="51 0 2.0E-5" sizen="20 6" style="TextStaticSmall" text="$fff<?php echo $stat->latestNetworkActivity ?>"/>
+	</frame>
+	<?php $i++; endforeach; ?>
+</frame>

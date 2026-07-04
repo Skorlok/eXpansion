@@ -1,0 +1,2 @@
+declare eXp_ratio_ActiveUrl = <0.0, 1.0, 0.0>;
+declare eXp_ratio_InactiveUrl = <1.0, 0.0, 0.0>;

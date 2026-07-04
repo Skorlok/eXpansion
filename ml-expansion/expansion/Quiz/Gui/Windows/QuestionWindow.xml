@@ -1,0 +1,27 @@
+<?php
+$okAction     = $this->getParam("okAction");
+$hidAction    = $this->getParam("hidAction");
+$questionText = $this->getParam("questionText");
+$imageUrl     = $this->getParam("imageUrl");
+?>
+<frame posn="0 -6 0">
+	<frame posn="0 0 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("question", 80, true, $this->addLang("Question"), $this->handleSpecialChars($questionText), null, null, true) ?>
+	</frame>
+<?php for ($x = 0; $x < 7; $x++):
+	$ansText = $this->getParam("answer" . $x);
+?>
+	<frame posn="0 -<?php echo 12 * ($x + 1); ?> 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("answer." . $x, 80, true, $this->addLang("Answer " . ($x + 1)), $this->handleSpecialChars($ansText), null, null, true) ?>
+	</frame>
+<?php endfor; ?>
+	<frame posn="0 -96 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("imageUrl", 80, true, $this->addLang("Url for image"), $this->handleSpecialChars($imageUrl), null, null, true) ?>
+	</frame>
+	<frame posn="0 -108 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Ask hidden"), null, null, null, null, null, $hidAction, null, null, null, null, null, null, true) ?>
+	</frame>
+</frame>
+<frame posn="66 -111 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, "0d0", null, null, $okAction, null, null, null, null, null, null, true) ?>
+</frame>

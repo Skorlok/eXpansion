@@ -65,7 +65,7 @@ class MapRatings extends ExpPlugin
     private $widgetEndMap;
 
     private $action = null;
-    private $actionEndMap = array(0 => null, 5 => null);
+    private $actionRating = array(0 => null, 1 => null, 2 => null, 3 => null, 4 => null, 5 => null);
 
     public function eXpOnInit()
     {
@@ -75,8 +75,12 @@ class MapRatings extends ExpPlugin
         $aH = ActionHandler::getInstance();
         
         $this->action = $aH->createAction(array($this, "showRatingsManager"));
-        $this->actionEndMap[0] = $aH->createAction(array($this, "saveRating"), 0);
-        $this->actionEndMap[5] = $aH->createAction(array($this, "saveRating"), 5);
+        $this->actionRating[0] = $aH->createAction(array($this, "saveRating"), 0);
+        $this->actionRating[1] = $aH->createAction(array($this, "saveRating"), 1);
+        $this->actionRating[2] = $aH->createAction(array($this, "saveRating"), 2);
+        $this->actionRating[3] = $aH->createAction(array($this, "saveRating"), 3);
+        $this->actionRating[4] = $aH->createAction(array($this, "saveRating"), 4);
+        $this->actionRating[5] = $aH->createAction(array($this, "saveRating"), 5);
 
         $actionFinal = $aH->createAction(array($this, "autoRemove"));
         Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($actionFinal);
@@ -86,6 +90,12 @@ class MapRatings extends ExpPlugin
         $this->widget->setLayer("normal");
         $this->widget->setSize(34, 10);
         $this->widget->setParam("action", $this->action);
+        $this->widget->setParam("rate_0", $this->actionRating[0]);
+        $this->widget->setParam("rate_1", $this->actionRating[1]);
+        $this->widget->setParam("rate_2", $this->actionRating[2]);
+        $this->widget->setParam("rate_3", $this->actionRating[3]);
+        $this->widget->setParam("rate_4", $this->actionRating[4]);
+        $this->widget->setParam("rate_5", $this->actionRating[5]);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -96,8 +106,12 @@ class MapRatings extends ExpPlugin
         $this->widgetEndMap->setSize(90, 25);
 
         $script = new Script("MapRatings\Gui\Script");
-        $script->setParam("rate_" . 0, $this->actionEndMap[0]);
-        $script->setParam("rate_" . 5, $this->actionEndMap[5]);
+        $script->setParam("rate_0", $this->actionRating[0]);
+        $script->setParam("rate_1", $this->actionRating[1]);
+        $script->setParam("rate_2", $this->actionRating[2]);
+        $script->setParam("rate_3", $this->actionRating[3]);
+        $script->setParam("rate_4", $this->actionRating[4]);
+        $script->setParam("rate_5", $this->actionRating[5]);
         $this->widgetEndMap->registerScript($script);
     }
 
@@ -759,6 +773,7 @@ class MapRatings extends ExpPlugin
         }
 
         $this->widget->erase();
+        $this->widgetEndMap->erase();
 
         // MXKarma
         if ($this->config->mxKarmaEnabled) {
@@ -937,7 +952,7 @@ class MapRatings extends ExpPlugin
         /** @var ActionHandler @aH */
         $aH = ActionHandler::getInstance();
         $aH->deleteAction($this->action);
-        $aH->deleteAction($this->actionEndMap[0]);
-        $aH->deleteAction($this->actionEndMap[5]);
+        $aH->deleteAction($this->actionRating[0]);
+        $aH->deleteAction($this->actionRating[5]);
     }
 }

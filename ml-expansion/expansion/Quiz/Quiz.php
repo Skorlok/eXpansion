@@ -3,15 +3,15 @@
 namespace ManiaLivePlugins\eXpansion\Quiz;
 
 use ManiaLive\Application\ErrorHandling;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\AddPoint;
-use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\HiddenQuestionWindow;
-use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\QuestionWindow;
 use ManiaLivePlugins\eXpansion\Quiz\Structures\Question;
 
 class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -60,6 +60,16 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $cmd_reset;
     private $cmd_points;
 
+    /** @var Window */
+    private $questionWindow;
+    private $okAction;
+    private $hidAction;
+
+    /** @var Window */
+    private $hiddenQuestionWindow;
+    private $hiddenOkAction;
+    private $hiddenQuestions = array();
+
     private $config;
 
     private $widget;
@@ -94,22 +104,25 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
-        $this->db->execute("CREATE TABLE IF NOT EXISTS `quiz_questions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `question` text COLLATE utf8_bin NOT NULL,
-  `answers` text COLLATE utf8_bin NOT NULL,
-  `asker` text COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;");
+        if (!$this->db->tableExists("quiz_questions")) {
+            $this->db->execute("CREATE TABLE IF NOT EXISTS `quiz_questions` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `question` text COLLATE utf8_bin NOT NULL,
+            `answers` text COLLATE utf8_bin NOT NULL,
+            `asker` text COLLATE utf8_bin NOT NULL,
+            PRIMARY KEY (`id`)
+            ) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;");
+        }
 
-
-        $this->db->execute("CREATE TABLE IF NOT EXISTS `quiz_points` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `score` int(11) NOT NULL DEFAULT '1',
-  `login` text COLLATE utf8_bin NOT NULL,  
-  `nickName` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin; ");
+        if (!$this->db->tableExists("quiz_points")) {
+            $this->db->execute("CREATE TABLE IF NOT EXISTS `quiz_points` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `score` int(11) NOT NULL DEFAULT '1',
+            `login` text COLLATE utf8_bin NOT NULL,  
+            `nickName` varchar(100) COLLATE utf8_bin NOT NULL DEFAULT '',
+            PRIMARY KEY (`id`)
+            ) ENGINE=MYISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_bin; ");
+        }
 
 
         $command = $this->registerChatCommand("ask", "ask", -1, true);
@@ -168,9 +181,28 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnReady()
     {
-        Gui\Windows\QuestionWindow::$mainPlugin = $this;
         Gui\Windows\Playerlist::$mainPlugin = $this;
         Gui\Windows\AddPoint::$mainPlugin = $this;
+
+        $ahandler = ActionHandler::getInstance();
+        $this->okAction  = $ahandler->createAction(array($this, 'questionOk'));
+        $this->hidAction = $ahandler->createAction(array($this, 'questionHidden'));
+
+        $this->questionWindow = new Window("Quiz\Gui\Windows\QuestionWindow.xml");
+        $this->questionWindow->setName("Quiz Question");
+        $this->questionWindow->setSize(90, 120);
+        $this->questionWindow->setTitle("New question");
+        $this->questionWindow->setParam("okAction", $this->okAction);
+        $this->questionWindow->setParam("hidAction", $this->hidAction);
+
+        $this->hiddenOkAction = $ahandler->createAction(array($this, 'hiddenOk'));
+
+        $this->hiddenQuestionWindow = new Window("Quiz\Gui\Windows\HiddenQuestionWindow.xml");
+        $this->hiddenQuestionWindow->setName("Quiz Hidden Question");
+        $this->hiddenQuestionWindow->setSize(90, 90);
+        $this->hiddenQuestionWindow->setTitle("Set order");
+        $this->hiddenQuestionWindow->setParam("okAction", $this->hiddenOkAction);
+        $this->hiddenQuestionWindow->registerScript(new Script("Quiz/Gui/Scripts/ClickScript"));
 
         $data = $this->db->execute("SELECT * FROM `quiz_points` order by score desc;")->fetchArrayOfObject();
         foreach ($data as $player) {
@@ -556,12 +588,14 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 $newHeight = $maxHeight;
             }
 
-            $win = HiddenQuestionWindow::Create($question->asker->login);
+            $login = $question->asker->login;
             $question->setImageSize($newWidth, $newHeight);
-            $win->setQuestion($question);
-            $win->setMain($this);
-            $win->setSize(90, 90);
-            $win->show();
+            $this->hiddenQuestions[$login] = $question;
+            $this->hiddenQuestionWindow->erase($login);
+            $this->hiddenQuestionWindow->setParam("imageUrl", $question->getImage());
+            $this->hiddenQuestionWindow->setParam("sizeX", $question->sizeX);
+            $this->hiddenQuestionWindow->setParam("sizeY", $question->sizeY);
+            $this->hiddenQuestionWindow->show($login);
         } else {
             $this->eXpChatSendServerMessage($this->msg_errorImageType);
         }
@@ -570,40 +604,102 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function ask($login, $text = "")
     {
-        $window = Gui\Windows\QuestionWindow::Create($login);
-        try {
-            if (strlen($text) > 1) {
-                $answerPosition = strpos($text, "?");
-                if ($answerPosition == false) {
-                    $this->eXpChatSendServerMessage($this->msg_format, $login);
+        $questionText = null;
+        $answerTexts  = array_fill(0, 7, null);
+        $imageUrl     = null;
 
-                    return;
-                }
-                $answer = trim(str_replace("?", "", strstr($text, "?")));
-                if ($answer == "") {
-                    $this->eXpChatSendServerMessage($this->msg_answerMissing, $login);
-
-                    return;
-                }
-
-                $question = new Structures\Question(
-                    $this->storage->getPlayerObject($login),
-                    trim(substr($text, 0, $answerPosition))
-                );
-                $answers = explode(",", $answer);
-
-                foreach ($answers as $ans) {
-                    $question->addAnswer(trim($ans));
-                }
-                $window->setQuestion($question);
+        if (strlen($text) > 1) {
+            $answerPosition = strpos($text, "?");
+            if ($answerPosition == false) {
+                $this->eXpChatSendServerMessage($this->msg_format, $login);
+                return;
+            }
+            $answer = trim(str_replace("?", "", strstr($text, "?")));
+            if ($answer == "") {
+                $this->eXpChatSendServerMessage($this->msg_answerMissing, $login);
+                return;
             }
 
-            $window->setSize(90, 120);
-            $window->centerOnScreen();
-            $window->setTitle(__("New question", $login));
-            $window->Show();
-        } catch (\Exception $e) {
-            $this->console("Error when asking : " . $e->getMessage());
+            $question = new Structures\Question(
+                $this->storage->getPlayerObject($login),
+                trim(substr($text, 0, $answerPosition))
+            );
+            $answers = explode(",", $answer);
+            foreach ($answers as $ans) {
+                $question->addAnswer(trim($ans));
+            }
+
+            $questionText = $question->question;
+            for ($x = 0; $x < 7; $x++) {
+                $answerTexts[$x] = isset($question->answer[$x]) ? $question->answer[$x]->answer : null;
+            }
+        }
+
+        $this->questionWindow->erase($login);
+        $this->questionWindow->setParam("questionText", $questionText);
+        for ($x = 0; $x < 7; $x++) {
+            $this->questionWindow->setParam("answer" . $x, $answerTexts[$x]);
+        }
+        $this->questionWindow->setParam("imageUrl", $imageUrl);
+        $this->questionWindow->show($login);
+    }
+
+    public function questionOk($login, $data)
+    {
+        $q = str_replace("?", "", $data['question']);
+        $question = new Structures\Question(
+            $this->storage->getPlayerObject($login),
+            trim($q)
+        );
+        for ($x = 0; $x < 7; $x++) {
+            if (trim($data['answer.' . $x]) != "") {
+                $question->addAnswer(trim($data['answer.' . $x]));
+            }
+        }
+        if (!empty($data['imageUrl'])) {
+            $question->setImage(trim($data['imageUrl']));
+        }
+        $this->addQuestion($question);
+        $this->questionWindow->erase($login);
+    }
+
+    public function hiddenOk($login, $data)
+    {
+        if (!isset($this->hiddenQuestions[$login])) {
+            return;
+        }
+        $items = explode(",", rtrim($data['boxOrder'], ","));
+        $order = array();
+        foreach ($items as $value) {
+            $tmp = explode("_", $value);
+            $order[] = intval($tmp[1]);
+        }
+        $question = $this->hiddenQuestions[$login];
+        $question->setBoxOrder($order);
+        unset($this->hiddenQuestions[$login]);
+        $this->addQuestion($question);
+        $this->hiddenQuestionWindow->erase($login);
+    }
+
+    public function questionHidden($login, $data)
+    {
+        $q = str_replace("?", "", $data['question']);
+        $question = new Structures\Question(
+            $this->storage->getPlayerObject($login),
+            trim($q)
+        );
+        for ($x = 0; $x < 7; $x++) {
+            if (trim($data['answer.' . $x]) != "") {
+                $question->addAnswer(trim($data['answer.' . $x]));
+            }
+        }
+        if (!empty($data['imageUrl'])) {
+            $question->setImage(trim($data['imageUrl']));
+            $question->setHidden(true);
+            $this->questionWindow->erase($login);
+            $this->setHiddenQuestionBoxes($question);
+        } else {
+            \ManiaLivePlugins\eXpansion\Gui\Gui::showNotice("To ask hidden question, you have to define url for image", $login);
         }
     }
 
@@ -647,12 +743,26 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         AddPoint::EraseAll();
         Gui\Windows\Playerlist::EraseAll();
-        QuestionWindow::EraseAll();
-        
+
+        if ($this->questionWindow instanceof Window) {
+            $this->questionWindow->erase();
+        }
+        $this->questionWindow = null;
+
+        if ($this->hiddenQuestionWindow instanceof Window) {
+            $this->hiddenQuestionWindow->erase();
+        }
+        $this->hiddenQuestionWindow = null;
+
+        $ahandler = ActionHandler::getInstance();
+        $ahandler->deleteAction($this->okAction);
+        $ahandler->deleteAction($this->hidAction);
+        $ahandler->deleteAction($this->hiddenOkAction);
+
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
         }
-        
+
         AdminGroups::removeAdminCommand($this->cmd_reset);
         AdminGroups::removeAdminCommand($this->cmd_points);
     }

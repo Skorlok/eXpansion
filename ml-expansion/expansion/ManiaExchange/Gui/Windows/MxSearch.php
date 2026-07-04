@@ -37,7 +37,6 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     protected $style;
     protected $lenght;
     protected $items = array();
-    /** @var  CheckboxScripted */
     protected $filter;
 
     public $mxPlugin;
@@ -84,10 +83,11 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->lenghtScript = $dropDown[1];
         $this->registerScript($this->lenghtScript);
 
-        $this->filter = new CheckboxScripted();
-        $this->filter->setText("Maps from all titles pack");
-        $this->filter->setPosX(149);
+        $this->filter = new \ManiaLive\Gui\Elements\Xml();
+        $this->filter->setContent('<frame posn="149 0 1">' . CheckboxScripted::getXML("filterAllPacks", false, 25, true, "Maps from all titles pack") . '</frame>');
         $this->searchframe->addComponent($this->filter);
+
+        $this->registerScript(CheckboxScripted::getScriptML());
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
@@ -354,8 +354,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $length = intval($args['length']) - 1;
         }
 
-        $this->filter->setArgs($args);
-        $this->search($login, $args['mapName'], $args['author'], $style, $length, $this->filter->getStatus());
+        $this->search($login, $args['mapName'], $args['author'], $style, $length, isset($args['filterAllPacks']) && $args['filterAllPacks'] == '1');
     }
 
     public function destroy()

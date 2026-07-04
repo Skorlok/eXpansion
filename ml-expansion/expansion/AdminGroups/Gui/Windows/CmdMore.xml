@@ -1,0 +1,47 @@
+<?php
+$cmd   = $this->getParam("cmd");
+
+$contentCmd   = $this->handleSpecialChars('/admin ' . $cmd->getCmd());
+$contentDesc  = $this->handleSpecialChars($cmd->getHelp());
+$contentDescm = $this->handleSpecialChars($cmd->getHelpMore());
+
+$aliases = "";
+$i = 1;
+foreach ($cmd->getAliases() as $alias) {
+    $aliases .= '$w' . $i . ')$z ' . $alias . "\n";
+    $i++;
+}
+$aliases = $this->handleSpecialChars($aliases);
+?>
+<frame posn="1 -1 0">
+	<quad posn="-2 0 0" sizen="58 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
+</frame>
+<label posn="1 -1 1.0E-5" sizen="56 5" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wCommand') ?>"/>
+<frame posn="60 -1 2.0E-5">
+	<quad posn="-2 0 0" sizen="58 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
+</frame>
+<label posn="60 -1 3.0E-5" sizen="56 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wDescription') ?>"/>
+<frame posn="1 -10 4.0E-5">
+	<quad posn="-2 0 0" sizen="78 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
+</frame>
+<label posn="1 -10 5.0E-5" sizen="74 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wMore') ?>"/>
+<frame posn="80 -10 6.0E-5">
+	<quad posn="-2 0 0" sizen="38 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
+</frame>
+<label posn="80 -10 7.0E-5" sizen="36 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wAliases') ?>"/>
+<frame posn="2 -5 8.0E-5">
+	<quad posn="-1 0 0" sizen="54 3.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+</frame>
+<label posn="2 -4 9.0E-5" sizen="54 4" halign="left" valign="top" style="TextStaticSmall" textid="<?php echo $this->addLang($contentCmd) ?>"/>
+<frame posn="61 -5 0.0001">
+	<quad posn="-1 0 0" sizen="54 3.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+</frame>
+<label posn="61 -4 0.00011" sizen="54 4" halign="left" valign="top" style="TextStaticSmall" textid="<?php echo $this->addLang($contentDesc) ?>"/>
+<frame posn="2 -54.5 0.00012">
+	<quad posn="-1 0 0" sizen="74 84.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+</frame>
+<label posn="2 -13 0.00013" sizen="68 151.66666666667" halign="left" valign="top" style="TextStaticSmall" textid="<?php echo $this->addLang($contentDescm) ?>" maxline="100"/>
+<frame posn="81 -54.5 0.00014">
+	<quad posn="-1 0 0" sizen="34 84.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+</frame>
+<label posn="81 -13 0.00015" sizen="34 85" halign="left" valign="top" style="TextStaticSmall" text="<?php echo $aliases ?>" maxline="100"/>

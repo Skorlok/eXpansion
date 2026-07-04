@@ -42,7 +42,7 @@ class MxMap extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 
     public $replayCount;
 
-    public $feature;
+    public $authorComments;
 
     public function getEnvironment()
     {

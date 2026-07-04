@@ -243,6 +243,12 @@ class ManiaLink extends Singletons
             echo preg_replace('/<script.*?>.*?<\/script>/is', '', $xml);
         }
         if ($login !== null) {
+            if (is_array($login)) {
+                // check if login exists in $this->storage->players and $this->storage->spectators
+                $login = array_filter($login, function ($l) {
+                    return isset($this->storage->players[$l]) || isset($this->storage->spectators[$l]);
+                });
+            }
             try {
                 $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, false); // fix the bug where player leave so method return `login unknown`
             } catch (\Exception $e) {

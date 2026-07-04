@@ -3,8 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\ServerStatistics;
 
 use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Windows\PlotterWindow;
-use ManiaLivePlugins\eXpansion\ServerStatistics\Gui\Windows\StatsWindow;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -13,6 +12,12 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public static $serverMemAction = -1;
     public static $serverCpuAction = -1;
     public static $serverPlayerAction = -1;
+
+    /** @var Window */
+    private $statsWindow;
+
+    /** @var Window */
+    private $plotterWindow;
     private $startTime;
     private $ellapsed = 0;
     public $nbPlayerMax = 0;
@@ -48,7 +53,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         parent::eXpOnLoad();
         $this->enableDedicatedEvents();
-        Gui\Windows\StatsWindow::$mainPlugin = $this;
     }
 
     public function eXpOnReady()
@@ -57,6 +61,18 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->enableTickerEvent();
 
         $this->registerChatCommand("serverstat", "showStats", 0, true);
+
+        $this->statsWindow = new Window("ServerStatistics\Gui\Windows\StatsWindow.xml");
+        $this->statsWindow->setName("Server Statistics");
+        $this->statsWindow->setSize(85, 72);
+        $this->statsWindow->setParam("serverPlayerAction", self::$serverPlayerAction);
+        $this->statsWindow->setParam("serverMemAction", self::$serverMemAction);
+        $this->statsWindow->setParam("serverCpuAction", self::$serverCpuAction);
+        $this->statsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
+
+        $this->plotterWindow = new Window("ServerStatistics\Gui\Windows\PlotterWindow.xml");
+        $this->plotterWindow->setName("Plotter");
+        $this->plotterWindow->setSize(170, 110);
 
         try {
             $this->enableDatabase();
@@ -146,49 +162,47 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function showStats($login)
+    public function showStats($login, $params = null)
     {
-        $data = array();
-
         $formatter = \ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate::getInstance();
 
-        //Statistics
-        $data['avgPlayer'] = 'unknown';
-        $data['avgSpec'] = 'unknown';
+        $avgPlayer = 'unknown';
+        $avgSpec = 'unknown';
         $sql = 'SELECT AVG(server_nbPlayers) as avgPlayer, AVG(server_nbSpec) as avgSpec FROM exp_server_stats WHERE server_login = ' . $this->db->quote($this->storage->serverLogin);
-        $result = $this->db->execute($sql)->fetchArrayOfObject();
-
-        foreach ($result as $r) {
-            $data['avgPlayer'] = $r->avgPlayer;
-            $data['avgSpec'] = $r->avgSpec;
+        foreach ($this->db->execute($sql)->fetchArrayOfObject() as $r) {
+            $avgPlayer = $r->avgPlayer;
+            $avgSpec = $r->avgSpec;
         }
 
-        //NbPlayers & Nations
-        $data['nbPlayer'] = 'unknown';
-        $data['nbNation'] = 'unknown';
-        $data['totalPlayersTimes'] = 'unknown';
+        $nbPlayer = 'unknown';
+        $nbNation = 'unknown';
+        $totalPlayersTimes = 'unknown';
         $sql = 'SELECT COUNT(*) as nbPlayer, COUNT(DISTINCT player_nation) as nbNation, SUM(player_timeplayed) as totalPlayersTimes FROM exp_players';
-        $result = $this->db->execute($sql)->fetchArrayOfObject();
-        foreach ($result as $r) {
-            $data['nbPlayer'] = $r->nbPlayer;
-            $data['nbNation'] = $r->nbNation;
-            $data['totalPlayersTimes'] = $formatter->format($r->totalPlayersTimes);
+        foreach ($this->db->execute($sql)->fetchArrayOfObject() as $r) {
+            $nbPlayer = $r->nbPlayer;
+            $nbNation = $r->nbNation;
+            $totalPlayersTimes = $formatter->format($r->totalPlayersTimes);
         }
-        $data['upTime'] = $formatter->format($this->expStorage->getExpansionUpTime());
-        $data['upTimeDedi'] = $formatter->format($this->expStorage->getDediUpTime());
 
-        $win = Gui\Windows\StatsWindow::Create($login);
-        $win->setTitle(__('Welcome to : %1$s', $login, \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name)));
-        $win->setSize(85, 72);
-        $win->setData($data, $this->storage);
-        $win->show($login);
+        $this->statsWindow->setTitle('Welcome to : ' . \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name));
+        $this->statsWindow->setParam("comment",           \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->comment, true));
+        $this->statsWindow->setParam("upTimeDedi",        $formatter->format($this->expStorage->getDediUpTime()));
+        $this->statsWindow->setParam("upTime",            $formatter->format($this->expStorage->getExpansionUpTime()));
+        $this->statsWindow->setParam("mapCount",          sizeof($this->storage->maps));
+        $this->statsWindow->setParam("maxPlayers",        strval($this->storage->server->currentMaxPlayers));
+        $this->statsWindow->setParam("avgPlayer",         $avgPlayer);
+        $this->statsWindow->setParam("maxSpectators",     strval($this->storage->server->currentMaxSpectators));
+        $this->statsWindow->setParam("avgSpec",           $avgSpec);
+        $this->statsWindow->setParam("ladderLimit",       $this->storage->server->ladderServerLimitMin . ' - ' . $this->storage->server->ladderServerLimitMax);
+        $this->statsWindow->setParam("nbPlayer",          $nbPlayer);
+        $this->statsWindow->setParam("nbNation",          $nbNation);
+        $this->statsWindow->setParam("totalPlayersTimes", $totalPlayersTimes);
+        $this->statsWindow->show($login);
     }
 
     public function showPlayers($login)
     {
         $startTime = (time() - (24 * 60 * 60));
-
-        Gui\Windows\PlotterWindow::Erase($login);
 
         $datas = $this->db->execute(
             "SELECT `server_nbPlayers` as players, server_nbSpec as specs, "
@@ -220,19 +234,20 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
         }
 
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Players", $login));
-        $win->setSize(170, 110);
-        $win->setDatas($out, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "00f", "f00");
-        $win->show($login);
+        $this->plotterWindow->setTitle("Players");
+        $this->plotterWindow->setParam("datas", $out);
+        $this->plotterWindow->setParam("limitY", (((int)($max / 5)) + 1) * 5);
+        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
+        $this->plotterWindow->setParam("labelsY", null);
+        $this->plotterWindow->setParam("color0", "00f");
+        $this->plotterWindow->setParam("color1", "f00");
+        $this->plotterWindow->show($login);
     }
 
     public function showMemory($login)
     {
         $startTime = (time() - (24 * 60 * 60));
 
-        Gui\Windows\PlotterWindow::Erase($login);
-        
         $datas = $this->db->execute(
             "SELECT `server_ramTotal` as total, "
             . "`server_ramFree` as free, "
@@ -250,13 +265,12 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if ($memory_limit != -1) {
             if (preg_match('/^(\d+)(.)$/', $memory_limit, $matches)) {
                 if ($matches[2] == 'M') {
-                    $memory_limit = $matches[1] * 1024 * 1024; // nnnM -> nnn MB
+                    $memory_limit = $matches[1] * 1024 * 1024;
                 } elseif ($matches[2] == 'K') {
-                    $memory_limit = $matches[1] * 1024; // nnnK -> nnn KB
+                    $memory_limit = $matches[1] * 1024;
                 }
             }
         }
-
 
         foreach ($datas as $data) {
             if ($memory_limit == -1) {
@@ -277,18 +291,19 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $labels[] = ((int)(($memory_limit - ($i * ($memory_limit / 5))) / (1024 * 1024))) . "M";
         }
 
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Memory usage", $login));
-        $win->setSize(170, 110);
-        $win->setDatas($out, $memory_limit, $this->getXDateLabels($startTime), $labels, "f90", "f00");
-        $win->show($login);
+        $this->plotterWindow->setTitle("Memory usage");
+        $this->plotterWindow->setParam("datas", $out);
+        $this->plotterWindow->setParam("limitY", $memory_limit);
+        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
+        $this->plotterWindow->setParam("labelsY", $labels);
+        $this->plotterWindow->setParam("color0", "f90");
+        $this->plotterWindow->setParam("color1", "f00");
+        $this->plotterWindow->show($login);
     }
 
     public function showCpu($login)
     {
         $startTime = (time() - (24 * 60 * 60));
-
-        Gui\Windows\PlotterWindow::Erase($login);
 
         $datas = $this->db->execute(
             "SELECT `server_load` as cpuload, server_updateDate as date"
@@ -310,11 +325,14 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[0][] = $data->cpuload;
         }
 
-        $win = Gui\Windows\PlotterWindow::Create($login);
-        $win->setTitle(__("Cpu usage", $login));
-        $win->setSize(170, 110);
-        $win->setDatas($out, 100, $this->getXDateLabels($startTime), null, "f00");
-        $win->show($login);
+        $this->plotterWindow->setTitle("Cpu usage");
+        $this->plotterWindow->setParam("datas", $out);
+        $this->plotterWindow->setParam("limitY", 100);
+        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
+        $this->plotterWindow->setParam("labelsY", null);
+        $this->plotterWindow->setParam("color0", "f00");
+        $this->plotterWindow->setParam("color1", null);
+        $this->plotterWindow->show($login);
     }
 
     private function getXDateLabels($startTime)
@@ -379,7 +397,16 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnUnload()
     {
-        StatsWindow::EraseAll();
-        PlotterWindow::EraseAll();
+        parent::eXpOnUnload();
+
+        if ($this->statsWindow instanceof Window) {
+            $this->statsWindow->erase();
+        }
+        $this->statsWindow = null;
+
+        if ($this->plotterWindow instanceof Window) {
+            $this->plotterWindow->erase();
+        }
+        $this->plotterWindow = null;
     }
 }

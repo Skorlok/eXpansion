@@ -492,6 +492,7 @@ abstract class Plugin extends ServerAdapter implements TickListener, AppListener
 	function onPlayerFinishLap($player, $time, $checkpoints, $nbLap) {}
 	function onPlayerChangeTeam($login, $formerTeamId, $newTeamId) {}
 	function onPlayerJoinGame($login) {}
+	function onSpectatorChangeTarget($player, $targetId) {}
 
 	// plugin events
 	function onPluginLoaded($pluginId) {}

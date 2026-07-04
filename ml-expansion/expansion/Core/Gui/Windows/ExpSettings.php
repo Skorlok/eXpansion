@@ -50,6 +50,7 @@ class ExpSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->mainFrame->addComponent($this->button_validate);
 
         $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getScriptML());
     }
 
     /**

@@ -21,12 +21,14 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
     protected $bg;
     protected $button_report;
     protected $widths;
+    protected $parentPlugin;
 
     public function __construct(
         $indexNumber,
         $login,
         \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord $record,
-        $widths
+        $widths,
+        $parentPlugin
     ) {
         $this->widths = $widths;
         $this->sizeY = 6;
@@ -66,15 +68,12 @@ class RecItem extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->button_report = new \ManiaLive\Gui\Elements\Xml();
         $this->button_report->setContent('<frame posn="106.153 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(8.846, 8, null, null, null, null, null, null, $this->createAction(array($this, "openRepWindow"), $record->login), null, null, array("Icons64x64_2", "Disconnected"), null, null, null) . '</frame>');
         $this->frame->addComponent($this->button_report);
+        $this->parentPlugin = $parentPlugin;
     }
 
     public function openRepWindow($login, $reportLogin)
     {
-        $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\DediReport::Create($login);
-        $window->setTitle("Report for Dedimania");
-        $window->setLogin($reportLogin);
-        $window->setSize(100, 100);
-        $window->show();
+        $this->parentPlugin->showDediReport($login, $reportLogin);
     }
 
     public function onResize($oldX, $oldY)

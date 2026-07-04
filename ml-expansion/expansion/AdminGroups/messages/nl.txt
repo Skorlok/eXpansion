@@ -67,17 +67,17 @@ Verwijder Groep
 Remove Player
 Verwijder Speler
 
-Command
-Commando
+$wCommand
+$wCommando
 
-Description
-Descriptie
+$wDescription
+$wDescriptie
 
-More
-Meer
+$wMore
+$wMeer
 
-Aliases
-Aliases
+$wAliases
+$wAliases
 
 OK
 OK

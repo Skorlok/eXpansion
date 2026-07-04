@@ -67,17 +67,17 @@ Effacer le groupe
 Remove Player
 Supprimer le joueur
 
-Command
-Commande
+$wCommand
+$wCommande
 
-Description
-Description
+$wDescription
+$wDescription
 
-More
-Autre
+$wMore
+$wAutre
 
-Aliases
-Pseudonymes
+$wAliases
+$wPseudonymes
 
 OK
 OK

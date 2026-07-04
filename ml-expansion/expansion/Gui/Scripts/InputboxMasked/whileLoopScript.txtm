@@ -1,1 +1,20 @@
-btLabel_<?php echo $this->btName ?>.SetText(passwordEntry_<?php echo $this->btName ?>.Value);
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseOver && Event.ControlId == "<?php echo $this->btName ?>_bt") {
+        if (passwordEntry_<?php echo $this->btName ?> != Null && clearLabel_<?php echo $this->btName ?> != Null) {
+            clearLabel_<?php echo $this->btName ?>.SetText(passwordEntry_<?php echo $this->btName ?>.Value);
+            passwordEntry_<?php echo $this->btName ?>.Hide();
+            clearLabel_<?php echo $this->btName ?>.Show();
+        } else if (maskedLabel_<?php echo $this->btName ?> != Null && clearLabel_<?php echo $this->btName ?> != Null) {
+            maskedLabel_<?php echo $this->btName ?>.Hide();
+            clearLabel_<?php echo $this->btName ?>.Show();
+        }
+    } else if (Event.Type == CMlEvent::Type::MouseOut && Event.ControlId == "<?php echo $this->btName ?>_bt") {
+        if (passwordEntry_<?php echo $this->btName ?> != Null && clearLabel_<?php echo $this->btName ?> != Null) {
+            clearLabel_<?php echo $this->btName ?>.Hide();
+            passwordEntry_<?php echo $this->btName ?>.Show();
+        } else if (maskedLabel_<?php echo $this->btName ?> != Null && clearLabel_<?php echo $this->btName ?> != Null) {
+            clearLabel_<?php echo $this->btName ?>.Hide();
+            maskedLabel_<?php echo $this->btName ?>.Show();
+        }
+    }
+}

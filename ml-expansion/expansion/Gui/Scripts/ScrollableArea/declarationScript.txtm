@@ -1,0 +1,33 @@
+declare CMlQuad ScrollBar <=> (Page.GetFirstChild("scrollVBar") as CMlQuad);
+declare CMlQuad ScrollBg <=> (Page.GetFirstChild("scrollVBg") as CMlQuad);
+declare CMlQuad ScrollUp <=> (Page.GetFirstChild("scrollVUp") as CMlQuad);
+declare CMlQuad ScrollDown <=> (Page.GetFirstChild("scrollVDown") as CMlQuad);
+
+declare CMlFrame Content <=> (Page.GetFirstChild("content") as CMlFrame);
+declare CMlFrame ScrollableArea <=> (Page.GetFirstChild("scrollableArea") as CMlFrame);
+
+declare contentSizeY = <?php echo $this->contentSizeY; ?>;
+
+declare Real pager_scrollYOriginPosition;
+
+declare Real disabledOpacity = 0.2;
+
+declare pager_moveScroll = False;
+declare pager_firstClick = False;
+
+declare Real pager_deltaMouseYPosition;
+declare Real pager_startMouseYPosition;
+
+declare Real ScrollBarHeight = ScrollBar.Size.Y;
+declare Real ScrollBgHeight = ScrollBg.Size.Y;
+
+declare Real pagerStartPos = ScrollBar.RelativePosition.Y;
+declare Real pagerStopPosition = pagerStartPos - ScrollBgHeight + ScrollBarHeight;
+
+declare Boolean isScrollUp = False;
+declare Boolean isScrollDown = False;
+
+declare Real oldPercent = 0.;
+declare Real percent = 0.;
+
+ScrollableArea.ClipWindowRelativePosition.Y = -ScrollableArea.ClipWindowSize.Y * 0.5;

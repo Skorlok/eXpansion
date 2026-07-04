@@ -1,0 +1,135 @@
+<?php
+$connection  = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
+$storage     = \ManiaLive\Data\Storage::getInstance();
+$version     = $connection->getVersion();
+$statsAction = $this->getParam("statsAction");
+
+$serverLogin = $this->handleSpecialChars($storage->serverLogin);
+$titleId     = $this->handleSpecialChars($version->titleId);
+$vVersion    = $this->handleSpecialChars($version->version);
+$vBuild      = $this->handleSpecialChars($version->build);
+$vApi        = $this->handleSpecialChars($version->apiVersion);
+$expVer      = $this->handleSpecialChars(\ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . " - " . date("Y-m-d h:i:s A", \ManiaLivePlugins\eXpansion\Helpers\Helper::getBuildDate()));
+$phpVer      = $this->handleSpecialChars(phpversion());
+
+$admContact = \ManiaLivePlugins\eXpansion\Core\Config::getInstance()->contact;
+if (strpos($admContact, '@') !== false) {
+	$admContact = '$lmailto://' . $admContact;
+} else {
+	$admContact = '$l' . $admContact;
+}
+$admContact = $this->handleSpecialChars($admContact);
+
+$joinLink = $this->handleSpecialChars("maniaplanet://#join=" . $storage->serverLogin . "@" . $version->titleId);
+$favLink  = $this->handleSpecialChars("maniaplanet://#addfavourite=" . $storage->serverLogin . "@" . $version->titleId);
+$favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php?login=" . rawurldecode($storage->serverLogin));
+?>
+<frame posn="0 2 0" scale="0.8">
+	<frame>
+		<frame>
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Server Login') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $serverLogin ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -6 4.0E-5">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Server version') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vVersion ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -12 8.0E-5">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Server Build') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vBuild ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -18 0.00012">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Server ApiVersion') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vApi ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -24 0.00016">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Server Titlepack') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $titleId ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -30 0.0002">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Manialive version') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars(\ManiaLive\Application\VERSION) ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -36 0.00024">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('eXpansion version') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $expVer ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -42 0.00028">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Php Version') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $phpVer ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -48 0.00032">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="<?php echo $this->addLang('Admin contact') ?>"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $admContact ?>" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<label posn="0 -54 0.00036" sizen="10 7" style="TextStaticSmall"/>
+		<frame posn="0 -61 1" scale="1.2">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("join", 77, true, $this->addLang("Join link:"), $joinLink, null, null, true) ?>
+		</frame>
+		<frame posn="0 -75.4 1" scale="1.2">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("fav", 77, true, $this->addLang("Favourite link:"), $favLink, null, null, true) ?>
+		</frame>
+	</frame>
+</frame>
+<?php if ($statsAction > 0): ?>
+<frame posn="78 -69 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 6, $this->addLang("Server Stats"), null, null, null, null, null, $statsAction, null, null, null, null, null, null, true) ?>
+</frame>
+<?php endif; ?>
+<frame posn="80 -60.5 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(20, 6, $this->addLang("Add to Fav's"), null, null, null, null, null, null, $favUrl, null, null, null, null, null, true) ?>
+</frame>

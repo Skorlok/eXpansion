@@ -1,18 +1,26 @@
-<manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="normal" name="<?php echo $this->getWidgetName() ?>">
+<manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->getWidgetName() ?>">
 <?php echo $this->getLanguages() ?>
-	<frame posn="0 0 -60" id="<?php echo $this->getWidgetName() ?>">
-		<frame posn="0 0 -0.1" id="windowFrame">
-			<quad posn="-6 0 0" sizen="152 31" halign="left" valign="top" bgcolor="471A58" opacity="0.9"/>
-			<quad id="MainWindow" posn="-6 -29 1.0E-5" sizen="152 6" halign="right" valign="bottom" opacity="0.9" image="file://Media/Manialinks/Common/Home/maniahome-title.dds" rot="-180"/>
-			<quad id="MainWindow" posn="-6 6 2.0E-5" sizen="152 37" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="7575CA"/>
-			<quad posn="-6 6 3.0E-5" sizen="152 6" halign="left" valign="top" bgcolor="7575CA" opacity="0.8"/>
-			<label id="TitlebarText" posn="0 1 4.0E-5" sizen="60 4" halign="left" valign="bottom" style="TextRaceMessageBig" textsize="1" textcolor="fff" text="Panneau de contrôle "/>
-			<quad id="Titlebar" posn="-6 6 5.0E-5" sizen="152 6" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="7575CA"/>
-			<quad id="Close" posn="144 1 5" sizen="4 4" halign="right" valign="bottom" image="file://Media/Manialinks/Common/Chat/buddy-buddy-deny-focus.dds" imagefocus="file://Media/Manialinks/Common/Chat/buddy-buddy-deny.dds" scriptevents="1"/>
-			<frame posn="0 -7 7.0E-5"></frame>
-		</frame>
-		<frame posn="0 -7 7.0E-5">
-			<!-- contenue de la fenetre -->
-		</frame>
-	</frame>
+<frame posn="0 0 -60" id="<?php echo $this->getWidgetName() ?>">
+
+<frame posn="0 0 -0.1" id="windowFrame">
+<quad posn="-6 0 0" sizen="<?php echo ($this->getSizeX()+12).' '.($this->getSizeY()+6) ?>" halign="left" valign="top" bgcolor="<?php echo $this->guiConfig->windowBackgroundColor ?>" opacity="0.9"/>
+<quad id="MainWindow" posn="-6 -<?php echo ($this->getSizeY()+4) ?> 1.0E-5" sizen="<?php echo ($this->getSizeX()+12) ?> 6" halign="right" valign="bottom" opacity="0.9" image="file://Media/Manialinks/Common/Home/maniahome-title.dds" rot="-180"/>
+<quad id="MainWindow" posn="-6 6 2.0E-5" sizen="<?php echo ($this->getSizeX()+12).' '.($this->getSizeY()+12) ?>" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="<?php echo $this->guiConfig->windowTitleBackgroundColor ?>"/>
+<quad posn="-6 6 3.0E-5" sizen="<?php echo ($this->getSizeX()+12) ?> 6" halign="left" valign="top" bgcolor="<?php echo $this->guiConfig->windowTitleBackgroundColor ?>" opacity="0.8"/>
+<label id="TitlebarText" posn="0 1 4.0E-5" sizen="<?php echo ($this->getSizeX()-10) ?> 4" halign="left" valign="bottom" style="TextRaceMessageBig" textsize="1" textcolor="<?php echo $this->guiConfig->windowTitleColor ?>" textid="<?php echo $this->getTitle() ?>"/>
+<quad id="Titlebar" posn="-6 6 5.0E-5" sizen="<?php echo ($this->getSizeX()+12) ?> 6" halign="left" valign="top" style="Bgs1" substyle="BgColorContour" scriptevents="1" modulatecolor="<?php echo $this->guiConfig->windowTitleBackgroundColor ?>"/>
+<quad id="Close" posn="<?php echo ($this->getSizeX()+4) ?> 1 5" sizen="4 4" halign="right" valign="bottom" image="file://Media/Manialinks/Common/Chat/buddy-buddy-deny-focus.dds" imagefocus="file://Media/Manialinks/Common/Chat/buddy-buddy-deny.dds" scriptevents="1"/>
+</frame>
+
+<frame posn="0 -7 7.0E-5">
+<?php echo $this->getXML() ?>
+</frame>
+
+<script>
+<!--
+<?php echo $this->getMlScripts() ?>
+-->
+</script>
+
+</frame>
 </manialink>

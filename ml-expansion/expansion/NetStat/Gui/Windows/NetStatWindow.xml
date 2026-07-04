@@ -1,0 +1,18 @@
+<?php
+$rows = $this->getParam("rows");
+if (!is_array($rows)) {
+	$rows = array();
+}
+$kickLabel = $this->addLang("Kick");
+?>
+<frame posn="5 5 0">
+<?php $y = 0; foreach ($rows as $row): ?>
+<frame posn="0 <?php echo $y; ?> 0">
+	<label sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($row['display']); ?>"/>
+	<label posn="35 0 1.0E-5" sizen="16 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($row['latency']); ?>"/>
+	<frame posn="51 -1.5 1" scale="0.666666667">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $kickLabel, null, null, null, null, null, $row['kickAction'], null, null, null, null, null, null, true) ?>
+	</frame>
+</frame>
+<?php $y -= 6; endforeach; ?>
+</frame>

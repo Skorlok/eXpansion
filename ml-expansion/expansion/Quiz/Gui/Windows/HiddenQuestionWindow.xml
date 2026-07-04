@@ -1,0 +1,34 @@
+<?php
+$okAction = $this->getParam("okAction");
+$imageUrl = $this->getParam("imageUrl");
+$sizeX    = (float)$this->getParam("sizeX");
+$sizeY    = (float)$this->getParam("sizeY");
+$cellX    = $sizeX / 3;
+$cellY    = $sizeY / 3;
+?>
+<quad posn="0 7 0" sizen="<?php echo $sizeX; ?> <?php echo $sizeY; ?>" image="<?php echo $this->handleSpecialChars($imageUrl); ?>"/>
+<frame posn="0 7 1.0E-5">
+<?php
+$c = 0;
+for ($i = 0; $i < 3; $i++) {
+	for ($j = 0; $j < 3; $j++) {
+		$qx = $i * $cellX;
+		$qy = -$j * $cellY;
+		$lx = $i * $cellX + $cellX / 2;
+		$ly = -$j * $cellY - $cellY / 2;
+?>
+	<quad id="quad_<?php echo $c; ?>" posn="<?php echo $qx; ?> <?php echo $qy; ?> 0" sizen="<?php echo $cellX; ?> <?php echo $cellY; ?>" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_<?php echo $c; ?>" posn="<?php echo $lx; ?> <?php echo $ly; ?> 1.0E-5" sizen="<?php echo $cellX; ?> <?php echo $cellY; ?>" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+<?php
+		$c++;
+	}
+}
+?>
+</frame>
+<frame posn="64 -23 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Undo"), null, null, null, null, null, null, null, null, null, "undo", null, null, true) ?>
+</frame>
+<frame posn="66 -74 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, "0d0", null, null, $okAction, null, null, null, null, null, null, true) ?>
+</frame>
+<entry posn="0 907 0" id="boxOrder" scriptevents="1" class="isTabIndex isEditable" name="boxOrder" hidden="1"/>

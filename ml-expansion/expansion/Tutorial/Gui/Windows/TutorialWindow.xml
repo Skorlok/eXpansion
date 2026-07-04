@@ -1,0 +1,38 @@
+<quad posn="0 7 7.0E-5" sizen="64 64" halign="left" valign="top" image="http://reaby.kapsi.fi/ml/help.png"/>
+<frame posn="66 1 8.0E-5">
+	<frame>
+		<frame posn="12 0 0">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang('If you see gray box on left, please press Backspace.') ?>"/>
+		</frame>
+		<frame posn="0 -4 1.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" text=""/>
+		</frame>
+		<frame posn="0 -8 2.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextRaceMessageBig" textsize="3" textcolor="fff" textid="<?php echo $this->addLang('Quick Start') ?>"/>
+		</frame>
+		<frame posn="6 -15 3.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang("Windows can be moved with drag'n'drop from title bar.") ?>"/>
+		</frame>
+		<frame posn="6 -19 4.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang('90&#37; of chat commands you already are familiar works here too!') ?>"/>
+		</frame>
+		<frame posn="0 -23 5.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" text=""/>
+		</frame>
+		<frame posn="0 -27 6.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextRaceMessageBig" textsize="3" textcolor="fff" textid="<?php echo $this->addLang('Customize HUD') ?>"/>
+		</frame>
+		<frame posn="6 -34 7.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang('Menu -> Hud -> Move Postitions') ?>"/>
+		</frame>
+		<frame posn="6 -38 8.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang('all widgets what blinks can now be moved, after you are done use') ?>"/>
+		</frame>
+		<frame posn="6 -42 9.0E-5">
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="<?php echo $this->addLang('Menu -> Hud -> Lock Positions') ?>"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="120 -67 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(45, 6, $this->addLang("Close - don't show again"), null, null, null, null, null, null, null, null, null, "CloseNotAgain", null, null, true) ?>
+</frame>

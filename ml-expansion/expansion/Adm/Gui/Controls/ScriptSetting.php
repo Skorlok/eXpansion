@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Adm\Gui\Controls;
 
+use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
+
 class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
 {
 
@@ -9,7 +11,6 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
     private $label;
     private $frame;
     public $inputbox = null;
-    public $checkBox = null;
     public $settingName;
     public $type = null;
 
@@ -25,6 +26,7 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
         $sizeY = 6;
         $this->settingName = $settingName;
         $this->type = gettype($value);
+        $this->inputbox = $value;
 
         $this->bg = new \ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround($indexNumber, $sizeX, $sizeY);
         $this->addComponent($this->bg);
@@ -33,7 +35,6 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->frame->setSize($sizeX, $sizeY);
         $this->frame->setLayout(new \ManiaLib\Gui\Layouts\Line());
 
-
         $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
         $spacer->setAlign("center", "center2");
@@ -41,33 +42,25 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
         $spacer->setSubStyle("Challenge");
         $this->frame->addComponent($spacer);
 
-        $spacer = new \ManiaLib\Gui\Elements\Quad();
-        $spacer->setSize(4, 4);
-        $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-        //$this->frame->addComponent($spacer);
-
         $this->label = new \ManiaLib\Gui\Elements\Label(120, 4);
         $this->label->setAlign('left', 'center');
         $this->label->setText($settingName);
         $this->label->setScale(0.8);
         $this->frame->addComponent($this->label);
 
-
         $spacer = new \ManiaLib\Gui\Elements\Quad();
         $spacer->setSize(4, 4);
         $spacer->setStyle(\ManiaLib\Gui\Elements\Icons64x64_1::EmptyIcon);
-
         $this->frame->addComponent($spacer);
 
         if (is_bool($value) === true) {
-            $this->checkBox = new \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted(4, 4, 25, $settingName);
-            $this->checkBox->setStatus($value);
-            $this->frame->addComponent($this->checkBox);
+            $cbXml = new \ManiaLive\Gui\Elements\Xml();
+            $cbXml->setContent('<frame posn="104 0 1">' . CheckboxScripted::getXML($settingName, $value, 25, true, '') . '</frame>');
+            $this->frame->addComponent($cbXml);
         } else {
             $inputbox = new \ManiaLive\Gui\Elements\Xml();
             $inputbox->setContent('<frame posn="104 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($settingName, 20, true, null, $value, null, null) . '</frame>');
             $this->frame->addComponent($inputbox);
-            $this->inputbox = $value;
         }
         $this->addComponent($this->frame);
 
@@ -82,7 +75,6 @@ class ScriptSetting extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->bg->setPosX(-2);
         $this->frame->setSize($this->sizeX, $this->sizeY);
     }
-
 
     public function destroy()
     {

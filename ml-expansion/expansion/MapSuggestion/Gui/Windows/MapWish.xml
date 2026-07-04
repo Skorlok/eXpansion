@@ -1,0 +1,16 @@
+<?php
+$from     = $this->getParam("from");
+$okAction = $this->getParam("okAction");
+?>
+<frame posn="2 -6 0">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("from", 60, false, $this->addLang("From"), $this->handleSpecialChars($from), null, null, true) ?>
+	<frame posn="0 -12 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("mxid", 60, true, $this->addLang("Mania-Exchange ID-number for map wish"), null, null, null, true) ?>
+	</frame>
+	<frame posn="0 -24 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("description", 60, true, $this->addLang("Why you would like this map to be added ?"), null, null, null, true) ?>
+	</frame>
+	<frame posn="0 -36 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, "0d0", null, null, $okAction, null, null, null, null, null, null, true) ?>
+	</frame>
+</frame>

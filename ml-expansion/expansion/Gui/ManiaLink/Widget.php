@@ -25,7 +25,7 @@ class Widget extends ManiaLink
         $this->scripts = array('declarationScript' => "", 'whileLoopScript' => "", 'libScript' => "", 'endDeclarationScript' => "");
         $this->axisDisabled = "";
 
-        $this->eXpWidgetScript = new Script("Gui\Scripts\\templateWidgetScript");
+        $this->eXpWidgetScript = new Script('Gui\Scripts\templateWidgetScript');
         $this->eXpWidgetScript->setParam('disablePersonalHud', guiConfig::getInstance()->disablePersonalHud ? 'True' : 'False');
         $this->registerScript($this->eXpWidgetScript);
         $this->size = array(0, 0);

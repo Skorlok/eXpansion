@@ -70,18 +70,16 @@ class ChatWebhook extends ExpPlugin
         $code = $info['http_code'];
         $data = $job->getResponse();
 
-        if (!substr($code, 0, 1) == 2) {
+        if (substr($code, 0, 1) != 2) {
             $this->console("Error while sending webhook message : " . $code);
         }
-        if ($data == false) {
-            return;
+        if ($data) {
+            $json = json_decode($data, true);
+			if ($json) {
+				$this->console(print_r($json, true));
+				return;
+			}
         }
-
-        $json = json_decode($data, true);
-        if ($json == false || !isset($json[0])) {
-            return;
-        }
-        $this->console(print_r($json, true));
     }
 
     public function setJoinTime($login)

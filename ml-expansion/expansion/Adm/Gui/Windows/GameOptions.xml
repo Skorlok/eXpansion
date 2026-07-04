@@ -1,0 +1,103 @@
+<?php
+$nextGameInfo = $this->getParam("nextGameInfo");
+$actions      = $this->getParam("actions");
+$mode         = $nextGameInfo->gameMode;
+?>
+<frame posn="124 0 0">
+	<frame>
+		<label posn="0 0 1" sizen="25 6" textsize="1" textid="<?php echo $this->addLang("Choose Gamemode:"); ?>"/>
+		<frame posn="0 -6 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getXML("gamemode", 0, "TimeAttack", $mode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK, 30, $this->addLang("Time Attack"), true); ?>
+		</frame>
+		<frame posn="0 -11 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getXML("gamemode", 1, "Rounds", $mode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS, 30, $this->addLang("Rounds"), true); ?>
+		</frame>
+		<frame posn="0 -16 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getXML("gamemode", 2, "Cup", $mode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP, 30, $this->addLang("Cup"), true); ?>
+		</frame>
+		<frame posn="0 -21 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getXML("gamemode", 3, "Laps", $mode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS, 30, $this->addLang("Laps"), true); ?>
+		</frame>
+		<frame posn="0 -26 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getXML("gamemode", 4, "Team", $mode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM, 30, $this->addLang("Team"), true); ?>
+		</frame>
+		<label posn="0 -32 1" sizen="25 8" textsize="1" textid="<?php echo $this->addLang("Additional Options:"); ?>"/>
+		<frame posn="-1 -39 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("roundsUseNewRules",     (bool)$nextGameInfo->roundsUseNewRules,     30, true, $this->addLang("Rounds: use new rules"),         true); ?>
+		</frame>
+		<frame posn="-1 -45 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("teamUseNewRules",       (bool)$nextGameInfo->teamUseNewRules,       30, true, $this->addLang("Team: use new rules"),           true); ?>
+		</frame>
+		<frame posn="-1 -51 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("DisableRespawn",        (bool)$nextGameInfo->disableRespawn,        30, true, $this->addLang("Disable Respawn"),               true); ?>
+		</frame>
+		<frame posn="-1 -57 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("ForceShowAllOpponents", (bool)$nextGameInfo->forceShowAllOpponents, 30, true, $this->addLang("Force Show All Opponents"),      true); ?>
+		</frame>
+	</frame>
+</frame>
+<frame posn="0 -5 0">
+	<frame>
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ChatTime",                  35, true, $this->addLang("Podium: Chat Time"),                   \ManiaLivePlugins\eXpansion\Helpers\TimeConversion::TMtoMS($nextGameInfo->chatTime),          null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("AllWarmupDuration",          35, true, $this->addLang("All: Warmup Duration"),                $nextGameInfo->allWarmUpDuration,                                                              null, null, true); ?>
+		</frame>
+		<frame posn="78 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("finishTimeOut",              35, true, $this->addLang("All: Finish Timeout"),                 \ManiaLivePlugins\eXpansion\Helpers\TimeConversion::TMtoMS($nextGameInfo->finishTimeout),      null, null, true); ?>
+		</frame>
+	</frame>
+	<frame posn="0 -10 0">
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("timeAttackLimit",            35, true, $this->addLang("TimeAttack: Time Limit"),              \ManiaLivePlugins\eXpansion\Helpers\TimeConversion::TMtoMS($nextGameInfo->timeAttackLimit),    null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("timeAttackSynchStartPeriod", 35, true, $this->addLang("TimeAttack: Synch Start Period"),      $nextGameInfo->timeAttackSynchStartPeriod,                                                     null, null, true); ?>
+		</frame>
+	</frame>
+	<frame posn="0 -20 0">
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("roundsPointsLimit",          35, true, $this->addLang("Rounds: Points Limit"),               $nextGameInfo->roundsPointsLimit,                                                              null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("roundsForcedLaps",           35, true, $this->addLang("Rounds: Set Number of Forced Laps"),  $nextGameInfo->roundsForcedLaps,                                                               null, null, true); ?>
+		</frame>
+		<frame posn="78 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("roundsPointsLimitNewRules",  35, true, $this->addLang("Rounds: Points Limit (NewRules)"),    $nextGameInfo->roundsPointsLimitNewRules,                                                      null, null, true); ?>
+		</frame>
+	</frame>
+	<frame posn="0 -30 0">
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("teamPointsLimit",            35, true, $this->addLang("Team: Points Limit"),                 $nextGameInfo->teamPointsLimit,                                                                null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("teamMaxPoints",              35, true, $this->addLang("Team: Max Points For a Round"),        $nextGameInfo->teamMaxPoints,                                                                  null, null, true); ?>
+		</frame>
+		<frame posn="78 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("teamPointsLimitNewRules",    35, true, $this->addLang("Team: Points Limit (NewRules)"),       $nextGameInfo->teamPointsLimitNewRules,                                                       null, null, true); ?>
+		</frame>
+	</frame>
+	<frame posn="0 -40 0">
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("cupPointsLimit",             35, true, $this->addLang("Cup: Points Limit"),                  $nextGameInfo->cupPointsLimit,                                                                 null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("cupNbWinners",               35, true, $this->addLang("Cup: Number of Winners"),             $nextGameInfo->cupNbWinners,                                                                   null, null, true); ?>
+		</frame>
+		<frame posn="78 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("cupRoundsPerMap",            35, true, $this->addLang("cup Rounds Per Map"),                $nextGameInfo->cupRoundsPerMap,                                                                null, null, true); ?>
+		</frame>
+	</frame>
+	<frame posn="0 -50 0">
+		<frame posn="0 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("lapsNbLaps",                 35, true, $this->addLang("Laps: Number of Laps"),               $nextGameInfo->lapsNbLaps,                                                                     null, null, true); ?>
+		</frame>
+		<frame posn="39 0 1">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("lapsTimeLimit",              35, true, $this->addLang("Laps: Time Limit"),                   \ManiaLivePlugins\eXpansion\Helpers\TimeConversion::TMtoMS($nextGameInfo->lapsTimeLimit),      null, null, true); ?>
+		</frame>
+	</frame>
+</frame>
+<frame posn="131 -76 0">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, null, null, null, $actions["ok"], null, null, null, null, null, null, true); ?>
+</frame>

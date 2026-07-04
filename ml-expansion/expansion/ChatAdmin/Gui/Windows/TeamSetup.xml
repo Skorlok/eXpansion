@@ -1,0 +1,20 @@
+<?php
+$okAction = $this->getParam("okAction");
+?>
+<frame posn="0 -1 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team1Name", 35, true, $this->addLang("Team1 Name"), null, null, null, true) ?>
+</frame>
+<label posn="0 -7 2.0E-5" sizen="35 12" style="TextStaticSmall" textid="<?php echo $this->addLang('Team1 Color (DO NOT ENTER $$)') ?>"/>
+<frame posn="0 -13 9.0E-5">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser::getXML("team1Color", 35, 3, false) ?>
+</frame>
+<frame posn="0 -25 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team2Name", 35, true, $this->addLang("Team2 Name"), null, null, null, true) ?>
+</frame>
+<label posn="0 -31 5.0E-5" sizen="35 12" style="TextStaticSmall" textid="<?php echo $this->addLang('Team2 Color (DO NOT ENTER $$)') ?>"/>
+<frame posn="0 -37 0.00012">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser::getXML("team2Color", 35, 3, false) ?>
+</frame>
+<frame posn="5 -52 1">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Ok"), null, null, null, null, null, $okAction, null, null, null, null, null, null, true) ?>
+</frame>

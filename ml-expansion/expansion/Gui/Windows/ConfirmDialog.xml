@@ -1,0 +1,14 @@
+<?php
+$text         = $this->getParam("text");
+$okAction     = $this->getParam("okAction");
+$cancelAction = $this->getCloseAction();
+$yesId        = $this->addLang("Yes");
+$noId         = $this->addLang("No");
+?>
+<label posn="3 0 0" sizen="57 12" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($text); ?>"/>
+<frame posn="4 -6 1">
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $yesId, null, null, "0D0", null, null, $okAction, null, null, null, null, null, null, true); ?>
+</frame>
+<frame posn="30 -6 1">
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $noId, null, null, "D00", null, null, $cancelAction, null, null, null, null, null, null, true); ?>
+</frame>

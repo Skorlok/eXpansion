@@ -16,6 +16,7 @@ use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 /**
@@ -61,6 +62,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     protected $msg_new;
     protected $msg_secure;
     protected $msg_improved;
+
+    /** @var Window */
+    protected $dediReportWindow;
 
     public static $actionOpenRecs = -1;
     public static $actionOpenCps = -1;
@@ -113,10 +117,17 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->enableApplicationEvents();
         $this->enableStorageEvents();
 
+        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::$parentPlugin = $this;
+
         \ManiaLive\Event\Dispatcher::register(\ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent::getClass(), $this);
 
         $this->tryConnection();
         // $this->previewDediMessages();
+
+        $this->dediReportWindow = new Window("Dedimania\Gui\Windows\DediReport.xml");
+        $this->dediReportWindow->setName("DediReport");
+        $this->dediReportWindow->setSize(100, 100);
+        $this->dediReportWindow->setTitle('Report for Dedimania');
     }
 
     public function previewDediMessages()
@@ -376,6 +387,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         $this->disableTickerEvent();
         $this->disableDedicatedEvents();
+        if ($this->dediReportWindow instanceof Window) {
+            $this->dediReportWindow->erase();
+        }
+        $this->dediReportWindow = null;
         \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::EraseAll();
         \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenCps);
         \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenSecCps);
@@ -625,6 +640,15 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $window->setSize(200, 100);
         $window->centerOnScreen();
         $window->show();
+    }
+
+    public function showDediReport($login, $reportLogin)
+    {
+        $this->dediReportWindow->erase($login);
+        $this->dediReportWindow->setParam("reportLogin",    $reportLogin);
+        $this->dediReportWindow->setParam("mapUid",         $this->storage->currentMap->uId);
+        $this->dediReportWindow->setParam("recipientLogin", $login);
+        $this->dediReportWindow->show($login);
     }
 
     public function force_dedisave($fromLogin, $params)

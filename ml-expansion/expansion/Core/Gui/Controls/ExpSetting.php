@@ -90,11 +90,8 @@ class ExpSetting extends Control
 
         } else {
             if ($var instanceof Boolean) {
-                $this->input = new CheckboxScripted(10, 5);
-                $this->input->setSkin();
-                $this->input->setStatus($var->getRawValue());
-                $this->input->setPosY(-2);
-                $this->input->setPosX(7);
+                $this->input = new \ManiaLive\Gui\Elements\Xml();
+                $this->input->setContent('<frame posn="7 -2 1">' . CheckboxScripted::getXML($var->getName(), (bool)$var->getRawValue(), 1, true, '') . '</frame>');
                 $this->addComponent($this->input);
             } elseif ($var instanceof ColorCode) {
                 $this->input = new \ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser($var->getName(), 35, $var->getUseFullHex(), $var->getUsePrefix(), $var->getRawValue());
@@ -103,7 +100,7 @@ class ExpSetting extends Control
                 $this->addComponent($this->input);
             } else {
                 $this->input = new \ManiaLive\Gui\Elements\Xml();
-                $this->input->setContent('<frame posn="7 -2 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($var->getName(), $sizeX - 28, true, null, $var->getRawValue(), null, null) . '</frame>');
+                $this->input->setContent('<frame posn="7 -2 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML($var->getName(), $sizeX - 28, true, null, $this->handleSpecialChars($var->getRawValue()), null, null) . '</frame>');
                 $this->addComponent($this->input);
             }
         }
@@ -178,10 +175,8 @@ class ExpSetting extends Control
     public function getVarValue($options)
     {
         if ($this->input != null) {
-            if ($this->input instanceof CheckboxScripted) {
-                $this->input->setArgs($options);
-
-                return $this->input->getStatus();
+            if ($this->var instanceof Boolean) {
+                return isset($options[$this->var->getName()]) && $options[$this->var->getName()] == '1';
             } else {
                 return isset($options[$this->var->getName()]) ? $options[$this->var->getName()] : null;
             }
@@ -193,5 +188,13 @@ class ExpSetting extends Control
         parent::destroy();
         // disabling for now, since reset didn't work...
         // $this->win = null;
+    }
+
+    public function handleSpecialChars($string)
+    {
+        if ($string == null) {
+            return "";
+        }
+        return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
     }
 }

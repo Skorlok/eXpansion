@@ -65,6 +65,13 @@ interface Listener extends \ManiaLive\Event\Listener
 	 * @param string $login
 	 */
 	function onPlayerJoinGame($login);
+
+	/**
+	 * Event fired when a spectator change his target
+	 * @param Player $player
+	 * @param int $targetId
+	 */
+	function onSpectatorChangeTarget($player, $targetId);
 }
 
 ?>

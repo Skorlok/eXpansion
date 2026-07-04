@@ -9,11 +9,10 @@ use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window as MLWindow;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Configuration;
-use ManiaLivePlugins\eXpansion\Gui\Windows\ConfirmDialog;
 use ManiaLivePlugins\eXpansion\Gui\Windows\HudMove;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Notice;
 use ManiaLivePlugins\eXpansion\Gui\Windows\ResetHud;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
@@ -30,6 +29,19 @@ class Gui extends ExpPlugin
 
     // used to sent widgets to players when they join, it's more efficient than sending statics widgets with callbacks in plugins
     public static $persistentWidgets = array();
+
+    /** @var MLWindow */
+    private static $errorWindow = null;
+
+    /** @var MLWindow */
+    private static $noticeWindow = null;
+
+    /** @var MLWindow */
+    private static $confirmWindow = null;
+
+    private static $confirmOkAction = null;
+
+    private static $pendingActions = array();
 
     public $playersWidgets = array();
 
@@ -57,6 +69,27 @@ class Gui extends ExpPlugin
 
         $this->preloader = Preloader::Create(null);
         $this->preloader->show();
+
+        /** @var ActionHandler $aH */
+        $aH = ActionHandler::getInstance();
+
+        self::$errorWindow = new MLWindow("Gui\\Windows\\Error.xml");
+        self::$errorWindow->setName("Gui Error");
+        self::$errorWindow->setSize(120, 90);
+        self::$errorWindow->setTitle("Error");
+
+        self::$noticeWindow = new MLWindow("Gui\\Windows\\Notice.xml");
+        self::$noticeWindow->setName("Gui Notice");
+        self::$noticeWindow->setSize(90, 60);
+        self::$noticeWindow->setTitle("Notice");
+
+        self::$confirmWindow = new MLWindow("Gui\\Windows\\ConfirmDialog.xml");
+        self::$confirmWindow->setName("Gui Confirm");
+        self::$confirmWindow->setSize(57, 16);
+        self::$confirmWindow->setTitle("Really do this ?");
+        self::$confirmOkAction = $aH->createAction(array($this, 'onConfirmDialogOk'));
+        self::$confirmWindow->setParam("okAction", self::$confirmOkAction);
+        self::$confirmWindow->registerCloseCallback(array($this, 'onConfirmDialogClose'));
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -357,6 +390,34 @@ EOT
         return $out;
     }
 
+    public function onConfirmDialogClose($login)
+    {
+        if (isset(self::$pendingActions[$login])) {
+            unset(self::$pendingActions[$login]);
+        }
+    }
+
+    public function onConfirmDialogOk($login)
+    {
+        if (isset(self::$pendingActions[$login])) {
+            $player  = $this->storage->getPlayerObject($login);
+
+            if (!$player) {
+                $this->console("Error on Confirm Dialog Ok: Player object not found for login: " . $login);
+                return;
+            }
+
+            /** @var ActionHandler $aH */
+            $aH = ActionHandler::getInstance();
+            $aH->onPlayerManialinkPageAnswer(intval($player->playerId), $login, intval(self::$pendingActions[$login]), array());
+
+            unset(self::$pendingActions[$login]);
+        } else {
+            $this->eXpChatSendServerMessage("Error: No action was pending for this confirm dialog.", $login);
+        }
+        self::$confirmWindow->erase($login);
+    }
+
     /**
      * @param $login
      * @param $actionId
@@ -364,10 +425,9 @@ EOT
      */
     public static function showConfirmDialog($login, $actionId, $text = "")
     {
-        $window = ConfirmDialog::Create($login);
-        $window->setText($text);
-        $window->setInvokeAction($actionId);
-        $window->show();
+        self::$pendingActions[$login] = $actionId;
+        self::$confirmWindow->setParam("text", $text);
+        self::$confirmWindow->show($login);
     }
 
     /**
@@ -377,19 +437,9 @@ EOT
      */
     public static function showNotice($message, $login, $args = array())
     {
-        $window = null;
-        if (is_array($login)) {
-            $grp = \ManiaLive\Gui\Group::Create("notice", $login);
-            $window = Notice::Create($grp);
-        } else {
-            $window = Notice::Create($login);
-        }
-
-        if (is_string($message)) {
-            $message = eXpGetMessage($message);
-        }
-        $window->setMessage($message, $args);
-        $window->show($login);
+        $textId = self::$noticeWindow->addLang((string)$message, empty($args) ? null : $args);
+        self::$noticeWindow->setParam("textId", $textId);
+        self::$noticeWindow->show($login);
     }
 
     /**
@@ -398,15 +448,15 @@ EOT
      */
     public static function showError($message, $login)
     {
-        $window = null;
-        if (is_array($login)) {
-            $grp = \ManiaLive\Gui\Group::Create("error", $login);
-            $window = Windows\Error::Create($grp);
-        } else {
-            $window = Windows\Error::Create($login);
+        $out = $message;
+        if (is_array($message)) {
+            $out = '';
+            foreach ($message as $line) {
+                $out .= trim($line) . "\n";
+            }
         }
-        $window->setMessage($message);
-        $window->show($login);
+        self::$errorWindow->setParam("message", $out);
+        self::$errorWindow->show($login);
     }
 
     /**

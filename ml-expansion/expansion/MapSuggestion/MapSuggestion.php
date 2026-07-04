@@ -3,18 +3,31 @@
 namespace ManiaLivePlugins\eXpansion\MapSuggestion;
 
 use ManiaLive\Event\Dispatcher;
+use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Hooks\ListButtons;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Hooks\ListButtons_Event;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\HookData;
-use ManiaLivePlugins\eXpansion\MapSuggestion\Gui\Windows\MapWish;
 
 class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements ListButtons_Event
 {
 
+    protected $mapWishWindow;
+    protected $actions = array();
+
     public function eXpOnReady()
     {
+        $ah = ActionHandler::getInstance();
+        $this->actions['mapWishOk'] = $ah->createAction(array($this, 'mapWishOk'));
+
+        $this->mapWishWindow = new Window("MapSuggestion\Gui\Windows\MapWish.xml");
+        $this->mapWishWindow->setName("MapSuggestion window");
+        $this->mapWishWindow->setSize(90, 60);
+        $this->mapWishWindow->setTitle('Wish a map');
+        $this->mapWishWindow->setParam("okAction", $this->actions['mapWishOk']);
+
         $this->registerChatCommand("mapwish", "showMapWishWindow", 0, true);
         $this->setPublicMethod("showMapWishWindow");
         Dispatcher::register(ListButtons::getClass(), $this);
@@ -22,9 +35,17 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
     public function showMapWishWindow($login)
     {
-        $window = MapWish::Create($login);
-        $window->setPlugin($this);
-        $window->show();
+        $player = $this->storage->getPlayerObject($login);
+        $from = $player->nickName . '$z$s$fff (' . $login . ')';
+        $this->mapWishWindow->setParam("from", $from);
+        $this->mapWishWindow->show($login);
+    }
+
+    public function mapWishOk($login, $entries)
+    {
+        $mxid = isset($entries['mxid']) ? $entries['mxid'] : '';
+        $description = isset($entries['description']) ? $entries['description'] : null;
+        $this->addMapToWish($login, $mxid, $description);
     }
 
     public function addMapToWish($login, $mxid, $description = null)
@@ -66,7 +87,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
                 ),
                 $login
             );
-            MapWish::Erase($login);
+            $this->mapWishWindow->erase($login);
 
             return;
         }
@@ -95,7 +116,15 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
     public function eXpOnUnload()
     {
-        MapWish::EraseAll();
+        $ah = ActionHandler::getInstance();
+        foreach ($this->actions as $action) {
+            $ah->deleteAction($action);
+        }
+
+        if ($this->mapWishWindow instanceof Window) {
+            $this->mapWishWindow->erase();
+        }
+        $this->mapWishWindow = null;
         Dispatcher::unregister(ListButtons::getClass(), $this);
         parent::eXpOnUnload();
 

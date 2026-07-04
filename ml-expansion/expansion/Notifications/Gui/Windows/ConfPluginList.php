@@ -66,6 +66,8 @@ class ConfPluginList extends Window
         $this->buttonSave = new \ManiaLive\Gui\Elements\Xml();
         $this->buttonSave->setContent('<frame posn="50 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, __('Save', $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'saveAction')), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonSave);
+
+        $this->registerScript(CheckboxScripted::getScriptML());
     }
 
     public function onResize($oldX, $oldY)
@@ -95,14 +97,8 @@ class ConfPluginList extends Window
     public function saveAction($login, $args)
     {
         $outArray = array();
-        // sync checkboxes
         foreach ($this->items as $item) {
-            foreach ($item->getComponents() as $component) {
-                if ($component instanceof CheckboxScripted) {
-                    $component->setArgs($args);
-                }
-            }
-            if ($item->checkbox->getStatus()) {
+            if (isset($args[$item->cbName]) && $args[$item->cbName] == '1') {
                 $outArray[] = (string)$item->pluginId;
             }
         }
@@ -110,7 +106,6 @@ class ConfPluginList extends Window
         $var = MetaData::getInstance()->getVariable('redirectedPlugins');
         $var->setRawValue($outArray);
         $var->hideConfWindow($login);
-
     }
 
     public function destroy()

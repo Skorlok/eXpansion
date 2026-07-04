@@ -1,0 +1,24 @@
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick) {
+        if (Event.ControlId != "Unassigned") {
+            declare Parts = TextLib::Split("_", Event.ControlId);
+            if (Parts.count == 4 && Parts[0] == "eXp" && Parts[1] == "RatioQ") {
+                declare Text GroupPrefix = "eXp_RatioQ_" ^ Parts[2] ^ "_";
+                declare Text EntryPrefix = "eXp_RatioE_" ^ Parts[2] ^ "_";
+                for (I, 0, 99) {
+                    declare Text QId = GroupPrefix ^ I;
+                    declare CMlQuad Quad <=> (Page.GetFirstChild(QId) as CMlQuad);
+                    if (Quad == Null) break;
+                    declare CMlEntry Entry <=> (Page.GetFirstChild(EntryPrefix ^ I) as CMlEntry);
+                    if (QId == Event.ControlId) {
+                        Quad.Colorize = eXp_ratio_ActiveUrl;
+                        if (Entry != Null) Entry.Value = "1";
+                    } else {
+                        Quad.Colorize = eXp_ratio_InactiveUrl;
+                        if (Entry != Null) Entry.Value = "0";
+                    }
+                }
+            }
+        }
+    }
+}

@@ -34,6 +34,8 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->ok = new \ManiaLive\Gui\Elements\Xml();
         $this->ok->setContent('<frame posn="140 -95.75 0">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0d0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
+
+        $this->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getScriptML());
     }
 
     protected function onResize($oldX, $oldY)
@@ -72,23 +74,23 @@ class ScriptSettings extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $diffParams = array();
 
         foreach ($this->items as $item) {
-            if ($item->checkBox !== null) {
-                if ($settings[$item->settingName] == 1) {
-                    $settings[$item->settingName] = true;
-                } else if ($settings[$item->settingName] == 0) {
-                    $settings[$item->settingName] = false;
-                } else {
-                    $settings[$item->settingName] = $item->checkBox->getStatus();
+            if ($item->type === 'boolean') {
+                $newValue = isset($settings[$item->settingName]) && $settings[$item->settingName] == '1';
+                if ((bool)$item->inputbox !== $newValue) {
+                    $diffParams[$item->settingName] = array(
+                        ($item->inputbox ? "True" : "False"),
+                        ($newValue ? "True" : "False")
+                    );
                 }
-
-                if ($item->checkBox->getStatus() != $settings[$item->settingName]) {
-                    $diffParams[$item->settingName] = array(($item->checkBox->getStatus() ? "True" : "False"), ($settings[$item->settingName] ? "True" : "False"));
-                }
+                $settings[$item->settingName] = $newValue;
             } else {
                 settype($settings[$item->settingName], $item->type);
 
                 if ($item->inputbox != $settings[$item->settingName]) {
-                    $diffParams[$item->settingName] = array(($item->inputbox ? $item->inputbox : '$iEmpty$i'), ($settings[$item->settingName] ? $settings[$item->settingName] : '$iEmpty$i'));
+                    $diffParams[$item->settingName] = array(
+                        ($item->inputbox ? $item->inputbox : '$iEmpty$i'),
+                        ($settings[$item->settingName] ? $settings[$item->settingName] : '$iEmpty$i')
+                    );
                 }
             }
         }

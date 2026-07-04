@@ -20,6 +20,7 @@ class Event extends \ManiaLive\Event\Event
 	const ON_PLAYER_FINISH_LAP     = 16;
 	const ON_PLAYER_CHANGE_TEAM    = 32;
 	const ON_PLAYER_JOIN_GAME	   = 64;
+	const ON_SPECTATOR_CHANGE_TARGET = 128;
 
 	protected $params;
 
@@ -44,6 +45,7 @@ class Event extends \ManiaLive\Event\Event
 			case self::ON_PLAYER_FINISH_LAP: $listener->onPlayerFinishLap($p[0], $p[1], $p[2], $p[3]); break;
 			case self::ON_PLAYER_CHANGE_TEAM: $listener->onPlayerChangeTeam($p[0], $p[1], $p[2]); break;
 			case self::ON_PLAYER_JOIN_GAME: $listener->onPlayerJoinGame($p[0]); break;
+			case self::ON_SPECTATOR_CHANGE_TARGET: $listener->onSpectatorChangeTarget($p[0], $p[1]); break;
 		}
 	}
 }

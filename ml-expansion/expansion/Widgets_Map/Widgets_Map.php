@@ -40,13 +40,10 @@ class Widgets_Map extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showMapInfo($login)
     {
-        if (ManiaExchange::$mxInfo) {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ManiaExchange\ManiaExchange') && ManiaExchange::$mxInfo) {
             \call_user_func(ManiaExchange::$openInfosAction, $login);
-        } else {
-            $window = MapInfo::create($login);
-            $window->setMap(null);
-            $window->setSize(160, 90);
-            $window->show($login);
+        } else if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Maps\Maps')) {
+            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "showMapInfo", $login, null);
         }
     }
 

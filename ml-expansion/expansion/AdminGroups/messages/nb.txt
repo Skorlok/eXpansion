@@ -67,17 +67,17 @@ Slett gruppe
 Remove Player
 Fjern spiller
 
-Command
-Kommando
+$wCommand
+$wKommando
 
-Description
-Beskrivelse
+$wDescription
+$wBeskrivelse
 
-More
-Mer
+$wMore
+$wMer
 
-Aliases
-Aliaser
+$wAliases
+$wAliaser
 
 OK
 OK

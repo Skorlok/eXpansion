@@ -2,19 +2,20 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Windows;
 
-use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted as Checkbox;
+use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
 
 class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 {
 
     protected $pager;
 
-    /** @var CheckboxScripted[] */
+    /** @var \ManiaLive\Gui\Elements\Xml[] */
     protected $items = array();
 
-    protected $ok;
+    /** @var \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem[] */
+    protected $statuses = array();
 
-    protected $cancel;
+    protected $ok;
 
     private $actionOk;
 
@@ -33,6 +34,8 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->ok = new \ManiaLive\Gui\Elements\Xml();
         $this->ok->setContent('<frame posn="94 -85 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, __("Apply", $login), null, null, "0D0", null, null, $this->actionOk, null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->ok);
+
+        $this->registerScript(CheckboxScripted::getScriptML());
     }
 
     public function onResize($oldX, $oldY)
@@ -48,16 +51,18 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
             $item->destroy();
         }
         $this->pager->clearItems();
-        $this->items = array();
+        $this->items    = array();
+        $this->statuses = array();
 
         $statuses = $this->parseData($data);
         $x = 0;
         foreach ($statuses as $status) {
-            $this->items[$x] = new \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted(4, 4, 50);
-            $this->items[$x]->setPosZ(1);
-            $this->items[$x]->setText($status->id);
-            $this->items[$x]->setStatus($status->value);
-            $this->pager->addItem($this->items[$x]);
+            $this->statuses[$x] = $status;
+
+            $cbXml = new \ManiaLive\Gui\Elements\Xml();
+            $cbXml->setContent('<frame posn="0 0 1">' . CheckboxScripted::getXML('cb_' . $x, (bool)$status->value, 50, true, $status->id) . '</frame>');
+            $this->items[$x] = $cbXml;
+            $this->pager->addItem($cbXml);
             $x++;
         }
     }
@@ -96,11 +101,9 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
     {
         $outValues = array();
 
-        foreach ($this->items as $component) {
-            if ($component instanceof Checkbox) {
-                $component->setArgs($options);
-                $outValues[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem($component->getText(), $this->gameMode, $component->getStatus());
-            }
+        foreach ($this->statuses as $x => $status) {
+            $isChecked = isset($options['cb_' . $x]) && $options['cb_' . $x] == '1';
+            $outValues[] = new \ManiaLivePlugins\eXpansion\Gui\Structures\ConfigItem($status->id, $this->gameMode, $isChecked);
         }
 
         $apply = HudSetVisibility::Create($login);
@@ -112,14 +115,9 @@ class Configuration extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function destroy()
     {
-        foreach ($this->items as $item) {
-            $item->destroy();
-        }
-
-        $this->items = array();
+        $this->items    = array();
+        $this->statuses = array();
         $this->pager->destroy();
-        $this->connection = null;
-        $this->storage = null;
         $this->destroyComponents();
         parent::destroy();
     }

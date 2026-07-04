@@ -1,0 +1,88 @@
+<?php
+$login           = $this->getParam("login");
+$server          = $this->getParam("server");
+$serverName      = $this->getParam("serverName");
+$serverComment   = $this->getParam("serverComment");
+$serverPassword  = $this->getParam("serverPassword");
+$serverSpecPass  = $this->getParam("serverSpecPassword");
+$refereePassword = $this->getParam("refereePassword");
+$actions         = $this->getParam("actions");
+
+$canName        = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_NAME);
+$canComment     = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_COMMENT);
+$canMaxPlayer   = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_MAXPLAYER);
+$canMaxSpec     = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_MAXSPEC);
+$canPassword    = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_PASSWORD);
+$canSpecPwd     = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_SPECPWD);
+$canRefPwd      = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_REFPWD);
+$canGenericOpts = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_GENERIC_OPTIONS);
+?>
+<frame posn="0 1 0">
+	<frame posn="0 0 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverName", 152, $canName, $this->addLang("Server Name"), $this->handleSpecialChars($serverName), null, null, true); ?>
+	</frame>
+	<?php if ($canComment) { ?>
+	<textedit id="serverComment" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="<?php echo $this->handleSpecialChars($serverComment); ?>" textformat="default" name="serverComment" showlinenumbers="0" autonewline="0"/>
+	<?php } ?>
+	<frame posn="0 -36 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxPlayers", 12, $canMaxPlayer, $this->addLang("Players"),     $server->nextMaxPlayers,    null, null, true); ?>
+	</frame>
+	<frame posn="15 -36 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxSpec",    12, $canMaxSpec,   $this->addLang("Spectators"),  $server->nextMaxSpectators, null, null, true); ?>
+	</frame>
+	<frame posn="0 -48 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMin",  35, false,         $this->addLang("Ladderpoints minimum"), $server->ladderServerLimitMin, null, null, true); ?>
+	</frame>
+	<frame posn="38 -48 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMax",  35, false,         $this->addLang("Ladderpoints Maximum"), $server->ladderServerLimitMax, null, null, true); ?>
+	</frame>
+	<frame posn="0 -60 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "serverPass",    76, $canPassword, $this->addLang("Password for server"), $this->handleSpecialChars($serverPassword), true, null, null, true); ?>
+	</frame>
+	<frame posn="0 -73 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "serverSpecPass", 76, $canSpecPwd,  $this->addLang("Password for spectators"), $this->handleSpecialChars($serverSpecPass),  true, null, null, true); ?>
+	</frame>
+	<frame posn="0 -86 1">
+		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "refereePass",   76, false,   $this->addLang("Referee password"), $this->handleSpecialChars($refereePassword), $canRefPwd, null, null, true); ?>
+	</frame>
+</frame>
+<frame posn="100 -18 0">
+	<frame>
+		<frame posn="0 0 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("publicServer",       $server->hideServer == 0,                 50, false,          $this->addLang("Show Server in public server list"),    true); ?>
+		</frame>
+		<frame posn="0 -6 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("ladderServer",       (bool)$server->currentLadderMode,         50, false,          $this->addLang("Ladder server"),                        true); ?>
+		</frame>
+		<frame posn="0 -12 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("allowMapDownload",   (bool)$server->allowMapDownload,          50, $canGenericOpts, $this->addLang("Allow map download using ingame menu"), true); ?>
+		</frame>
+		<frame posn="0 -18 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("p2pDownload",        (bool)$server->isP2PDownload,             50, $canGenericOpts, $this->addLang("Allow Peer-2-Peer download"),          true); ?>
+		</frame>
+		<frame posn="0 -24 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("p2pUpload",          (bool)$server->isP2PUpload,               50, $canGenericOpts, $this->addLang("Allow Peer-2-Peer upload"),            true); ?>
+		</frame>
+		<frame posn="0 -30 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("refereeMode",        (bool)$server->refereeMode,               50, false,           $this->addLang("Enable Referee-mode"),                 true); ?>
+		</frame>
+		<frame posn="0 -36 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("DisableHorns",       (bool)$server->disableHorns,              50, true,            $this->addLang("Disable Horns"),                        true); ?>
+		</frame>
+		<frame posn="0 -42 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("DisableAnnounces",   (bool)$server->disableServiceAnnounces,   50, true,            $this->addLang("Disable Announces"),                    true); ?>
+		</frame>
+		<frame posn="0 -48 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("AutosaveReplays",    (bool)$server->autoSaveReplays,           50, true,            $this->addLang("Autosave All Replays"),                 true); ?>
+		</frame>
+		<frame posn="0 -54 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("AutosaveValidation", (bool)$server->autoSaveValidationReplays, 50, true,            $this->addLang("Autosave Validation Replays"),          true); ?>
+		</frame>
+		<frame posn="0 -60 0">
+			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("KeepPlayerSlots",    (bool)$server->keepPlayerSlots,           50, true,            $this->addLang("Keep Player Slots"),                    true); ?>
+		</frame>
+	</frame>
+</frame>
+<frame posn="126 -93 0">
+	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, null, null, null, $actions["ok"], null, null, null, null, null, null, true); ?>
+</frame>

@@ -463,6 +463,25 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 		if (($formerPlayer->teamId != -1 || $player->teamId != -1) && $formerPlayer->teamId != $player->teamId) {
 			Dispatcher::dispatch(new Event(Event::ON_PLAYER_CHANGE_TEAM, $player->login, $formerPlayer->teamId, $player->teamId));
 		}
+		if ($player->spectator && ($formerPlayer->currentTargetId !== $player->currentTargetId || $formerPlayer->autoTarget !== $player->autoTarget)) {
+			// if `autoTarget` is true, it means that the spectator is speccing nobody, so we set the target to null
+			$target = $player->autoTarget ? null : $player->currentTargetId;
+			Dispatcher::dispatch(new Event(Event::ON_SPECTATOR_CHANGE_TARGET, $player, $target));
+		}
+
+		// debug: show differences between former and current player info
+		/*$currentVars = get_object_vars($player);
+		$formerVars  = get_object_vars($formerPlayer);
+		$diff = array();
+		foreach ($currentVars as $key => $value) {
+			$former = isset($formerVars[$key]) ? $formerVars[$key] : null;
+			if (serialize($value) !== serialize($former)) {
+				$diff[$key] = $value;
+			}
+		}
+		if (!empty($diff)) {
+			Console::printlnFormatted("Player info changed for {$player->login}: " . json_encode($diff));
+		}*/
 	}
 
 	function onManualFlowControlTransition($transition)
