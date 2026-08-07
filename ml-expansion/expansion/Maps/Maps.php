@@ -285,6 +285,10 @@ class Maps extends ExpPlugin
         if (isset(MapsFilterHelper::$playerSortModes[$login])) {
             unset(MapsFilterHelper::$playerSortModes[$login]);
         }
+
+        if (isset($this->mapListWindowOpened[$login])) {
+            unset($this->mapListWindowOpened[$login]);
+        }
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
