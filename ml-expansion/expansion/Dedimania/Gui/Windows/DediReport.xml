@@ -8,6 +8,6 @@ $reportText .= "Map: " . $mapUid . "&#10;";
 $reportText .= "Reason: *edit your reason here*&#10;";
 $reportText .= "Reportee: " . $recipientLogin . "&#10;";
 ?>
-<label posn="0 7 0" sizen="100 16" style="TextStaticSmall" textsize="2" textid="<?php echo $this->addLang("To report invalid records for dedimania, &#10; please copy the following info at clipboard (ctrl-a + ctrl-c)") ?>"/>
+<label posn="0 7 0" sizen="100 16" style="TextStaticSmall" textsize="2" textid="{@To report invalid records for dedimania, &#10; please copy the following info at clipboard (ctrl-a + ctrl-c)}"/>
 <textedit posn="0 -9 1.0E-5" sizen="100 40" default="<?php echo $reportText ?>" textformat="default" name="" showlinenumbers="0" autonewline="0"/>
-<label posn="0 -59 2.0E-5" sizen="100 32" style="TextStaticSmall" textsize="2" textid="<?php echo $this->addLang('$fffThen go click following link:$3af&#10;$lhttp://dedimania.net/SITE/forum/viewtopic.php?id=384$l &#10;$fffand post this information there.') ?>"/>
+<label posn="0 -59 2.0E-5" sizen="100 32" style="TextStaticSmall" textsize="2" textid="{@$fffThen go click following link:$3af&#10;$lhttp://dedimania.net/SITE/forum/viewtopic.php?id=384$l &#10;$fffand post this information there.}"/>

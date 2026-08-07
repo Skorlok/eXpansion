@@ -35,7 +35,7 @@ class ItemPlugin extends \ManiaLivePlugins\eXpansion\Gui\Control
     {
         $this->checkbox->setContent(
             '<frame posn="0 0 1">' .
-            \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML($this->cbName, $boolean, 60, true, $this->cbText) .
+            \ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox::getXML($this->cbName, $boolean, 60, true, $this->cbText) .
             '</frame>'
         );
     }

@@ -6,11 +6,11 @@ use ManiaLive\Event\Dispatcher;
 use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\AutoLoad\Gui\Windows\PluginList;
 use ManiaLivePlugins\eXpansion\AutoLoad\Structures\PluginNotFoundException;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Events\ConfigLoadEvent;
 use ManiaLivePlugins\eXpansion\Core\types\config\MetaData as MetaDataType;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
@@ -44,11 +44,17 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     private $configPlugins = array();
 
+    /** @var Window */
+    protected $pluginListWindow;
+    protected $pluginListGroups        = array();
+    protected $pluginListPlayerState    = array();
+
     /**
      * @inheritdoc
      */
     public function eXpOnLoad()
     {
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
         $this->setPublicMethod('showPluginsWindow');
         Dispatcher::register(ConfigLoadEvent::getClass(), $this, ConfigLoadEvent::ON_CONFIG_FILE_LOADED);
         $this->console("AutoLoading eXpansion pack ... ");
@@ -100,6 +106,11 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('pluginListShowConfig', false, true);
+        $this->registerManialinkCallback('pluginListToggle', true, true);
+        $this->registerManialinkCallback('pluginListSetGroup', true, true);
+        $this->registerManialinkCallback('pluginListSearch', true);
+        
         //We Need the plugin Handler
         $pHandler = PluginHandler::getInstance();
 
@@ -143,6 +154,29 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->configPlugins = $this->config->plugins;
 
         AdminGroups::addAdminCommand('plugins', $this, 'showPluginsWindow', Permission::EXPANSION_PLUGIN_START_STOP);
+
+        // Compute groups from available plugins (same logic as old PluginList::populate firstDisplay)
+        $groups = array();
+        foreach ($this->availablePlugins as $metaData) {
+            if (count($metaData->getGroups()) == 0) {
+                $groups["Other"] = true;
+            }
+            foreach ($metaData->getGroups() as $name) {
+                if ($name != "Core") {
+                    $groups[$name] = true;
+                }
+            }
+        }
+        $groupNames = array_keys($groups);
+        sort($groupNames, SORT_STRING);
+        $this->pluginListGroups = $groupNames;
+
+        $this->pluginListWindow = new Window("AutoLoad\Gui\Windows\PluginList.xml");
+        $this->pluginListWindow->setName("PluginList");
+        $this->pluginListWindow->setSize(172, 90);
+        $this->pluginListWindow->setTitle("Plugin List");
+        $this->pluginListWindow->registerCloseCallback(array($this, 'onPluginListWindowClosed'));
+        $this->pluginListWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(8, 86));
     }
 
     /**
@@ -508,13 +542,169 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
      */
     public function showPluginsWindow($login)
     {
-        PluginList::Erase($login);
-        $win = PluginList::Create($login);
-        $win->setTitle("Plugin List");
-        $win->centerOnScreen();
-        $win->setSize(172, 90);
-        $win->populate($this, $this->availablePlugins);
-        $win->show();
+        $state        = isset($this->pluginListPlayerState[$login]) ? $this->pluginListPlayerState[$login] : array();
+        $groupIdx     = isset($state['groupIdx']) ? $state['groupIdx'] : 0;
+        $filterName   = isset($state['name'])     ? $state['name']     : '';
+        $filterAuthor = isset($state['author'])   ? $state['author']   : '';
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    private function pluginListBuildAndShow($login, $selectedGroupIdx = 0, $filterName = '', $filterAuthor = '')
+    {
+        $this->pluginListPlayerState[$login] = array(
+            'groupIdx' => $selectedGroupIdx,
+            'name'     => $filterName,
+            'author'   => $filterAuthor,
+        );
+
+        $pHandler  = PluginHandler::getInstance();
+        $configMgr = ConfigManager::getInstance();
+
+        $selectedGroupName = isset($this->pluginListGroups[$selectedGroupIdx])
+            ? $this->pluginListGroups[$selectedGroupIdx]
+            : (count($this->pluginListGroups) ? $this->pluginListGroups[0] : '');
+
+        $pluginsData = array();
+        $i = 0;
+        foreach ($this->availablePlugins as $pluginId => $metaData) {
+            if (in_array("Core", $metaData->getGroups())) {
+                continue;
+            }
+            if (!empty($filterName) && strpos(strtoupper($metaData->getName()), strtoupper($filterName)) === false) {
+                continue;
+            }
+            if (!empty($filterAuthor) && strpos(strtoupper($metaData->getAuthor()), strtoupper($filterAuthor)) === false) {
+                continue;
+            }
+            if ($selectedGroupName != '' && !in_array($selectedGroupName, $metaData->getGroups())) {
+                continue;
+            }
+
+            $metaData->checkAll();
+
+            $isLoaded  = $pHandler->isLoaded($pluginId);
+            $isInStart = $this->isInStartList($pluginId);
+
+            if ($isLoaded) {
+                $toggleColorize = '0f0';
+                $toggleTooltip  = "Plugin is running. Click to unload!";
+            } elseif ($isInStart) {
+                $toggleColorize = 'ff0';
+                $toggleTooltip  = "Plugin not compatible with game mode, title or server settings.\n Plugin will be enabled when possible.";
+            } else {
+                $toggleColorize = 'f00';
+                $toggleTooltip  = "Plugin not running. Click to load!";
+            }
+
+            $titleCompat   = $metaData->checkTitleCompatibility();
+            $gameCompat    = $metaData->checkGameCompatibility();
+            $otherIssues   = $metaData->checkOtherCompatibility();
+
+            $titleColorize = $titleCompat ? '090' : 'f00';
+            $titleTooltip  = $titleCompat
+                ? "This plugin is compatible with the current Title"
+                : "This plugin isn't compatible with the current Title";
+
+            $gameColorize  = $gameCompat ? '090' : 'f00';
+            $gameTooltip   = $gameCompat
+                ? "This plugin is compatible with the current Game mode"
+                : "This plugin isn't compatible with the current Game mode";
+
+            if (empty($otherIssues)) {
+                $otherColorize = '090';
+                $otherTooltip  = "This plugin is compatible with current installation";
+                $otherSizeY    = 5;
+            } else {
+                $otherColorize = 'f00';
+                $otherTooltip  = "This plugin has a few compatibility issues :\n" . implode("\n", $otherIssues);
+                $otherSizeY    = 5 * (count($otherIssues) + 1);
+            }
+
+            if ($isInStart || $isLoaded) {
+                $startText     = "Stop";
+                $startColorize = "F00";
+            } else {
+                $startText     = "Start";
+                $startColorize = "0D0";
+            }
+
+            $pluginsData[] = array(
+                'id'             => $pluginId,
+                'index'          => $i++,
+                'name'           => ($metaData->getName() == "" ? $pluginId : $metaData->getName()),
+                'desc'           => $metaData->getDescription(),
+                'toggleColorize' => $toggleColorize,
+                'toggleTooltip'  => $toggleTooltip,
+                'titleColorize'  => $titleColorize,
+                'titleTooltip'   => $titleTooltip,
+                'gameColorize'   => $gameColorize,
+                'gameTooltip'    => $gameTooltip,
+                'otherColorize'  => $otherColorize,
+                'otherTooltip'   => $otherTooltip,
+                'otherSizeY'     => $otherSizeY,
+                'configAvailable'   => !empty($configMgr->getGroupedVariables($pluginId)),
+                'startText'      => $startText,
+                'startColorize'  => $startColorize,
+            );
+        }
+
+        $groupsData = array();
+        foreach ($this->pluginListGroups as $idx => $groupName) {
+            $groupsData[] = array(
+                'name'     => $groupName,
+                'selected' => ($idx == $selectedGroupIdx),
+            );
+        }
+
+        $this->pluginListWindow->setParam("plugins",         $pluginsData);
+        $this->pluginListWindow->setParam("groups",          $groupsData);
+        $this->pluginListWindow->setParam("groupNames",      $this->pluginListGroups);
+        $this->pluginListWindow->setParam("currentGroupIdx", $selectedGroupIdx);
+        $this->pluginListWindow->setParam("currentName",     $filterName);
+        $this->pluginListWindow->setParam("currentAuthor",   $filterAuthor);
+        $this->pluginListWindow->show($login);
+    }
+
+    public function pluginListSetGroup($login, $groupIdx, $params = array())
+    {
+        $filterName   = isset($params['name'])   ? $params['name']   : '';
+        $filterAuthor = isset($params['author']) ? $params['author'] : '';
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    public function pluginListSearch($login, $params = array())
+    {
+        $filterName   = isset($params['name'])   ? $params['name']   : '';
+        $filterAuthor = isset($params['author']) ? $params['author'] : '';
+        $groupIdx     = isset($params['group'])  ? intval($params['group']) : 0;
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    public function pluginListToggle($login, $pluginId)
+    {
+        if (isset($this->availablePlugins[$pluginId])) {
+            $this->togglePlugin($login, $this->availablePlugins[$pluginId]);
+        }
+    }
+
+    public function pluginListShowConfig($login, $pluginId)
+    {
+        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'showExpSettings', $login, null, $pluginId);
+    }
+
+    public function onPluginListWindowClosed($login)
+    {
+        unset($this->pluginListPlayerState[$login]);
+    }
+
+    public function eXpOnUnload()
+    {
+        parent::eXpOnUnload();
+        if ($this->pluginListWindow instanceof Window) {
+            $this->pluginListWindow->erase();
+        }
+        $this->pluginListWindow      = null;
+        $this->pluginListPlayerState    = array();
     }
 
     /**

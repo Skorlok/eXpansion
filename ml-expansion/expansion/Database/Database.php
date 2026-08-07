@@ -6,7 +6,9 @@ use ManiaLivePlugins\eXpansion\Helpers\Formatting as StringFormatting;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
 
@@ -18,6 +20,9 @@ use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
 class Database extends ExpPlugin
 {
     private $config;
+
+    /** @var Window */
+    private $maintainanceWindow;
 
     public function eXpOnInit()
     {
@@ -52,6 +57,22 @@ class Database extends ExpPlugin
         $cmd = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::addAdminCommand('dbtools', $this, 'showDbMaintenance', Permission::SERVER_DATABASE);
         $cmd->setHelp('shows administrative window for database');
         $cmd->setMinParam(0);
+
+        $this->maintainanceWindow = new Window("Database\Gui\Windows\Maintainance.xml");
+        $this->maintainanceWindow->setName("DbMaintainance");
+        $this->maintainanceWindow->setSize(160, 100);
+        $this->maintainanceWindow->setTitle("Database Maintenance");
+        $this->maintainanceWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 90));
+        $this->maintainanceWindow->setParam("sizeX",          160);
+        $this->maintainanceWindow->setParam("sizeY",          100);
+    }
+
+    public function eXpOnReady()
+    {
+        $this->registerManialinkCallback('maintainanceTruncate', true);
+        $this->registerManialinkCallback('maintainanceRepair', true);
+        $this->registerManialinkCallback('maintainanceOptimize', true);
+        $this->registerManialinkCallback('maintainanceBackup', true);
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -191,10 +212,20 @@ class Database extends ExpPlugin
         foreach ($this->storage->maps as $map) {
             $uids .= $this->db->quote($map->uId) . ",";
             $mapsByUid[$map->uId] = $map;
+
+            if (!isset($map->strippedName)) {
+                $map->strippedName = Formatting::stripStyles($map->name);
+            }
         }
         $uids = trim($uids, ",");
         $g = "SELECT * FROM `exp_maps`  WHERE challenge_uid IN ($uids);";
-        $query = $this->db->execute($g);
+
+        try{
+            $query = $this->db->execute($g);
+        } catch (\Exception $e) {
+            $this->dumpException("Error while updating server challenges", $e);
+            return;
+        }
 
 
         while ($data = $query->fetchObject()) {
@@ -204,11 +235,20 @@ class Database extends ExpPlugin
             }
         }
 
+        $count = count($mapsByUid);
+
         if (!empty($mapsByUid)) {
+            $this->console("Found " . $count . " new maps to add to database.");
+            $inserted = 0;
             foreach ($mapsByUid as $map) {
                 $this->insertMap($map);
                 $map->addTime = time();
+                $inserted++;
+                if ($inserted % 100 === 0) {
+                    $this->console("Adding maps to database: " . $inserted . " / " . $count . "...");
+                }
             }
+            $this->console("Done adding maps to database: " . $inserted . " / " . $count . ".");
         }
     }
 
@@ -442,15 +482,78 @@ class Database extends ExpPlugin
 
     public function showDbMaintenance($login)
     {
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
-            $window = Gui\Windows\Maintainance::Create($login);
-            $window->init($this->db);
-            $window->setTitle(__('Database Maintenance'));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-
-            $window->show();
+        if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
         }
+        /** @var \ManiaLive\Database\Config $dbConfig */
+        $dbConfig = \ManiaLive\Database\Config::getInstance();
+        $rows     = $this->db->execute("SHOW TABLES in `" . $dbConfig->database . "`;")->fetchArrayOfRow();
+        $tables   = array();
+        foreach ($rows as $row) {
+            $tables[] = $row[0];
+        }
+        $this->maintainanceWindow->setParam("tables", $tables);
+        $this->maintainanceWindow->show($login);
+    }
+
+    public function maintainanceRepair($login, $params = array())
+    {
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $status    = $this->db->execute("REPAIR TABLE " . $tableName . ";")->fetchObject();
+                $this->connection->chatSendServerMessage(
+                    "Table " . $status->Table . " repaired with " . $status->Msg_type . ":" . $status->Msg_text,
+                    $login
+                );
+            }
+        }
+    }
+
+    public function maintainanceOptimize($login, $params = array())
+    {
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $status    = $this->db->execute("OPTIMIZE TABLE `" . $tableName . "`;")->fetchObject();
+                $this->connection->chatSendServerMessage(
+                    "Table " . $status->Table . " Optimized with " . $status->Msg_type . ":" . $status->Msg_text,
+                    $login
+                );
+            }
+        }
+    }
+
+    public function maintainanceTruncate($login, $params = array())
+    {
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $this->db->execute("TRUNCATE TABLE " . $tableName . ";");
+                $this->connection->chatSendServerMessage(
+                    'Table \'$0d0' . $tableName . '$fff\' contents is now $d00CLEARED$fff!',
+                    $login
+                );
+            }
+        }
+    }
+
+    public function maintainanceBackup($login, $params = array())
+    {
+        $window = Gui\Windows\BackupRestore::Create($login);
+        $window->init($this->db);
+        $window->setTitle(__('Database Backup and Restore'));
+        $window->centerOnScreen();
+        $window->setSize(160, 100);
+        $window->show();
+    }
+
+    public function eXpOnUnload()
+    {
+        if ($this->maintainanceWindow !== null) {
+            $this->maintainanceWindow->erase();
+        }
+        $this->maintainanceWindow = null;
     }
 
     public function showBackupRestore($login)
@@ -497,6 +600,7 @@ class Database extends ExpPlugin
             $this->connection->chatSendServerMessage("Creating database backup...", $login);
         }
 
+        /** @var \ManiaLive\Database\Config $dbconfig */
         $dbconfig = \ManiaLive\Database\Config::getInstance();
         $dbName = $dbconfig->database;
 

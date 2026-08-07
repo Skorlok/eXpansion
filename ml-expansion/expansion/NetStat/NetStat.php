@@ -32,7 +32,6 @@ class NetStat extends ExpPlugin
 
     /** @var Window */
     private $netStatWindow;
-    private $kickActions = array();
     private $netStatViewers = array();
     private $lastUpdate = 0;
 
@@ -41,6 +40,8 @@ class NetStat extends ExpPlugin
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
         $this->enableApplicationEvents(Event::ON_POST_LOOP);
+
+        $this->registerManialinkCallback('kick', false, true);
 
         /** @var ActionHandler $ahandler */
         $ahandler = ActionHandler::getInstance();
@@ -62,13 +63,6 @@ class NetStat extends ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
-
-        /** @var ActionHandler $aH */
-        $aH = ActionHandler::getInstance();
-        foreach ($this->kickActions as $action) {
-            $aH->deleteAction($action);
-        }
-        $this->kickActions = array();
 
         if ($this->netStatWindow instanceof Window) {
             $this->netStatWindow->erase();
@@ -118,14 +112,10 @@ class NetStat extends ExpPlugin
                 $color = '$0f0';
             }
 
-            if (!isset($this->kickActions[$login])) {
-                $this->kickActions[$login] = $ahandler->createAction(array($this, 'kick'), $login);
-            }
-
             $rows[] = array(
                 'display'    => ($index + 1) . '. ' . $nick,
                 'latency'    => $color . $stat->updateLatency . 'ms',
-                'kickAction' => $this->kickActions[$login],
+                'kickAction' => 'exp:eXpansion.NetStat:kick:' . $login,
             );
             $index++;
         }
@@ -155,12 +145,6 @@ class NetStat extends ExpPlugin
     public function onPlayerDisconnect($login, $disconnectionReason = null)
     {
         unset($this->netStatViewers[$login]);
-        if (isset($this->kickActions[$login])) {
-            /** @var ActionHandler $aH */
-            $aH = ActionHandler::getInstance();
-            $aH->deleteAction($this->kickActions[$login]);
-            unset($this->kickActions[$login]);
-        }
     }
 
     public function onPostLoop()

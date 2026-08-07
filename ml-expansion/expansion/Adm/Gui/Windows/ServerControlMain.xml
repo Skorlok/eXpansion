@@ -1,54 +1,38 @@
-<?php
-$actions = $this->getParam("actions");
-$isRelay = $this->getParam("isRelay");
-?>
 <frame>
 	<frame posn="0 0 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Deciated Control"),    null, null, null, null, null, $actions["serverManagement"], null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@Deciated Control" action="exp:eXpansion.Adm:serverManagement" isTextId="true"/>
 	</frame>
 	<frame posn="33.5 0 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Server options"),      null, null, null, null, null, $actions["serverOptions"],    null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@Server options" action="exp:eXpansion.Adm:serverOptions" isTextId="true"/>
 	</frame>
-	<frame posn="67 0 0">
-		<?php if (!$isRelay) {
-            echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Game options"),         null, null, null, null, null, $actions["gameOptions"],      null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="67 0 0" hidden="{isRelay}">
+		<exp:button sizeX="40" sizeY="5.5" text="@Game options" action="exp:eXpansion.Adm:gameOptions" isTextId="true"/>
 	</frame>
 	<frame posn="100.5 0 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Admin Groups"),        null, null, null, null, null, $actions["adminGroups"],      null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@Admin Groups" action="exp:eXpansion.Adm:adminGroups" isTextId="true"/>
 	</frame>
-	<frame posn="0 -6.625 0">
-        <?php if (!$isRelay) {
-		    echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Match settings"),        null, null, null, null, null, $actions["matchSettings"],    null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="0 -6.625 0" hidden="{isRelay}">
+        <exp:button sizeX="40" sizeY="5.5" text="@Match settings" action="exp:eXpansion.Adm:matchSettings" isTextId="true"/>
 	</frame>
-	<frame posn="33.5 -6.625 0">
-        <?php if (!$isRelay) {
-		    echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("ScriptMode settings"),   null, null, null, null, null, $actions["scriptSettings"],   null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="33.5 -6.625 0" hidden="{isRelay}">
+        <exp:button sizeX="40" sizeY="5.5" text="@ScriptMode settings" action="exp:eXpansion.Adm:scriptSettings" isTextId="true"/>
 	</frame>
-	<frame posn="67 -6.625 0">
-        <?php if (!$isRelay) {
-		    echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Force Scores"),          null, null, null, null, null, $actions["forceScores"],      null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="67 -6.625 0" hidden="{isRelay}">
+        <exp:button sizeX="40" sizeY="5.5" text="@Force Scores" action="exp:eXpansion.Adm:forceScores" isTextId="true"/>
 	</frame>
-	<frame posn="100.5 -6.625 0">
-        <?php if (!$isRelay) {
-		    echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Round points"),          null, null, null, null, null, $actions["roundPoints"],      null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="100.5 -6.625 0" hidden="{isRelay}">
+        <exp:button sizeX="40" sizeY="5.5" text="@Round points" action="exp:eXpansion.Adm:roundPoints" isTextId="true"/>
 	</frame>
 	<frame posn="0 -13.25 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Database tools"),     null, null, null, null, null, $actions["dbTools"],          null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@Database tools" action="exp:eXpansion.Adm:dbTools" isTextId="true"/>
 	</frame>
 	<frame posn="33.5 -13.25 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("eXpansion Settings"), null, null, null, null, null, $actions["expSettings"],      null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@eXpansion Settings" action="exp:eXpansion.Adm:showExpSettings" isTextId="true"/>
 	</frame>
 	<frame posn="67 -13.25 0">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Plugin Management"),  null, null, null, null, null, $actions["pluginManagement"], null, null, null, null, null, null, true); ?>
+		<exp:button sizeX="40" sizeY="5.5" text="@Plugin Management" action="exp:eXpansion.Adm:showPluginManagement" isTextId="true"/>
 	</frame>
-	<frame posn="100.5 -13.25 0">
-        <?php if (!$isRelay) {
-		    echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 5.5, $this->addLang("Configure Votes"),      null, null, null, null, null, $actions["votesConfig"],      null, null, null, null, null, null, true);
-        } ?>
+	<frame posn="100.5 -13.25 0" hidden="{isRelay}">
+        <exp:button sizeX="40" sizeY="5.5" text="@Configure Votes" action="exp:eXpansion.Adm:showVotesConfig" isTextId="true"/>
 	</frame>
 </frame>

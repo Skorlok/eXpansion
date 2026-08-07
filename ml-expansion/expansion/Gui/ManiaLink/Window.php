@@ -15,6 +15,9 @@ class Window extends ManiaLink
     /** @var Script[] */
     private $userScript = array();
 
+    /** @var Script[] keyed by class name — re-registering replaces */
+    private $overrideScripts = array();
+
     /** @var string[] raw ManiaScript strings */
     private $moreScripts = array();
 
@@ -40,9 +43,9 @@ class Window extends ManiaLink
         $this->size  = array(0, 0);
         $this->title = "";
 
-        /** @var \ManiaLive\Gui\ActionHandler $aH */
-        $aH = \ManiaLive\Gui\ActionHandler::getInstance();
-        $this->closeAction = $aH->createAction(array($this, 'closeWindow'));
+        /** @var ActionManager */
+        $aM = ActionManager::getInstance();
+        $this->closeAction = $aM->createAction(array($this, 'closeWindow'));
     }
 
     public function setTitle($text, $parameter = null)
@@ -103,6 +106,11 @@ class Window extends ManiaLink
         $this->extraWLoop .= $script;
     }
 
+    public function registerOrOverrideScript(Script $script)
+    {
+        $this->overrideScripts[get_class($script)] = $script;
+    }
+
     public function addScriptToLib($script)
     {
         $this->extraScriptLib .= $script;
@@ -119,6 +127,20 @@ class Window extends ManiaLink
             $dDeclares .= $script->getEndScript($this, false);
             $wLoop     .= $script->getWhileLoopScript($this, false);
             $scriptLib .= $script->getlibScript($this, false);
+        }
+
+        foreach ($this->overrideScripts as $script) {
+            $dDeclares .= $script->getDeclarationScript($this, false);
+            $dDeclares .= $script->getEndScript($this, false);
+            $wLoop     .= $script->getWhileLoopScript($this, false);
+            $scriptLib .= $script->getlibScript($this, false);
+        }
+
+        foreach ($this->elementsScript as $elementScript) {
+            $dDeclares .= $elementScript->getDeclarationScript($this, false);
+            $dDeclares .= $elementScript->getEndScript($this, false);
+            $wLoop     .= $elementScript->getWhileLoopScript($this, false);
+            $scriptLib .= $elementScript->getlibScript($this, false);
         }
 
         foreach ($this->moreScripts as $raw) {
@@ -150,9 +172,9 @@ class Window extends ManiaLink
 
     public function __destruct()
     {
-        /** @var \ManiaLive\Gui\ActionHandler $aH */
-        $aH = \ManiaLive\Gui\ActionHandler::getInstance();
-        $aH->deleteAction($this->closeAction);
+        /** @var ActionManager */
+        $aM = ActionManager::getInstance();
+        $aM->deleteAction($this->closeAction);
         $this->closeAction = null;
         $this->windowScript = null;
     }

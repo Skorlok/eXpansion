@@ -2,12 +2,19 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
-
 class Dropdown
 {
-    public static function getXML($callerClass, $name, $items = array("initial"), $selectedIndex = 0, $sizeX = 35)
+    public static function getXML($mlClass, $name, $itemsVarName = null, $selectedIndex = 0, $sizeX = 35)
     {
+        if ($mlClass) {
+            $items = $mlClass->getParam($itemsVarName);
+            if (!is_array($items)) {
+                $items = array("initial");
+            }
+        } else {
+            $items = $itemsVarName;
+        }
+
         $xml = '<frame>
             <entry id="' . $name . 'e" posn="1000 1000 0" sizen="' . $sizeX . ' 6" style="" scriptevents="1" textsize="1" textcolor="000" name="' . $name . '"/>
             <label id="' . $name . 'l" posn="0 0 4" sizen="' . $sizeX . ' 4" halign="left" valign="center" bgcolor="000" bgcolorfocus="3af" scriptevents="1" textsize="1" text="' . $items[$selectedIndex] . '" focusareacolor1="000" focusareacolor2="3af"/>
@@ -24,8 +31,8 @@ class Dropdown
         $script->setParam("name", $name);
         $script->setParam("values", $items);
         $script->setParam("selected", $selectedIndex);
-        if ($callerClass instanceof Widget) {
-            $callerClass->registerScript($script);
+        if ($mlClass) {
+            $mlClass->registerElementScript($script, $name . ':' . implode(',', $items) . ':' . $selectedIndex);
         } else {
             return array($xml, $script);
         }

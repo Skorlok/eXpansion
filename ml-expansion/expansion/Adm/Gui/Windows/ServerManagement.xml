@@ -1,15 +1,8 @@
-<?php
-$actions = $this->getParam("actions");
-?>
 <frame posn="2 1 0">
-	<frame posn="0 0 0">
-		<?php if ($this->getParam("canStopDedicated")) {
-			echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, $this->addLang("Stop Server"),    null, null, "d00", null, null, $actions["stopServer"],    null, null, null, null, null, null, true);
-		} ?>
+	<frame posn="0 0 0" hidden="{hideStopDedicated}">
+		<exp:button sizeX="40" sizeY="6" text="@Stop Server" colorize="d00" action="{stopServerAction}" isTextId="true"/>
 	</frame>
-	<frame posn="31.5 0 0">
-		<?php if ($this->getParam("canStopManialive")) {
-			echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(40, 6, $this->addLang("Stop Manialive"), null, null, "d00", null, null, $actions["stopManialive"], null, null, null, null, null, null, true);
-		} ?>
+	<frame posn="31.5 0 0" hidden="{hideStopManialive}">
+		<exp:button sizeX="40" sizeY="6" text="@Stop Manialive" colorize="d00" action="{stopManialiveAction}" isTextId="true"/>
 	</frame>
 </frame>

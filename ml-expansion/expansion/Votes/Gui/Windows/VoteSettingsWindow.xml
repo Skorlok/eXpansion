@@ -1,0 +1,52 @@
+<?php
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$limits      = $this->getParam("limits");
+$votes       = $this->getParam("votes");
+$sizeX       = (int)$this->getParam("sizeX");
+$sizeY       = (int)$this->getParam("sizeY");
+
+$pagerSizeX = $sizeX - 5;
+$pagerSizeY = $sizeY - 16;
+$bgWidth    = $pagerSizeX - 6;
+$itemSizeY  = 10;
+$applyPosX  = $sizeX - 24;
+$applyPosY  = $sizeY - 3;
+
+$itemsXml = "";
+$n        = 0;
+
+foreach ((array)$limits as $limit) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="' . $bgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<label posn="0 0 0" sizen="50 ' . $itemSizeY . '" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($limit['label']) . '"/>';
+    $itemsXml .= '<frame posn="50 -1 1">';
+    $itemsXml .= '<exp:inputbox name="' . $limit['name'] . '" sizeX="14" label="@Limit" text="' . (string)$limit['value'] . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $n++;
+}
+
+foreach ((array)$votes as $vote) {
+    $votersHtml = '<exp:dropdown name="' . $vote['votersName'] . '" itemsVarName="voterOptions" selectedIndex="' . $vote['votersSelected'] . '" sizeX="20"/>';
+
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="' . $bgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<label posn="0 0 0" sizen="50 ' . $itemSizeY . '" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($vote['label']) . '"/>';
+    $itemsXml .= '<frame posn="50 -1 1">';
+    $itemsXml .= '<exp:inputbox name="' . $vote['timeoutName'] . '" sizeX="14" label="@Timeout" text="' . (string)$vote['timeoutValue'] . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '<frame posn="68 -1 1">';
+    $itemsXml .= '<exp:inputbox name="' . $vote['ratioName'] . '" sizeX="14" label="@Ratio" text="' . (string)$vote['ratioValue'] . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '<frame posn="86 -1 1">';
+    $itemsXml .= $votersHtml;
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $n++;
+}
+?>
+<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 5, 7); ?>
+<frame posn="96 -86 1">
+    <exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Votes:applyVoteSettings" isTextId="true"/>
+</frame>

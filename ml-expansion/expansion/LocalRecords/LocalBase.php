@@ -397,11 +397,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         if ($count > 0) {
             $uids = trim($uids, ",");
 
-            $q = 'SELECT `rank`, `record_challengeuid` as `uid` FROM (SELECT *, IF(@prev <> exp_records.record_challengeuid, @rn:=-1,@rn), @prev:=exp_records.record_challengeuid, @rn:=@rn+1 AS `rank` FROM `exp_records`, (SELECT @rn:=0) rn, (SELECT @prev:=\'\') prev ORDER BY exp_records.record_challengeuid ASC, exp_records.record_score ASC) temp  WHERE `record_challengeuid` IN (' . $uids . ')	AND `record_playerlogin` = ' . $this->db->quote($login);
+            $q = 'SELECT `rank`, `record_challengeuid` as `uid`, `record_score` as `score` FROM (SELECT *, IF(@prev <> exp_records.record_challengeuid, @rn:=-1,@rn), @prev:=exp_records.record_challengeuid, @rn:=@rn+1 AS `rank` FROM `exp_records`, (SELECT @rn:=0) rn, (SELECT @prev:=\'\') prev ORDER BY exp_records.record_challengeuid ASC, exp_records.record_score ASC) temp  WHERE `record_challengeuid` IN (' . $uids . ')	AND `record_playerlogin` = ' . $this->db->quote($login);
             $data = $this->db->execute($q);
 
             while ($row = $data->fetchObject()) {
-                $mapsByUid[$row->uid]->localRecords[$login] = $row->rank;
+                $mapsByUid[$row->uid]->localRecords[$login] = array($row->rank, $row->score);
             }
         }
     }
@@ -459,7 +459,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $currentMap->localRecords = array();
         foreach ($this->currentChallengeRecords as $i => $record) {
-            $currentMap->localRecords[$record->login] = $record->place - 1;
+            $currentMap->localRecords[$record->login] = array($record->place - 1, $record->time);
         }
     }
 

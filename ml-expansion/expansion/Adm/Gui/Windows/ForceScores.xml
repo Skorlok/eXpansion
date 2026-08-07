@@ -1,0 +1,38 @@
+<?php
+$players = $this->getParam("players");
+
+$sizeX      = 160;
+$pagerSizeY = 72;   // window sizeY(80) - 8
+$itemSizeY  = 6;
+$itemWidth  = 152;  // sizeX - 8
+
+$itemsXml = "";
+$i = 0;
+foreach ((array)$players as $player) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<frame posn="4 0 1.0E-5">';
+    $itemsXml .= '<quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>';
+    $itemsXml .= '<label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($player->nickName) . '"/>';
+    $itemsXml .= '<quad posn="100 0 2.0E-5" sizen="4 4" style="Empty" substyle="BgWindow2"/>';
+    $itemsXml .= '<frame posn="104 0 1">';
+    $itemsXml .= '<exp:inputbox name="' . $player->login . '" sizeX="20"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $i++;
+}
+?>
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getXML($sizeX, $pagerSizeY, $itemsXml); ?>
+<frame posn="40 2 0">
+	<exp:button sizeX="32" sizeY="6" text="@Reset scores" action="exp:eXpansion.Adm:forceScoresClear" isTextId="true"/>
+	<frame posn="27.5 0 1">
+		<exp:button sizeX="32" sizeY="6" text="@Skip & reset" action="exp:eXpansion.Adm:forceScoresSkip" isTextId="true"/>
+	</frame>
+	<frame posn="55 0 0">
+		<exp:button sizeX="32" sizeY="6" text="@Restart & reset" action="exp:eXpansion.Adm:forceScoresRestart" isTextId="true"/>
+	</frame>
+</frame>
+<frame posn="129 -74 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Adm:forceScoresApply" isTextId="true"/>
+</frame>

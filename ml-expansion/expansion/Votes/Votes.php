@@ -2,18 +2,17 @@
 
 namespace ManiaLivePlugins\eXpansion\Votes;
 
-use ManiaLive\Gui\ActionHandler;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
-use ManiaLivePlugins\eXpansion\Votes\Gui\Windows\VoteSettingsWindow;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
 
 class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -26,12 +25,11 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     private $widget;
     private $script;
-    private $actionYes;
-    private $actionNo;
-    private $actionPass;
-    private $actionCancel;
 
     public $currentVote = null;
+
+    /** @var Window */
+    private $voteSettingsWindow;
 
     /**
      * returns managedvote with key of command name
@@ -104,18 +102,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $cmd->setHelp('Pass current running vote');
         AdminGroups::addAlias($cmd, "passv");
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
         Menu::addMenuItem("Votes",
             array("Vote" => array(null, array(
-                "Skip" => array(null, $aH->createAction(array($this, "vote_Skip"))),
-                "Res" => array(null, $aH->createAction(array($this, "vote_Restart"))),
-                "Extend Time" => array(null, $aH->createAction(array($this, "vote_Extend"))),
-                "End Round" => array(null, $aH->createAction(array($this, "vote_EndRound"))),
-                "Balance Teams" => array(null, $aH->createAction(array($this, "vote_balance"))),
-                "Config..." => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "showVotesConfig"))),
-                '$f00Cancel' => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "cancelVote"))),
-                '$0c0Pass' => array(Permission::SERVER_VOTES, $aH->createAction(array($this, "passVote")))
+                "Skip" => array(null, 'exp:eXpansion.Votes:vote_Skip'),
+                "Res" => array(null, 'exp:eXpansion.Votes:vote_Restart'),
+                "Extend Time" => array(null, 'exp:eXpansion.Votes:vote_Extend'),
+                "End Round" => array(null, 'exp:eXpansion.Votes:vote_EndRound'),
+                "Balance Teams" => array(null, 'exp:eXpansion.Votes:vote_balance'),
+                "Config..." => array(Permission::SERVER_VOTES, 'exp:eXpansion.Votes:showVotesConfig'),
+                '$f00Cancel' => array(Permission::SERVER_VOTES, 'exp:eXpansion.Votes:cancelVote'),
+                '$0c0Pass' => array(Permission::SERVER_VOTES, 'exp:eXpansion.Votes:passVote')
             )))
         );
     }
@@ -124,6 +120,17 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
+
+        $this->registerManialinkCallback('handlePlayerVote', false, true);
+        $this->registerManialinkCallback('applyVoteSettings', true);
+        $this->registerManialinkCallback('vote_Skip');
+        $this->registerManialinkCallback('vote_Restart');
+        $this->registerManialinkCallback('vote_Extend');
+        $this->registerManialinkCallback('vote_EndRound');
+        $this->registerManialinkCallback('vote_balance');
+        $this->registerManialinkCallback('showVotesConfig');
+        $this->registerManialinkCallback('cancelVote');
+        $this->registerManialinkCallback('passVote');
 
         $this->config = Config::getInstance();
 
@@ -146,19 +153,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->syncSettings();
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-
-        $this->actionYes = $aH->createAction(array($this, "handlePlayerVote"), "yes");
-        $this->actionNo = $aH->createAction(array($this, "handlePlayerVote"), "no");
-        $this->actionPass = $aH->createAction(array($this, "passVote"));
-        $this->actionCancel = $aH->createAction(array($this, "cancelVote"));
-
         $this->script = new Script("Votes/Gui/Script");
-        $this->script->setParam("actionYes", $this->actionYes);
-        $this->script->setParam("actionNo", $this->actionNo);
-        $this->script->setParam("actionPass", $this->actionPass);
-        $this->script->setParam("actionCancel", $this->actionCancel);
         $this->script->setParam("isTrackmania", ($this->expStorage->simpleEnviTitle == "TM"));
         
 
@@ -166,9 +161,19 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->widget->setName("Vote Manager Widget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(90, 27);
-        $this->widget->setParam("actionYes", $this->actionYes);
-        $this->widget->setParam("actionNo", $this->actionNo);
         $this->widget->registerScript($this->script);
+
+        $this->script->setParam("actionYes", 'exp:eXpansion.Votes:handlePlayerVote:yes');
+        $this->script->setParam("actionNo", 'exp:eXpansion.Votes:handlePlayerVote:no');
+        $this->script->setParam("actionPass", 'exp:eXpansion.Votes:passVote');
+        $this->script->setParam("actionCancel", 'exp:eXpansion.Votes:cancelVote');
+
+        $this->voteSettingsWindow = new Window("Votes\Gui\Windows\VoteSettingsWindow.xml");
+        $this->voteSettingsWindow->setName("VoteSettings");
+        $this->voteSettingsWindow->setSize(120, 96);
+        $this->voteSettingsWindow->setTitle("Configure Votes");
+        $this->voteSettingsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(10, 88));
+        $this->voteSettingsWindow->setParam("voterOptions", array("Select", "Active Players", "Players", "Everybody"));
     }
 
     public function syncSettings()
@@ -717,14 +722,103 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showVotesConfig($login)
     {
-        /** @var Gui\Windows\VoteSettingsWindow */
-        $window = Gui\Windows\VoteSettingsWindow::Create($login);
-        $window->setSize(120, 96);
-        $window->setTitle(__("Configure Votes", $login));
-        $window->addLimits();
-        $window->populateList($this->getVotes(), $this->metaData);
-        $window->addMxVotes();
-        $window->show($login);
+        $config   = Config::getInstance();
+        /** @var \ManiaLivePlugins\eXpansion\ManiaExchange\Config $mxConfig */
+        $mxConfig = \ManiaLivePlugins\eXpansion\ManiaExchange\Config::getInstance();
+
+        $limitsData = array(
+            array('label' => "Max votes per map (0 = disabled)",     'name' => '!_voteLimit',    'value' => $config->limit_votes),
+            array('label' => "Max restarts of a map (0 = disabled)", 'name' => '!_restartLimit', 'value' => $config->restartLimit),
+        );
+
+        $votesData    = array();
+        $managedVotes = $this->getVotes();
+        foreach ($managedVotes as $cmd => $vote) {
+            $selectedIdx = min(3, max(0, $vote->voters + 1));
+            $votesData[] = array(
+                'label'          => $vote->command,
+                'timeoutName'    => $vote->command . '_timeouts',
+                'timeoutValue'   => $vote->timeout,
+                'ratioName'      => $vote->command . '_ratios',
+                'ratioValue'     => $vote->ratio,
+                'votersName'     => $vote->command . '_voters',
+                'votersSelected' => $selectedIdx,
+            );
+        }
+
+        $mxSelectedIdx = min(3, max(0, $mxConfig->mxVote_voters + 1));
+        $votesData[] = array(
+            'label'          => "mxVote",
+            'timeoutName'    => "mxVote_timeouts",
+            'timeoutValue'   => $mxConfig->mxVote_timeouts,
+            'ratioName'      => "mxVote_ratios",
+            'ratioValue'     => $mxConfig->mxVote_ratios,
+            'votersName'     => "mxVote_voters",
+            'votersSelected' => $mxSelectedIdx,
+        );
+
+        $this->voteSettingsWindow->setParam("limits",      $limitsData);
+        $this->voteSettingsWindow->setParam("votes",       $votesData);
+        $this->voteSettingsWindow->setParam("sizeX",       120);
+        $this->voteSettingsWindow->setParam("sizeY",       100);
+        $this->voteSettingsWindow->show($login);
+    }
+
+    public function applyVoteSettings($login, $params = array())
+    {
+        foreach ($params as $key => $value) {
+            $exploded = explode("_", $key);
+
+            if ($exploded[0] == "!") {
+                switch ($exploded[1]) {
+                    case "voteLimit":
+                        $var = $this->metaData->getVariable("limit_votes");
+                        $var->setRawValue(intval($value));
+                        break;
+                    case "restartLimit":
+                        $var = $this->metaData->getVariable("restartLimit");
+                        $var->setRawValue(intval($value));
+                        break;
+                }
+            } else {
+                if ($exploded[1] == "voters") {
+                    $value = intval($value) - 1;
+                }
+
+                if ($exploded[1] == "ratios") {
+                    $value = floatval($value);
+                } else {
+                    $value = intval($value);
+                }
+
+                if ($exploded[0] == "mxVote") {
+                    $meta = \ManiaLivePlugins\eXpansion\ManiaExchange\MetaData::getInstance();
+                    $var  = $meta->getVariable($key);
+                    $var->setRawValue($value);
+                }
+
+                if ($key == "mxVote_ratios") {
+                    $meta = \ManiaLivePlugins\eXpansion\ManiaExchange\MetaData::getInstance();
+                    $var  = $meta->getVariable('mxVote_enable');
+                    if ($value == -1.) {
+                        $var->setRawValue(false);
+                    } else {
+                        $var->setRawValue(true);
+                    }
+                }
+
+                $varName  = 'managedVote_' . array_pop($exploded);
+                $voteName = implode('_', $exploded);
+
+                $var = $this->metaData->getVariable($varName);
+                if ($var instanceof \ManiaLivePlugins\eXpansion\Core\types\config\types\HashList) {
+                    $var->setValue($voteName, $value);
+                }
+            }
+        }
+
+        \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+        $this->voteSettingsWindow->erase($login);
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -736,18 +830,16 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnUnload()
     {
-        VoteSettingsWindow::EraseAll();
-        
-        $this->widget->erase();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
         $this->widget = null;
         $this->script = null;
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->actionYes);
-        $aH->deleteAction($this->actionNo);
-        $aH->deleteAction($this->actionPass);
-        $aH->deleteAction($this->actionCancel);
+        if ($this->voteSettingsWindow instanceof Window) {
+            $this->voteSettingsWindow->erase();
+        }
+        $this->voteSettingsWindow = null;
 
         $this->currentVote = null;
         $this->counters = array();

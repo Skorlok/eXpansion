@@ -32,21 +32,30 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(false);
         $this->registerVariable($var);
 
-        $var = new SortedList("publicQueueAmount", "Jukeboxing costs", $config, false, true);
+        $var = new SortedList("publicQueueAmount", "Jukeboxing costs", $config, false, false);
         $var->setGroup('Planets');
         $var->setType(new TypeInt("", "", null));
-        $var->setDefaultValue(array(0));
+        $var->setDescription(
+            array(
+                "Set the amount a player has to pay for jukeboxing a map,",
+                "the key is the planet id, and the value is the amount.",
+                "If the number of maps in the queue is higher than the amount of values,",
+                "jukeboxing won't be possible.",
+                "If the value is set to 0, jukeboxing will be free for that planet.",
+                "If the parameter is not set, jukeboxing will be free"
+            )
+        );
         $this->registerVariable($var);
-
-        $var = new TypeInt("bufferSize", "Map Buffer size", $config, false, false);
-        $var->setGroup("Buffers");
-        $var->setDefaultValue(5);
-        $this->registerVariable($var);
-
 
         $var = new TypeInt("historySize", "Map History size", $config, false, false);
         $var->setGroup("Buffers");
         $var->setDefaultValue(7);
+        $this->registerVariable($var);
+
+        $var = new TypeInt("maxPlayerQueueSize", "Max amount of maps a player can queue", $config, false, false);
+        $var->setGroup("Buffers");
+        $var->setDefaultValue(1);
+        $var->setDescription("Max amount of maps a player can queue, if set to -1, no limit");
         $this->registerVariable($var);
 
         $var = new Boolean("showCurrentMapWidget", "Show Now Playing map widget", $config, false, false);

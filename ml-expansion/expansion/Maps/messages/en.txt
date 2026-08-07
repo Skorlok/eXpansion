@@ -154,8 +154,8 @@ Search Map
 Search Author
 Search Author
 
-Clear Maplist
-Clear Maplist
+$d00Clear Maplist
+$d00Clear Maplist
 
 #queue#/jb uses next params: drop, reset and show
 #queue#/jb uses next params: drop, reset and show
@@ -166,8 +166,8 @@ Clear Maplist
 Are you sure you want to wish this map to be played
 Are you sure you want to wish this map to be played
 
-#admin_error# $iYOu can't wish for a map at the moment.
-#admin_error# $iYOu can't wish for a map at the moment.
+#admin_error# $iYou can't wish for a map at the moment.
+#admin_error# $iYou can't wish for a map at the moment.
 
 Sort By Add Date
 Sort By Add Date
@@ -229,8 +229,23 @@ File  deleted from filesystem!
 $f00$oError $z$s$fff%s
 $f00$oError $z$s$fff%s
 
-Maps on server
-Maps on server
+Maps on server (%s)
+Maps on server (%s)
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s
+Maps on server (%1$s) - Sorted by '%2$s' %3$s
+
+Maps on server (%1$s) - Filtered by '%2$s'
+Maps on server (%1$s) - Filtered by '%2$s'
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s - Filtered by '%4$s'
+Maps on server (%1$s) - Sorted by '%2$s' %3$s - Filtered by '%4$s'
+
+ascending
+ascending
+
+descending
+descending
 
 History of Maps
 History of Maps
@@ -252,3 +267,141 @@ Open
 
 Display is limiting to first %1$s maps.
 Display is limiting to first %1$s maps.
+
+Filters
+Filters
+
+Sort By
+Sort By
+
+Not Finished
+Not Finished
+
+Finished
+Finished
+
+Not Rated
+Not Rated
+
+Rated
+Rated
+
+Recently Played
+Recently Played
+
+Not Recently Played
+Not Recently Played
+
+Map Name
+Map Name
+
+Map Author
+Map Author
+
+Gold Time
+Gold Time
+
+Local Record
+Local Record
+
+Map Rating
+Map Rating
+
+Add Time
+Add Time
+
+Direction
+Direction
+
+Ascending
+Ascending
+
+Descending
+Descending
+
+Maplist Filters Selection
+Maplist Filters Selection
+
+Open Filter Window
+Open Filter Window
+
+Clear Filters
+Clear Filters
+
+No Author time
+No Author time
+
+No Gold time
+No Gold time
+
+No Silver time
+No Silver time
+
+No Bronze time
+No Bronze time
+
+Only Multilap
+Only Multilap
+
+No Multilap
+No Multilap
+
+Sunrise
+Sunrise
+
+Day
+Day
+
+Sunset
+Sunset
+
+Night
+Night
+
+Environment
+Environment
+
+Mood
+Mood
+
+Medals
+Medals
+
+My rating
+My rating
+
+Display Cost
+Display Cost
+
+Behind player
+Behind player
+
+Login
+Login
+
+Not Rated Maps
+Not Rated Maps
+
+Rated Maps
+Rated Maps
+
+#error#You cannot use this filter because the LocalRecords plugin is not loaded!
+#error#You cannot use this filter because the LocalRecords plugin is not loaded!
+
+#error#You cannot use this filter because the MapRatings plugin is not loaded!
+#error#You cannot use this filter because the MapRatings plugin is not loaded!
+
+#error#You must enter a login to filter behind!
+#error#You must enter a login to filter behind!
+
+#error#You cannot filter behind yourself!
+#error#You cannot filter behind yourself!
+
+#error#The login you entered does not exist in the database!
+#error#The login you entered does not exist in the database!
+
+#error#The login you entered has no records in the database!
+#error#The login you entered has no records in the database!
+
+#admin_error# $iYou have reached the maximum number of maps you can queue...
+#admin_error# $iYou have reached the maximum number of maps you can queue...

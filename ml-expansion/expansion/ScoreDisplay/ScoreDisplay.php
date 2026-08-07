@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ScoreDisplay;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -18,12 +17,6 @@ class ScoreDisplay extends ExpPlugin
     private $widget;
     private $scoreSetupWindow;
 
-    private $actionDisplayWidget;
-    private $actionPlus0;
-    private $actionMinus0;
-    private $actionPlus1;
-    private $actionMinus1;
-
     private $widgetData = array(
         "teamName0" => "",
         "teamName1" => "",
@@ -35,34 +28,26 @@ class ScoreDisplay extends ExpPlugin
 
     public function eXpOnReady()
     {
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+        $this->registerManialinkCallback('add', false, true);
+        $this->registerManialinkCallback('sub', false, true);
+        $this->registerManialinkCallback('displayWidget', true);
+        
         $this->config = Config::getInstance();
         $cmd = AdminGroups::addAdminCommand('scores', $this, 'scores', Permission::QUIZ_ADMIN);
         $cmd->setHelp('Setup the scores widget');
         $cmd->setHelpMore('$wSetup the scores widget');
         $this->cmd_scores = $cmd;
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $this->actionDisplayWidget = $aH->createAction(array($this, "displayWidget"));
-        $this->actionPlus0 = $aH->createAction(array($this, "add"), 0);
-        $this->actionMinus0 = $aH->createAction(array($this, "sub"), 0);
-        $this->actionPlus1 = $aH->createAction(array($this, "add"), 1);
-        $this->actionMinus1 = $aH->createAction(array($this, "sub"), 1);
-
         $this->widget = new Widget("ScoreDisplay\Gui\Widgets\Scores.xml");
         $this->widget->setName("ScoreWidget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(45, 7);
-        $this->widget->setParam("actionPlus0", $this->actionPlus0);
-        $this->widget->setParam("actionMinus0", $this->actionMinus0);
-        $this->widget->setParam("actionPlus1", $this->actionPlus1);
-        $this->widget->setParam("actionMinus1", $this->actionMinus1);
 
         $this->scoreSetupWindow = new Window("ScoreDisplay\Gui\Windows\ScoreSetup.xml");
         $this->scoreSetupWindow->setName("ScoreSetup");
         $this->scoreSetupWindow->setSize(40, 80);
         $this->scoreSetupWindow->setTitle('ScoreSetup');
-        $this->scoreSetupWindow->setParam("okAction", $this->actionDisplayWidget);
     }
 
     public function scores($login, $params = array())
@@ -138,28 +123,16 @@ class ScoreDisplay extends ExpPlugin
     {
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
-            $this->widget = null;
         }
+        $this->widget = null;
 
         if ($this->scoreSetupWindow instanceof Window) {
             $this->scoreSetupWindow->erase();
         }
         $this->scoreSetupWindow = null;
+        
         AdminGroups::removeAdminCommand($this->cmd_scores);
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->actionDisplayWidget);
-        $aH->deleteAction($this->actionPlus0);
-        $aH->deleteAction($this->actionMinus0);
-        $aH->deleteAction($this->actionPlus1);
-        $aH->deleteAction($this->actionMinus1);
-
-        $this->actionDisplayWidget = null;
-        $this->actionPlus0 = null;
-        $this->actionMinus0 = null;
-        $this->actionPlus1 = null;
-        $this->actionMinus1 = null;
         $this->config = null;
 
         parent::eXpOnUnload();

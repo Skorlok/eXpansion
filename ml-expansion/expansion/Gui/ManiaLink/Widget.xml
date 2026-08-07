@@ -1,15 +1,15 @@
-<manialink id="<?php echo $this->getWidgetHashName() ?>" version="2" layer="<?php echo $this->getLayer() ?>" name="<?php echo $this->getWidgetName() ?>">
-<?php echo $this->getLanguages() ?>
-<frame posn="<?php echo $this->getPosX() . " " . $this->getPosY() . " " . $this->getPosZ() ?>" id="<?php echo $this->getWidgetName() ?>">
+<manialink id="{widgetHashName}" version="2" layer="{layer}" name="{widgetName}">
+{languages}
+<frame posn="{pos}" id="{widgetName}">
 
-<?php echo $this->getXML() ?>
+{xml}
 
-<quad id="enableMove" posn="0 0 38.5" sizen="<?php echo $this->getSizeX() . " " . $this->getSizeY() ?>" style="Icons128x128_1" substyle="ShareBlink" scriptevents="1" hidden="1"/>
-<label id="coordLabel" posn="<?php echo $this->getSizeX()  / 2 . " " . -$this->getSizeY() / 2 ?> 39" sizen="20 7" halign="center" valign="center" style="TextStaticSmall" hidden="1"/>
+<quad id="enableMove" posn="0 0 38.5" sizen="{size}" style="Icons128x128_1" substyle="ShareBlink" scriptevents="1" hidden="1"/>
+<label id="coordLabel" posn="{sizeHalfPos} 39" sizen="20 7" halign="center" valign="center" style="TextStaticSmall" hidden="1"/>
 
 <script>
 <!--
-<?php echo $this->getMlScripts() ?>
+{mlScripts}
 -->
 </script>
 </frame>

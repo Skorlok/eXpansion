@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_ResSkip;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Donate\Config as DonateConfig;
@@ -56,12 +55,11 @@ class Widgets_ResSkip extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->registerManialinkCallback('skipMap');
+        $this->registerManialinkCallback('restartMap');
 
         $this->config = Config::getInstance();
         $this->donateConfig = DonateConfig::getInstance();
-
-        $this->actions['skip'] = ActionHandler::getInstance()->createAction(array($this, "skipMap"));
-        $this->actions['res'] = ActionHandler::getInstance()->createAction(array($this, "restartMap"));
 
         $this->showResSkip();
     }
@@ -104,8 +102,6 @@ class Widgets_ResSkip extends ExpPlugin
         $this->widget->setSize(20, 10);
         $this->widget->setParam("resAmount", $resAmount);
         $this->widget->setParam("skipAmount", $skipAmount);
-        $this->widget->setParam("resAction", ($resAmount != null ? $this->actions['res'] : null));
-        $this->widget->setParam("skipAction", ($skipAmount != null ? $this->actions['skip'] : null));
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }

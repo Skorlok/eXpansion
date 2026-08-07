@@ -11,7 +11,7 @@ class Inputbox
         }
         
         $xml = '<frame>';
-        if ($editable) {
+        if ($editable !== false) {
             $xml .= '<entry posn="1 0 0.05" id="' . ($id ? $id : $name) . '" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="" scriptevents="1" class="isTabIndex isEditable' . $class . '" textformat="default" textsize="1" textcolor="fff" focusareacolor1="222" focusareacolor2="000" name="' . $name . '" default="' . $text . '"/>';
         } else {
             $xml .= '<label posn="1 0 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="2" textcolor="fff" text="' . $text . '"/>';

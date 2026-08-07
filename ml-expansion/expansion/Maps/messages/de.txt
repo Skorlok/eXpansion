@@ -169,8 +169,8 @@ Nach Autor suchen
 Sort By Add Date
 Streckenliste löschen
 
-Clear Maplist
-#translate# Clear Maplist
+$d00Clear Maplist
+#translate# $d00Clear Maplist
 
 Erases current map from the playlist.
 #translate# Erases current map from the playlist.
@@ -181,7 +181,7 @@ Erases current map from the playlist.
 Are you sure you want to wish this map to be played
 Bist du dir sicher, dass du dir diese Strecke wünschen willst?
 
-#admin_error# $iYOu can't wish for a map at the moment.
+#admin_error# $iYou can't wish for a map at the moment.
 #admin_error# $iDu kannst dir momentan leider keine Strecke wünschen.
 
 #admin_action#Admin #variable#%1$s #admin_action#removed the map #variable#%3$s #admin_action# from playlist!
@@ -220,8 +220,23 @@ File  deleted from filesystem!
 $f00$oError $z$s$fff%s
 #translate# $f00$oError $z$s$fff%s
 
-Maps on server
-#translate# Maps on server
+Maps on server (%s)
+Maps auf dem Server (%s)
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s
+Maps auf dem Server (%1$s) - Sortiert nach '%2$s' %3$s
+
+Maps on server (%1$s) - Filtered by '%2$s'
+Maps auf dem Server (%1$s) - Gefiltert nach '%2$s'
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s - Filtered by '%4$s'
+Maps auf dem Server (%1$s) - Sortiert nach '%2$s' %3$s - Gefiltert nach '%4$s'
+
+ascending
+aufsteigend
+
+descending
+absteigend
 
 History of Maps
 #translate# History of Maps
@@ -243,3 +258,141 @@ Open
 
 Display is limiting to first %1$s maps.
 #translate# Display is limiting to first %1$s maps.
+
+Filters
+Filter
+
+Sort By
+Sortieren nach
+
+Not Finished
+Nicht beendet
+
+Finished
+Beendet
+
+Not Rated
+Nicht bewertet
+
+Rated
+Bewertet
+
+Recently Played
+Kürzlich gespielt
+
+Not Recently Played
+Nicht kürzlich gespielt
+
+Map Name
+Kartenname
+
+Map Author
+Kartenautor
+
+Gold Time
+Goldzeit
+
+Local Record
+Lokaler Rekord
+
+Map Rating
+Kartenbewertung
+
+Add Time
+Hinzufügezeit
+
+Direction
+Richtung
+
+Ascending
+Aufsteigend
+
+Descending
+Absteigend
+
+Maplist Filters Selection
+Maplist-Filterauswahl
+
+Open Filter Window
+Filterfenster öffnen
+
+Clear Filters
+Filter zurücksetzen
+
+No Author time
+Keine Autorenzeit
+
+No Gold time
+Keine Goldzeit
+
+No Silver time
+Keine Silberzeit
+
+No Bronze time
+Keine Bronzezeit
+
+Only Multilap
+Nur Multilap
+
+No Multilap
+Kein Multilap
+
+Sunrise
+Sonnenaufgang
+
+Day
+Tag
+
+Sunset
+Sonnenuntergang
+
+Night
+Nacht
+
+Environment
+Umgebung
+
+Mood
+Stimmung
+
+Medals
+Medaillen
+
+My rating
+Meine Wertung
+
+Display Cost
+Anzeigekosten
+
+Behind player
+Hinter Spieler
+
+Login
+Login
+
+Not Rated Maps
+Nicht bewertete Maps
+
+Rated Maps
+Bewertete Maps
+
+#error#You cannot use this filter because the LocalRecords plugin is not loaded!
+#error#Dieser Filter kann nicht verwendet werden, da das Plugin LocalRecords nicht geladen ist!
+
+#error#You cannot use this filter because the MapRatings plugin is not loaded!
+#error#Dieser Filter kann nicht verwendet werden, da das Plugin MapRatings nicht geladen ist!
+
+#error#You must enter a login to filter behind!
+#error#Sie müssen einen Login eingeben, um dahinter zu filtern!
+
+#error#You cannot filter behind yourself!
+#error#Sie können nicht hinter sich selbst filtern!
+
+#error#The login you entered does not exist in the database!
+#error#Der eingegebene Login existiert nicht in der Datenbank!
+
+#error#The login you entered has no records in the database!
+#error#Der eingegebene Login hat keine Rekorde in der Datenbank!
+
+#admin_error# $iYou have reached the maximum number of maps you can queue...
+#admin_error# $iSie haben die maximale Anzahl an Maps in der Warteschlange erreicht...

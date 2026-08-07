@@ -158,4 +158,51 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
 
         return $this->myScript;
     }
+
+    /**
+     * Generate the Pager HTML structure (scrollable container + scrollbar chrome).
+     *
+     * @param float  $sizeX  Total width
+     * @param float  $sizeY  Total height
+     * @param string $items  Pre-generated XML string of items to embed in the Pager frame
+     * @param float  $posX   Horizontal position
+     * @param float  $posY   Vertical position
+     * @return string
+     */
+    public static function getXML($sizeX = 100, $sizeY = 50, $items = "", $posX = 0, $posY = 0)
+    {
+        $pagerWidth  = $sizeX - 6;
+        $scrollX     = $sizeX - 3;
+        $scrollBgH   = $sizeY - 9;
+        $scrollDownY = $sizeY - 10;
+
+        $xml  = '<frame posn="' . $posX . ' ' . $posY . ' 0">';
+        $xml .= '<frame id="Pager" sizen="' . $pagerWidth . ' ' . $sizeY . '" scriptevents="1">';
+        $xml .= $items;
+        $xml .= '</frame>';
+        $xml .= '<frame posn="0 -5 0">';
+        $xml .= '<quad id="ScrollBg" posn="' . $scrollX . ' 0 0" sizen="4 ' . $scrollBgH . '" halign="center" valign="top" style="Bgs1InRace" substyle="BgPlayerCard" opacity="0.9"/>';
+        $xml .= '<quad id="ScrollBar" posn="' . $scrollX . ' 0 1" sizen="3 15" halign="center" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerName" scriptevents="1"/>';
+        $xml .= '<quad id="ScrollDown" posn="' . $scrollX . ' -' . $scrollDownY . ' 0" sizen="6.5 6.5" halign="center" valign="top" style="Icons64x64_1" substyle="ArrowDown" scriptevents="1"/>';
+        $xml .= '<quad id="ScrollUp" posn="' . $scrollX . ' -1 0" sizen="6.5 6.5" halign="center" valign="bottom" style="Icons64x64_1" substyle="ArrowUp" scriptevents="1"/>';
+        $xml .= '</frame>';
+        $xml .= '</frame>';
+
+        return $xml;
+    }
+
+    /**
+     * Return a Script instance for the Pager ManiaScript, with parameters set.
+     *
+     * @param float $itemSizeY  Height of one item row
+     * @param float $pagerSizeY Total visible height of the pager
+     * @return \ManiaLivePlugins\eXpansion\Gui\Structures\Script
+     */
+    public static function getScriptML($itemSizeY = 6, $pagerSizeY = 50)
+    {
+        $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\Pager");
+        $script->setParam("sizeY", $itemSizeY);
+        $script->setParam("pagerSizeY", $pagerSizeY);
+        return $script;
+    }
 }

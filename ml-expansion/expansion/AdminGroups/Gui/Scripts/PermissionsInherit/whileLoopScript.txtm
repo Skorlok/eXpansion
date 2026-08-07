@@ -1,0 +1,22 @@
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick) {
+        declare Text[] expPrmParts = TextLib::Split("_", Event.ControlId);
+        if (expPrmParts.count == 3 && expPrmParts[0] == "eXp" && expPrmParts[1] == "CheckboxQ") {
+            declare Integer expPrmId = TextLib::ToInteger(expPrmParts[2]);
+            if (expPrmId >= <?php echo $this->firstInheritId; ?> && expPrmId <= <?php echo $this->lastInheritId; ?> && (expPrmId - <?php echo $this->firstInheritId; ?>) % 2 == 0) {
+                declare CMlEntry expPrmInhE <=> (Page.GetFirstChild("eXp_CheckboxE_" ^ TextLib::ToText(expPrmId)) as CMlEntry);
+                declare CMlQuad expPrmHavQ <=> (Page.GetFirstChild("eXp_CheckboxQ_" ^ TextLib::ToText(expPrmId - 1)) as CMlQuad);
+                declare CMlEntry expPrmHavE <=> (Page.GetFirstChild("eXp_CheckboxE_" ^ TextLib::ToText(expPrmId - 1)) as CMlEntry);
+                if (expPrmInhE != Null && expPrmHavQ != Null && expPrmHavE != Null) {
+                    if (expPrmInhE.Value == "1") {
+                        if (expPrmHavE.Value == "1") { expPrmHavQ.Colorize = eXp_checkBox_disabledActiveUrl; }
+                        else { expPrmHavQ.Colorize = eXp_checkBox_disabledUrl; }
+                    } else {
+                        if (expPrmHavE.Value == "1") { expPrmHavQ.Colorize = eXp_checkBox_ActiveUrl; }
+                        else { expPrmHavQ.Colorize = eXp_checkBox_InactiveUrl; }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -33,10 +33,8 @@ class Faq extends ExpPlugin
         $this->msg_admin_info = eXpGetMessage('Notice: Displaying a help page "%1$s" to "%2$s"');
         $this->setPublicMethod("showFaq");
 
-        /** @var ActionHandler $aH */
-        $aH = ActionHandler::getInstance();
         Menu::addMenuItem("Faq",
-            array("Help" => array(null, $aH->createAction(array($this, "showFaq"))))
+            array("Help" => array(null, 'exp:eXpansion.Faq:showFaq'))
         );
 
         $langs = new DirectoryIterator(__DIR__ . DIRECTORY_SEPARATOR . "Topics");
@@ -56,6 +54,8 @@ class Faq extends ExpPlugin
 
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('showFaq');
+        
         $this->registerChatCommand("faq", "showFaq", 0, true);
         $this->registerChatCommand("faq", "showFaq", 1, true);
         $this->registerChatCommand("faq", "showFaq", 2, true);
@@ -250,6 +250,7 @@ class Faq extends ExpPlugin
                 $text = $um['textb'] . '$3af$l[' . str_replace('##', '', $um['url']) . ']' . $um['text'] . '$l$z' . $um['texta'];
             } else {
                 $linkFile  = str_replace("#", "", $um['url']);
+                /** @var ActionHandler $aH */
                 $aH        = ActionHandler::getInstance();
                 $action    = $aH->createAction(array($this, "showFaq"), $linkFile, null);
                 $textColor = '3af';

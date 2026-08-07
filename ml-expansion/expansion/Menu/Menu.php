@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Menu;
 
 use Exception;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Events\Event;
@@ -40,40 +39,37 @@ class Menu extends ExpPlugin implements Listener
 
     public function eXpOnInit()
     {
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-
         $this->menuItems = array(
-            "Players" => array(null, $aH->createAction(array($this, "actionHandler"), "!players")),
-            "Server Info" => array(null, $aH->createAction(array($this, "actionHandler"), "!serverinfo")),
+            "Players" => array(null, 'exp:eXpansion.Menu:actionHandler:!players'),
+            "Server Info" => array(null, 'exp:eXpansion.Menu:actionHandler:!serverinfo'),
             "Hud" => array(null, array(
-                "Move" => array(null, $aH->createAction(array($this, "actionHandler"), "!hudMove")),
-                "Lock" => array(null, $aH->createAction(array($this, "actionHandler"), "!hudLock")),
-                "Reset" => array(null, $aH->createAction(array($this, "actionHandler"), "!hudReset")),
-                "Config..." => array(null, $aH->createAction(array($this, "actionHandler"), "!hudConfig"))
+                "Move" => array(null, 'exp:eXpansion.Menu:actionHandler:!hudMove'),
+                "Lock" => array(null, 'exp:eXpansion.Menu:actionHandler:!hudLock'),
+                "Reset" => array(null, 'exp:eXpansion.Menu:actionHandler:!hudReset'),
+                "Config..." => array(null, 'exp:eXpansion.Menu:actionHandler:!hudConfig')
             )),
             '$f00Admin' => array(null, array(
-                "Instant Res" => array(Permission::MAP_RES, $aH->createAction(array($this, "actionHandler"), "!admres")),
-                "Replay" => array(Permission::MAP_RES, $aH->createAction(array($this, "actionHandler"), "!admreplay")),
-                "Skip" => array(Permission::MAP_SKIP, $aH->createAction(array($this, "actionHandler"), "!admskip")),
-                "Extend" => array(Permission::GAME_SETTINGS, $aH->createAction(array($this, "actionHandler"), "!admext")),
-                "End Round" => array(Permission::MAP_END_ROUND, $aH->createAction(array($this, "actionHandler"), "!admer")),
-                "End WarmUp" => array(Permission::MAP_END_ROUND, $aH->createAction(array($this, "actionHandler"), "!admewu")),
-                "End Round WarmUp" => array(Permission::MAP_END_ROUND, $aH->createAction(array($this, "actionHandler"), "!admewur")),
-                "Start pause" => array(Permission::GAME_SETTINGS, $aH->createAction(array($this, "actionHandler"), "!admpause")),
-                "End pause" => array(Permission::GAME_SETTINGS, $aH->createAction(array($this, "actionHandler"), "!admresume")),
-                "Balance Teams" => array(Permission::TEAM_BALANCE, $aH->createAction(array($this, "actionHandler"), "!teambalance"))
+                "Instant Res" => array(Permission::MAP_RES, 'exp:eXpansion.Menu:actionHandler:!admres'),
+                "Replay" => array(Permission::MAP_RES, 'exp:eXpansion.Menu:actionHandler:!admreplay'),
+                "Skip" => array(Permission::MAP_SKIP, 'exp:eXpansion.Menu:actionHandler:!admskip'),
+                "Extend" => array(Permission::GAME_SETTINGS, 'exp:eXpansion.Menu:actionHandler:!admext'),
+                "End Round" => array(Permission::MAP_END_ROUND, 'exp:eXpansion.Menu:actionHandler:!admer'),
+                "End WarmUp" => array(Permission::MAP_END_ROUND, 'exp:eXpansion.Menu:actionHandler:!admewu'),
+                "End Round WarmUp" => array(Permission::MAP_END_ROUND, 'exp:eXpansion.Menu:actionHandler:!admewur'),
+                "Start pause" => array(Permission::GAME_SETTINGS, 'exp:eXpansion.Menu:actionHandler:!admpause'),
+                "End pause" => array(Permission::GAME_SETTINGS, 'exp:eXpansion.Menu:actionHandler:!admresume'),
+                "Balance Teams" => array(Permission::TEAM_BALANCE, 'exp:eXpansion.Menu:actionHandler:!teambalance')
             )),
             "Server Control" => array(Permission::SERVER_CONTROL_PANEL, array(
-                "Control Panel" => array(Permission::SERVER_CONTROL_PANEL, $aH->createAction(array($this, "actionHandler"), "!admcontrol")),
-                '$fffe$3afX$fffpansion Config' => array(Permission::EXPANSION_PLUGIN_SETTINGS, $aH->createAction(array($this, "actionHandler"), "!adm_settings")),
-                "Plugin Manager" => array(Permission::EXPANSION_PLUGIN_START_STOP, $aH->createAction(array($this, "actionHandler"), "!adm_plugins"))
+                "Control Panel" => array(Permission::SERVER_CONTROL_PANEL, 'exp:eXpansion.Menu:actionHandler:!admcontrol'),
+                '$fffe$3afX$fffpansion Config' => array(Permission::EXPANSION_PLUGIN_SETTINGS, 'exp:eXpansion.Menu:actionHandler:!adm_settings'),
+                "Plugin Manager" => array(Permission::EXPANSION_PLUGIN_START_STOP, 'exp:eXpansion.Menu:actionHandler:!adm_plugins')
             )),
             "Maps" => array(null, array()),
             "Records" => array(null, array()),
             "Vote" => array(null, array(
-                "Skip" => array(null, $aH->createAction(array($this, "actionHandler"), "!voteskip")),
-                "Res" => array(null, $aH->createAction(array($this, "actionHandler"), "!voteres"))
+                "Skip" => array(null, 'exp:eXpansion.Menu:actionHandler:!voteskip'),
+                "Res" => array(null, 'exp:eXpansion.Menu:actionHandler:!voteres')
             ))
         );
     }
@@ -84,6 +80,8 @@ class Menu extends ExpPlugin implements Listener
         $this->enablePluginEvents();
         Dispatcher::register(Event::getClass(), $this);
         $this->prepareMenu();
+
+        $this->registerManialinkCallback('actionHandler', false, true);
     }
 
     public function eXpAdminAdded($login)

@@ -1,10 +1,10 @@
 <frame posn="0 0 2.0E-5" id="Frame">
     <frame>
-        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML($this->getParam('sizeX'), (3 + $this->getParam('nbFields') * 4) + 1.5, $this->getParam('action')); ?>
+        <?php echo '<exp:widgetbg sizeX="{sizeX}" sizeY="' . ((3 + $this->getParam('nbFields') * 4) + 1.5) . '" action="{action}"/>'; ?>
     </frame>
 
     <frame posn="0 0 1.0E-5">
-        <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML($this->getParam('sizeX'), (3 + $this->getParam('nbFields') * 4), $this->addLang($this->getParam('title')), "minimizeButton"); ?>
+        <?php echo '<exp:widgettitle sizeX="{sizeX}" sizeY="' . (3 + $this->getParam('nbFields') * 4) . '" text="{@{title}}" id="minimizeButton"/>'; ?>
     </frame>
 
     <frame posn="<?php echo ($this->getParam('sizeX') / 2) + 1 ?> -5.5 4.0E-5">

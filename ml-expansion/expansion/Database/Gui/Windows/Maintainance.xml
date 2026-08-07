@@ -1,0 +1,36 @@
+<?php
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$tables         = $this->getParam("tables");
+$sizeX          = (int)$this->getParam("sizeX");
+$sizeY          = (int)$this->getParam("sizeY");
+
+$pagerSizeX = $sizeX - 4;
+$pagerSizeY = $sizeY - 10;
+$bgWidth    = $sizeX - 8;
+$itemSizeY  = 6;
+$btnPosY    = -($sizeY - 3);
+
+$itemsXml = "";
+$n        = 0;
+
+foreach ((array)$tables as $table) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="' . $bgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<frame posn="0 0 1">';
+    $itemsXml .= '<exp:checkbox name="cb_' . $table . '" textWidth="1"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '<label posn="6 0 2" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($table) . '"/>';
+    $itemsXml .= '</frame>';
+    $n++;
+}
+?>
+<frame posn="0 7 0">
+    <?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 3, 0); ?>
+    <frame posn="30 <?php echo $btnPosY; ?> 1">
+        <frame posn="25.5 0 1"><exp:button sizeX="32" sizeY="6" text="Clear Table" colorize="d00" action="exp:eXpansion.Database:maintainanceTruncate"/></frame>
+        <frame posn="51 0 1"><exp:button sizeX="32" sizeY="6" text="Repair" action="exp:eXpansion.Database:maintainanceRepair"/></frame>
+        <frame posn="76.5 0 1"><exp:button sizeX="32" sizeY="6" text="Optimize" action="exp:eXpansion.Database:maintainanceOptimize"/></frame>
+        <frame posn="102 0 1"><exp:button sizeX="32" sizeY="6" text="Access Backups" colorize="0d0" action="exp:eXpansion.Database:maintainanceBackup"/></frame>
+    </frame>
+</frame>

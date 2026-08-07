@@ -6,7 +6,6 @@ $serverComment   = $this->getParam("serverComment");
 $serverPassword  = $this->getParam("serverPassword");
 $serverSpecPass  = $this->getParam("serverSpecPassword");
 $refereePassword = $this->getParam("refereePassword");
-$actions         = $this->getParam("actions");
 
 $canName        = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_NAME);
 $canComment     = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_COMMENT);
@@ -19,70 +18,70 @@ $canGenericOpts = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermis
 ?>
 <frame posn="0 1 0">
 	<frame posn="0 0 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("serverName", 152, $canName, $this->addLang("Server Name"), $this->handleSpecialChars($serverName), null, null, true); ?>
+		<?php echo '<exp:inputbox name="serverName" sizeX="152" editable="' . ($canName ? 'true' : 'false') . '" label="@Server Name" text="' . $this->handleSpecialChars($serverName) . '" isTextId="true"/>'; ?>
 	</frame>
 	<?php if ($canComment) { ?>
 	<textedit id="serverComment" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="<?php echo $this->handleSpecialChars($serverComment); ?>" textformat="default" name="serverComment" showlinenumbers="0" autonewline="0"/>
 	<?php } ?>
 	<frame posn="0 -36 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxPlayers", 12, $canMaxPlayer, $this->addLang("Players"),     $server->nextMaxPlayers,    null, null, true); ?>
+		<?php echo '<exp:inputbox name="maxPlayers" sizeX="12" editable="' . ($canMaxPlayer ? 'true' : 'false') . '" label="@Players" text="' . $server->nextMaxPlayers . '" isTextId="true"/>'; ?>
 	</frame>
 	<frame posn="15 -36 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("maxSpec",    12, $canMaxSpec,   $this->addLang("Spectators"),  $server->nextMaxSpectators, null, null, true); ?>
+		<?php echo '<exp:inputbox name="maxSpec" sizeX="12" editable="' . ($canMaxSpec ? 'true' : 'false') . '" label="@Spectators" text="' . $server->nextMaxSpectators . '" isTextId="true"/>'; ?>
 	</frame>
 	<frame posn="0 -48 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMin",  35, false,         $this->addLang("Ladderpoints minimum"), $server->ladderServerLimitMin, null, null, true); ?>
+		<?php echo '<exp:inputbox name="ladderMin" sizeX="35" editable="false" label="@Ladderpoints minimum" text="' . $server->ladderServerLimitMin . '" isTextId="true"/>'; ?>
 	</frame>
 	<frame posn="38 -48 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("ladderMax",  35, false,         $this->addLang("Ladderpoints Maximum"), $server->ladderServerLimitMax, null, null, true); ?>
+		<?php echo '<exp:inputbox name="ladderMax" sizeX="35" editable="false" label="@Ladderpoints Maximum" text="' . $server->ladderServerLimitMax . '" isTextId="true"/>'; ?>
 	</frame>
 	<frame posn="0 -60 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "serverPass",    76, $canPassword, $this->addLang("Password for server"), $this->handleSpecialChars($serverPassword), true, null, null, true); ?>
+		<exp:inputboxmasked name="serverPass" sizeX="76" editable="<?php echo $canPassword ? 'true' : 'false'; ?>" label="@Password for server" text="<?php echo $this->handleSpecialChars($serverPassword); ?>" showClearText="true" isTextId="true"/>
 	</frame>
 	<frame posn="0 -73 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "serverSpecPass", 76, $canSpecPwd,  $this->addLang("Password for spectators"), $this->handleSpecialChars($serverSpecPass),  true, null, null, true); ?>
+		<exp:inputboxmasked name="serverSpecPass" sizeX="76" editable="<?php echo $canSpecPwd ? 'true' : 'false'; ?>" label="@Password for spectators" text="<?php echo $this->handleSpecialChars($serverSpecPass); ?>" showClearText="true" isTextId="true"/>
 	</frame>
 	<frame posn="0 -86 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\InputboxMasked::getXML(null, "refereePass",   76, false,   $this->addLang("Referee password"), $this->handleSpecialChars($refereePassword), $canRefPwd, null, null, true); ?>
+		<exp:inputboxmasked name="refereePass" sizeX="76" editable="false" label="@Referee password" text="<?php echo $this->handleSpecialChars($refereePassword); ?>" showClearText="<?php echo $canRefPwd ? 'true' : 'false'; ?>" isTextId="true"/>
 	</frame>
 </frame>
 <frame posn="100 -18 0">
 	<frame>
 		<frame posn="0 0 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("publicServer",       $server->hideServer == 0,                 50, false,          $this->addLang("Show Server in public server list"),    true); ?>
+			<exp:checkbox name="publicServer" active="<?php echo ($server->hideServer == 0) ? 'true' : 'false'; ?>" textWidth="50" enabled="false" text="@Show Server in public server list" isTextId="true"/>
 		</frame>
 		<frame posn="0 -6 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("ladderServer",       (bool)$server->currentLadderMode,         50, false,          $this->addLang("Ladder server"),                        true); ?>
+			<exp:checkbox name="ladderServer" active="<?php echo $server->currentLadderMode ? 'true' : 'false'; ?>" textWidth="50" enabled="false" text="@Ladder server" isTextId="true"/>
 		</frame>
 		<frame posn="0 -12 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("allowMapDownload",   (bool)$server->allowMapDownload,          50, $canGenericOpts, $this->addLang("Allow map download using ingame menu"), true); ?>
+			<exp:checkbox name="allowMapDownload" active="<?php echo $server->allowMapDownload ? 'true' : 'false'; ?>" textWidth="50" enabled="<?php echo $canGenericOpts ? 'true' : 'false'; ?>" text="@Allow map download using ingame menu" isTextId="true"/>
 		</frame>
 		<frame posn="0 -18 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("p2pDownload",        (bool)$server->isP2PDownload,             50, $canGenericOpts, $this->addLang("Allow Peer-2-Peer download"),          true); ?>
+			<exp:checkbox name="p2pDownload" active="<?php echo $server->isP2PDownload ? 'true' : 'false'; ?>" textWidth="50" enabled="<?php echo $canGenericOpts ? 'true' : 'false'; ?>" text="@Allow Peer-2-Peer download" isTextId="true"/>
 		</frame>
 		<frame posn="0 -24 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("p2pUpload",          (bool)$server->isP2PUpload,               50, $canGenericOpts, $this->addLang("Allow Peer-2-Peer upload"),            true); ?>
+			<exp:checkbox name="p2pUpload" active="<?php echo $server->isP2PUpload ? 'true' : 'false'; ?>" textWidth="50" enabled="<?php echo $canGenericOpts ? 'true' : 'false'; ?>" text="@Allow Peer-2-Peer upload" isTextId="true"/>
 		</frame>
 		<frame posn="0 -30 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("refereeMode",        (bool)$server->refereeMode,               50, false,           $this->addLang("Enable Referee-mode"),                 true); ?>
+			<exp:checkbox name="refereeMode" active="<?php echo $server->refereeMode ? 'true' : 'false'; ?>" textWidth="50" enabled="false" text="@Enable Referee-mode" isTextId="true"/>
 		</frame>
 		<frame posn="0 -36 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("DisableHorns",       (bool)$server->disableHorns,              50, true,            $this->addLang("Disable Horns"),                        true); ?>
+			<exp:checkbox name="DisableHorns" active="<?php echo $server->disableHorns ? 'true' : 'false'; ?>" textWidth="50" text="@Disable Horns" isTextId="true"/>
 		</frame>
 		<frame posn="0 -42 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("DisableAnnounces",   (bool)$server->disableServiceAnnounces,   50, true,            $this->addLang("Disable Announces"),                    true); ?>
+			<exp:checkbox name="DisableAnnounces" active="<?php echo $server->disableServiceAnnounces ? 'true' : 'false'; ?>" textWidth="50" text="@Disable Announces" isTextId="true"/>
 		</frame>
 		<frame posn="0 -48 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("AutosaveReplays",    (bool)$server->autoSaveReplays,           50, true,            $this->addLang("Autosave All Replays"),                 true); ?>
+			<exp:checkbox name="AutosaveReplays" active="<?php echo $server->autoSaveReplays ? 'true' : 'false'; ?>" textWidth="50" text="@Autosave All Replays" isTextId="true"/>
 		</frame>
 		<frame posn="0 -54 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("AutosaveValidation", (bool)$server->autoSaveValidationReplays, 50, true,            $this->addLang("Autosave Validation Replays"),          true); ?>
+			<exp:checkbox name="AutosaveValidation" active="<?php echo $server->autoSaveValidationReplays ? 'true' : 'false'; ?>" textWidth="50" text="@Autosave Validation Replays" isTextId="true"/>
 		</frame>
 		<frame posn="0 -60 0">
-			<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getXML("KeepPlayerSlots",    (bool)$server->keepPlayerSlots,           50, true,            $this->addLang("Keep Player Slots"),                    true); ?>
+			<exp:checkbox name="KeepPlayerSlots" active="<?php echo $server->keepPlayerSlots ? 'true' : 'false'; ?>" textWidth="50" text="@Keep Player Slots" isTextId="true"/>
 		</frame>
 	</frame>
 </frame>
 <frame posn="126 -93 0">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, null, null, null, $actions["ok"], null, null, null, null, null, null, true); ?>
+	<exp:button sizeX="32" sizeY="6" text="@Apply" action="exp:eXpansion.Adm:serverOptionsOk" isTextId="true"/>
 </frame>

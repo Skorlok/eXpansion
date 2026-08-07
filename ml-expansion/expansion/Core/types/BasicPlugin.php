@@ -101,6 +101,11 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          */
         protected $expStorage;
 
+        /**
+         * @var array[]
+         */
+        private $allowedManialinkCallbacks = array();
+
         final public function onInit()
         {
             $this->expStorage = Storage::getInstance();
@@ -604,6 +609,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             $this->eXpUnloading = true;
             $pHandler->unload($this->getId());
             self::$plugins_onHold[$this->getId()] = $this->getId();
+
+            $this->allowedManialinkCallbacks = array();
         }
 
         /**
@@ -800,6 +807,85 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             $this->console('Line: ' . $e->getLine());
             $this->console('Message: ' . $e->getMessage());
             $this->console('');
+        }
+
+        /**
+         * Security measure to allow only certain functions to be called from manialink callbacks.
+         * 
+         * @param string $callback The function name to allow
+         * @param boolean $allowEntries If true, allows the function to be called with entries, otherwise it will be called without entries
+         * @param boolean $allowParams If true, allows the function to be called with parameters, otherwise it will be called without parameters
+         */
+        public function registerManialinkCallback($callback, $allowEntries = false, $allowParams = false)
+        {
+            if (!isset($this->allowedManialinkCallbacks[$callback])) {
+                $this->allowedManialinkCallbacks[$callback] = array($allowEntries, $allowParams);
+            }
+        }
+
+        public function unregisterManialinkCallback($callback)
+        {
+            if (isset($this->allowedManialinkCallbacks[$callback])) {
+                unset($this->allowedManialinkCallbacks[$callback]);
+            }
+        }
+
+        public function onPlayerManialinkPageAnswer($playerUid, $login, $answer, array $entries)
+        {
+            if ($answer === 'eXpOptimizedPagerAction') {
+                foreach ($entries as $entry) {
+                    if ($entry['Name'] === 'eXpOptimizedPager' && substr(trim($entry['Value']), 0, 4) === 'exp:') {
+                        $answer = trim($entry['Value']); // For some reason there is sometimes a space at the beginning of the value
+                        break;
+                    }
+                }
+            }
+
+            if (substr($answer, 0, 4) === 'exp:') {
+
+                $parts      = explode(':', $answer, 4);
+                $classParts = explode('\\', get_class($this));
+                $partialNs  = isset($classParts[2]) ? $classParts[1] . '.' . $classParts[2] : $classParts[1];
+
+                if (count($parts) >= 3 && $parts[1] === $partialNs) {
+                    $method = $parts[2];
+
+                    if (!isset($this->allowedManialinkCallbacks[$method])) {
+                        $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" not registered in ' . get_class($this));
+                        $this->console('Player: ' . $login . ' answer: ' . $answer);
+                        return;
+                    }
+
+                    $cbConfig = $this->allowedManialinkCallbacks[$method];
+
+                    if (method_exists($this, $method)) {
+
+                        $params = array($login);
+                        if ($cbConfig[1] && isset($parts[3])) {
+                            $params[] = $parts[3];
+                        } else if (!$cbConfig[1] && isset($parts[3])) {
+                            $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" does not allow parameters in ' . get_class($this));
+                            $this->console('Player: ' . $login . ' answer: ' . $answer);
+                        }
+                        
+                        if ($cbConfig[0] && count($entries)) {
+                            $entryValues = array();
+                            foreach ($entries as $entry) {
+                                if ($entry['Name'] !== 'eXpOptimizedPager') {
+                                    $entryValues[$entry['Name']] = $entry['Value'];
+                                }
+                            }
+                            if (count($entryValues)) {
+                                $params[] = $entryValues;
+                            }
+                        }
+                        call_user_func_array(array($this, $method), $params);
+                    } else {
+                        $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" not found in ' . get_class($this));
+                        $this->console('Player: ' . $login . ' answer: ' . $answer);
+                    }
+                }
+            }
         }
 
         /**

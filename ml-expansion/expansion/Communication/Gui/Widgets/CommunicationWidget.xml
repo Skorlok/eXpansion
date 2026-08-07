@@ -35,12 +35,12 @@
         <label id="line_3" posn="0 -15 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
         <label id="line_4" posn="0 -20 0" sizen="116 5" style="TextStaticSmall" textcolor="fff"/>
         <frame posn="0 -28 1">
-            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("chatEntry", 110, true, null, null, null, null); ?>
+            <exp:inputbox name="chatEntry" sizeX="110"/>
         </frame>
     </frame>
-    <quad id="addTab" posn="0 -0.5 0.00023" sizen="6 6" style="Icons64x64_1" substyle="Add" action="<?php echo $this->getParam("actionPlayers"); ?>"/>
+    <quad id="addTab" posn="0 -0.5 0.00023" sizen="6 6" style="Icons64x64_1" substyle="Add" action="exp:eXpansion.Communication:selectPlayer"/>
 </frame>
-<quad posn="0 600 0" sizen="5 5" bgcolor="000" action="<?php echo $this->getParam("actionSend"); ?>"/>
+<quad posn="0 600 0" sizen="5 5" bgcolor="000" action="exp:eXpansion.Communication:guiSendMessage"/>
 <frame posn="0 600 1">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("replyTo", 30, true, null, null, null, null); ?>
+    <exp:inputbox name="replyTo" sizeX="30"/>
 </frame>

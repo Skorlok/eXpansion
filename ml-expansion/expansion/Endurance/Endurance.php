@@ -38,6 +38,8 @@ class Endurance extends ExpPlugin implements EnduroListener
     {
         $this->enableDatabase();
         $this->enableDedicatedEvents();
+		
+        $this->registerManialinkCallback('showEnduroWindow');
 
 		Dispatcher::register(EnduroEvents::getClass(), $this);
 
@@ -92,7 +94,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 		$cmd = AdminGroups::addAdminCommand("removepoints", $this, "chat_removepoints", Permission::GAME_SETTINGS);
         $cmd->setHelp("Remove last (total) points in the CSV file");
 
-		Endurance::$openScoresAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showEnduroWindow'));
+		Endurance::$openScoresAction = 'exp:eXpansion.Endurance:showEnduroWindow';
 
         $this->onBeginMap(null, null, null);
     }

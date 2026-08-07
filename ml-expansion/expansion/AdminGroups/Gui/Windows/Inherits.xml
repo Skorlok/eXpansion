@@ -1,0 +1,29 @@
+<?php
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$groups    = $this->getParam("groups");
+$sizeX     = (int)$this->getParam("sizeX");
+$sizeY     = (int)$this->getParam("sizeY");
+
+$pagerSizeX = $sizeX + 4;
+$pagerSizeY = $sizeY - 12;
+$okPosX     = $sizeX - 42;
+$okPosY     = -($sizeY - 5);
+
+$itemsXml = "";
+$n = 0;
+
+foreach ((array)$groups as $group) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="' . ($pagerSizeX - 4) . '" sizeY="4"/>';
+    $itemsXml .= '<frame posn="0 0 1">';
+    $itemsXml .= '<exp:checkbox name="cb_' . $group['name'] . '" active="' . ((bool)$group['checked'] ? 'true' : 'false') . '" textWidth="60" text="' . $this->handleSpecialChars($group['name']) . '"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $n++;
+}
+?>
+<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 0, 0); ?>
+<frame posn="<?php echo $okPosX; ?> <?php echo $okPosY; ?> 1">
+    <exp:button sizeX="32" sizeY="6" text="@OK" action="exp:eXpansion.AdminGroups:inheritsOk" isTextId="true"/>
+</frame>

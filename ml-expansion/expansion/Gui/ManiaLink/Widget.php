@@ -78,6 +78,13 @@ class Widget extends ManiaLink
             $this->scripts['libScript'] .= $userScript->getlibScript($this, false);
         }
 
+        foreach ($this->elementsScript as $elementScript) {
+            $this->scripts['declarationScript'] .= $elementScript->getDeclarationScript($this, false);
+            $this->scripts['endDeclarationScript'] .= $elementScript->getEndScript($this, false);
+            $this->scripts['whileLoopScript'] .= $elementScript->getWhileLoopScript($this, false);
+            $this->scripts['libScript'] .= $elementScript->getlibScript($this, false);
+        }
+
         $this->widgetScript->setParam("dDeclares", $this->scripts['declarationScript'] . $this->scripts['endDeclarationScript']);
         $this->widgetScript->setParam("scriptLib", $this->scripts['libScript']);
         $this->widgetScript->setParam("wLoop", $this->scripts['whileLoopScript']);

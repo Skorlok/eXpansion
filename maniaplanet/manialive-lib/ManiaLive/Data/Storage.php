@@ -88,6 +88,12 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 		$this->connection = Connection::factory($config->host, $config->port, $config->timeout, $config->user, $config->password);
 		$this->serverStatus = $this->connection->getStatus();
 
+		while ($this->serverStatus->code != 4) {
+			Console::printlnFormatted('Waiting for server to be in "Running" state, current state: ' . $this->serverStatus->name);
+			sleep(5);
+			$this->serverStatus = $this->connection->getStatus();
+		}
+
 		$infos = $this->connection->getPlayerList(-1, 0);
 		foreach ($infos as $info) {
 			try {
@@ -111,24 +117,49 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 			}
 		}
 
-		try {
-			$this->maps = $this->connection->getMapList(-1, 0);
-			$this->currentMap = $this->connection->getCurrentMapInfo();
-			if (isset($this->maps[$this->connection->getNextMapIndex()]))
-				$this->nextMap = $this->maps[$this->connection->getNextMapIndex()];
-			else
-				$this->nextMap = null;
-		} catch (\Exception $e) {
-			$this->maps = array();
+		$this->loadMaplist();
+
+		// Fetch current map and next map
+		$this->currentMap = $this->connection->getCurrentMapInfo();
+		if (isset($this->maps[$this->connection->getNextMapIndex()]))
+			$this->nextMap = $this->maps[$this->connection->getNextMapIndex()];
+		else
 			$this->nextMap = null;
-			$this->currentMap = null;
-		}
+
+
 		$this->server = $this->connection->getServerOptions();
 		$this->gameInfos = $this->connection->getCurrentGameInfo();
 		try {
 			$this->serverLogin = $this->connection->getSystemInfo()->serverLogin;
 		} catch (\Exception $e) {
 			$this->serverLogin = null;
+		}
+	}
+
+	function loadMaplist()
+	{
+		// Fetch all maps in chunks; getMapList(-1, 0) breaks above ~20 000 maps.
+		// Max iterations = 500 guards against a server bug returning the same chunk forever (500 * 1000 = 500 000 maps).
+		$this->maps = array();
+		$chunkSize  = 1000;
+		$offset     = 0;
+		for ($i = 0; $i < 500; $i++) {
+			try {
+				$chunk = $this->connection->getMapList($chunkSize, $offset);
+			} catch (\Exception $e) {
+				break;
+			}
+			if (empty($chunk)) {
+				break;
+			}
+			foreach ($chunk as $map) {
+				$this->maps[] = $map;
+			}
+			// Server returned fewer maps than requested: this was the last page
+			if (count($chunk) < $chunkSize) {
+				break;
+			}
+			$offset += $chunkSize;
 		}
 	}
 
@@ -211,13 +242,8 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 
 	function onServerStart()
 	{
-		try {
-			$this->serverLogin = $this->connection->getMainServerPlayerInfo()->login;
-			$this->maps = $this->connection->getMapList(-1, 0);
-		} catch (\Exception $e) {
-			$this->serverLogin = null;
-			$this->maps = array();
-		}
+		$this->serverLogin = $this->connection->getMainServerPlayerInfo()->login;
+		$this->loadMaplist();
 	}
 
 	function onServerStop()
@@ -414,27 +440,41 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 	function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
 	{
 		if ($isListModified) {
-			$maps = $this->connection->getMapList(-1, 0);
+			// Build uid -> storage key index once (O(n)) to avoid O(n²) from findMap inside the chunk loop.
+			$uidIndex = array();
+			foreach ($this->maps as $key => $map) {
+				if (isset($map->uId)) {
+					$uidIndex[$map->uId] = $key;
+				}
+			}
 
-			foreach ($maps as $key => $map) {
-				$storageKey = $this->findMap($map, $this->maps);
-				if ($storageKey !== false)
-					$maps[$key] = $this->maps[$storageKey];
-				else
-					$this->maps[$storageKey] = null;
+			$maps      = array();
+			$chunkSize = 1000;
+			$offset    = 0;
+			for ($i = 0; $i < 500; $i++) {
+				try {
+					$chunk = $this->connection->getMapList($chunkSize, $offset);
+				} catch (\Exception $e) {
+					break;
+				}
+				if (empty($chunk)) {
+					break;
+				}
+				foreach ($chunk as $map) {
+					if (isset($map->uId) && isset($uidIndex[$map->uId])) {
+						$maps[] = $this->maps[$uidIndex[$map->uId]];
+					} else {
+						$maps[] = $map;
+					}
+				}
+				if (count($chunk) < $chunkSize) {
+					break;
+				}
+				$offset += $chunkSize;
 			}
 			$this->maps = $maps;
 		}
 		$this->nextMap = isset($this->maps[$nextMapIndex]) ? $this->maps[$nextMapIndex] : null;
-	}
-
-	protected function findMap(Map $newMap, $listMaps)
-	{
-		foreach ($listMaps as $key => $map) {
-			if (isset($map->uId) && $map->uId == $newMap->uId)
-				return $key;
-		}
-		return false;
 	}
 
 	function onPlayerInfoChanged($playerInfo)
@@ -534,18 +574,13 @@ class Storage extends \ManiaLib\Utils\Singleton implements ServerListener, AppLi
 
 	function resetMapInfos()
 	{
-		try {
-			$this->maps = $this->connection->getMapList(-1, 0);
-			$this->currentMap = $this->connection->getCurrentMapInfo();
-			if (isset($this->maps[$this->connection->getNextMapIndex()]))
-				$this->nextMap = $this->maps[$this->connection->getNextMapIndex()];
-			else
-				$this->nextMap = null;
-		} catch (\Exception $e) {
-			$this->maps = array();
+		$this->loadMaplist();
+		
+		$this->currentMap = $this->connection->getCurrentMapInfo();
+		if (isset($this->maps[$this->connection->getNextMapIndex()]))
+			$this->nextMap = $this->maps[$this->connection->getNextMapIndex()];
+		else
 			$this->nextMap = null;
-			$this->currentMap = null;
-		}
 	}
 
 	/**

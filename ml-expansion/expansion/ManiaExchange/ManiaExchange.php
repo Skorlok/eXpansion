@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ManiaExchange;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
@@ -60,17 +59,17 @@ class ManiaExchange extends ExpPlugin
         $this->msg_worldRec = eXpGetMessage('#mx#MX World Record: #time#%s#mx# by #variable#%s');
         $this->msg_not_found = eXpGetMessage('#error#Map not found on ManiaExchange');
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
         Menu::addMenuItem("ManiaExchange",
             array("Maps" => array(null, array(
-                "ManiaExchange" => array(Permission::MAP_ADD_MX, $aH->createAction(array($this, "mxSearch")))
+                "ManiaExchange" => array(Permission::MAP_ADD_MX, 'exp:eXpansion.ManiaExchange:mxSearch')
             )))
         );
     }
 
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('mxSearch');
+        
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
         $this->registerChatCommand("mx", "chatMX", 2, true);
         $this->registerChatCommand("mx", "chatMX", 1, true);
@@ -116,7 +115,6 @@ class ManiaExchange extends ExpPlugin
         $this->mxInfosWindow = new Window("ManiaExchange\Gui\Windows\MxInfos.xml");
         $this->mxInfosWindow->setName("MX Infos");
         $this->mxInfosWindow->setSize(220, 100);
-        $this->mxInfosWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
 
         $this->onBeginMap(null, null, null);
     }

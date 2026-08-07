@@ -1,0 +1,81 @@
+<?php
+$chunkCount  = (int)$this->chunkCount;
+$chunkSize   = (int)$this->chunkSize;
+$rowsPerPage = (int)$this->rowPerPage;
+$totalRows   = (int)$this->totalRows;
+$varName     = $this->varName;
+?>
+
+declare Real itemSizeY = 6.0;
+declare CMlFrame Pager <=> (Page.GetFirstChild("Pager") as CMlFrame);
+declare CMlQuad ScrollBar <=> (Page.GetFirstChild("ScrollBar") as CMlQuad);
+declare CMlQuad ScrollBg <=> (Page.GetFirstChild("ScrollBg") as CMlQuad);
+declare CMlQuad ScrollUp <=> (Page.GetFirstChild("ScrollUp") as CMlQuad);
+declare CMlQuad ScrollDown <=> (Page.GetFirstChild("ScrollDown") as CMlQuad);
+declare Real disabledOpacity = 0.2;
+
+declare CMlEntry entry <=> (Page.GetFirstChild("entry") as CMlEntry);
+
+declare Real pager_scrollYOriginPosition;
+declare Real pager_mouseYPosition;
+declare Real pager_deltaMouseYPosition;
+declare Real pager_startMouseYPosition;
+declare pager_moveScroll = False;
+declare pager_firstClick = False;
+
+declare Real ScrollBarHeight = ScrollBar.Size.Y;
+declare Real ScrollBgHeight = ScrollBg.Size.Y;
+
+declare Real pagerStartPos = ScrollBar.RelativePosition.Y;
+declare Real pagerStopPosition = pagerStartPos - ScrollBgHeight + ScrollBarHeight;
+
+declare Integer pager_chunkSize = <?php echo $chunkSize; ?>;
+
+// Chunk 0 : données inline, toujours disponibles immédiatement
+declare Text[][Integer] <?php echo $varName; ?>textData_0 <?php echo $this->chunk0items; ?>;
+declare Text[][Integer] <?php echo $varName; ?>data_0 <?php echo $this->chunk0data; ?>;
+
+// Chunks 1-N : for UI, déjà remplis via multicall avant l'exécution du script
+<?php for ($c = 1; $c < $chunkCount; $c++): ?>
+declare Text[][Integer] <?php echo $varName; ?>textData_<?php echo $c; ?> for UI = Text[][Integer];
+declare Text[][Integer] <?php echo $varName; ?>data_<?php echo $c; ?> for UI = Text[][Integer];
+<?php endfor; ?>
+
+declare Integer rowsPerPage = <?php echo $rowsPerPage; ?>;
+declare Integer itemsPerRow = <?php echo (int)$this->itemsPerRow; ?>;
+declare Integer totalRows = <?php echo $totalRows; ?>;
+
+declare Integer currentIndex = 0;
+declare Integer oldIndex = 0;
+declare Integer maxIndex = totalRows - rowsPerPage;
+
+declare Boolean isScrollDown = False;
+declare Boolean isScrollUp = False;
+
+declare CMlLabel[Integer][Integer] labels;
+
+// Initialisation des labels depuis chunk 0 (toujours disponible)
+for (i, 0, rowsPerPage) {
+    labels[i] = CMlLabel[Integer];
+    for (r, 0, itemsPerRow-1) {
+        declare CMlLabel item <=> (Page.GetFirstChild("column_"^i^"_"^r) as CMlLabel);
+        labels[i][r] = item;
+        if (item != Null && <?php echo $varName; ?>textData_0.existskey(i) && <?php echo $varName; ?>textData_0[i].count > r) {
+            item.SetText(<?php echo $varName; ?>textData_0[i][r]);
+        }
+    }
+}
+
+if (totalRows <= rowsPerPage) {
+    ScrollBar.Hide();
+    ScrollBg.Opacity = disabledOpacity;
+    ScrollDown.Opacity = disabledOpacity;
+    ScrollUp.Opacity = disabledOpacity;
+
+    for (i, totalRows, rowsPerPage) {
+        declare CMlFrame rowFrame <=> (Page.GetFirstChild("row_"^i) as CMlFrame);
+        if (rowFrame != Null) {
+            rowFrame.Hide();
+        }
+    }
+}

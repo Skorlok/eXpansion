@@ -157,8 +157,8 @@ Etsi Nimellä
 Search Author
 Etsi Tekijällä
 
-Clear Maplist
-Tyhjennä Karttalista
+$d00Clear Maplist
+$d00Tyhjennä Karttalista
 
 #admin_error# $iA payment for wishin a track is in progress please try later.
 #admin_error# $iMaksu karttatoiveesta on käynnissä, kokeile myöhemmin uudestaan.
@@ -166,7 +166,7 @@ Tyhjennä Karttalista
 Are you sure you want to wish this map to be played
 Oletko varma, että haluat toivoa tämän kartan pelattavaksi uudelleen ?
 
-#admin_error# $iYOu can't wish for a map at the moment.
+#admin_error# $iYou can't wish for a map at the moment.
 #admin_error# $iEt voi toivoa tätä karttaa tällä hetkellä.
 
 Sort By Add Date
@@ -220,8 +220,23 @@ Tiedosto poistettu palvelimelta!
 $f00$oError $z$s$fff%s
 $f00$oVirhe $z$s$fff%s
 
-Maps on server
-Kartat palvelimella
+Maps on server (%s)
+Kartat palvelimella (%s)
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s
+Kartat palvelimella (%1$s) - Lajiteltu: '%2$s' %3$s
+
+Maps on server (%1$s) - Filtered by '%2$s'
+Kartat palvelimella (%1$s) - Suodatettu: '%2$s'
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s - Filtered by '%4$s'
+Kartat palvelimella (%1$s) - Lajiteltu: '%2$s' %3$s - Suodatettu: '%4$s'
+
+ascending
+nouseva
+
+descending
+laskeva
 
 History of Maps
 Karttojen historia
@@ -243,3 +258,141 @@ Lista on rajoitettu %1$s karttaan.
 
 #admin_error#This instance of eXpansion is running remote! Can%s, $this->getRecipient(
 #translate# #admin_error#This instance of eXpansion is running remote! Can%s, $this->getRecipient(
+
+Filters
+Suodattimet
+
+Sort By
+Lajittele
+
+Not Finished
+Ei suoritettu
+
+Finished
+Suoritettu
+
+Not Rated
+Ei arvioitu
+
+Rated
+Arvioitu
+
+Recently Played
+Viimeksi pelattu
+
+Not Recently Played
+Ei äskettäin pelattu
+
+Map Name
+Kartan nimi
+
+Map Author
+Kartan tekijä
+
+Gold Time
+Kultaaika
+
+Local Record
+Paikallinen ennätys
+
+Map Rating
+Kartan arviointi
+
+Add Time
+Lisäysaika
+
+Direction
+Suunta
+
+Ascending
+Nouseva
+
+Descending
+Laskeva
+
+Maplist Filters Selection
+Karttalistan suodatinvalinta
+
+Open Filter Window
+Avaa suodatinikkuna
+
+Clear Filters
+Tyhjennä suodattimet
+
+No Author time
+Ei tekijäaikaa
+
+No Gold time
+Ei kultaaikaa
+
+No Silver time
+Ei hopeaaikaa
+
+No Bronze time
+Ei pronssiaaikaa
+
+Only Multilap
+Vain multilap
+
+No Multilap
+Ei multilapia
+
+Sunrise
+Auringonnousu
+
+Day
+Päivä
+
+Sunset
+Auringonlasku
+
+Night
+Yö
+
+Environment
+Ympäristö
+
+Mood
+Tunnelma
+
+Medals
+Mitalit
+
+My rating
+Oma arvio
+
+Display Cost
+Näyttökustannus
+
+Behind player
+Pelaajan takana
+
+Login
+Login
+
+Not Rated Maps
+Arvostelemattomat mapit
+
+Rated Maps
+Arvostellut mapit
+
+#error#You cannot use this filter because the LocalRecords plugin is not loaded!
+#error#Et voi käyttää tätä suodatinta, koska LocalRecords-lisäosa ei ole ladattu!
+
+#error#You cannot use this filter because the MapRatings plugin is not loaded!
+#error#Et voi käyttää tätä suodatinta, koska MapRatings-lisäosa ei ole ladattu!
+
+#error#You must enter a login to filter behind!
+#error#Sinun täytyy syöttää kirjautumistunnus suodattaaksesi sen takaa!
+
+#error#You cannot filter behind yourself!
+#error#Et voi suodattaa oman itsesi takaa!
+
+#error#The login you entered does not exist in the database!
+#error#Syöttämääsi kirjautumistunnusta ei löydy tietokannasta!
+
+#error#The login you entered has no records in the database!
+#error#Syöttämälläsi kirjautumistunnuksella ei ole ennätyksiä tietokannassa!
+
+#admin_error# $iYou have reached the maximum number of maps you can queue...
+#admin_error# $iOlet saavuttanut maksimimäärän jonoon lisättäviä karttoja...

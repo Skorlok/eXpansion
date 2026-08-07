@@ -1,0 +1,148 @@
+<?php
+$chunkCount = (int)$this->chunkCount;
+$varName    = $this->varName;
+?>
+
+if (pager_moveScroll) {
+    if (pager_firstClick) {
+        pager_scrollYOriginPosition = ScrollBar.RelativePosition.Y;
+    }
+    pager_firstClick = False;
+
+    declare ypos = pager_scrollYOriginPosition + pager_deltaMouseYPosition;
+
+    if (ypos >= pagerStartPos) {
+        ScrollBar.RelativePosition.Y = pagerStartPos;
+    } else if (ypos < pagerStopPosition) {
+        ScrollBar.RelativePosition.Y = pagerStopPosition;
+    } else {
+        ScrollBar.RelativePosition.Y = pager_scrollYOriginPosition + pager_deltaMouseYPosition;
+    }
+
+    declare maxDelta = pagerStartPos - pagerStopPosition;
+    currentIndex = MathLib::NearestInteger((ScrollBar.RelativePosition.Y / maxDelta) * maxIndex) * -1;
+}
+
+if (oldIndex != currentIndex) {
+    oldIndex = currentIndex;
+
+    // Copie de la fenêtre visible en local : rowsPerPage accès for UI au lieu de rowsPerPage × itemsPerRow
+    declare Text[][Integer] windowItems = Text[][Integer];
+    for (i, 0, rowsPerPage) {
+        declare Integer absRow   = i + currentIndex;
+        declare Integer chunkIdx = absRow / pager_chunkSize;
+        declare Integer inChunk  = absRow % pager_chunkSize;
+        switch (chunkIdx) {
+<?php for ($c = 0; $c < $chunkCount; $c++): ?>
+            case <?php echo $c; ?>: { if (<?php echo $varName; ?>textData_<?php echo $c; ?>.existskey(inChunk)) windowItems[i] = <?php echo $varName; ?>textData_<?php echo $c; ?>[inChunk]; }
+<?php endfor; ?>
+        }
+    }
+
+    for (i, 0, rowsPerPage) {
+        for (r, 0, itemsPerRow-1) {
+            declare CMlLabel item = labels[i][r];
+            if (item != Null) {
+                declare Text colText = "";
+                if (windowItems.existskey(i) && windowItems[i].count > r) {
+                    colText = windowItems[i][r];
+                }
+                item.SetText(colText);
+            }
+        }
+    }
+
+    if (totalRows > rowsPerPage) {
+        ScrollUp.Opacity = 1.0;
+        ScrollDown.Opacity = 1.0;
+        if (currentIndex == 0) {
+            ScrollUp.Opacity = disabledOpacity;
+        }
+        if (currentIndex == maxIndex) {
+            ScrollDown.Opacity = disabledOpacity;
+        }
+    }
+}
+
+if (isScrollDown) {
+    isScrollDown = False;
+    if (totalRows > rowsPerPage) {
+        currentIndex = currentIndex + 5;
+        if (currentIndex > maxIndex) {
+            currentIndex = maxIndex;
+        }
+        declare maxDelta = pagerStartPos - pagerStopPosition;
+        ScrollBar.RelativePosition.Y = -1 * (maxDelta / maxIndex) * currentIndex;
+    }
+}
+
+if (isScrollUp) {
+    isScrollUp = False;
+    if (totalRows > rowsPerPage) {
+        currentIndex = currentIndex - 5;
+        if (currentIndex < 0) {
+            currentIndex = 0;
+        }
+        declare maxDelta = pagerStartPos - pagerStopPosition;
+        ScrollBar.RelativePosition.Y = -1 * (maxDelta / maxIndex) * currentIndex;
+    }
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick) {
+        if (Event.ControlId == "ScrollBar") {
+            pager_startMouseYPosition = MouseY;
+            pager_firstClick = True;
+            pager_moveScroll = True;
+        } else if (Event.ControlId == "ScrollDown") {
+            isScrollDown = True;
+        } else if (Event.ControlId == "ScrollUp") {
+            isScrollUp = True;
+        }
+    }
+    // pagedown = 78
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 78) {
+        if (exp_windowStack.count > 0) {
+            if (exp_windowStack[0] == id) {
+                isScrollDown = True;
+            }
+        }
+    }
+    // pageup = 103
+    if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyCode == 103) {
+        if (exp_windowStack.count > 0) {
+            if (exp_windowStack[0] == id) {
+                isScrollUp = True;
+            }
+        }
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseOver && Event.ControlId != "Unassigned") {
+        if (Event.Control.HasClass("eXpOptimizedPagerAction")) {
+            declare id = TextLib::Split("_", Event.ControlId);
+            declare Integer row      = TextLib::ToInteger(id[1]) + currentIndex;
+            declare Integer col      = TextLib::ToInteger(id[2]);
+            declare Integer chunkIdx = row / pager_chunkSize;
+            declare Integer inChunk  = row % pager_chunkSize;
+            declare Text actionVal = "";
+            // Lecture unique du for UI, copie en local avant d'extraire la colonne
+            declare Text[] rowData = Text[];
+            switch (chunkIdx) {
+<?php for ($c = 0; $c < $chunkCount; $c++): ?>
+                case <?php echo $c; ?>: { if (<?php echo $varName; ?>data_<?php echo $c; ?>.existskey(inChunk)) rowData = <?php echo $varName; ?>data_<?php echo $c; ?>[inChunk]; }
+<?php endfor; ?>
+            }
+            if (rowData.count > col) actionVal = rowData[col];
+            entry.Value = " " ^ actionVal;
+        } else {
+            entry.Value = "";
+        }
+    }
+}
+
+if (MouseLeftButton == False) {
+    pager_firstClick = False;
+    pager_moveScroll = False;
+} else if (pager_moveScroll) {
+    pager_deltaMouseYPosition = MouseY - pager_startMouseYPosition;
+}

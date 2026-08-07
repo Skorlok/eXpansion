@@ -16,19 +16,19 @@ $aliases = $this->handleSpecialChars($aliases);
 <frame posn="1 -1 0">
 	<quad posn="-2 0 0" sizen="58 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
 </frame>
-<label posn="1 -1 1.0E-5" sizen="56 5" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wCommand') ?>"/>
+<label posn="1 -1 1.0E-5" sizen="56 5" halign="left" valign="center" style="TextStaticSmall" textid="{@$wCommand}"/>
 <frame posn="60 -1 2.0E-5">
 	<quad posn="-2 0 0" sizen="58 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
 </frame>
-<label posn="60 -1 3.0E-5" sizen="56 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wDescription') ?>"/>
+<label posn="60 -1 3.0E-5" sizen="56 4" halign="left" valign="center" style="TextStaticSmall" textid="{@$wDescription}"/>
 <frame posn="1 -10 4.0E-5">
 	<quad posn="-2 0 0" sizen="78 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
 </frame>
-<label posn="1 -10 5.0E-5" sizen="74 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wMore') ?>"/>
+<label posn="1 -10 5.0E-5" sizen="74 4" halign="left" valign="center" style="TextStaticSmall" textid="{@$wMore}"/>
 <frame posn="80 -10 6.0E-5">
 	<quad posn="-2 0 0" sizen="38 4" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
 </frame>
-<label posn="80 -10 7.0E-5" sizen="36 4" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('$wAliases') ?>"/>
+<label posn="80 -10 7.0E-5" sizen="36 4" halign="left" valign="center" style="TextStaticSmall" textid="{@$wAliases}"/>
 <frame posn="2 -5 8.0E-5">
 	<quad posn="-1 0 0" sizen="54 3.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 </frame>

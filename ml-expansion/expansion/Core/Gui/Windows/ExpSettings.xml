@@ -1,0 +1,112 @@
+<?php
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$groups     = $this->getParam("groups");
+$settings   = $this->getParam("settings");
+$sizeX      = (int)$this->getParam("sizeX");
+
+// Layout: left column = sizeX/4, pager occupies right 3/4 minus scrollbar margin
+$colWidth    = (float)($sizeX / 4);           // 35 (140) or 42 (170)
+$pagerSizeX  = (float)($sizeX * 3 / 4) - 3;  // 102 (140) or 124 (170)
+$pagerSizeY  = 92;                           // 100 - 8
+$itemBgWidth = $pagerSizeX - 8;             // 94 or 116
+$itemSizeY   = 10;
+$menuBtnW    = $colWidth / 0.8;             // 43.75 or 53.125
+$savePosX    = $sizeX - 34;                 // 106 or 136
+
+$itemsXml = "";
+foreach ((array)$settings as $setting) {
+    $i           = $setting['index'];
+    $type        = $setting['type'];
+    $varName     = $setting['varName'];
+    $value       = $setting['value'];
+    $label       = $setting['label'];
+    $preview     = $setting['previewValue'];
+    $desc        = $setting['desc'];
+    $descLines   = $setting['descLines'];
+    $isGlobal    = $setting['isGlobal'];
+    $resetAction = $setting['resetAction'];
+    $openAction  = $setting['openAction'];
+
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemBgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    // Label width: from pos 7 to start of buttons area (pagerSizeX - 31 for list, pagerSizeX - 22 for others)
+    $itemsXml .= '<label posn="7 4 0" sizen="' . ($pagerSizeX - 39) . ' 5" style="TextStaticSmall" text="' . $this->handleSpecialChars($label) . '"/>';
+
+    if ($type == 'list') {
+        // Current value preview
+        $itemsXml .= '<label id="column_' . $i . '_1" posn="7 -1 2.0E-5" sizen="' . ($pagerSizeX - 39) . ' 5" scale="0.9" style="TextStaticSmall" text="' . $this->handleSpecialChars($preview) . '"/>';
+        // Change button at pagerSizeX-31, reset at pagerSizeX-39
+        if ($openAction) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 31) . ' 0 1">';
+            $itemsXml .= '<exp:button sizeX="25" sizeY="6" text="@Change" action="' . $openAction . '" isTextId="true"/>';
+            $itemsXml .= '</frame>';
+        }
+        if (!empty($desc) && $resetAction) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 39) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="' . $resetAction . '" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>';
+            $itemsXml .= '</frame>';
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 47) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="' . $this->handleSpecialChars($desc) . '" descSizeX="120" descLines="' . $descLines . '" icon="UIConstructionSimple_Buttons" iconSub="Help"/>';
+            $itemsXml .= '</frame>';
+        } elseif (!empty($desc)) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 39) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="' . $this->handleSpecialChars($desc) . '" descSizeX="120" descLines="' . $descLines . '" icon="UIConstructionSimple_Buttons" iconSub="Help"/>';
+            $itemsXml .= '</frame>';
+        } elseif ($resetAction) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 39) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="' . $resetAction . '" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>';
+            $itemsXml .= '</frame>';
+        }
+    } else {
+        // Input area: width = pagerSizeX - 28 (leave room for buttons on right)
+        $itemsXml .= '<frame posn="7 -2 1">';
+        if ($type == 'checkbox') {
+            $itemsXml .= '<exp:checkbox name="' . $varName . '" active="' . ((bool)$value ? 'true' : 'false') . '" textWidth="1"/>';
+        } elseif ($type == 'color') {
+            $itemsXml .= '<exp:colorchooser inputboxName="' . $varName . '" sizeX="35" digits="' . $setting['colorDigits'] . '" hasPrefix="' . ($setting['colorPrefix'] ? 'true' : 'false') . '"' . ($value !== '' ? ' color="' . $value . '"' : '') . '/>';
+        } else {
+            $itemsXml .= '<exp:inputbox name="' . $varName . '" sizeX="' . ($pagerSizeX - 28) . '" text="' . $this->handleSpecialChars($value) . '"/>';
+        }
+        $itemsXml .= '</frame>';
+
+        // Buttons: reset at pagerSizeX-15, help at pagerSizeX-14, both: reset at pagerSizeX-22 help at pagerSizeX-14
+        if (!empty($desc) && $resetAction) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 22) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="' . $resetAction . '" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>';
+            $itemsXml .= '</frame>';
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 14) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="' . $this->handleSpecialChars($desc) . '" descSizeX="120" descLines="' . $descLines . '" icon="UIConstructionSimple_Buttons" iconSub="Help"/>';
+            $itemsXml .= '</frame>';
+        } elseif (!empty($desc)) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 14) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="' . $this->handleSpecialChars($desc) . '" descSizeX="120" descLines="' . $descLines . '" icon="UIConstructionSimple_Buttons" iconSub="Help"/>';
+            $itemsXml .= '</frame>';
+        } elseif ($resetAction) {
+            $itemsXml .= '<frame posn="' . ($pagerSizeX - 15) . ' 0 1">';
+            $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="' . $resetAction . '" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>';
+            $itemsXml .= '</frame>';
+        }
+    }
+
+    // Scope icon (leftmost)
+    $itemsXml .= '<frame posn="0 0 1">';
+    $itemsXml .= '<exp:icon sizeX="7" sizeY="7" description="@' . ($isGlobal ? 'Global Setting, Saved for all servers sharing this configuration' : 'Server Setting, Saved for this server only') . '" descSizeX="' . ($isGlobal ? 130 : 90) . '" icon="Icons64x64_1" iconSub="' . ($isGlobal ? 'IconLeaguesLadder' : 'IconServers') . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+
+    $itemsXml .= '</frame>';
+}
+?>
+<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, $colWidth, 3); ?>
+<frame posn="0 0 0.00034">
+    <frame posn="-2 0 0">
+    <?php foreach ((array)$groups as $idx => $group): ?>
+    <frame posn="0 -<?php echo $idx * 6; ?> 1">
+        <?php echo '<exp:button sizeX="' . $menuBtnW . '" sizeY="6" text="' . $this->handleSpecialChars($group['name']) . '"' . ($group['selected'] ? ' colorize="0b0"' : '') . ' action="' . $group['action'] . '"/>'; ?>
+    </frame>
+    <?php endforeach; ?>
+    </frame>
+</frame>
+<frame posn="<?php echo $savePosX; ?> -95 1">
+    <exp:button sizeX="32" sizeY="6" text="@Save" action="{saveAction}" isTextId="true"/>
+</frame>

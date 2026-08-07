@@ -3,18 +3,14 @@
 namespace ManiaLivePlugins\eXpansion\Gui;
 
 use Exception;
-use ManiaLive\Gui\ActionHandler;
-use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window as MLWindow;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Configuration;
+use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
 use ManiaLivePlugins\eXpansion\Gui\Windows\HudMove;
 use ManiaLivePlugins\eXpansion\Gui\Windows\ResetHud;
-use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class Gui extends ExpPlugin
 {
@@ -38,12 +34,15 @@ class Gui extends ExpPlugin
 
     /** @var MLWindow */
     private static $confirmWindow = null;
-
-    private static $confirmOkAction = null;
-
-    private static $pendingActions = array();
+    /** @var Script */
+    private static $confirmScript = null;
 
     public $playersWidgets = array();
+
+    /** @var MLWindow */
+    private $configWindow;
+    private $configStatuses = array();
+    private $configGameMode = array();
 
     public function eXpOnInit()
     {
@@ -58,8 +57,13 @@ class Gui extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+
+        $this->registerManialinkCallback('showConfirmDialogMl', false, true);
+        $this->registerManialinkCallback('configurationOk', true);
+
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
+        
         $this->setPublicMethod("hudCommands");
 
         GetPlayerWidgets::$parentPlugin = $this;
@@ -69,9 +73,6 @@ class Gui extends ExpPlugin
 
         $this->preloader = Preloader::Create(null);
         $this->preloader->show();
-
-        /** @var ActionHandler $aH */
-        $aH = ActionHandler::getInstance();
 
         self::$errorWindow = new MLWindow("Gui\\Windows\\Error.xml");
         self::$errorWindow->setName("Gui Error");
@@ -83,13 +84,20 @@ class Gui extends ExpPlugin
         self::$noticeWindow->setSize(90, 60);
         self::$noticeWindow->setTitle("Notice");
 
+        self::$confirmScript = new Script("Gui/Scripts/ConfirmDialog");
         self::$confirmWindow = new MLWindow("Gui\\Windows\\ConfirmDialog.xml");
         self::$confirmWindow->setName("Gui Confirm");
         self::$confirmWindow->setSize(57, 16);
         self::$confirmWindow->setTitle("Really do this ?");
-        self::$confirmOkAction = $aH->createAction(array($this, 'onConfirmDialogOk'));
-        self::$confirmWindow->setParam("okAction", self::$confirmOkAction);
-        self::$confirmWindow->registerCloseCallback(array($this, 'onConfirmDialogClose'));
+        self::$confirmWindow->registerScript(self::$confirmScript);
+
+        $this->configWindow = new MLWindow("Gui\\Windows\\Configuration.xml");
+        $this->configWindow->setName("HUD Configuration");
+        $this->configWindow->setSize(120, 90);
+        $this->configWindow->setTitle("Configure HUD");
+        $this->configWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 82));
+        $this->configWindow->setParam("sizeX", 120);
+        $this->configWindow->setParam("sizeY", 90);
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -232,7 +240,8 @@ EOT
 
     public function onPlayerDisconnect($login, $reason = null)
     {
-
+        unset($this->configStatuses[$login]);
+        unset($this->configGameMode[$login]);
     }
 
     public function hudCommands($login, $param = "null")
@@ -305,12 +314,48 @@ EOT
     {
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
-        } else {
-            $window = Configuration::Create($login, true);
-            $window->setSize(120, 90);
-            $window->setData($entries);
-            $window->show();
+            return;
         }
+        if (!array_key_exists("widgetStatus", $entries)) {
+            return;
+        }
+
+        $rawEntries = explode("|", $entries["widgetStatus"]);
+        $statuses   = array();
+        $gameMode   = "";
+        foreach ($rawEntries as $entry) {
+            if (empty($entry)) {
+                continue;
+            }
+            $val      = explode(":", $entry, 3);
+            $gameMode = $val[1];
+            $statuses[] = array('id' => $val[0], 'value' => ($val[2] != "0"));
+        }
+
+        $this->configStatuses[$login] = $statuses;
+        $this->configGameMode[$login] = $gameMode;
+
+        $this->configWindow->setParam("items", $statuses);
+        $this->configWindow->show($login);
+    }
+
+    public function configurationOk($login, $params = array())
+    {
+        if (!isset($this->configStatuses[$login])) {
+            return;
+        }
+        $outValues = array();
+        foreach ($this->configStatuses[$login] as $x => $status) {
+            $isChecked = isset($params['cb_' . $x]) && $params['cb_' . $x] == '1';
+            $outValues[] = new Structures\ConfigItem($status['id'], $this->configGameMode[$login], $isChecked ? '1' : '0');
+        }
+        $apply = Windows\HudSetVisibility::Create($login);
+        $apply->setData($outValues);
+        $apply->setTimeout(5);
+        $apply->show();
+        $this->configWindow->erase($login);
+        unset($this->configStatuses[$login]);
+        unset($this->configGameMode[$login]);
     }
 
     public function resetHud($login)
@@ -333,26 +378,6 @@ EOT
         print "\n" . $mem . "\n";
     }
 
-    public function onPlayerManialinkPageAnswer($playerUid, $login, $answer, array $entries)
-    {
-        if (strpos($answer, "onMenuItemClick") !== false) {
-
-            $parseStr = str_replace("onMenuItemClick?", "", $answer);
-            $parsed = array();
-
-            parse_str($parseStr, $parsed);
-
-            if (!array_key_exists($parsed['hash'], self::$callbacks)) {
-                return;
-            }
-            $item = $parsed['item'];
-            $hash = $parsed['hash'];
-            $value = $parsed['dataId'];
-
-            $test = \call_user_func(self::$callbacks[$hash], array($login, $item, self::$items[$hash][$value]->data));
-        }
-    }
-
     /**
      * Cleans the string for manialink or maniascript purposes.
      *
@@ -362,15 +387,12 @@ EOT
      */
     public static function fixString($string, $multiline = false)
     {
-        $out = str_replace("\r", '', $string);
-        if (!$multiline) {
-            $out = str_replace("\n", '', $out);
+        if ($multiline) {
+            return str_replace(array("\r", '"',  '\\',  '-'),
+                               array('',   "'", '\\\\', '–'), $string);
         }
-        $out = str_replace('"', "'", $out);
-        $out = str_replace('\\', '\\\\', $out);
-        $out = str_replace('-', '–', $out);
-
-        return $out;
+        return str_replace(array("\r", "\n", '"',  '\\',  '-'),
+                           array('',   '',   "'", '\\\\', '–'), $string);
     }
 
     /**
@@ -390,34 +412,6 @@ EOT
         return $out;
     }
 
-    public function onConfirmDialogClose($login)
-    {
-        if (isset(self::$pendingActions[$login])) {
-            unset(self::$pendingActions[$login]);
-        }
-    }
-
-    public function onConfirmDialogOk($login)
-    {
-        if (isset(self::$pendingActions[$login])) {
-            $player  = $this->storage->getPlayerObject($login);
-
-            if (!$player) {
-                $this->console("Error on Confirm Dialog Ok: Player object not found for login: " . $login);
-                return;
-            }
-
-            /** @var ActionHandler $aH */
-            $aH = ActionHandler::getInstance();
-            $aH->onPlayerManialinkPageAnswer(intval($player->playerId), $login, intval(self::$pendingActions[$login]), array());
-
-            unset(self::$pendingActions[$login]);
-        } else {
-            $this->eXpChatSendServerMessage("Error: No action was pending for this confirm dialog.", $login);
-        }
-        self::$confirmWindow->erase($login);
-    }
-
     /**
      * @param $login
      * @param $actionId
@@ -425,8 +419,15 @@ EOT
      */
     public static function showConfirmDialog($login, $actionId, $text = "")
     {
-        self::$pendingActions[$login] = $actionId;
-        self::$confirmWindow->setParam("text", $text);
+        self::$confirmScript->setParam("action", $actionId);
+        self::$confirmWindow->setParam("text", self::$confirmWindow->handleSpecialChars($text));
+        self::$confirmWindow->show($login);
+    }
+
+    public function showConfirmDialogMl($login, $actionId, $text = "")
+    {
+        self::$confirmScript->setParam("action", $actionId);
+        self::$confirmWindow->setParam("text", self::$confirmWindow->handleSpecialChars($text));
         self::$confirmWindow->show($login);
     }
 
@@ -491,11 +492,6 @@ EOT
      */
     public static function createConfirm($finalAction)
     {
-        $outAction = ActionHandler::getInstance()->createAction(
-            array('\\ManiaLivePlugins\\eXpansion\\Gui\\Gui', 'showConfirmDialog'),
-            $finalAction
-        );
-
-        return $outAction;
+        return 'exp:eXpansion.Gui:showConfirmDialogMl:' . $finalAction;
     }
 }

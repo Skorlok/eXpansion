@@ -35,13 +35,12 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\PlayerList;
-use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\ServerList;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -59,30 +58,32 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     private $config;
 
-    private $actionHandler;
-    private $action;
-
     private $widget;
     private $script;
 
+    /** @var Window */
+    private $serverListWindow;
+
     public function eXpOnInit()
     {
-        $this->setVersion("1.5");
+        $this->setVersion("1.6");
         $this->config = Config::getInstance();
         $this->setPublicMethod("showServerList");
     }
 
     public function eXpOnLoad()
     {
-        /** @var ActionHandler @aH */
-        $this->actionHandler = ActionHandler::getInstance();
-        $this->action = $this->actionHandler->createAction(array($this, "showServerList"));
-
         Menu::addMenuItem("ServerNeighborhood",
-            array("Server Neighborhood" => array(null, $this->action))
+            array("Server Neighborhood" => array(null, 'exp:eXpansion.ServerNeighborhood:showServerList'))
         );
 
         $this->initWidget();
+
+        $this->serverListWindow = new Window("ServerNeighborhood\Gui\Windows\ServerList.xml");
+        $this->serverListWindow->setName("ServerList");
+        $this->serverListWindow->setSize(120, 105);
+        $this->serverListWindow->setTitle("ServerNeighborhood - Server List");
+        $this->serverListWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(14, 87));
     }
 
     public function initWidget()
@@ -92,7 +93,6 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->widget = new Widget("ServerNeighborhood\Gui\Widgets\ServerNeighborhood.xml");
         $this->widget->setName("Server Neighborhood Panel");
         $this->widget->setLayer("normal");
-        $this->widget->setParam("action", $this->action);
         $this->widget->setParam('ownLogin', $this->storage->serverLogin);
         $this->widget->setParam('title', 'Server Neighborhood');
         $this->widget->registerScript($this->script);
@@ -114,12 +114,16 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('showServerList');
+        $this->registerManialinkCallback('showServerPlayers', false, true);
+        
         $this->server = new Server();
         $this->server->create_fromConnection($this->connection, $this->storage);
 
         $this->registerChatCommand('servers', 'showServerList', 0, true);
 
         $this->enableTickerEvent();
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
     }
 
     public function onSettingsChanged(Variable $var)
@@ -252,7 +256,7 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             } else {
                 $server = new Server();
                 $this->servers[$cleanIndex] = $server;
-                $this->servers[$cleanIndex]->mlAction = $this->actionHandler->createAction(array($this, "showServerPlayers"), $this->servers[$cleanIndex]);
+                $this->servers[$cleanIndex]->mlAction = 'exp:eXpansion.ServerNeighborhood:showServerPlayers:' . $cleanIndex;
             }
 
             $server->setServer_data($xml);
@@ -298,8 +302,14 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->widget->show(null, true);
     }
 
-    public function showServerPlayers($login, $server)
+    public function showServerPlayers($login, $serverId)
     {
+        if (!isset($this->servers[$serverId])) {
+            $this->console('Error: Server with id ' . $serverId . ' not found!');
+            return;
+        }
+
+        $server = $this->servers[$serverId];
         PlayerList::Erase($login);
         $w = PlayerList::Create($login);
         $w->setTitle('ServerNeighborhood - Server Players');
@@ -311,24 +321,43 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showServerList($login)
     {
-        ServerList::Erase($login);
-        $w = ServerList::Create($login);
-        $w->setTitle('ServerNeighborhood - Server List');
-        $w->setSize(120, 105);
-        $w->setServers($this->servers);
-        $w->centerOnScreen();
-        $w->show();
+        $serversData = array();
+        foreach ($this->servers as $serverId => $server) {
+            if (!$server->isOnline()) {
+                continue;
+            }
+            $sd = $server->getServer_data();
+            $serversData[] = array(
+                'env'           => $sd->current->map->environment,
+                'sname'         => $sd->server->name,
+                'playersCurrent'=> $sd->server->players->current,
+                'playersMax'    => $sd->server->players->maximum,
+                'specsCurrent'  => $sd->server->spectators->current,
+                'specsMax'      => $sd->server->spectators->maximum,
+                'ladderMin'     => $sd->server->ladder->minimum,
+                'ladderMax'     => $sd->server->ladder->maximum,
+                'mapName'       => $sd->current->map->name,
+                'mapAuthor'     => $sd->current->map->author,
+                'mapAuthorTime' => $sd->current->map->authortime,
+                'action'        => 'exp:eXpansion.ServerNeighborhood:showServerPlayers:' . $serverId,
+            );
+        }
+        $this->serverListWindow->setParam("servers", $serversData);
+        $this->serverListWindow->show($login);
     }
 
     public function eXpOnUnload()
     {
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
-            $this->widget = null;
         }
-        ServerList::EraseAll();
-        PlayerList::EraseAll();
+        $this->widget = null;
 
-        $this->actionHandler->deleteAction($this->action);
+        if ($this->serverListWindow instanceof Window) {
+            $this->serverListWindow->erase();
+        }
+        $this->serverListWindow = null;
+
+        PlayerList::EraseAll();
     }
 }

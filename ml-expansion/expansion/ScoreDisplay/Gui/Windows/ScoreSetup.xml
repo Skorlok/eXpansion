@@ -1,20 +1,17 @@
-<?php
-$okAction = $this->getParam("okAction");
-?>
 <frame posn="0 -1 0">
 	<frame posn="0 0 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team1Country", 35, true, $this->addLang("Team1 Country"), null, null, null, true) ?>
+		<exp:inputbox name="team1Country" sizeX="35" label="@Team1 Country" isTextId="true"/>
 	</frame>
 	<frame posn="0 -12 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team1Name", 35, true, $this->addLang("Team1 Name"), null, null, null, true) ?>
+		<exp:inputbox name="team1Name" sizeX="35" label="@Team1 Name" isTextId="true"/>
 	</frame>
 	<frame posn="0 -24 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team2Country", 35, true, $this->addLang("Team2 Country"), null, null, null, true) ?>
+		<exp:inputbox name="team2Country" sizeX="35" label="@Team2 Country" isTextId="true"/>
 	</frame>
 	<frame posn="0 -36 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("team2Name", 35, true, $this->addLang("Team2 Name"), null, null, null, true) ?>
+		<exp:inputbox name="team2Name" sizeX="35" label="@Team2 Name" isTextId="true"/>
 	</frame>
 	<frame posn="0 -48 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Ok"), null, null, "A54B4B", null, null, $okAction, null, null, null, null, null, null, true) ?>
+		<exp:button sizeX="32" sizeY="6" text="@Ok" colorize="A54B4B" action="exp:eXpansion.ScoreDisplay:displayWidget" isTextId="true"/>
 	</frame>
 </frame>

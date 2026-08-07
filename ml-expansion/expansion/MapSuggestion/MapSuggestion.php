@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\MapSuggestion;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
@@ -15,18 +14,18 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 {
 
     protected $mapWishWindow;
-    protected $actions = array();
 
     public function eXpOnReady()
     {
-        $ah = ActionHandler::getInstance();
-        $this->actions['mapWishOk'] = $ah->createAction(array($this, 'mapWishOk'));
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+        
+        $this->registerManialinkCallback('mapWishOk', true);
+        $this->registerManialinkCallback('showMapWishWindow');
 
         $this->mapWishWindow = new Window("MapSuggestion\Gui\Windows\MapWish.xml");
         $this->mapWishWindow->setName("MapSuggestion window");
         $this->mapWishWindow->setSize(90, 60);
         $this->mapWishWindow->setTitle('Wish a map');
-        $this->mapWishWindow->setParam("okAction", $this->actions['mapWishOk']);
 
         $this->registerChatCommand("mapwish", "showMapWishWindow", 0, true);
         $this->setPublicMethod("showMapWishWindow");
@@ -65,6 +64,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
         $data = "";
 
+        /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess $dataAccess */
         $dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
         if (is_numeric($mxid)) {
@@ -116,11 +116,6 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
     public function eXpOnUnload()
     {
-        $ah = ActionHandler::getInstance();
-        foreach ($this->actions as $action) {
-            $ah->deleteAction($action);
-        }
-
         if ($this->mapWishWindow instanceof Window) {
             $this->mapWishWindow->erase();
         }

@@ -1,11 +1,9 @@
 <?php
 $replays     = $this->getParam("replays");
 $imageUrl    = $this->getParam("imageUrl");
-$mxPageUrl   = $this->getParam("mxPageUrl");
-$description = $this->getParam("description");
+
 $mxRows      = $this->getParam("mxRows");
 $hasLocalMap = $this->getParam("hasLocalMap");
-$uid         = $this->getParam("uid");
 $fileName    = $this->getParam("fileName");
 $localRows   = $this->getParam("localRows");
 $rightRows   = $this->getParam("rightRows");
@@ -20,7 +18,7 @@ if (!is_array($rightRows)) { $rightRows = array(); }
 <frame posn="183 -5 0">
 <?php foreach ($replays as $i => $rec): ?>
 	<frame posn="0 <?php echo -$i * 3.5; ?> <?php echo $i * 2.0E-5; ?>">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\ListBackGround::getXML($i, 42, 3.5); ?>
+		<exp:listbg indexNumber="<?php echo $i; ?>" sizeX="42" sizeY="3.5"/>
 		<frame>
 			<label sizen="10 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="<?php echo $i + 1; ?>."/>
 			<label posn="6 0 1.0" sizen="30 6" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($rec['name']); ?>"/>
@@ -29,24 +27,24 @@ if (!is_array($rightRows)) { $rightRows = array(); }
 	</frame>
 <?php endforeach; ?>
 </frame>
-<label posn="188 0 0" sizen="27 6" halign="left" valign="center" style="TextStaticSmall" textid="<?php echo $this->addLang('Top 25 MX Records'); ?>"/>
+<label posn="188 0 0" sizen="27 6" halign="left" valign="center" style="TextStaticSmall" textid="{@Top 25 MX Records}"/>
 <quad posn="-4 0 7.0E-5" sizen="60 37" image="<?php echo $this->handleSpecialChars($imageUrl); ?>"/>
 <frame posn="58 -2.6 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, $this->addLang('Visit the map page'), null, null, null, null, null, null, null, $mxPageUrl, null, null, null, null, true) ?>
+	<exp:button sizeX="37.5" sizeY="6.25" text="@Visit the map page" url="{mxPageUrl}" isTextId="true"/>
 </frame>
 <?php $y = -39; foreach ($mxRows as $row): ?>
 <label posn="-2 <?php echo $y; ?> 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang($row['key']); ?>"/>
 <label posn="20 <?php echo $y; ?> 0" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($row['value']); ?>"/>
 <?php $y -= 5; endforeach; ?>
-<label posn="58 -9.5 0" sizen="150 0" scale="0.8" style="TextStaticSmall" autonewline="1" maxline="9" text="<?php echo $description; ?>"/>
+<label posn="58 -9.5 0" sizen="150 0" scale="0.8" style="TextStaticSmall" autonewline="1" maxline="9" text="{description}"/>
 <?php if ($hasLocalMap): ?>
-<label posn="58 -39 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('UID:'); ?>"/>
+<label posn="58 -39 0" sizen="35 6" style="TextStaticSmall" textid="{@UID:}"/>
 <frame posn="80 -39 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 45, true, null, $uid, null, null) ?>
+	<?php echo '<exp:inputbox name="" sizeX="45" text="{uid}"/>'; ?>
 </frame>
-<label posn="58 -44 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('File Name:'); ?>"/>
+<label posn="58 -44 0" sizen="35 6" style="TextStaticSmall" textid="{@File Name:}"/>
 <frame posn="80 -45 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 45, true, null, $this->handleSpecialChars($fileName), null, null) ?>
+	<?php echo '<exp:inputbox name="" sizeX="45" text="' . $this->handleSpecialChars($fileName) . '"/>'; ?>
 </frame>
 <?php $y = -49; foreach ($localRows as $row): ?>
 <label posn="58 <?php echo $y; ?> 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang($row['key']); ?>"/>
@@ -58,12 +56,12 @@ if (!is_array($rightRows)) { $rightRows = array(); }
 <?php $y -= 5; endforeach; ?>
 <?php if ($modUrl): ?>
 <frame posn="118 -2.6 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, $this->addLang('Download Mod'), null, null, null, null, null, null, null, $modUrl, null, null, null, null, true) ?>
+	<exp:button sizeX="37.5" sizeY="6.25" text="@Download Mod" url="{modUrl}" isTextId="true"/>
 </frame>
 <?php endif; ?>
 <?php if ($songUrl): ?>
 <frame posn="148 -2.6 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, $this->addLang('Download Song'), null, null, null, null, null, null, null, $songUrl, null, null, null, null, true) ?>
+	<exp:button sizeX="37.5" sizeY="6.25" text="@Download Song" url="{songUrl}" isTextId="true"/>
 </frame>
 <?php endif; ?>
 <?php endif; ?>

@@ -135,14 +135,7 @@ class Groups extends Window
      */
     public function changePermission($login, $group)
     {
-        Permissions::Erase($login);
-        /** @var Permissions $window */
-        $window = Permissions::Create($login);
-        $window->setGroup($group);
-        $window->setTitle(__(AdminGroups::$txt_permissionsTitle, $login, $group->getGroupName()));
-        $window->setSize(90, 100);
-        $window->centerOnScreen();
-        $window->show();
+        AdminGroups::getInstance()->showPermissionsWindow($login, $group);
     }
 
     /**
@@ -167,14 +160,7 @@ class Groups extends Window
      */
     public function inheritList($login, $group)
     {
-        Inherits::Erase($login);
-        /** @var Inherits $window */
-        $window = Inherits::Create($login);
-        $window->setGroup($group);
-        $window->setTitle(__(AdminGroups::$txt_permissionsTitle, $login, $group->getGroupName()));
-        $window->setSize(74, 100);
-        $window->centerOnScreen();
-        $window->show();
+        AdminGroups::getInstance()->showInheritsWindow($login, $group);
     }
 
     /**
@@ -203,24 +189,6 @@ class Groups extends Window
     {
         /** @var Players[] $windows */
         $windows = Players::GetAll();
-        foreach ($windows as $window) {
-            $window->setGroup(AdminGroups::getInstance()->getGroup($window->getGroup()->getGroupName()));
-            $login = $window->getRecipient();
-            $window->onShow();
-            $window->redraw($login);
-        }
-
-        /** @var Inherits[] $windows */
-        $windows = Inherits::GetAll();
-        foreach ($windows as $window) {
-            $window->setGroup(AdminGroups::getInstance()->getGroup($window->getGroup()->getGroupName()));
-            $login = $window->getRecipient();
-            $window->onShow();
-            $window->redraw($login);
-        }
-
-        /** @var Permissions[] $windows */
-        $windows = Permissions::GetAll();
         foreach ($windows as $window) {
             $window->setGroup(AdminGroups::getInstance()->getGroup($window->getGroup()->getGroupName()));
             $login = $window->getRecipient();

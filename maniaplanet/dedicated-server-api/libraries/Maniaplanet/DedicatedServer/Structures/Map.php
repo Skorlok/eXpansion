@@ -42,6 +42,15 @@ class Map extends AbstractStructure
 	/** var string */
 	public $mapStyle;
 
+	// Extra fields for eXpansion
+
+	/** @var string */
+	public $strippedName;
+	/** @var array */
+	public $localRecords;
+	/** @var \ManiaLivePlugins\eXpansion\MapRatings\Structures\Rating */
+	public $mapRating;
+
 	/**
 	 * @return Map
 	 */

@@ -4,6 +4,15 @@ namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
 class WidgetButton
 {
+    public static function getWidgetButtonXML($sizeX, $sizeY, $action = null, $row0 = null, $row1 = null, $row2 = null)
+    {
+        $text = array();
+        if ($row0 !== null) $text[] = $row0;
+        if ($row1 !== null) $text[] = $row1;
+        if ($row2 !== null) $text[] = $row2;
+        return self::getXML($sizeX, $sizeY, $text, $action);
+    }
+
     public static function getXML($sizeX, $sizeY, Array $text, $action = null)
     {
         $xml = '<frame posn="-5 0 -1">';

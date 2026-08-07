@@ -4,7 +4,6 @@ namespace ManiaLivePlugins\eXpansion\Dedimania;
 
 use ManiaLive\Application\ErrorHandling;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Core\Core;
@@ -101,11 +100,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->msg_improved = eXpGetMessage('%1$s #dedirecord#improves #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
         $this->msg_secure = eXpGetMessage('%1$s #dedirecord#secures #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
         Menu::addMenuItem("Dedimania",
             array("Records" => array(null, array(
-                "Dedimania" => array(null, $aH->createAction(array($this, "showRecs")))
+                "Dedimania" => array(null, 'exp:eXpansion.Dedimania:showRecs')
             )))
         );
     }
@@ -116,6 +113,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->enableDedicatedEvents();
         $this->enableApplicationEvents();
         $this->enableStorageEvents();
+
+        $this->registerManialinkCallback('showRecs');
+        $this->registerManialinkCallback('showCps');
+        $this->registerManialinkCallback('showSecCps');
 
         \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::$parentPlugin = $this;
 
@@ -176,9 +177,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
                     $admins->announceToPermission('expansion_settings', "#admin_action#Dedimania connection successfull.");
 
-                    self::$actionOpenRecs = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showRecs"));
-                    self::$actionOpenCps = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showCps"));
-                    self::$actionOpenSecCps = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, "showSecCps"));
+                    self::$actionOpenRecs = 'exp:eXpansion.Dedimania:showRecs';
+                    self::$actionOpenCps = 'exp:eXpansion.Dedimania:showCps';
+                    self::$actionOpenSecCps = 'exp:eXpansion.Dedimania:showSecCps';
                 } catch (\Exception $ex) {
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
                     $admins->announceToPermission('expansion_settings', "#admin_error#Server login or/and Server code is wrong in Dedimania Configuration");
@@ -392,9 +393,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         $this->dediReportWindow = null;
         \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::EraseAll();
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenCps);
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenSecCps);
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenRecs);
         self::$actionOpenRecs = -1;
         self::$actionOpenCps = -1;
         self::$actionOpenSecCps = -1;

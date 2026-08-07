@@ -1,9 +1,7 @@
 <?php
-$textId      = $this->getParam("textId");
-$closeId     = $this->addLang("Close");
 $closeAction = $this->getCloseAction();
 ?>
 <frame posn="32.25 -48 1">
-<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $closeId, null, null, null, null, null, $closeAction, null, null, null, null, null, null, true); ?>
+<exp:button sizeX="32" sizeY="6" text="{@Close}" action="<?php echo $closeAction; ?>" isTextId="true"/>
 </frame>
-<label posn="45 -5 0" sizen="80 50" halign="center" valign="center" style="TextStaticSmall" textid="<?php echo $textId; ?>"/>
+<label posn="45 -5 0" sizen="80 50" halign="center" valign="center" style="TextStaticSmall" textid="{textId}"/>

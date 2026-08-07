@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\ExtendTime;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
@@ -15,28 +14,21 @@ class ExtendTime extends ExpPlugin
     protected $config;
     protected $voteCount = 0;
     protected $widget;
-    protected $actionYes;
-    protected $actionNo;
-    protected $actionCalcVotes;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        
+        $this->registerManialinkCallback('vote', false, true);
+        $this->registerManialinkCallback('calcVotes');
 
         /** @var Config $config */
         $this->config = Config::getInstance();
-
-        /** @var ActionHandler @aH */
-        $ah = ActionHandler::getInstance();
-        $this->actionYes = $ah->createAction(array($this, "vote"), "yes");
-        $this->actionNo = $ah->createAction(array($this, "vote"), "no");
-        $this->actionCalcVotes = $ah->createAction(array($this, "calcVotes"));
-
         
         $script = new Script("ExtendTime/Gui/Script");
-        $script->setParam("actionYes", $this->actionYes);
-        $script->setParam("actionNo", $this->actionNo);
-        $script->setParam("calcVotes", $this->actionCalcVotes);
+        $script->setParam("actionYes", 'exp:eXpansion.ExtendTime:vote:yes');
+        $script->setParam("actionNo",  'exp:eXpansion.ExtendTime:vote:no');
+        $script->setParam("calcVotes", 'exp:eXpansion.ExtendTime:calcVotes');
 
         $this->widget = new Widget("ExtendTime\Gui\Widgets\TimeExtendVote.xml");
         $this->widget->setName("Extend Timelimit");
@@ -104,12 +96,10 @@ class ExtendTime extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        $this->widget->erase();
-        /** @var ActionHandler @aH */
-        $ah = ActionHandler::getInstance();
-        $ah->deleteAction($this->actionYes);
-        $ah->deleteAction($this->actionNo);
-        $ah->deleteAction($this->actionCalcVotes);
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
         $this->votes = [];
         $this->voters = [];
         $this->voteCount = 0;

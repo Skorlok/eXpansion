@@ -2,141 +2,53 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLivePlugins\eXpansion\Gui\Config;
-
-class Checkbox extends \ManiaLivePlugins\eXpansion\Gui\Control
+/**
+ * Description of Checkbox
+ *
+ * @author De Cramer Oliver
+ */
+class Checkbox
 {
 
-    protected $label;
+    private static $counter = 0;
+    private static $script = null;
 
-    protected $button;
-
-    protected $active = false;
-
-    protected $textWidth;
-
-    protected $action;
-
-    protected $toToggle = null;
-
-    public function __construct($sizeX = 5, $sizeY = 5, $textWidth = 25, $toToggle = null)
+    public static function getScriptML()
     {
-        $this->textWidth = $textWidth;
-        $this->action = $this->createAction(array($this, 'toggleActive'));
-        $this->toToggle = $toToggle;
-
-        $config = Config::getInstance();
-        $this->button = new \ManiaLib\Gui\Elements\Quad($sizeX, $sizeY);
-        $this->button->setAlign('left', 'center2');
-        $this->button->setAction($this->action);
-        $this->button->setStyle('Icons64x64_1');
-        $this->button->setSubStyle('GenericButton');
-
-        $this->button->setScriptEvents(true);
-        $this->addComponent($this->button);
-
-        $this->label = new \ManiaLib\Gui\Elements\Label($textWidth, 6);
-        $this->label->setAlign('left', 'center');
-        $this->label->setTextSize(1);
-        $this->label->setScale(1.1);
-        $this->label->setStyle("TextCardInfoSmall");
-        $this->addComponent($this->label);
-
-        $this->setSize($sizeX + $textWidth, $sizeY);
+        if (self::$script === null) {
+            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\CheckboxScript();
+        }
+        return self::$script;
     }
 
-    public function SetIsWorking($state)
+    public static function getLastId()
     {
-        if ($state) {
-            if ($this->button->getAction() == -1) {
-                $this->button->setAction($this->action);
-            }
+        return (self::$counter > 0) ? self::$counter - 1 : 100000;
+    }
+
+    public static function getXML($name, $active = false, $textWidth = 25, $enabled = true, $text = "", $isTextId = false)
+    {
+        $id = self::$counter++;
+        if (self::$counter > 100000) {
+            self::$counter = 0;
+        }
+
+        if ($enabled === false) {
+            $colorize = $active ? '7f7' : 'f77';
         } else {
-            $this->button->setAction(-1);
+            $colorize = $active ? '0f0' : 'f00';
         }
-    }
 
-    public function ToogleIsWorking()
-    {
-        if ($this->button->getAction() == -1) {
-            $this->button->setAction($this->action);
+        $xml  = '<frame>';
+        $xml .= '<quad id="eXp_CheckboxQ_' . $id . '" sizen="5 5" halign="left" valign="center2" style="Icons64x64_1" substyle="GenericButton" scriptevents="1" colorize="' . $colorize . '"/>';
+        $xml .= '<entry id="eXp_CheckboxE_' . $id . '" posn="4000 0 1.0E-5" sizen="20 4" style="" scriptevents="1" name="' . $name . '" default="' . ($active ? '1' : '0') . '"/>';
+        if ($isTextId) {
+            $xml .= '<label posn="5 0 2.0E-5" sizen="' . $textWidth . ' 5" scale="1.1" halign="left" valign="center" style="TextCardInfoSmall" textsize="1" textcolor="fff" textid="' . $text . '"/>';
         } else {
-            $this->button->setAction(-1);
+            $xml .= '<label posn="5 0 2.0E-5" sizen="' . $textWidth . ' 5" scale="1.1" halign="left" valign="center" style="TextCardInfoSmall" textsize="1" textcolor="fff" text="' . $text . '"/>';
         }
-    }
+        $xml .= '</frame>';
 
-    protected function onResize($oldX, $oldY)
-    {
-        $this->button->setSize(5, 5);
-        $this->button->setPosition(0, 0);
-        $this->label->setSize($this->textWidth, 5);
-        $this->label->setPosition(5, 0);
-        parent::onResize($this->textWidth + 5, 5);
-    }
-
-    protected function onDraw()
-    {
-        $config = Config::getInstance();
-
-        if ($this->button->getAction() == -1) {
-            if ($this->active) {
-
-                $this->button->setModulateColor("afa");
-            } else {
-                $this->button->setModulateColor("faa");
-            }
-        } else {
-            if ($this->active) {
-                $this->button->setModulateColor("0f0");
-            } else {
-                $this->button->setModulateColor("f00");
-            }
-        }
-    }
-
-    public function setStatus($boolean)
-    {
-        $this->active = $boolean;
-    }
-
-    public function getStatus()
-    {
-        return $this->active;
-    }
-
-    public function getText()
-    {
-        return $this->label->getText();
-    }
-
-    public function setText($text)
-    {
-        $this->label->setText('$fff' . $text);
-    }
-
-    public function toggleActive($login)
-    {
-        $this->active = !$this->active;
-        if ($this->toToggle != null) {
-            $this->toToggle->ToogleIsWorking($login);
-        }
-        $this->redraw();
-    }
-
-    public function setAction($action)
-    {
-        $this->button->setAction($action);
-    }
-
-    public function destroy()
-    {
-        $this->button->setAction($this->action);
-        parent::destroy();
-    }
-
-    public function onIsRemoved(\ManiaLive\Gui\Container $target)
-    {
-        parent::onIsRemoved($target);
-        $this->destroy();
+        return $xml;
     }
 }

@@ -1,5 +1,4 @@
 <?php
-$okAction = $this->getParam("okAction");
 $imageUrl = $this->getParam("imageUrl");
 $sizeX    = (float)$this->getParam("sizeX");
 $sizeY    = (float)$this->getParam("sizeY");
@@ -26,9 +25,9 @@ for ($i = 0; $i < 3; $i++) {
 ?>
 </frame>
 <frame posn="64 -23 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Undo"), null, null, null, null, null, null, null, null, null, "undo", null, null, true) ?>
+	<exp:button sizeX="32" sizeY="6" text="@Undo" id="undo" isTextId="true"/>
 </frame>
 <frame posn="66 -74 1">
-	<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang("Apply"), null, null, "0d0", null, null, $okAction, null, null, null, null, null, null, true) ?>
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Quiz:hiddenOk" isTextId="true"/>
 </frame>
 <entry posn="0 907 0" id="boxOrder" scriptevents="1" class="isTabIndex isEditable" name="boxOrder" hidden="1"/>

@@ -1,3 +1,3 @@
 <frame posn="6 0 0">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetButton::getXML(10, 10, array($this->addLang('$sWish'), $this->addLang('$sfor'), $this->addLang('$sMap')), $this->getParam('action')); ?>
+    <exp:widgetbutton sizeX="10" sizeY="10" action="exp:eXpansion.MapSuggestion:showMapWishWindow" row0="@$sWish" row1="@$sfor" row2="@$sMap"/>
 </frame>

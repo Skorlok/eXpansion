@@ -1,0 +1,33 @@
+<?php
+$settings  = $this->getParam("settings");
+
+$sizeX      = 155;  // window 160 - pager posX 5
+$pagerSizeY = 92;   // window 100 - 8
+$itemSizeY  = 6;
+$itemWidth  = 147;  // pager frame width (sizeX-6) minus margins
+
+$itemsXml = "";
+$i = 0;
+foreach ((array)$settings as $settingName => $value) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<frame posn="-2 0 0"><exp:listbg indexNumber="' . $i . '" sizeX="' . $itemWidth . '" sizeY="' . $itemSizeY . '"/></frame>';
+    $itemsXml .= '<frame posn="0 0 1.0E-5">';
+    $itemsXml .= '<quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>';
+    $itemsXml .= '<label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($settingName) . '"/>';
+    $itemsXml .= '<quad posn="100 0 2.0E-5" sizen="4 4" style="Empty" substyle="BgWindow2"/>';
+    $itemsXml .= '<frame posn="104 0 1">';
+    if (is_bool($value)) {
+        $itemsXml .= '<exp:checkbox name="' . $settingName . '" active="' . ($value ? 'true' : 'false') . '"/>';
+    } else {
+        $itemsXml .= '<exp:inputbox name="' . $settingName . '" sizeX="20" text="' . $value . '"/>';
+    }
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $i++;
+}
+?>
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getXML($sizeX, $pagerSizeY, $itemsXml, 5, 0); ?>
+<frame posn="140 -95.75 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Adm:scriptSettingsApply" isTextId="true"/>
+</frame>

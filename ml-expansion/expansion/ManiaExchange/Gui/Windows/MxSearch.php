@@ -5,7 +5,7 @@ namespace ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows;
 use ManiaLib\Application\ErrorHandling;
 use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
@@ -67,7 +67,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->inputAuthor->setContent('<frame posn="38 0 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("author", 35, true, "Author name", null, null, null) . '</frame>');
         $this->searchframe->addComponent($this->inputAuthor);
 
-        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "style", $this->styleOptions);
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML(null, "style", $this->styleOptions);
         $this->style = new \ManiaLive\Gui\Elements\Xml();
         $this->style->setContent('<frame posn="76 0 1">' . $dropDown[0] . '</frame>');
         $this->searchframe->addComponent($this->style);
@@ -75,7 +75,7 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->styleScript = $dropDown[1];
         $this->registerScript($this->styleScript);
 
-        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "length", $this->lenghtOptions);
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML(null, "length", $this->lenghtOptions);
         $this->lenght = new \ManiaLive\Gui\Elements\Xml();
         $this->lenght->setContent('<frame posn="114 0 1">' . $dropDown[0] . '</frame>');
         $this->searchframe->addComponent($this->lenght);
@@ -84,10 +84,10 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $this->registerScript($this->lenghtScript);
 
         $this->filter = new \ManiaLive\Gui\Elements\Xml();
-        $this->filter->setContent('<frame posn="149 0 1">' . CheckboxScripted::getXML("filterAllPacks", false, 25, true, "Maps from all titles pack") . '</frame>');
+        $this->filter->setContent('<frame posn="149 0 1">' . Checkbox::getXML("filterAllPacks", false, 25, true, "Maps from all titles pack") . '</frame>');
         $this->searchframe->addComponent($this->filter);
 
-        $this->registerScript(CheckboxScripted::getScriptML());
+        $this->registerScript(Checkbox::getScriptML());
 
         $this->actionSearch = ActionHandler::getInstance()->createAction(array($this, "actionOk"));
 
@@ -201,13 +201,13 @@ class MxSearch extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
         $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
 
 
-        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "length", $this->lenghtOptions, ($length !== null) ? intval($length) + 1 : 0);
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML(null, "length", $this->lenghtOptions, ($length !== null) ? intval($length) + 1 : 0);
         $this->lenght->setContent('<frame posn="114 0 1">' . $dropDown[0] . '</frame>');
         $this->unregisterScript($this->lenghtScript);
         $this->lenghtScript = $dropDown[1];
         $this->registerScript($this->lenghtScript);
 
-        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "style", $this->styleOptions, intval($style));
+        $dropDown = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML(null, "style", $this->styleOptions, intval($style));
         $this->style->setContent('<frame posn="76 0 1">' . $dropDown[0] . '</frame>');
         $this->unregisterScript($this->styleScript);
         $this->styleScript = $dropDown[1];

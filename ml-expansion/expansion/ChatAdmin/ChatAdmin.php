@@ -28,7 +28,6 @@ use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Elements\ColorChooser;
 use ManiaLivePlugins\eXpansion\Gui\Scripts\DropDownScript;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
@@ -55,8 +54,6 @@ class ChatAdmin extends ExpPlugin
     protected $clubLinks = array();
     protected $clubLinksGet = 0;
     protected $clubLinksExpected = 0;
-
-    protected $actions = array("clubLinks" => array(), "paramDialog" => array(), "teamSetup" => array());
 
     /** @var Window */
     protected $clubLinksWindow;
@@ -406,31 +403,36 @@ class ChatAdmin extends ExpPlugin
 
         $this->enableDatabase();
         $this->enableTickerEvent();
-        self::$showActions['ignore'] = ActionHandler::getInstance() ->createAction(array($this, 'showIgnoreList'));
-        self::$showActions['ban'] = ActionHandler::getInstance() ->createAction(array($this, 'showBanList'));
-        self::$showActions['black'] = ActionHandler::getInstance() ->createAction(array($this, 'showBlackList'));
-        self::$showActions['guest'] = ActionHandler::getInstance() ->createAction(array($this, 'showGuestList'));
+        self::$showActions['ignore'] = 'exp:eXpansion.ChatAdmin:showIgnoreList';
+        self::$showActions['ban'] = 'exp:eXpansion.ChatAdmin:showBanList';
+        self::$showActions['black'] = 'exp:eXpansion.ChatAdmin:showBlackList';
+        self::$showActions['guest'] = 'exp:eXpansion.ChatAdmin:showGuestList';
 
-        self::$showActions['guestPlayer'] = ActionHandler::getInstance() ->createAction(array($this, 'addGuestList'));
-        self::$showActions['ignorePlayer'] = ActionHandler::getInstance() ->createAction(array($this, 'addIgnore'));
-        self::$showActions['banPlayer'] = ActionHandler::getInstance() ->createAction(array($this, 'addBan'));
-        self::$showActions['blackPlayer'] = ActionHandler::getInstance() ->createAction(array($this, 'addBlack'));
+        self::$showActions['guestPlayer'] = 'exp:eXpansion.ChatAdmin:addGuestList';
+        self::$showActions['ignorePlayer'] = 'exp:eXpansion.ChatAdmin:addIgnore';
+        self::$showActions['banPlayer'] = 'exp:eXpansion.ChatAdmin:addBan';
+        self::$showActions['blackPlayer'] = 'exp:eXpansion.ChatAdmin:addBlack';
     }
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-
-        /** @var ActionHandler $ah */
-        $ah = ActionHandler::getInstance();
-        $this->actions["clubLinks"]["ok"] = $ah->createAction(array($this, 'clubLinksOk'));
-        $this->actions["paramDialog"]["ok"] = $ah->createAction(array($this, 'parameterDialogOk'));
-        $this->actions["teamSetup"]["ok"] = $ah->createAction(array($this, 'teamSetupOk'));
+        
+        $this->registerManialinkCallback('clubLinksOk', true);
+        $this->registerManialinkCallback('parameterDialogOk', true);
+        $this->registerManialinkCallback('teamSetupOk', true);
+        $this->registerManialinkCallback('showIgnoreList');
+        $this->registerManialinkCallback('showBanList');
+        $this->registerManialinkCallback('showBlackList');
+        $this->registerManialinkCallback('showGuestList');
+        $this->registerManialinkCallback('addGuestList', true);
+        $this->registerManialinkCallback('addIgnore', true);
+        $this->registerManialinkCallback('addBan', true);
+        $this->registerManialinkCallback('addBlack', true);
 
         $this->paramDialogWindow = new Window("ChatAdmin\Gui\Windows\ParameterDialog.xml");
         $this->paramDialogWindow->setName("ParameterDialog");
         $this->paramDialogWindow->setSize(110, 20);
-        $this->paramDialogWindow->setParam("okAction",      $this->actions["paramDialog"]["ok"]);
         $this->paramDialogWindow->setParam("dropdownItems", $this->paramDialogDropdownItems);
         $dropScript = new DropDownScript();
         $dropScript->setParam("name",     "select");
@@ -442,15 +444,12 @@ class ChatAdmin extends ExpPlugin
         $this->clubLinksWindow->setName("ClubLinksSetup");
         $this->clubLinksWindow->setSize(38, 60);
         $this->clubLinksWindow->setTitle('Team clublinks');
-        $this->clubLinksWindow->setParam("action", $this->actions["clubLinks"]["ok"]);
 
         
         $this->teamSetupWindow = new Window("ChatAdmin\Gui\Windows\TeamSetup.xml");
         $this->teamSetupWindow->setName("TeamSetup");
         $this->teamSetupWindow->setSize(38, 60);
         $this->teamSetupWindow->setTitle('Team names and colors');
-        $this->teamSetupWindow->setParam("okAction", $this->actions["teamSetup"]["ok"]);
-        $this->teamSetupWindow->registerScript(ColorChooser::getScriptML());
 
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
 
@@ -857,6 +856,18 @@ class ChatAdmin extends ExpPlugin
 
     public function setTeamDisplayAfterWindow($fromLogin, $params)
     {
+        if (!isset($params["team1Name"]) || !isset($params["team2Name"]) || !isset($params["team1Color"]) || !isset($params["team2Color"])) {
+            $this->eXpChatSendServerMessage('#admin_error#Error: Invalid parameters for team setup.', $fromLogin);
+            return;
+        }
+        if (empty($params["team1Name"]) || empty($params["team2Name"])) {
+            $this->eXpChatSendServerMessage('#admin_error#Error: Team names cannot be empty.', $fromLogin);
+            return;
+        }
+        if (!preg_match('/^[0-9a-fA-F]{3}$/', $params["team1Color"]) || !preg_match('/^[0-9a-fA-F]{3}$/', $params["team2Color"])) {
+            $this->eXpChatSendServerMessage('#admin_error#Error: Team colors must be valid hex codes (e.g., "f00" for red).', $fromLogin);
+            return;
+        }
         $r1 = hexdec($params["team1Color"][0].$params["team1Color"][0]);
 		$g1 = hexdec($params["team1Color"][1].$params["team1Color"][1]);
 		$b1 = hexdec($params["team1Color"][2].$params["team1Color"][2]);
@@ -2713,14 +2724,5 @@ class ChatAdmin extends ExpPlugin
             $this->paramDialogWindow->erase();
         }
         $this->paramDialogWindow = null;
-        
-        /** @var ActionHandler $aH */
-        $aH = ActionHandler::getInstance();
-        foreach ($this->actions as $actions) {
-            foreach ($actions as $action) {
-                $aH->deleteAction($action);
-            }
-        }
-        $this->actions = array();
     }
 }

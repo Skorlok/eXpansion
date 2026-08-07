@@ -15,6 +15,8 @@ class Script
 
     private $libs = array();
 
+    private $params = array();
+
     /**
      * construct a script
      *
@@ -60,6 +62,12 @@ class Script
     public function setParam($name, $value)
     {
         $this->$name = $value;
+        $this->params[$name] = $value;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
     }
 
     /**

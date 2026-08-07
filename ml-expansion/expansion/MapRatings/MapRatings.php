@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\MapRatings;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
@@ -64,38 +63,18 @@ class MapRatings extends ExpPlugin
     private $widget;
     private $widgetEndMap;
 
-    private $action = null;
-    private $actionRating = array(0 => null, 1 => null, 2 => null, 3 => null, 4 => null, 5 => null);
-
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        
-        $this->action = $aH->createAction(array($this, "showRatingsManager"));
-        $this->actionRating[0] = $aH->createAction(array($this, "saveRating"), 0);
-        $this->actionRating[1] = $aH->createAction(array($this, "saveRating"), 1);
-        $this->actionRating[2] = $aH->createAction(array($this, "saveRating"), 2);
-        $this->actionRating[3] = $aH->createAction(array($this, "saveRating"), 3);
-        $this->actionRating[4] = $aH->createAction(array($this, "saveRating"), 4);
-        $this->actionRating[5] = $aH->createAction(array($this, "saveRating"), 5);
+        Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm("exp:eXpansion.MapRatings:autoRemove");
 
-        $actionFinal = $aH->createAction(array($this, "autoRemove"));
-        Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($actionFinal);
+        $this->setPublicMethod("getPlayersRatingsForAllMaps");
 
         $this->widget = new Widget("MapRatings\Gui\Widgets\RatingsWidget.xml");
         $this->widget->setName("Map Ratings Widget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(34, 10);
-        $this->widget->setParam("action", $this->action);
-        $this->widget->setParam("rate_0", $this->actionRating[0]);
-        $this->widget->setParam("rate_1", $this->actionRating[1]);
-        $this->widget->setParam("rate_2", $this->actionRating[2]);
-        $this->widget->setParam("rate_3", $this->actionRating[3]);
-        $this->widget->setParam("rate_4", $this->actionRating[4]);
-        $this->widget->setParam("rate_5", $this->actionRating[5]);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -106,12 +85,12 @@ class MapRatings extends ExpPlugin
         $this->widgetEndMap->setSize(90, 25);
 
         $script = new Script("MapRatings\Gui\Script");
-        $script->setParam("rate_0", $this->actionRating[0]);
-        $script->setParam("rate_1", $this->actionRating[1]);
-        $script->setParam("rate_2", $this->actionRating[2]);
-        $script->setParam("rate_3", $this->actionRating[3]);
-        $script->setParam("rate_4", $this->actionRating[4]);
-        $script->setParam("rate_5", $this->actionRating[5]);
+        $script->setParam("rate_0", 'exp:eXpansion.MapRatings:saveRating:0');
+        $script->setParam("rate_1", 'exp:eXpansion.MapRatings:saveRating:1');
+        $script->setParam("rate_2", 'exp:eXpansion.MapRatings:saveRating:2');
+        $script->setParam("rate_3", 'exp:eXpansion.MapRatings:saveRating:3');
+        $script->setParam("rate_4", 'exp:eXpansion.MapRatings:saveRating:4');
+        $script->setParam("rate_5", 'exp:eXpansion.MapRatings:saveRating:5');
         $this->widgetEndMap->registerScript($script);
     }
 
@@ -182,6 +161,9 @@ class MapRatings extends ExpPlugin
 
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('saveRating', false, true);
+        $this->registerManialinkCallback('showRatingsManager');
+        
         $this->reload();
 
         $this->showWidget();
@@ -375,6 +357,23 @@ class MapRatings extends ExpPlugin
 
         foreach ($ratings as $rating) {
             $mapsByUid[$rating->uid]->mapRating = new Structures\Rating($rating->rating, $rating->ratingTotal, $rating->uid);
+        }
+    }
+
+    public function getPlayersRatingsForAllMaps($login)
+    {
+        $uids = "";
+        $mapsByUid = array();
+        foreach ($this->storage->maps as $map) {
+            $uids .= $this->db->quote($map->uId) . ",";
+            $mapsByUid[$map->uId] = $map;
+        }
+        $uids = trim($uids, ",");
+
+        $ratings = $this->db->execute("SELECT uid, rating FROM exp_ratings WHERE uid IN (" . $uids . ") AND login = " . $this->db->quote($login) . ";")->fetchArrayOfObject();
+
+        foreach ($ratings as $rating) {
+            $mapsByUid[$rating->uid]->mapRating->playerVotes[$login] = $rating->rating;
         }
     }
 
@@ -948,11 +947,5 @@ class MapRatings extends ExpPlugin
 
         \ManiaLive\Event\Dispatcher::unregister(MXKarmaEvent::getClass(), $this);
         unset($this->mxConnection);
-
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->action);
-        $aH->deleteAction($this->actionRating[0]);
-        $aH->deleteAction($this->actionRating[5]);
     }
 }

@@ -19,7 +19,6 @@ use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Data\Player;
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
@@ -54,7 +53,6 @@ class Chat extends ExpPlugin
     private $badWords = array();
 
     private $widget;
-    private $action;
 
     /**
      *
@@ -66,15 +64,10 @@ class Chat extends ExpPlugin
         $this->loadProfanityList();
         $this->channels = array_merge(array("Public"), $config->channels);
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $this->action = $aH->createAction(array($this, 'selectChannel'));
-
         $this->widget = new Widget("Chat\Gui\Widgets\ChatSelect.xml");
         $this->widget->setName("Chat Channel Selector");
         $this->widget->setLayer("normal");
         $this->widget->setSize(55, 6);
-        $this->widget->setParam("action", $this->action);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -87,6 +80,9 @@ class Chat extends ExpPlugin
     {
         $this->enableDedicatedEvents(Event::ON_PLAYER_CONNECT);
         $this->enableDedicatedEvents(Event::ON_PLAYER_DISCONNECT);
+        $this->enableDedicatedEvents(Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+        
+        $this->registerManialinkCallback('selectChannel', true);
 
         Dispatcher::register(Event::getClass(), $this, Event::ON_PLAYER_CHAT, 10);
 
@@ -500,15 +496,9 @@ class Chat extends ExpPlugin
      */
     public function eXpOnUnload()
     {
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->action);
-
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
-            $this->widget = null;
         }
-        $this->action = null;
         $this->config = null;
         $this->widget = null;
 

@@ -1,0 +1,51 @@
+<?php
+use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Scripts\PermissionsInheritScript;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$permissions  = $this->getParam("permissions");
+$sizeX        = (int)$this->getParam("sizeX");
+$sizeY        = (int)$this->getParam("sizeY");
+$hasInherits  = (bool)$this->getParam("hasInherits");
+$inheritLabel = (string)$this->getParam("inheritLabel");
+
+$pagerSizeX  = $sizeX + 4;
+$pagerSizeY  = $sizeY - 12;
+$okPosX      = (int)(($sizeX - 32) / 2);
+$okPosY      = -($sizeY - 5);
+$cbHaveWidth = $hasInherits ? 55 : 80;
+
+$itemsXml  = "";
+$permPairs = array();
+$n = 0;
+
+foreach ((array)$permissions as $perm) {
+    $haveEnabled = $hasInherits ? !(bool)$perm['checked_inherit'] : true;
+
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="' . ($pagerSizeX - 4) . '" sizeY="4"/>';
+    $itemsXml .= '<frame posn="0 0 1">';
+    $itemsXml .= Checkbox::getXML('cb_have_' . $perm['name'], (bool)$perm['checked_have'], $cbHaveWidth, $haveEnabled, $this->handleSpecialChars($perm['label']));
+    $haveId = Checkbox::getLastId();
+    if ($hasInherits) {
+        $itemsXml .= '<frame posn="100 0 0">';
+        $itemsXml .= Checkbox::getXML('cb_inherit_' . $perm['name'], (bool)$perm['checked_inherit'], 25, true, $this->handleSpecialChars($inheritLabel));
+        $inheritId = Checkbox::getLastId();
+        $permPairs[] = array('haveId' => $haveId, 'inheritId' => $inheritId);
+        $itemsXml .= '</frame>';
+    }
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $n++;
+}
+
+if ($hasInherits && !empty($permPairs)) {
+    $firstInheritId = $permPairs[0]['inheritId'];
+    $lastInheritId  = $permPairs[count($permPairs) - 1]['inheritId'];
+    $this->registerOrOverrideScript(new PermissionsInheritScript($firstInheritId, $lastInheritId));
+}
+?>
+<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 0, 0); ?>
+<frame posn="<?php echo $okPosX; ?> <?php echo $okPosY; ?> 1">
+    <exp:button sizeX="32" sizeY="6" text="@OK" action="exp:eXpansion.AdminGroups:permissionsOk" isTextId="true"/>
+</frame>

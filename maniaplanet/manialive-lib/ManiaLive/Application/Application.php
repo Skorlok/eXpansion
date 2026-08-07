@@ -36,6 +36,9 @@ class Application extends \ManiaLib\Utils\Singleton
 			declare(ticks = 1);
 		}
 
+		// disable memory limit
+		ini_set('memory_limit', -1);
+
 		try {
 			$configFile = CommandLineInterpreter::preConfigLoad();
 

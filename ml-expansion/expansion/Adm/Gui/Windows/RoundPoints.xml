@@ -1,0 +1,46 @@
+<?php
+$presets         = $this->getParam("presets");
+$customPoints    = $this->getParam("customPoints");
+
+$sizeX      = 160;
+$pagerSizeY = 82;   // window 90 - 8
+$itemSizeY  = 6;
+$itemWidth  = 152;  // sizeX - 8
+
+$itemsXml = "";
+
+// Row 0: custom points input
+$itemsXml .= '<frame>';
+$itemsXml .= '<exp:listbg indexNumber="0" sizeX="' . $itemWidth . '" sizeY="' . $itemSizeY . '"/>';
+$itemsXml .= '<frame posn="2 0 1.0E-5">';
+$itemsXml .= '<quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>';
+$itemsXml .= '<label posn="4 0 1.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textid="' . $this->addLang("Custom point") . '"/>';
+$itemsXml .= '<quad posn="36 0 2.0E-5" sizen="4 4" style="Empty" substyle="BgWindow2"/>';
+$itemsXml .= '<frame posn="40 0 1">';
+$itemsXml .= '<exp:inputbox name="customPoints" sizeX="90" text="' . $customPoints . '"/>';
+$itemsXml .= '</frame>';
+$itemsXml .= '<frame posn="130 0 5.0E-5" scale="0.8">';
+$itemsXml .= '<exp:button sizeX="32" sizeY="6" text="@Set" action="exp:eXpansion.Adm:roundPointsSetCustom" isTextId="true"/>';
+$itemsXml .= '</frame>';
+$itemsXml .= '</frame>';
+$itemsXml .= '</frame>';
+
+// Rows 1+: presets
+$i = 1;
+foreach ((array)$presets as $preset) {
+    $itemsXml .= '<frame>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<frame posn="2 0 1.0E-5">';
+    $itemsXml .= '<quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>';
+    $itemsXml .= '<label posn="4 0 1.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($preset['name']) . '"/>';
+    $itemsXml .= '<quad posn="36 0 2.0E-5" sizen="4 4" style="Empty" substyle="BgWindow2"/>';
+    $itemsXml .= '<label posn="40 0 3.0E-5" sizen="90 3" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="' . $this->handleSpecialChars($preset['points']) . '"/>';
+    $itemsXml .= '<frame posn="130 0 5.0E-5" scale="0.8">';
+    $itemsXml .= '<exp:button sizeX="32" sizeY="6" text="@Set" action="' . $preset['action'] . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $i++;
+}
+?>
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getXML($sizeX, $pagerSizeY, $itemsXml, 0, 0); ?>

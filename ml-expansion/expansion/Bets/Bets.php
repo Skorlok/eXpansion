@@ -19,7 +19,6 @@
 namespace ManiaLivePlugins\eXpansion\Bets;
 
 use ManiaLive\Data\Player;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Bets\Classes\BetCounter;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -50,9 +49,6 @@ class Bets extends ExpPlugin
     private $widget;
     private $widgetAccept;
     private $script;
-    private $actions;
-    private $actionAccept;
-    private $action;
 
     public static $state = self::OFF;
     public static $betAmount = 0;
@@ -80,18 +76,10 @@ class Bets extends ExpPlugin
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
 
-        $this->config = Config::getInstance();
+        $this->registerManialinkCallback('acceptBet');
+        $this->registerManialinkCallback('setBetAmount', true, true);
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $this->actionAccept = $aH->createAction(array($this, "acceptBet"));
-        $this->action = $aH->createAction(array($this, "setBetAmount"), null);
-        $this->actions = array();
-        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 25);
-        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 50);
-        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 100);
-        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 250);
-        $this->actions[] = $aH->createAction(array($this, "setBetAmount"), 500);
+        $this->config = Config::getInstance();
 
         $this->script = new Script("Bets/Gui/Scripts");
 
@@ -99,16 +87,12 @@ class Bets extends ExpPlugin
         $this->widget->setName("Bet widget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(80, 20);
-        $this->widget->setParam("actions", $this->actions);
-        $this->widget->setParam("action", $this->action);
-        $this->widget->setParam("values", array(25, 50, 100, 250, 500));
         $this->widget->registerScript($this->script);
 
         $this->widgetAccept = new Widget("Bets\Gui\Widgets\AcceptBetWidget.xml");
         $this->widgetAccept->setName("Bet accept widget");
         $this->widgetAccept->setLayer("normal");
         $this->widgetAccept->setSize(80, 20);
-        $this->widgetAccept->setParam("action", $this->actionAccept);
         $this->widgetAccept->registerScript($this->script);
 
         $this->reset();
@@ -166,7 +150,7 @@ class Bets extends ExpPlugin
 
     public function setBetAmount($login, $amount = null, $data = array())
     {
-        if ($amount == null) {
+        if (!$amount) {
             $amount = $data['betAmount'];
         }
 
@@ -319,21 +303,15 @@ class Bets extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        $this->widget->erase();
-        $this->widgetAccept->erase();
-
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->action);
-        $aH->deleteAction($this->actionAccept);
-        foreach ($this->actions as $action) {
-            $aH->deleteAction($action);
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
         }
-        $this->actions = array();
-        $this->action = null;
-        $this->script = null;
         $this->widget = null;
+        if ($this->widgetAccept instanceof Widget) {
+            $this->widgetAccept->erase();
+        }
         $this->widgetAccept = null;
+        $this->script = null;
 
         parent::eXpOnUnload();
     }

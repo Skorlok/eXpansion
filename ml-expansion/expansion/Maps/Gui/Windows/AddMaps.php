@@ -169,9 +169,18 @@ class AddMaps extends \ManiaLivePlugins\eXpansion\Gui\Windows\Window
 
     public function addAllMaps($login)
     {
-        $mapsAtDisk = glob($this->allMapsPath . "/*.Map.Gbx");
-        $this->connection->addMapList($mapsAtDisk);
-        $this->connection->chatSendServerMessage("Added " . count($mapsAtDisk) . " maps to playlist.", $login);
+        $maps = array();
+        foreach (new \DirectoryIterator($this->allMapsPath) as $file) {
+            if ($file->isFile() && preg_match('/\.Map\.Gbx$/i', $file->getFilename())) {
+                $maps[] = $file->getRealPath();
+            }
+        }
+        if (empty($maps)) {
+            $this->connection->chatSendServerMessage(__("No maps found in current directory.", $this->getRecipient()), $login);
+            return;
+        }
+        $this->connection->addMapList($maps);
+        $this->connection->chatSendServerMessage("Added " . count($maps) . " maps to playlist.", $login);
     }
 
     public function changeDirectory($login, $dir)

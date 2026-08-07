@@ -1,0 +1,59 @@
+<?php
+use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
+
+$servers = $this->getParam("servers");
+
+$iSize   = 14.0 / 3.0;  // ≈ 4.6667 — ServerItem::iSize
+$envH    = $iSize * 0.8; // ≈ 3.7333 — height of env label (scale 0.8)
+$iconsY  = -($envH + $iSize); // -8.4 — Y of icons frame within server_frame
+
+$itemsXml = "";
+
+foreach ((array)$servers as $server) {
+    $isFullPlayers    = ((int)$server['playersCurrent'] >= (int)$server['playersMax']);
+    $infoColorPlayers = $isFullPlayers ? 'F00' : '111';
+
+    $isFullSpecs      = ((int)$server['specsCurrent'] >= (int)$server['specsMax']);
+    $infoColorSpecs   = $isFullSpecs ? 'F00' : '111';
+
+    // icon X positions (Line layout within scale=0.8 icons frame)
+    $x1 = $iSize;            // players label
+    $x2 = $x1 + 14;          // specs icon
+    $x3 = $x2 + $iSize;      // specs label
+    $x4 = $x3 + 14;          // ladder icon
+    $x5 = $x4 + $iSize;      // ladder label
+
+    $itemsXml .= '<frame>';
+
+    // Left side: server info — frame_main at (0,7), server_frame at (3,-1) within
+    $itemsXml .= '<frame posn="0 7 0">';
+    $itemsXml .= '<frame posn="3 -1 0">';
+    $itemsXml .= '<label sizen="20 ' . $iSize . '" scale="0.8" style="TextStaticSmall" text="$111$i' . $this->handleSpecialChars($server['env']) . '"/>';
+    $itemsXml .= '<label posn="0 -' . $envH . ' 0" sizen="50 ' . $iSize . '" halign="left" valign="top" style="TextRaceMessageBig" textsize="2" text="' . $this->handleSpecialChars($server['sname']) . '"/>';
+    $itemsXml .= '<frame posn="0 ' . $iconsY . ' 0" scale="0.8">';
+    $itemsXml .= '<quad posn="0 0 0.1" sizen="' . $iSize . ' ' . $iSize . '" style="Icons64x64_1" substyle="Buddy"/>';
+    $itemsXml .= '<label posn="' . $x1 . ' 0 0" sizen="14 9" style="TextStaticSmall" textcolor="' . $infoColorPlayers . '" text="' . $server['playersCurrent'] . '/' . $server['playersMax'] . '"/>';
+    $itemsXml .= '<quad posn="' . $x2 . ' 0 0.1" sizen="' . $iSize . ' ' . $iSize . '" style="Icons64x64_1" substyle="IconPlayers"/>';
+    $itemsXml .= '<label posn="' . $x3 . ' 0 0" sizen="14 9" style="TextStaticSmall" textcolor="' . $infoColorSpecs . '" text="' . $server['specsCurrent'] . '/' . $server['specsMax'] . '"/>';
+    $itemsXml .= '<quad posn="' . $x4 . ' 0 0.1" sizen="' . $iSize . ' ' . $iSize . '" style="Icons128x128_1" substyle="LadderPoints"/>';
+    $itemsXml .= '<label posn="' . $x5 . ' 0 0" sizen="14 ' . $iSize . '" style="TextStaticSmall" textcolor="111" text="' . $server['ladderMin'] . ' - ' . $server['ladderMax'] . 'k"/>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+    $itemsXml .= '</frame>';
+
+    // Right side: map info at (108, 6)
+    $itemsXml .= '<frame posn="108 6 0">';
+    $itemsXml .= '<label sizen="50 ' . $iSize . '" halign="right" valign="top" style="TextRaceMessageBig" textsize="2" text="$111' . $this->handleSpecialChars($server['mapName']) . '"/>';
+    $itemsXml .= '<label posn="0 -' . $iSize . ' 0" sizen="20 ' . $iSize . '" halign="right" valign="top" style="TextStaticSmall" text="$111' . $this->handleSpecialChars($server['mapAuthor']) . '"/>';
+    $itemsXml .= '<label posn="0 -' . ($iSize * 2) . ' 0" sizen="20 ' . $iSize . '" halign="right" valign="top" style="TextStaticSmall" textsize="1" text="$111' . $this->handleSpecialChars($server['mapAuthorTime']) . '"/>';
+    $itemsXml .= '</frame>';
+
+    // Full-item clickable button overlay at (0, 7) matching the Y+7 shift of bg_main
+    $itemsXml .= '<frame posn="0 0 0" scale="1.333333333">';
+    $itemsXml .= '<exp:icon sizeX="108" sizeY="11.5" description="Click to show more info" descSizeX="40" action="' . $server['action'] . '" icon="Bgs1" iconSub="BgCardOnline"/>';
+    $itemsXml .= '</frame>';
+
+    $itemsXml .= '</frame>';  // item
+}
+?>
+<?php echo Pager::getXML(118, 87, $itemsXml, 0, 0); ?>

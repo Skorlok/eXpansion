@@ -6,13 +6,13 @@ class Config extends \ManiaLib\Utils\Singleton
 {
     public $skipLeft = true;
     public $skipRight = false;
-    public $bufferSize = 5;
     public $historySize = 7;
+    public $maxPlayerQueueSize = 1;
     public $showCurrentMapWidget = true;
     public $showNextMapWidget = true;
     public $showEndMatchNotices = true;
     public $showEndMatchNoticesJukebox = true;
-    public $publicQueueAmount = array(0);
+    public $publicQueueAmount = array();
 
     public $currentMapWidget_PosX = -80;
     public $currentMapWidget_PosY = 61;

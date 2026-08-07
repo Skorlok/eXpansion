@@ -1,8 +1,8 @@
 <frame posn="0 0 0">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(40, (3 * $this->getParam('nbFields')) + 4.5); ?>
+    <?php echo '<exp:widgetbg sizeX="40" sizeY="' . ((3 * $this->getParam('nbFields')) + 4.5) . '"/>'; ?>
 </frame>
 <frame posn="0 0 1">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(40, 4, $this->addLang($this->getParam('title'))); ?>
+    <exp:widgettitle sizeX="40" sizeY="4" text="{@{title}}"/>
 </frame>
 <frame posn="4 -5 0">
     <frame>

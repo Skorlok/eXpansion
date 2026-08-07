@@ -26,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.2.6";
+    const EXP_VERSION = "1.2.2.7";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -107,8 +107,6 @@ class Core extends types\ExpPlugin
 
     private $guestListLastRead = 0;
 
-    public static $action_serverInfo = -1;
-
     /** @var Window */
     protected $infoWindow;
 
@@ -132,6 +130,9 @@ class Core extends types\ExpPlugin
     public static $core = null;
 
     private $quitDialogXml = "";
+
+    /** @var \ManiaLivePlugins\eXpansion\Core\Gui\Controller\ExpSettingsController */
+    protected $expSettingsController;
 
     private static $availableCallbacks = array();
 
@@ -160,10 +161,6 @@ class Core extends types\ExpPlugin
 
         //Listen for changes on server events
         Dispatcher::register(\ManiaLivePlugins\eXpansion\Core\Events\ServerSettingsEvent::getClass(), $this);
-
-        //Creata an action to show server information
-        $aHandler = \ManiaLive\Gui\ActionHandler::getInstance();
-        self::$action_serverInfo = $aHandler->createAction(array($this, 'showInfo'));
 
         //Starting the config manager.
         $this->configManager = ConfigManager::getInstance($this);
@@ -347,6 +344,8 @@ EOT;
      */
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('showInfo');
+        
         $this->lastTick = time();
         $this->config = Config::getInstance();
 
@@ -480,6 +479,8 @@ EOT;
         $this->netStatWindow->setSize(140, 100);
         $this->netStatWindow->setTitle('Network Status');
         $this->netStatWindow->registerCloseCallback(array($this, 'onNetStatWindowCloseCallback'));
+
+        $this->expSettingsController = new Gui\Controller\ExpSettingsController($this->configManager);
     }
 
     public function eXpOnModeScriptCallback($callback, $array)
@@ -1370,14 +1371,7 @@ EOT;
     public function showExpSettings($login, $pluginId, $confName = 'main')
     {
         if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
-            Gui\Windows\ExpSettings::Erase($login);
-            /** @var Gui\Windows\ExpSettings $win */
-            $win = Gui\Windows\ExpSettings::Create($login);
-            $win->setTitle("Expansion Settings");
-            $win->centerOnScreen();
-            $win->setSize(170, 100);
-            $win->populate($this->configManager, 'General', $confName);
-            $win->show();
+            $this->expSettingsController->show($login, $confName);
         }
     }
 

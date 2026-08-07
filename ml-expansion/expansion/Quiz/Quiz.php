@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Quiz;
 
 use ManiaLive\Application\ErrorHandling;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
@@ -62,12 +61,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     /** @var Window */
     private $questionWindow;
-    private $okAction;
-    private $hidAction;
 
     /** @var Window */
     private $hiddenQuestionWindow;
-    private $hiddenOkAction;
+
     private $hiddenQuestions = array();
 
     private $config;
@@ -181,27 +178,22 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('hiddenOk', true);
+        $this->registerManialinkCallback('questionHidden', true);
+        $this->registerManialinkCallback('questionOk', true);
+        
         Gui\Windows\Playerlist::$mainPlugin = $this;
         Gui\Windows\AddPoint::$mainPlugin = $this;
-
-        $ahandler = ActionHandler::getInstance();
-        $this->okAction  = $ahandler->createAction(array($this, 'questionOk'));
-        $this->hidAction = $ahandler->createAction(array($this, 'questionHidden'));
 
         $this->questionWindow = new Window("Quiz\Gui\Windows\QuestionWindow.xml");
         $this->questionWindow->setName("Quiz Question");
         $this->questionWindow->setSize(90, 120);
         $this->questionWindow->setTitle("New question");
-        $this->questionWindow->setParam("okAction", $this->okAction);
-        $this->questionWindow->setParam("hidAction", $this->hidAction);
-
-        $this->hiddenOkAction = $ahandler->createAction(array($this, 'hiddenOk'));
 
         $this->hiddenQuestionWindow = new Window("Quiz\Gui\Windows\HiddenQuestionWindow.xml");
         $this->hiddenQuestionWindow->setName("Quiz Hidden Question");
         $this->hiddenQuestionWindow->setSize(90, 90);
         $this->hiddenQuestionWindow->setTitle("Set order");
-        $this->hiddenQuestionWindow->setParam("okAction", $this->hiddenOkAction);
         $this->hiddenQuestionWindow->registerScript(new Script("Quiz/Gui/Scripts/ClickScript"));
 
         $data = $this->db->execute("SELECT * FROM `quiz_points` order by score desc;")->fetchArrayOfObject();
@@ -754,14 +746,10 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
         $this->hiddenQuestionWindow = null;
 
-        $ahandler = ActionHandler::getInstance();
-        $ahandler->deleteAction($this->okAction);
-        $ahandler->deleteAction($this->hidAction);
-        $ahandler->deleteAction($this->hiddenOkAction);
-
         if ($this->widget instanceof Widget) {
             $this->widget->erase();
         }
+        $this->widget = null;
 
         AdminGroups::removeAdminCommand($this->cmd_reset);
         AdminGroups::removeAdminCommand($this->cmd_points);

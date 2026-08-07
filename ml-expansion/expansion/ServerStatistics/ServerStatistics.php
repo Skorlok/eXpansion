@@ -42,11 +42,9 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->startTime = time();
 
+        /** @var ActionHandler $aHandler */
         $aHandler = ActionHandler::getInstance();
         self::$serverStatAction = $aHandler->createAction(array($this, 'showStats'));
-        self::$serverCpuAction = $aHandler->createAction(array($this, 'showCpu'));
-        self::$serverMemAction = $aHandler->createAction(array($this, 'showMemory'));
-        self::$serverPlayerAction = $aHandler->createAction(array($this, 'showPlayers'));
     }
 
     public function eXpOnLoad()
@@ -60,15 +58,15 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         parent::eXpOnReady();
         $this->enableTickerEvent();
 
+        $this->registerManialinkCallback('showPlayers');
+        $this->registerManialinkCallback('showMemory');
+        $this->registerManialinkCallback('showCpu');
+
         $this->registerChatCommand("serverstat", "showStats", 0, true);
 
         $this->statsWindow = new Window("ServerStatistics\Gui\Windows\StatsWindow.xml");
         $this->statsWindow->setName("Server Statistics");
         $this->statsWindow->setSize(85, 72);
-        $this->statsWindow->setParam("serverPlayerAction", self::$serverPlayerAction);
-        $this->statsWindow->setParam("serverMemAction", self::$serverMemAction);
-        $this->statsWindow->setParam("serverCpuAction", self::$serverCpuAction);
-        $this->statsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
 
         $this->plotterWindow = new Window("ServerStatistics\Gui\Windows\PlotterWindow.xml");
         $this->plotterWindow->setName("Plotter");

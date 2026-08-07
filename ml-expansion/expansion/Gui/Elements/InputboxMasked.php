@@ -7,7 +7,7 @@ use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
 
 class InputboxMasked
 {
-    public static function getXML($widgetClass, $name, $sizeX = 35, $editable = true, $label = null, $text = null, $showClearText = false, $id = null, $class = null, $isTextId = false)
+    public static function getXML($mlClass, $name, $sizeX = 35, $editable = true, $label = null, $text = null, $showClearText = false, $id = null, $class = null, $isTextId = false)
     {
         // Debug for ManiaPlanet 4: attribute require capital P, otherwise the password is shown in clear text.
         // I want to keep a backward compatibility with MP3
@@ -25,23 +25,22 @@ class InputboxMasked
                 $xml .= '<label id="' . $name . '_clear" posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="" hidden="1"/>';
             }
 
-            if ($widgetClass !== null) {
-                $script = new Script("Gui/Scripts/InputboxMasked");
-                $script->setParam("btName", $name);
-                $widgetClass->registerScript($script);
-            }
+            $script = new Script("Gui/Scripts/InputboxMasked");
+            $script->setParam("btName", $name);
+            $mlClass->registerElementScript($script, $name);
         } else {
+            if ($text === null) {
+                $text = "";
+            }
             if ($showClearText) {
                 // Two labels: one with asterisks (visible), one with clear text (hidden).
                 // The script toggles them on MouseOver/MouseOut of the ugly square button.
                 $xml  = '<label id="' . $name . '_masked" posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . str_repeat("*", strlen($text)) . '"/>';
                 $xml .= '<label id="' . $name . '_clear"  posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . $text . '" hidden="1"/>';
 
-                if ($widgetClass !== null) {
-                    $script = new Script("Gui/Scripts/InputboxMasked");
-                    $script->setParam("btName", $name);
-                    $widgetClass->registerScript($script);
-                }
+                $script = new Script("Gui/Scripts/InputboxMasked");
+                $script->setParam("btName", $name);
+                $mlClass->registerElementScript($script, $name);
             } else {
                 $xml = '<label posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . str_repeat("*", strlen($text)) . '"/>';
             }

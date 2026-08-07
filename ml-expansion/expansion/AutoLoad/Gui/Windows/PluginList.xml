@@ -1,0 +1,85 @@
+<?php
+$plugins         = $this->getParam("plugins");
+$groups          = $this->getParam("groups");
+$currentGroupIdx = $this->getParam("currentGroupIdx");
+
+// Pager: window 172×90, pager occupies right 139px, height 86
+$pagerSizeX  = 139;  // 172 - 33 (category column)
+$pagerSizeY  = 86;   // 90 - 4
+$itemSizeY   = 8;
+$itemBgWidth = 134;  // pagerSizeX - 6 + 1
+
+$itemsXml = "";
+foreach ((array)$plugins as $plugin) {
+    $i = $plugin['index'];
+
+    $itemsXml .= '<frame>';
+
+    // Background
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemBgWidth . '" sizeY="' . $itemSizeY . '"/>';
+
+    // Toggle icon (load/unload)
+    $itemsXml .= '<frame posn="0 0 1">';
+    $itemsXml .= '<exp:icon sizeX="8" sizeY="8" description="' . $this->handleSpecialChars($plugin['toggleTooltip']) . '" descSizeX="100" colorize="' . $plugin['toggleColorize'] . '" action="exp:eXpansion.AutoLoad:pluginListToggle:' . $plugin['id'] . '" icon="Icons64x64_1" iconSub="GenericButton"/>';
+    $itemsXml .= '</frame>';
+
+    // Plugin name
+    $itemsXml .= '<label posn="8 3 2.0E-5" sizen="76 4" style="TextStaticSmall" textsize="2" text="' . $this->handleSpecialChars($plugin['name']) . '"/>';
+
+    // Plugin description
+    $itemsXml .= '<label posn="8 -0.5 3.0E-5" sizen="76 4" style="TextCardScores2" textsize="1" text="$i' . $this->handleSpecialChars($plugin['desc']) . '"/>';
+
+    // Title compatibility icon
+    $itemsXml .= '<frame posn="102 0 1">';
+    $itemsXml .= '<exp:icon sizeX="7" sizeY="7" description="' . $this->handleSpecialChars($plugin['titleTooltip']) . '" descSizeX="100" colorize="' . $plugin['titleColorize'] . '" icon="Icons64x64_1" iconSub="GenericButton"/>';
+    $itemsXml .= '</frame>';
+
+    // Game mode compatibility icon
+    $itemsXml .= '<frame posn="108 0 1">';
+    $itemsXml .= '<exp:icon sizeX="7" sizeY="7" description="' . $this->handleSpecialChars($plugin['gameTooltip']) . '" descSizeX="100" colorize="' . $plugin['gameColorize'] . '" icon="Icons64x64_1" iconSub="GenericButton"/>';
+    $itemsXml .= '</frame>';
+
+    // Other compatibility icon
+    $itemsXml .= '<frame posn="114 0 1">';
+    $itemsXml .= '<exp:icon sizeX="7" sizeY="7" description="' . $this->handleSpecialChars($plugin['otherTooltip']) . '" descSizeX="100" descSizeY="' . $plugin['otherSizeY'] . '" descLines="3" colorize="' . $plugin['otherColorize'] . '" icon="Icons64x64_1" iconSub="GenericButton"/>';
+    $itemsXml .= '</frame>';
+
+    // Settings button (only for plugins with configuration)
+    if (!empty($plugin['configAvailable'])) {
+        $itemsXml .= '<frame posn="84 0 1">';
+        $itemsXml .= '<exp:button sizeX="22" sizeY="7" text="@Settings" action="exp:eXpansion.AutoLoad:pluginListShowConfig:' . $plugin['id'] . '" isTextId="true"/>';
+        $itemsXml .= '</frame>';
+    }
+
+    // Start / Stop button
+    $itemsXml .= '<frame posn="121 0 1">';
+    $itemsXml .= '<exp:button sizeX="14" sizeY="7" text="' . $this->addLang($plugin['startText']) . '" colorize="' . $plugin['startColorize'] . '" action="exp:eXpansion.AutoLoad:pluginListToggle:' . $plugin['id'] . '" isTextId="true"/>';
+    $itemsXml .= '</frame>';
+
+    $itemsXml .= '</frame>';
+}
+?>
+<frame>
+<?php foreach ((array)$groups as $idx => $group): ?>
+<frame posn="0 -<?php echo $idx * 6.5; ?> 1">
+<?php echo '<exp:button sizeX="32" sizeY="6" text="' . $this->handleSpecialChars($group['name']) . '"' . ($group['selected'] ? ' colorize="0b0"' : '') . ' action="exp:eXpansion.AutoLoad:pluginListSetGroup:' . $idx . '"/>'; ?>
+</frame>
+<?php endforeach; ?>
+</frame>
+<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 33, -2); ?>
+<frame posn="33 -1 0.00127">
+	<frame>
+		<frame posn="0 0 1">
+			<exp:inputbox name="name" sizeX="35" label="@Name" text="{currentName}" isTextId="true"/>
+		</frame>
+		<frame posn="37 0 1">
+			<exp:inputbox name="author" sizeX="35" label="@Author" text="{currentAuthor}" isTextId="true"/>
+		</frame>
+		<frame posn="74 0 1">
+			<?php echo '<exp:dropdown name="group" itemsVarName="groupNames" selectedIndex="' . $currentGroupIdx . '" sizeX="25"/>'; ?>
+		</frame>
+		<frame posn="101 0 1">
+			<exp:button sizeX="32" sizeY="6" text="@Search" action="exp:eXpansion.AutoLoad:pluginListSearch" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>

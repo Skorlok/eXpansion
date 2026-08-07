@@ -154,8 +154,8 @@ Chercher un circuit
 Search Author
 Chercher un auteur
 
-Clear Maplist
-Vider la liste des circuits
+$d00Clear Maplist
+$d00Vider la liste des circuits
 
 #admin_error# $iA payment for wishin a track is in progress please try later.
 #admin_error# $iA payement pour la demande d'un circuit est en progrès, veuillez vous essayer plus tard.
@@ -163,7 +163,7 @@ Vider la liste des circuits
 Are you sure you want to wish this map to be played
 Etes vous sure de vouloir faire jouer ce circuit
 
-#admin_error# $iYOu can't wish for a map at the moment.
+#admin_error# $iYou can't wish for a map at the moment.
 #admin_error# $iVous ne pouvez pas souhaiter un circuit en ce moment
 
 Now Playing
@@ -226,8 +226,23 @@ Fichier supprimé du système de fichiers!
 $f00$oError $z$s$fff%s
 $f00$oErreur $z$s$fff%s
 
-Maps on server
-Carte sur le servuer
+Maps on server (%s)
+Carte sur le serveur (%s)
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s
+Carte sur le serveur (%1$s) - Triée par '%2$s' %3$s
+
+Maps on server (%1$s) - Filtered by '%2$s'
+Carte sur le serveur (%1$s) - Filtrée par '%2$s'
+
+Maps on server (%1$s) - Sorted by '%2$s' %3$s - Filtered by '%4$s'
+Carte sur le serveur (%1$s) - Triée par '%2$s' %3$s - Filtrée par '%4$s'
+
+ascending
+croissant
+
+descending
+décroissant
 
 History of Maps
 Historique des cartes
@@ -246,3 +261,141 @@ Open
 
 Display is limiting to first %1$s maps.
 Affichage limité au premier cartes %1$s maps.
+
+Filters
+Filtres
+
+Sort By
+Trier par
+
+Not Finished
+Pas terminé
+
+Finished
+Terminé
+
+Not Rated
+Non noté
+
+Rated
+Noté
+
+Recently Played
+Joué récemment
+
+Not Recently Played
+Non joué récemment
+
+Map Name
+Nom de la map
+
+Map Author
+Auteur de la map
+
+Gold Time
+Temps or
+
+Local Record
+Record local
+
+Map Rating
+Note de la map
+
+Add Time
+Date d'ajout
+
+Direction
+Direction
+
+Ascending
+Croissant
+
+Descending
+Décroissant
+
+Maplist Filters Selection
+Sélection des filtres de la liste de maps
+
+Open Filter Window
+Ouvrir la fenêtre de filtres
+
+Clear Filters
+Effacer les filtres
+
+No Author time
+Sans temps auteur
+
+No Gold time
+Sans temps or
+
+No Silver time
+Sans temps argent
+
+No Bronze time
+Sans temps bronze
+
+Only Multilap
+Multilap uniquement
+
+No Multilap
+Sans multilap
+
+Sunrise
+Aube
+
+Day
+Jour
+
+Sunset
+Crépuscule
+
+Night
+Nuit
+
+Environment
+Environnement
+
+Mood
+Ambiance
+
+Medals
+Médailles
+
+My rating
+Ma note
+
+Display Cost
+Coût d'affichage
+
+Behind player
+Derrière joueur
+
+Login
+Login
+
+Not Rated Maps
+Maps non notées
+
+Rated Maps
+Maps notées
+
+#error#You cannot use this filter because the LocalRecords plugin is not loaded!
+#error#Vous ne pouvez pas utiliser ce filtre car le plugin LocalRecords n'est pas chargé !
+
+#error#You cannot use this filter because the MapRatings plugin is not loaded!
+#error#Vous ne pouvez pas utiliser ce filtre car le plugin MapRatings n'est pas chargé !
+
+#error#You must enter a login to filter behind!
+#error#Vous devez entrer un login pour filtrer derrière !
+
+#error#You cannot filter behind yourself!
+#error#Vous ne pouvez pas filtrer derrière vous-même !
+
+#error#The login you entered does not exist in the database!
+#error#Le login que vous avez entré n'existe pas dans la base de données !
+
+#error#The login you entered has no records in the database!
+#error#Le login que vous avez entré n'a pas de records dans la base de données !
+
+#admin_error# $iYou have reached the maximum number of maps you can queue...
+#admin_error# $iVous avez atteint le nombre maximum de maps que vous pouvez mettre en file d'attente...

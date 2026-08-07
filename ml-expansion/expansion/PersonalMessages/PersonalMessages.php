@@ -2,7 +2,6 @@
 
 namespace ManiaLivePlugins\eXpansion\PersonalMessages;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Config;
@@ -34,8 +33,6 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $widget;
     private $script;
     private $trayScript;
-    private $actionPlayers;
-    private $actionSend;
 
     public function eXpOnLoad()
     {
@@ -45,11 +42,6 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->msg_self = eXpGetMessage("#personalmessage#You can't send a message to yourself.");
         $this->msg_help = eXpGetMessage("#personalmessage#Usage /pm [login] your personal message here");
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $this->actionPlayers = $aH->createAction(array($this, 'players'));
-        $this->actionSend = $aH->createAction(array($this, 'send'));
-
         $this->trayScript = new Script("Gui\Scripts\TrayWidget");
         $this->trayScript->setParam('isMinimized', "True");
         $this->trayScript->setParam('autoCloseTimeout', 0); //TODO: add config
@@ -58,17 +50,15 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->trayScript->setParam('posXMax', -4);
 
         $this->script = new Script("PersonalMessages\Gui\Script");
-        $this->script->setParam("sendAction", $this->actionSend);
+        $this->script->setParam("sendAction", 'exp:eXpansion.PersonalMessages:send');
 
         $this->widget = new Widget("PersonalMessages\Gui\Widgets\MessagesPanel.xml");
         $this->widget->setName("Personal Chat Widget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(100, 6);
         $this->widget->setDisableAxis("x");
-        $this->widget->setParam("actionPlayers", $this->actionPlayers);
         $this->widget->registerScript($this->trayScript);
         $this->widget->registerScript($this->script);
-        $this->widget->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -77,8 +67,13 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+
+        $this->registerManialinkCallback('players');
+        $this->registerManialinkCallback('send', true);
+
         $this->registerChatCommand("pm", "chatSendPersonalMessage", -1, true);
         $this->registerChatCommand("r", "sendReply", -1, true);
+        
         $admingroup = AdminGroups::getInstance();
 
         $cmd = AdminGroups::addAdminCommand("channel", $this, "adminChat", "admin_chatChannel");
@@ -257,17 +252,12 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnUnload()
     {
-        $this->widget->erase();
-
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->actionPlayers);
-        $aH->deleteAction($this->actionSend);
-        $this->actionPlayers = null;
-        $this->actionSend = null;
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
         $this->script = null;
         $this->trayScript = null;
-        $this->widget = null;
 
         AdminGroups::removeAdminCommand($this->cmd_chat);
         AdminGroups::removeShortAllias('a');

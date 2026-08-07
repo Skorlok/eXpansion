@@ -1,25 +1,20 @@
 <?php
 $adminAction   = $this->getParam("adminAction");
 $adminTarget   = $this->getParam("adminTarget");
-$dropdownItems = $this->getParam("dropdownItems");
-$okAction      = $this->getParam("okAction");
 $showDrop      = ($adminAction !== "kick");
 ?>
 <frame posn="2 1 1">
 	<frame posn="0 0 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("parameter", 100, true, $this->addLang("Give a reason"), "Bad Behavior", null, null, true) ?>
+		<exp:inputbox name="parameter" sizeX="100" label="@Give a reason" text="Bad Behavior" isTextId="true"/>
 	</frame>
 	<frame posn="0 -6 1"<?php echo ($showDrop ? '' : ' hidden="1"') ?>>
-		<?php
-		$dropResult = \ManiaLivePlugins\eXpansion\Gui\Elements\Dropdown::getXML($this, "select", $dropdownItems);
-		echo is_array($dropResult) ? $dropResult[0] : $dropResult;
-		?>
+		<exp:dropdown name="select" itemsVarName="dropdownItems"/>
 	</frame>
 </frame>
 <entry posn="10000 10000 0" sizen="50 5" style="" scriptevents="0" textformat="default" textsize="1" textcolor="fff" name="adminAction" default="<?php echo $this->handleSpecialChars($adminAction) ?>"/>
 <entry posn="10000 10000 0" sizen="50 5" style="" scriptevents="0" textformat="default" textsize="1" textcolor="fff" name="adminTarget" default="<?php echo $this->handleSpecialChars($adminTarget) ?>"/>
 <frame posn="62 -7 1">
 	<frame posn="25.5 0 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(32, 6, $this->addLang($adminAction), null, null, null, null, null, $okAction, null, null, null, null, null, null, true) ?>
+		<exp:button sizeX="32" sizeY="6" text="{@{adminAction}}" action="exp:eXpansion.ChatAdmin:parameterDialogOk" isTextId="true"/>
 	</frame>
 </frame>

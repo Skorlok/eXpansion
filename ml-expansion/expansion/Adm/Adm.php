@@ -4,17 +4,13 @@ namespace ManiaLivePlugins\eXpansion\Adm;
 
 use Exception;
 use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ForceScores;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\GameOptions;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\MatchSettings;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\RoundPoints;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ScriptSettings;
-use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ServerOptions;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions as DedicatedServerOptions;
@@ -22,18 +18,30 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions as DedicatedServerOptio
 class Adm extends ExpPlugin
 {
     /** @var Message Messages needed */
-    private $msgScriptSettings;
-    /** @var Message Messages needed */
     private $msgDatabasePlugin;
     /** @var Message Messages needed */
     private $msgForceScoreError;
 
-    protected $actions = array("ServerControlMain" => array(), "ServerManagement" => array(), "GameOptions" => array(), "ServerOptions" => array());
+    protected $actions = array("ServerControlMain" => array(), "ServerManagement" => array(), "GameOptions" => array(), "ServerOptions" => array(), "ForceScores" => array(), "ScriptSettings" => array(), "MatchSettings" => array(), "RoundPoints" => array());
 
+    protected $matchSettingsFileActions = array();
+
+    /** @var Window */
     protected $serverControlMainWindow;
+    /** @var Window */
     protected $serverManagementWindow;
+    /** @var Window */
     protected $gameOptionsWindow;
+    /** @var Window */
     protected $serverOptionsWindow;
+    /** @var Window */
+    protected $forceScoresWindow;
+    /** @var Window */
+    protected $scriptSettingsWindow;
+    /** @var Window */
+    protected $matchSettingsWindow;
+    /** @var Window */
+    protected $roundPointsWindow;
 
     /**
      * @inheritdoc
@@ -41,7 +49,6 @@ class Adm extends ExpPlugin
     public function eXpOnLoad()
     {
         $this->msgForceScoreError = eXpGetMessage("ForceScores can be used only with rounds or team mode");
-        $this->msgScriptSettings = eXpGetMessage("ScriptSettings available only in script mode");
         $this->msgDatabasePlugin = eXpGetMessage("Database plugin not loaded!");
 
         $this->setPublicMethod('serverControlMain');
@@ -57,30 +64,46 @@ class Adm extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        
+        $this->registerManialinkCallback('forceScoresClear');
+        $this->registerManialinkCallback('forceScoresSkip');
+        $this->registerManialinkCallback('forceScoresRestart');
+        $this->registerManialinkCallback('forceScoresApply', true);
+        $this->registerManialinkCallback('gameOptionsOk', true);
+        $this->registerManialinkCallback('matchSettingsSaveAs', true);
+        $this->registerManialinkCallback('matchSettingsLoadAs', true);
+        $this->registerManialinkCallback('roundPointsSetCustom', true);
+        $this->registerManialinkCallback('scriptSettingsApply', true);
+        $this->registerManialinkCallback('serverManagement');
+        $this->registerManialinkCallback('serverOptions');
+        $this->registerManialinkCallback('gameOptions');
+        $this->registerManialinkCallback('adminGroups');
+        $this->registerManialinkCallback('matchSettings');
+        $this->registerManialinkCallback('scriptSettings');
+        $this->registerManialinkCallback('forceScores');
+        $this->registerManialinkCallback('roundPoints');
+        $this->registerManialinkCallback('dbTools');
+        $this->registerManialinkCallback('showExpSettings');
+        $this->registerManialinkCallback('showPluginManagement');
+        $this->registerManialinkCallback('showVotesConfig');
+        $this->registerManialinkCallback('serverOptionsOk', true);
+        $this->registerManialinkCallback('stopManialive');
+        $this->registerManialinkCallback('stopServer');
 
         /** @var ActionHandler $ah */
         $ah = ActionHandler::getInstance();
-        $this->actions["ServerControlMain"]["serverOptions"]    = $ah->createAction(array($this, 'serverOptions'));
-        $this->actions["ServerControlMain"]["gameOptions"]      = $ah->createAction(array($this, 'gameOptions'));
-        $this->actions["ServerControlMain"]["matchSettings"]    = $ah->createAction(array($this, 'matchSettings'));
-        $this->actions["ServerControlMain"]["serverManagement"] = $ah->createAction(array($this, 'serverManagement'));
-        $this->actions["ServerControlMain"]["adminGroups"]      = $ah->createAction(array($this, 'adminGroups'));
-        $this->actions["ServerControlMain"]["scriptSettings"]   = $ah->createAction(array($this, 'scriptSettings'));
-        $this->actions["ServerControlMain"]["forceScores"]      = $ah->createAction(array($this, 'forceScores'));
-        $this->actions["ServerControlMain"]["roundPoints"]      = $ah->createAction(array($this, 'roundPoints'));
-        $this->actions["ServerControlMain"]["dbTools"]          = $ah->createAction(array($this, 'dbTools'));
-        $this->actions["ServerControlMain"]["expSettings"]      = $ah->createAction(array($this, 'showExpSettings'));
-        $this->actions["ServerControlMain"]["votesConfig"]      = $ah->createAction(array($this, 'showVotesConfig'));
-        $this->actions["ServerControlMain"]["pluginManagement"] = $ah->createAction(array($this, 'showPluginManagement'));
 
-        $this->actions["ServerManagement"]["stopServerf"]    = $ah->createAction(array($this, 'stopServer'));
-        $this->actions["ServerManagement"]["stopServer"]     = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($this->actions["ServerManagement"]["stopServerf"]);
-        $this->actions["ServerManagement"]["stopManialivef"] = $ah->createAction(array($this, 'stopManialive'));
-        $this->actions["ServerManagement"]["stopManialive"]  = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($this->actions["ServerManagement"]["stopManialivef"]);
-
-        $this->actions["GameOptions"]["ok"] = $ah->createAction(array($this, 'gameOptionsOk'));
-
-        $this->actions["ServerOptions"]["ok"] = $ah->createAction(array($this, 'serverOptionsOk'));
+        $rpoints = $this->roundPointsGetPresets();
+        $presetsForTemplate = array();
+        foreach ($rpoints as $i => $preset) {
+            $actionKey = "preset_" . $i;
+            $this->actions["RoundPoints"][$actionKey] = $ah->createAction(array($this, 'roundPointsSetPreset'), $preset['points']);
+            $presetsForTemplate[] = array(
+                'name'   => $preset['name'],
+                'points' => implode(",", $preset['points']),
+                'action' => $this->actions["RoundPoints"][$actionKey],
+            );
+        }
 
 
 
@@ -88,48 +111,49 @@ class Adm extends ExpPlugin
         $this->gameOptionsWindow->setName("GameOptions");
         $this->gameOptionsWindow->setSize(160, 85);
         $this->gameOptionsWindow->setTitle('Game Options');
-        $this->gameOptionsWindow->setParam("actions", $this->actions["GameOptions"]);
-        $this->gameOptionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getScriptML());
-        $this->gameOptionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Ratiobutton::getScriptML());
 
         $this->serverControlMainWindow = new Window("Adm\Gui\Windows\ServerControlMain.xml");
         $this->serverControlMainWindow->setName("ServerControlMain");
         $this->serverControlMainWindow->setSize(140, 25);
         $this->serverControlMainWindow->setTitle('Control Panel');
-        $this->serverControlMainWindow->setParam("actions", $this->actions["ServerControlMain"]);
         $this->serverControlMainWindow->setParam("isRelay", Storage::getInstance()->isRelay);
 
         $this->serverManagementWindow = new Window("Adm\Gui\Windows\ServerManagement.xml");
         $this->serverManagementWindow->setName("ServerManagement");
         $this->serverManagementWindow->setSize(90, 30);
         $this->serverManagementWindow->setTitle("Server Control");
-        $this->serverManagementWindow->setParam("actions", $this->actions["ServerManagement"]);
+        $this->serverManagementWindow->setParam("stopManialiveAction", \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm("exp:eXpansion.Adm:stopManialive"));
+        $this->serverManagementWindow->setParam("stopServerAction", \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm("exp:eXpansion.Adm:stopServer"));
 
         $this->serverOptionsWindow = new Window("Adm\Gui\Windows\ServerOptions.xml");
         $this->serverOptionsWindow->setName("ServerOptions");
         $this->serverOptionsWindow->setSize(160, 100);
         $this->serverOptionsWindow->setTitle('Server Options');
-        $this->serverOptionsWindow->setParam("actions", $this->actions["ServerOptions"]);
-        $this->serverOptionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Button::getScriptML());
-        $this->serverOptionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted::getScriptML());
 
-        // bypass the problem where the scripts are registered twice because the template is reloaded on every show
-        $scriptServerPass = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/InputboxMasked");
-        $scriptServerPass->setParam("btName", "serverPass");
-        $this->serverOptionsWindow->registerScript($scriptServerPass);
+        $this->forceScoresWindow = new Window("Adm\Gui\Windows\ForceScores.xml");
+        $this->forceScoresWindow->setName("ForceScores");
+        $this->forceScoresWindow->setSize(160, 80);
+        $this->forceScoresWindow->setTitle("Force Scores");
+        $this->forceScoresWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 72));
 
-        $scriptServerSpecPass = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/InputboxMasked");
-        $scriptServerSpecPass->setParam("btName", "serverSpecPass");
-        $this->serverOptionsWindow->registerScript($scriptServerSpecPass);
+        $this->scriptSettingsWindow = new Window("Adm\Gui\Windows\ScriptSettings.xml");
+        $this->scriptSettingsWindow->setName("ScriptSettings");
+        $this->scriptSettingsWindow->setSize(160, 100);
+        $this->scriptSettingsWindow->setTitle("Script Settings");
+        $this->scriptSettingsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 92));
 
-        $scriptRefereePass = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui/Scripts/InputboxMasked");
-        $scriptRefereePass->setParam("btName", "refereePass");
-        $this->serverOptionsWindow->registerScript($scriptRefereePass);
-        // ----------------------------------------------------------------------------------------------------------
+        $this->matchSettingsWindow = new Window("Adm\Gui\Windows\MatchSettings.xml");
+        $this->matchSettingsWindow->setName("MatchSettings");
+        $this->matchSettingsWindow->setSize(160, 100);
+        $this->matchSettingsWindow->setTitle("Match Settings");
+        $this->matchSettingsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 84));
 
-        RoundPoints::$plugin = $this;
-        ForceScores::$mainPlugin = $this;
-        ScriptSettings::$mainPlugin = $this;
+        $this->roundPointsWindow = new Window("Adm\Gui\Windows\RoundPoints.xml");
+        $this->roundPointsWindow->setName("RoundPoints");
+        $this->roundPointsWindow->setSize(160, 90);
+        $this->roundPointsWindow->setTitle("Custom Round Points");
+        $this->roundPointsWindow->setParam("presets", $presetsForTemplate);
+        $this->roundPointsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 82));
 
 
         $cmd = AdminGroups::addAdminCommand('server control', $this, 'serverControlMain', Permission::SERVER_CONTROL_PANEL);
@@ -241,15 +265,64 @@ class Adm extends ExpPlugin
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
             $gamemode = $this->storage->gameInfos->gameMode;
             if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || GameInfos::GAMEMODE_CUP) {
-                $window = ForceScores::Create($login);
-                $window->setTitle(__('Force Scores', $login));
-                $window->centerOnScreen();
-                $window->setSize(160, 80);
-                $window->show();
+                $this->forceScoresWindow->setParam("players", Core::$rankings);
+                $this->forceScoresWindow->show($login);
             } else {
                 $this->eXpChatSendServerMessage($this->msgForceScoreError, $login);
             }
         }
+    }
+
+    public function forceScoresApply($fromLogin, $scores = array())
+    {
+        foreach ($scores as $login => $val) {
+            if ($val != null) {
+                if (!Core::$useTeams) {
+                    $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$login", "", "", "$val"));
+                    $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$login", "", "", "$val"));
+                } else {
+                    $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$login", "", "$val", "$val"));
+                    $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$login", "", "$val", "$val"));
+                }
+            }
+        }
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
+        $this->forceScoresOk();
+        $this->forceScoresWindow->erase($fromLogin);
+    }
+
+    public function forceScoresClear($fromLogin)
+    {
+        foreach (Core::$rankings as $rank) {
+            if (!Core::$useTeams) {
+                $this->connection->triggerModeScriptEventArray('Trackmania.SetPlayerPoints', array("$rank->login", "0", "0", "0"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetPlayerPoints', array("$rank->login", "0", "0", "0"));
+            } else {
+                $this->connection->triggerModeScriptEventArray('Trackmania.SetTeamPoints', array("$rank->login", "0", "0", "0"));
+                $this->connection->triggerModeScriptEventArray('Shootmania.SetTeamPoints', array("$rank->login", "0", "0", "0"));
+            }
+        }
+        $this->connection->triggerModeScriptEventArray('Trackmania.GetScores', array());
+        $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
+        $this->forceScoresOk();
+
+        $this->forceScoresWindow->setParam("players", Core::$rankings);
+        $this->forceScoresWindow->show($fromLogin);
+    }
+
+    public function forceScoresSkip($login)
+    {
+        $ag = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
+        $ag->adminCmd($login, "rskip");
+        $this->forceScoresWindow->erase($login);
+    }
+
+    public function forceScoresRestart($login)
+    {
+        $ag = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
+        $ag->adminCmd($login, "rres");
+        $this->forceScoresWindow->erase($login);
     }
 
     /**
@@ -346,8 +419,8 @@ class Adm extends ExpPlugin
         $canManialive  = AdminGroups::hasPermission($login, Permission::SERVER_STOP_MANIALIVE);
 
         if ($canDedicated || $canManialive) {
-            $this->serverManagementWindow->setParam("canStopDedicated", $canDedicated);
-            $this->serverManagementWindow->setParam("canStopManialive", $canManialive);
+            $this->serverManagementWindow->setParam("hideStopDedicated", !$canDedicated);
+            $this->serverManagementWindow->setParam("hideStopManialive", !$canManialive);
             $this->serverManagementWindow->show($login);
         }
     }
@@ -377,12 +450,46 @@ class Adm extends ExpPlugin
     public function roundPoints($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            $window = RoundPoints::Create($login);
-            $window->setTitle(__('Custom Round Points', $login));
-            $window->setSize(160, 90);
-            $window->centerOnScreen();
-            $window->show();
+            $this->roundPointsWindow->setParam("customPoints", implode(",", $this->connection->getRoundCustomPoints()));
+            $this->roundPointsWindow->show($login);
         }
+    }
+
+    public function roundPointsSetCustom($fromLogin, $entries = array())
+    {
+        if (!empty($entries['customPoints'])) {
+            $parts = explode(",", $entries['customPoints']);
+            rsort($parts, SORT_NUMERIC);
+            $intPoints = array();
+            foreach ($parts as $p) {
+                $intPoints[] = intval($p);
+            }
+            $this->setPoints($fromLogin, $intPoints);
+        }
+        $this->roundPointsWindow->erase($fromLogin);
+    }
+
+    public function roundPointsSetPreset($fromLogin, $points)
+    {
+        $this->setPoints($fromLogin, $points);
+        $this->roundPointsWindow->erase($fromLogin);
+    }
+
+    private function roundPointsGetPresets()
+    {
+        return array(
+            array('name' => 'Formula 1 GP New',       'points' => array(25, 18, 15, 12, 10, 8, 6, 4, 2, 1)),
+            array('name' => 'Formula 1 GP Old',       'points' => array(10, 8, 6, 5, 4, 3, 2, 1)),
+            array('name' => 'MotoGP',                 'points' => array(25, 20, 16, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)),
+            array('name' => 'MotoGP + 5',             'points' => array(30, 25, 21, 18, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)),
+            array('name' => 'Formula ET Season 1',    'points' => array(12, 10, 9, 8, 7, 6, 5, 4, 4, 3, 3, 3, 2, 2, 2, 1)),
+            array('name' => 'Formula ET Season 2',    'points' => array(15, 12, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 1)),
+            array('name' => 'Formula ET Season 3',    'points' => array(15, 12, 11, 10, 9, 8, 7, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 2, 2, 1)),
+            array('name' => 'Champ Car World Series', 'points' => array(31, 27, 25, 23, 21, 19, 17, 15, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)),
+            array('name' => 'Superstars',             'points' => array(20, 15, 12, 10, 8, 6, 4, 3, 2, 1)),
+            array('name' => 'Simple 5',               'points' => array(5, 4, 3, 2, 1)),
+            array('name' => 'Simple 10',              'points' => array(10, 9, 8, 7, 6, 5, 4, 3, 2, 1)),
+        );
     }
 
     /**
@@ -428,16 +535,146 @@ class Adm extends ExpPlugin
     /**
      * Show window to set up the match settings used
      *
-     *  string $login The login of the player
+     * @param string $login The login of the player
      */
     public function matchSettings($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_MATCH_SAVE) || AdminGroups::hasPermission($login, 'game_matchDelete') || AdminGroups::hasPermission($login, 'game_match')) {
-            $window = MatchSettings::Create($login);
-            $window->setTitle(__('Match Settings', $login));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-            $window->show();
+            $this->matchSettingsShowFor($login);
+        }
+    }
+
+    private function matchSettingsShowFor($login)
+    {
+        /** @var ActionHandler $ah */
+        $ah = ActionHandler::getInstance();
+        foreach ($this->matchSettingsFileActions as $acts) {
+            $ah->deleteAction($acts['load']);
+            $ah->deleteAction($acts['save']);
+            $ah->deleteAction($acts['deletef']);
+            $ah->deleteAction($acts['delete']);
+        }
+        $this->matchSettingsFileActions = array();
+
+        $isRemote = Storage::getInstance()->isRemoteControlled;
+        $files    = array();
+
+        if (!$isRemote) {
+            $path     = Helper::getPaths()->getMatchSettingPath() . "*.txt";
+            $settings = glob($path);
+            if ($settings) {
+                foreach ($settings as $filename) {
+                    $loadAct    = $ah->createAction(array($this, 'matchSettingsLoad'), $filename);
+                    $saveAct    = $ah->createAction(array($this, 'matchSettingsSave'), $filename);
+                    $deleteActf = $ah->createAction(array($this, 'matchSettingsDelete'), $filename);
+                    $deleteAct  = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm($deleteActf);
+
+                    $this->matchSettingsFileActions[$filename] = array(
+                        'load'    => $loadAct,
+                        'save'    => $saveAct,
+                        'deletef' => $deleteActf,
+                        'delete'  => $deleteAct,
+                    );
+
+                    $parts    = explode(DIRECTORY_SEPARATOR, $filename);
+                    $basename = end($parts);
+                    $files[]  = array(
+                        'filename' => $filename,
+                        'basename' => $basename,
+                        'load'     => $loadAct,
+                        'save'     => $saveAct,
+                        'delete'   => $deleteAct,
+                    );
+                }
+            }
+        }
+
+        $perms = array(
+            'canSaveAs' => AdminGroups::hasPermission($login, Permission::GAME_MATCH_SAVE),
+            'canLoad'   => AdminGroups::hasPermission($login, Permission::GAME_MATCH_SETTINGS),
+            'canSave'   => AdminGroups::hasPermission($login, Permission::GAME_MATCH_SAVE),
+            'canDelete' => AdminGroups::hasPermission($login, Permission::GAME_MATCH_DELETE),
+        );
+
+        $this->matchSettingsWindow->setParam("files",     $files);
+        $this->matchSettingsWindow->setParam("isRemote",  $isRemote);
+        $this->matchSettingsWindow->setParam("perms",     $perms);
+        $this->matchSettingsWindow->show($login);
+    }
+
+    public function matchSettingsSaveAs($login, $entries = array())
+    {
+        try {
+            if (empty($entries['SaveAs'])) {
+                $this->connection->chatSendServerMessage(__("Error in filename", $login), $login);
+                return;
+            }
+            $appendTxt = ".txt";
+            if (substr($entries['SaveAs'], -4, 4) == ".txt") {
+                $appendTxt = "";
+            }
+            $filename = Helper::getPaths()->getMatchSettingPath() . $entries['SaveAs'] . $appendTxt;
+            $this->connection->saveMatchSettings($filename);
+            $file = explode("/", $filename);
+            $this->connection->chatSendServerMessage(__("Saved MatchSettings to file: %s", $login, end($file)), $login);
+            $this->matchSettingsShowFor($login);
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage(__('$f00$oError $z$s$fff%s', $login, $e->getMessage()), $login);
+        }
+    }
+
+    public function matchSettingsLoadAs($login, $entries = array())
+    {
+        try {
+            if (empty($entries['LoadAs'])) {
+                $this->connection->chatSendServerMessage(__("Error in filename", $login), $login);
+                return;
+            }
+            $appendTxt = ".txt";
+            if (substr($entries['LoadAs'], -4, 4) == ".txt") {
+                $appendTxt = "";
+            }
+            $filename = Helper::getPaths()->getMatchSettingPath() . $entries['LoadAs'] . $appendTxt;
+            $this->connection->loadMatchSettings($filename);
+            $file = explode("/", $filename);
+            $this->connection->chatSendServerMessage(__("Loaded MatchSettings from file: %s", $login, end($file)), $login);
+            $this->matchSettingsShowFor($login);
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage(__('$f00$oError $z$s$fff%s', $login, $e->getMessage()), $login);
+        }
+    }
+
+    public function matchSettingsSave($login, $filename)
+    {
+        try {
+            $this->connection->saveMatchSettings($filename);
+            $file = explode("/", $filename);
+            $this->connection->chatSendServerMessage(__("Saved MatchSettings to file: %s", $login, end($file)), $login);
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage(__('$f00$oError $z$s$fff%s', $login, $e->getMessage()), $login);
+        }
+    }
+
+    public function matchSettingsLoad($login, $filename)
+    {
+        try {
+            $this->connection->loadMatchSettings($filename);
+            $file = explode("/", $filename);
+            $this->connection->chatSendServerMessage(__("Loaded MatchSettings from file: %s", $login, end($file)), $login);
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage(__('$f00$oError $z$s$fff%s', $login, $e->getMessage()), $login);
+        }
+    }
+
+    public function matchSettingsDelete($login, $filename)
+    {
+        try {
+            unlink($filename);
+            $file = explode("/", $filename);
+            $this->connection->chatSendServerMessage(__("File '%s' deleted from filesystem!", $login, end($file)), $login);
+            $this->matchSettingsShowFor($login);
+        } catch (\Exception $e) {
+            $this->connection->chatSendServerMessage(__('$f00$oError $z$s$fff%s', $login, $e->getMessage()), $login);
         }
     }
 
@@ -449,12 +686,47 @@ class Adm extends ExpPlugin
     public function scriptSettings($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            $window = ScriptSettings::Create($login);
-            $window->setTitle(__('Script Settings', $login));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-            $window->show();
+            $this->scriptSettingsWindow->setParam("settings", $this->connection->getModeScriptSettings());
+            $this->scriptSettingsWindow->show($login);
         }
+    }
+
+    public function scriptSettingsApply($fromLogin, $submitted = array())
+    {
+        $currentSettings = $this->connection->getModeScriptSettings();
+        $newSettings     = array();
+        $diffParams      = array();
+
+        foreach ($currentSettings as $name => $oldValue) {
+            $type = gettype($oldValue);
+            if ($type === 'boolean') {
+                $newValue = isset($submitted[$name]) && $submitted[$name] == '1';
+                if ((bool)$oldValue !== $newValue) {
+                    $diffParams[$name] = array(
+                        ($oldValue ? "True" : "False"),
+                        ($newValue ? "True" : "False")
+                    );
+                }
+                $newSettings[$name] = $newValue;
+            } else {
+                $newValue = isset($submitted[$name]) ? $submitted[$name] : $oldValue;
+                settype($newValue, $type);
+                if ($oldValue != $newValue) {
+                    $diffParams[$name] = array(
+                        ($oldValue ? $oldValue : '$iEmpty$i'),
+                        ($newValue ? $newValue : '$iEmpty$i')
+                    );
+                }
+                $newSettings[$name] = $newValue;
+            }
+        }
+
+        if (!empty($newSettings)) {
+            $this->connection->setModeScriptSettings($newSettings);
+            $this->afterScriptSettings($fromLogin, $diffParams);
+        }
+
+        $this->scriptSettingsWindow->erase($fromLogin);
     }
 
     public function afterScriptSettings($login, $diffPameters = array())
@@ -552,10 +824,6 @@ class Adm extends ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
-        ForceScores::EraseAll();
-        MatchSettings::EraseAll();
-        RoundPoints::EraseAll();
-        ScriptSettings::EraseAll();
 
         if ($this->serverControlMainWindow instanceof Window) {
             $this->serverControlMainWindow->erase();
@@ -577,8 +845,36 @@ class Adm extends ExpPlugin
         }
         $this->serverOptionsWindow = null;
 
+        if ($this->forceScoresWindow instanceof Window) {
+            $this->forceScoresWindow->erase();
+        }
+        $this->forceScoresWindow = null;
+
+        if ($this->scriptSettingsWindow instanceof Window) {
+            $this->scriptSettingsWindow->erase();
+        }
+        $this->scriptSettingsWindow = null;
+
+        if ($this->matchSettingsWindow instanceof Window) {
+            $this->matchSettingsWindow->erase();
+        }
+        $this->matchSettingsWindow = null;
+
+        if ($this->roundPointsWindow instanceof Window) {
+            $this->roundPointsWindow->erase();
+        }
+        $this->roundPointsWindow = null;
+
         /** @var ActionHandler $aH */
         $aH = ActionHandler::getInstance();
+        foreach ($this->matchSettingsFileActions as $acts) {
+            $aH->deleteAction($acts['load']);
+            $aH->deleteAction($acts['save']);
+            $aH->deleteAction($acts['deletef']);
+            $aH->deleteAction($acts['delete']);
+        }
+        $this->matchSettingsFileActions = array();
+
         foreach ($this->actions as $actions) {
             foreach ($actions as $action) {
                 $aH->deleteAction($action);

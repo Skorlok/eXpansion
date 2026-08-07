@@ -20,7 +20,6 @@
 namespace ManiaLivePlugins\eXpansion\Communication;
 
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
@@ -41,8 +40,6 @@ class Communication extends ExpPlugin
     private $widget;
     private $script;
     private $trayScript;
-    private $actionPlayers;
-    private $actionSend;
 
     /** @var \ManiaLivePlugins\eXpansion\Core\I18n\Message */
     private $msg_noLogin;
@@ -56,6 +53,9 @@ class Communication extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        
+        $this->registerManialinkCallback('selectPlayer');
+        $this->registerManialinkCallback('guiSendMessage', true);
 
         $this->config = Config::getInstance();
 
@@ -63,11 +63,6 @@ class Communication extends ExpPlugin
         $this->msg_noMessage = eXpGetMessage("#personalmessage#No message to send to!");
         $this->msg_self = eXpGetMessage("#personalmessage#You can't send a message to yourself.");
         $this->msg_help = eXpGetMessage("#personalmessage#Usage /send [login] your personal message here");
-
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $this->actionPlayers = $aH->createAction(array($this, 'selectPlayer'));
-        $this->actionSend = $aH->createAction(array($this, 'guiSendMessage'));
 
         $this->trayScript = new Script("Gui\Scripts\TrayWidget");
         $this->trayScript->setParam('isMinimized', "True");
@@ -77,20 +72,18 @@ class Communication extends ExpPlugin
         $this->trayScript->setParam('posXMax', -4);
 
         $this->script = new Script("Communication\Gui\Script");
-        $this->script->setParam("sendAction", $this->actionSend);
 
         $this->widget = new Widget("Communication\Gui\Widgets\CommunicationWidget.xml");
         $this->widget->setName("Messaging Widget");
         $this->widget->setLayer("normal");
         $this->widget->setSize(120, 39);
         $this->widget->setDisableAxis("x");
-        $this->widget->setParam("actionPlayers", $this->actionPlayers);
-        $this->widget->setParam("actionSend", $this->actionSend);
         $this->widget->registerScript($this->trayScript);
         $this->widget->registerScript($this->script);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
+        $this->script->setParam("sendAction", 'exp:eXpansion.Communication:guiSendMessage');
 
         $this->sendWidget();
 
@@ -270,14 +263,10 @@ class Communication extends ExpPlugin
     public function eXpOnUnload()
     {
         $this->connection->sendDisplayManialinkPage(null, '<manialink id="messager_update"></manialink>', 0, false, true);
-        $this->widget->erase();
-
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        $aH->deleteAction($this->actionPlayers);
-        $aH->deleteAction($this->actionSend);
-        $this->actionPlayers = null;
-        $this->actionSend = null;
+        
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
         $this->script = null;
         $this->trayScript = null;
         $this->widget = null;

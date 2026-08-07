@@ -1,17 +1,17 @@
 <frame>
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetBackGround::getXML(90, 27); ?>
+    <exp:widgetbg sizeX="90" sizeY="27"/>
 </frame>
 <frame posn="0 0 1">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\WidgetTitle::getXML(90, 4, $this->addLang("Current vote")); ?>
+    <exp:widgettitle sizeX="90" sizeY="4" text="@Current vote"/>
 </frame>
 
-<label id="textLabel" posn="45 -5.75 1" sizen="80 4" halign="center" valign="top" style="TextCardSmallScores2" textsize="2" textemboss="1" text="<?php echo $this->getParam('voteText') ?>"/>
+<label id="textLabel" posn="45 -5.75 1" sizen="80 4" halign="center" valign="top" style="TextCardSmallScores2" textsize="2" textemboss="1" text="{voteText}"/>
 
 <frame posn="1 -14.5 1">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F1", null, null, "0D0", null, null, $this->getParam('actionYes'), null, null, null, "button_yes", null, null); ?>
+    <exp:button sizeX="14" sizeY="7" text="F1" colorize="0D0" action="exp:eXpansion.Votes:handlePlayerVote:yes" id="button_yes"/>
 </frame>
 <frame posn="77 -14.5 1">
-    <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(14, 7, "F2", null, null, "F00", null, null, $this->getParam('actionNo'), null, null, null, "button_no", null, null); ?>
+    <exp:button sizeX="14" sizeY="7" text="F2" colorize="F00" action="exp:eXpansion.Votes:handlePlayerVote:no" id="button_no"/>
 </frame>
 
 
@@ -28,4 +28,4 @@
 </frame>
 <quad id="confirmVoteYes" posn="4.5 -9.5" sizen="5 5" halign="left" valign="center2" style="Icons64x64_1" substyle="ShowDown2" hidden="1"/>
 <quad id="confirmVoteNo" posn="80.6 -9.5" sizen="5 5" halign="left" valign="center2" style="Icons64x64_1" substyle="ShowDown2" hidden="1"/>
-<quad id="bgRatio" posn="<?php echo $this->getParam('ratioPos') ?> -14.5 10" sizen="0.5 8" halign="left" valign="center2" style="Bgs1InRace" substyle="BgCard" colorize="000F"/>
+<quad id="bgRatio" posn="{ratioPos} -14.5 10" sizen="0.5 8" halign="left" valign="center2" style="Bgs1InRace" substyle="BgCard" colorize="000F"/>

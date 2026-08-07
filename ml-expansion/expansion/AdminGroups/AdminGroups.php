@@ -118,6 +118,14 @@ class AdminGroups extends ExpPlugin
 
     /** @var Window */
     protected $cmdMoreWindow;
+
+    /** @var Window */
+    private $inheritsWindow;
+    private $inheritsGroupPerLogin = array();
+
+    /** @var Window */
+    private $permissionsWindow;
+    private $permissionsGroupPerLogin = array();
     public static $txt_msg_cmdDontEx;
     public static $txt_groupsTitle;
     public static $txt_helpTitle;
@@ -219,10 +227,30 @@ class AdminGroups extends ExpPlugin
 
     public function eXpOnReady()
     {
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+
+        $this->registerManialinkCallback('inheritsOk', true);
+        $this->registerManialinkCallback('permissionsOk', true);
+        
         $this->cmdMoreWindow = new Window("AdminGroups\Gui\Windows\CmdMore.xml");
         $this->cmdMoreWindow->setName("CmdMore");
         $this->cmdMoreWindow->setSize(120, 100);
         $this->cmdMoreWindow->setTitle('Admin Commands Extended Help');
+
+        $this->inheritsWindow = new Window("AdminGroups\Gui\Windows\Inherits.xml");
+        $this->inheritsWindow->setName("Inherits");
+        $this->inheritsWindow->setSize(74, 100);
+        $this->inheritsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(4, 88));
+        $this->inheritsWindow->setParam("sizeX", 74);
+        $this->inheritsWindow->setParam("sizeY", 100);
+
+        $this->permissionsWindow = new Window("AdminGroups\Gui\Windows\Permissions.xml");
+        $this->permissionsWindow->setName("Permissions");
+        $this->permissionsWindow->setSize(130, 100);
+        $this->permissionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(4, 88));
+        $this->permissionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox::getScriptML());
+        $this->permissionsWindow->setParam("sizeX", 130);
+        $this->permissionsWindow->setParam("sizeY", 100);
     }
 
     /**
@@ -1331,6 +1359,150 @@ class AdminGroups extends ExpPlugin
     }
 
     /**
+     * Show the Inherits MLWindow for a given group.
+     *
+     * @param string $login
+     * @param Group  $group
+     */
+    public function showInheritsWindow($login, Group $group)
+    {
+        $inherits = $group->getInherits();
+        $groups   = array();
+        foreach (self::$groupList as $g) {
+            $nh = $g->getInherits();
+            if ($group !== $g && !isset($nh[$group->getGroupName()])) {
+                $groups[] = array(
+                    'name'    => $g->getGroupName(),
+                    'checked' => isset($inherits[$g->getGroupName()]),
+                );
+            }
+        }
+        $this->inheritsGroupPerLogin[$login] = $group;
+        $this->inheritsWindow->setTitle(__(self::$txt_permissionsTitle, $login, $group->getGroupName()));
+        $this->inheritsWindow->setParam("groups", $groups);
+        $this->inheritsWindow->show($login);
+    }
+
+    /**
+     * Callback when OK is clicked in the Inherits window.
+     *
+     * @param string $login
+     * @param array  $params
+     */
+    public function inheritsOk($login, $params = array())
+    {
+        if (!isset($this->inheritsGroupPerLogin[$login])) {
+            return;
+        }
+        $group           = $this->inheritsGroupPerLogin[$login];
+        $newInheritances = array();
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') !== 0 || $value != '1') {
+                continue;
+            }
+            $g = $this->getGroup(substr($key, 3));
+            if ($g === null || $g === $group) {
+                continue;
+            }
+            $nh = $g->getInherits();
+            if (!isset($nh[$group->getGroupName()])) {
+                $newInheritances[] = $g;
+            }
+        }
+        $this->changeInheritanceOfGroup($login, $group, $newInheritances);
+        $this->inheritsWindow->erase($login);
+        unset($this->inheritsGroupPerLogin[$login]);
+
+        $windows = Gui\Windows\Groups::GetAll();
+        foreach ($windows as $window) {
+            $wLogin = $window->getRecipient();
+            $window->onShow();
+            $window->redraw($wLogin);
+        }
+    }
+
+    /**
+     * Show the Permissions MLWindow for a given group.
+     *
+     * @param string $login
+     * @param Group  $group
+     */
+    public function showPermissionsWindow($login, Group $group)
+    {
+        $inherits    = $group->getInherits();
+        $hasInherits = !empty($inherits);
+        $permissions = array();
+        foreach (self::$permissionList as $key => $val) {
+            $permissions[] = array(
+                'name'           => $key,
+                'label'          => __(self::getPermissionTitleMessage($key), $login),
+                'checked_have'   => $group->hasPermission($key),
+                'checked_inherit' => ($group->getPermission($key) == self::UNKNOWN_PERMISSION),
+            );
+        }
+        $this->permissionsGroupPerLogin[$login] = $group;
+        $this->permissionsWindow->setTitle(__(self::$txt_permissionsTitle, $login, $group->getGroupName()));
+        $this->permissionsWindow->setParam("permissions", $permissions);
+        $this->permissionsWindow->setParam("hasInherits", $hasInherits);
+        $this->permissionsWindow->setParam("inheritLabel", __(self::$txt_inherits, $login) . "?");
+        $this->permissionsWindow->show($login);
+    }
+
+    /**
+     * Callback when OK is clicked in the Permissions window.
+     *
+     * @param string $login
+     * @param array  $params
+     */
+    public function permissionsOk($login, $params = array())
+    {
+        if (!isset($this->permissionsGroupPerLogin[$login])) {
+            return;
+        }
+        $group       = $this->permissionsGroupPerLogin[$login];
+        $hasInherits = !empty($group->getInherits());
+
+        $inheritChecked = array();
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_inherit_') === 0) {
+                $permName = substr($key, 11);
+                if (array_key_exists($permName, self::$permissionList)) {
+                    $inheritChecked[$permName] = ($value == '1');
+                }
+            }
+        }
+
+        $newPermissions = array();
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_have_') !== 0) {
+                continue;
+            }
+            $permName = substr($key, 8);
+            if (!array_key_exists($permName, self::$permissionList)) {
+                continue;
+            }
+            if ($hasInherits && !empty($inheritChecked[$permName])) {
+                $newPermissions[$permName] = self::UNKNOWN_PERMISSION;
+            } elseif ($value == '1') {
+                $newPermissions[$permName] = self::HAVE_PERMISSION;
+            } else {
+                $newPermissions[$permName] = $hasInherits ? self::NO_PERMISSION : self::UNKNOWN_PERMISSION;
+            }
+        }
+        $this->changePermissionOfGroup($login, $group, $newPermissions);
+        $this->permissionsWindow->erase($login);
+        unset($this->permissionsGroupPerLogin[$login]);
+
+        $windows = Gui\Windows\Groups::GetAll();
+        foreach ($windows as $window) {
+            $wLogin = $window->getRecipient();
+            $window->onShow();
+            $window->redraw($wLogin);
+            $window->refreshAll();
+        }
+    }
+
+    /**
      *  Create Management window for groups
      *
      * @param string $login
@@ -1383,6 +1555,19 @@ class AdminGroups extends ExpPlugin
             $this->cmdMoreWindow->erase();
         }
         $this->cmdMoreWindow = null;
+
+        if ($this->inheritsWindow instanceof Window) {
+            $this->inheritsWindow->erase();
+        }
+        $this->inheritsWindow = null;
+        $this->inheritsGroupPerLogin = array();
+
+        if ($this->permissionsWindow instanceof Window) {
+            $this->permissionsWindow->erase();
+        }
+        $this->permissionsWindow = null;
+        $this->permissionsGroupPerLogin = array();
+
         self::$admins = array();
         self::$commands = array();
         self::$commandsList = array();

@@ -26,7 +26,7 @@ namespace ManiaLivePlugins\eXpansion\Notifications\Gui\Windows;
 use ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Gui\Elements\CheckboxScripted;
+use ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox;
 use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 use ManiaLivePlugins\eXpansion\Gui\Windows\Window;
 use ManiaLivePlugins\eXpansion\Notifications\Gui\Controls\ItemPlugin;
@@ -67,7 +67,7 @@ class ConfPluginList extends Window
         $this->buttonSave->setContent('<frame posn="50 -3 1">' . \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(30, 5, __('Save', $this->getRecipient()), null, null, null, null, null, $this->createAction(array($this, 'saveAction')), null, null, null, null, null, null) . '</frame>');
         $this->mainFrame->addComponent($this->buttonSave);
 
-        $this->registerScript(CheckboxScripted::getScriptML());
+        $this->registerScript(Checkbox::getScriptML());
     }
 
     public function onResize($oldX, $oldY)

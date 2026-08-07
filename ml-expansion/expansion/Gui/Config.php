@@ -38,6 +38,7 @@ class Config extends \ManiaLib\Utils\Singleton
     public $style_widget_title_lbStyle = 'TextCardScores2';
     public $style_widget_title_lbSize = 1;
     public $style_widget_title_lbColor = 'fff';
+    public $chunkSize = 500;
     public $disableAnimations = false;
     public $disablePersonalHud = false;
     public $colorPreview = "http://reaby.kapsi.fi/ml/ui3/colorchooser/1.png";

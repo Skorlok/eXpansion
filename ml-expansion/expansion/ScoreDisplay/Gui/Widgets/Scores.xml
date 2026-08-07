@@ -10,16 +10,16 @@
     <frame posn="0 -12 6.0E-5">
         <label sizen="16 6" style="TextStaticSmall"/>
         <frame posn="16 0 1">
-            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "+", null, null, null, null, null, $this->getParam("actionPlus0"), null, null, null, null, null, null); ?>
+            <exp:button sizeX="9" sizeY="6" text="+" action="exp:eXpansion.ScoreDisplay:add:0"/>
         </frame>
         <frame posn="24.25 0 1">
-            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "-", null, null, null, null, null, $this->getParam("actionMinus0"), null, null, null, null, null, null); ?>
+            <exp:button sizeX="9" sizeY="6" text="-" action="exp:eXpansion.ScoreDisplay:sub:0"/>
         </frame>
         <frame posn="84.5 0 1">
-            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "+", null, null, null, null, null, $this->getParam("actionPlus1"), null, null, null, null, null, null); ?>
+            <exp:button sizeX="9" sizeY="6" text="+" action="exp:eXpansion.ScoreDisplay:add:1"/>
         </frame>
         <frame posn="92.75 0 1">
-            <?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(9, 6, "-", null, null, null, null, null, $this->getParam("actionMinus1"), null, null, null, null, null, null); ?>
+            <exp:button sizeX="9" sizeY="6" text="-" action="exp:eXpansion.ScoreDisplay:sub:1"/>
         </frame>
     </frame>
 </frame>

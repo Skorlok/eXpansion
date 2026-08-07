@@ -23,61 +23,61 @@ $modUrl      = $this->getParam("modUrl");
 $songUrl     = $this->getParam("songUrl");
 ?>
 <frame posn="-35 1 7.0E-5">
-	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Unique id') ?>"/>
+	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="{@Unique id}"/>
 	<frame posn="70 0 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 35, true, null, $this->handleSpecialChars($uid), null, null, false) ?>
+		<?php echo '<exp:inputbox name="" sizeX="35" text="' . $this->handleSpecialChars($uid) . '"/>'; ?>
 	</frame>
-	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('File Name') ?>"/>
+	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@File Name}"/>
 	<frame posn="70 -6 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Inputbox::getXML("", 35, true, null, $this->handleSpecialChars($fileName), null, null, false) ?>
+		<?php echo '<exp:inputbox name="" sizeX="35" text="' . $this->handleSpecialChars($fileName) . '"/>'; ?>
 	</frame>
-	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Name') ?>"/>
+	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Name}"/>
 	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapName) ?>"/>
-	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Author') ?>"/>
+	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author}"/>
 	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($author) ?>"/>
-	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Author Nick') ?>"/>
+	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author Nick}"/>
 	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($authorNick) ?>"/>
-	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Mood') ?>"/>
+	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="{@Mood}"/>
 	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mood) ?>"/>
-	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Map Style') ?>"/>
+	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="{@Map Style}"/>
 	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapStyle) ?>"/>
-	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Map Type') ?>"/>
+	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="{@Map Type}"/>
 	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapType) ?>"/>
-	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Environment') ?>"/>
+	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="{@Environment}"/>
 	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($environment) ?>"/>
-	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Car type') ?>"/>
+	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="{@Car type}"/>
 	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($carType) ?>"/>
 	<label posn="35 -45 0.0002" sizen="35 6" style="TextStaticSmall"/>
 	<?php if ($modUrl): ?>
 	<frame posn="80 -85 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, $this->addLang("Download Mod"), null, null, null, null, null, null, null, $this->handleSpecialChars($modUrl), null, null, null, null, true) ?>
+		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Mod" url="<?php echo $this->handleSpecialChars($modUrl); ?>" isTextId="true"/>
 	</frame>
 	<?php endif; ?>
 	<?php if ($songUrl): ?>
 	<frame posn="110 -85 1">
-		<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Button::getXML(37.5, 6.25, $this->addLang("Download Song"), null, null, null, null, null, null, null, $this->handleSpecialChars($songUrl), null, null, null, null, true) ?>
+		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Song" url="<?php echo $this->handleSpecialChars($songUrl); ?>" isTextId="true"/>
 	</frame>
 	<?php endif; ?>
 </frame>
 <frame posn="40 1 0.00028">
-	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Add Date') ?>"/>
+	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="{@Add Date}"/>
 	<label posn="70 0 1.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($addDate) ?>"/>
-	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Author Time') ?>"/>
+	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author Time}"/>
 	<label posn="70 -5 3.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($authorTime) ?>"/>
-	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Gold Time') ?>"/>
+	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Gold Time}"/>
 	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($goldTime) ?>"/>
-	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Silver Time') ?>"/>
+	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Silver Time}"/>
 	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($silverTime) ?>"/>
-	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Bronze Time') ?>"/>
+	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Bronze Time}"/>
 	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($bronzeTime) ?>"/>
-	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Checkpoints') ?>"/>
+	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="{@Checkpoints}"/>
 	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($checkpoints) ?>"/>
-	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Laps') ?>"/>
+	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="{@Laps}"/>
 	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($laps) ?>"/>
-	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Display Cost') ?>"/>
+	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="{@Display Cost}"/>
 	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($displayCost) ?>"/>
-	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Song Name') ?>"/>
+	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="{@Song Name}"/>
 	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($songName) ?>"/>
-	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="<?php echo $this->addLang('Mod Name') ?>"/>
+	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="{@Mod Name}"/>
 	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($modName) ?>"/>
 </frame>
