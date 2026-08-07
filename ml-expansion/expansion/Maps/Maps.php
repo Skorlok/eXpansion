@@ -221,7 +221,7 @@ class Maps extends ExpPlugin
         $this->mapListWindow = new Window('Maps\Gui\Windows\Maplist.xml');
         $this->mapListWindow->setName('Maplist');
         $this->mapListWindow->setSize(214, 100);
-        $this->mapInfoWindow->registerCloseCallback(array($this, 'onMapListWindowClosed'));
+        $this->mapListWindow->registerCloseCallback(array($this, 'onMapListWindowClosed'));
 
         $this->removeAllAction = Gui::createConfirm("exp:eXpansion.Maps:removeAllMaps");
     }
