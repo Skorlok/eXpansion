@@ -25,4 +25,13 @@ class PlayerRanking extends Player
 	public $nbrLapsFinished;
 	/** @var float */
 	public $ladderScore;
+
+	// Extra fields for eXpansion
+
+	/** @var string */
+	public $team;
+	/** @var bool */
+	public $spectator;
+	/** @var bool */
+	public $away;
 }

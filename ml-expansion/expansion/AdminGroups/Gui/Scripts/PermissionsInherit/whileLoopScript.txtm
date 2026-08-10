@@ -3,7 +3,7 @@ foreach (Event in PendingEvents) {
         declare Text[] expPrmParts = TextLib::Split("_", Event.ControlId);
         if (expPrmParts.count == 3 && expPrmParts[0] == "eXp" && expPrmParts[1] == "CheckboxQ") {
             declare Integer expPrmId = TextLib::ToInteger(expPrmParts[2]);
-            if (expPrmId >= <?php echo $this->firstInheritId; ?> && expPrmId <= <?php echo $this->lastInheritId; ?> && (expPrmId - <?php echo $this->firstInheritId; ?>) % 2 == 0) {
+            if (expPrmId >= {{ firstInheritId }} && expPrmId <= {{ lastInheritId }} && (expPrmId - {{ firstInheritId }}) % 2 == 0) {
                 declare CMlEntry expPrmInhE <=> (Page.GetFirstChild("eXp_CheckboxE_" ^ TextLib::ToText(expPrmId)) as CMlEntry);
                 declare CMlQuad expPrmHavQ <=> (Page.GetFirstChild("eXp_CheckboxQ_" ^ TextLib::ToText(expPrmId - 1)) as CMlQuad);
                 declare CMlEntry expPrmHavE <=> (Page.GetFirstChild("eXp_CheckboxE_" ^ TextLib::ToText(expPrmId - 1)) as CMlEntry);

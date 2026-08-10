@@ -84,6 +84,13 @@ class Widget extends PlainWidget
         $this->script->setParam("gameMode", $this->storage->getCleanGamemodeName());
         $this->script->setParam("visibleLayerInit", $this->visibleLayerInit);
         $this->script->setParam("forceReset", $this->getBoolean(DEBUG));
+        $this->script->setParam("id", $this->getId());
+        $this->script->setParam("layer", $this->getLayer());
+        $this->script->setParam("widgetVisible", $this->getWidgetVisible());
+        $this->script->setParam("posX", $this->script->getNumber($this->getPosX()));
+        $this->script->setParam("posY", $this->script->getNumber($this->getPosY()));
+        $this->script->setParam("deltaX", $this->axisDisabled == 'x' ? '' : "DeltaPos.X = MouseX - lastMouseX;");
+        $this->script->setParam("deltaY", $this->axisDisabled == 'y' ? '' : "DeltaPos.Y = MouseY - lastMouseY;");
         parent::onDraw();
     }
 

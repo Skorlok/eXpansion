@@ -15,69 +15,70 @@ class CustomUI extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     protected function updateData()
     {
-		$this->config = Config::getInstance();
+		/** @var Config $config */
+		$config = Config::getInstance();
 
         $ui  = '<ui_properties>';
-		$ui .= '<map_info visible="' . (($this->config->map_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->map_info_x).' '.floatval($this->config->map_info_y).' '.floatval($this->config->map_info_z). '" />';
-		$ui .= '<live_info visible="' . (($this->config->live_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->live_info_x).' '.floatval($this->config->live_info_y).' '.floatval($this->config->live_info_z). '" />';
-		$ui .= '<opponents_info visible="' . (($this->config->opponents_info) ? 'true' : 'false') . '" />';
-		$ui .= '<chat visible="' . (($this->config->chat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($this->config->chatline) . '" />';
-		$ui .= '<checkpoint_list visible="' . (($this->config->checkpoint_list) ? 'true' : 'false') . '" pos="' . floatval($this->config->checkpoint_list_x).' '.floatval($this->config->checkpoint_list_y).' '.floatval($this->config->checkpoint_list_z). '" />';
-		$ui .= '<checkpoint_ranking visible="' . (($this->config->checkpoint_ranking) ? 'true' : 'false') . '" pos="' . floatval($this->config->checkpoint_ranking_x).' '.floatval($this->config->checkpoint_ranking_y).' '.floatval($this->config->checkpoint_ranking_z). '" />';
-		$ui .= '<round_scores visible="' . (($this->config->round_scores) ? 'true' : 'false') . '" pos="' . floatval($this->config->round_scores_x).' '.floatval($this->config->round_scores_y).' '.floatval($this->config->round_scores_z). '" />';
-		$ui .= '<countdown visible="' . (($this->config->countdown) ? 'true' : 'false') . '" pos="' . floatval($this->config->countdown_x).' '.floatval($this->config->countdown_y).' '.floatval($this->config->countdown_z). '" />';
-		$ui .= '<go visible="' . (($this->config->go) ? 'true' : 'false') . '" />';
-		$ui .= '<chrono visible="' . (($this->config->chrono) ? 'true' : 'false') . '" pos="' . floatval($this->config->chrono_x).' '.floatval($this->config->chrono_y).' '.floatval($this->config->chrono_z). '" />';
-		$ui .= '<speed_and_distance visible="' . (($this->config->speed_and_distance) ? 'true' : 'false') . '" pos="' . floatval($this->config->speed_and_distance_x).' '.floatval($this->config->speed_and_distance_y).' '.floatval($this->config->speed_and_distance_z). '" />';
-		$ui .= '<personal_best_and_rank visible="' . (($this->config->personal_best_and_rank) ? 'true' : 'false') . '" pos="' . floatval($this->config->personal_best_and_rank_x).' '.floatval($this->config->personal_best_and_rank_y).' '.floatval($this->config->personal_best_and_rank_z). '" />';
-		$ui .= '<position visible="' . (($this->config->position) ? 'true' : 'false') . '" pos="' . floatval($this->config->position_x).' '.floatval($this->config->position_y).' '.floatval($this->config->position_z). '" />';
-		$ui .= '<checkpoint_time visible="' . (($this->config->checkpoint_time) ? 'true' : 'false') . '" pos="' . floatval($this->config->checkpoint_time_x).' '.floatval($this->config->checkpoint_time_y).' '.floatval($this->config->checkpoint_time_z). '" />';
-		$ui .= '<chat_avatar visible="' . (($this->config->chat_avatar) ? 'true' : 'false') . '" />';
-		$ui .= '<warmup visible="' . (($this->config->warmup) ? 'true' : 'false') . '" pos="' . floatval($this->config->warmup_x).' '.floatval($this->config->warmup_y).' '.floatval($this->config->warmup_z). '" />';
-		$ui .= '<endmap_ladder_recap visible="' . (($this->config->endmap_ladder_recap) ? 'true' : 'false') . '" />';
-		$ui .= '<multilap_info visible="' . (($this->config->multilap_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->multilap_info_x).' '.floatval($this->config->multilap_info_y).' '.floatval($this->config->multilap_info_z). '" />';
-		$ui .= '<spectator_info visible="' . (($this->config->spectator_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->spectator_info_x).' '.floatval($this->config->spectator_info_y).' '.floatval($this->config->spectator_info_z). '" />';
-		$ui .= '<scorestable alt_visible="' . (($this->config->scorestablealt) ? 'true' : 'false') . '" visible="' . (($this->config->scorestable) ? 'true' : 'false') . '" />';
-		$ui .= '<viewers_count visible="' . (($this->config->viewers_count) ? 'true' : 'false') . '" pos="' . floatval($this->config->viewers_count_x).' '.floatval($this->config->viewers_count_y).' '.floatval($this->config->viewers_count_z). '" />';
+		$ui .= '<map_info visible="' . (($config->map_info) ? 'true' : 'false') . '" pos="' . floatval($config->map_info_x).' '.floatval($config->map_info_y).' '.floatval($config->map_info_z). '" />';
+		$ui .= '<live_info visible="' . (($config->live_info) ? 'true' : 'false') . '" pos="' . floatval($config->live_info_x).' '.floatval($config->live_info_y).' '.floatval($config->live_info_z). '" />';
+		$ui .= '<opponents_info visible="' . (($config->opponents_info) ? 'true' : 'false') . '" />';
+		$ui .= '<chat visible="' . (($config->chat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($config->chatline) . '" />';
+		$ui .= '<checkpoint_list visible="' . (($config->checkpoint_list) ? 'true' : 'false') . '" pos="' . floatval($config->checkpoint_list_x).' '.floatval($config->checkpoint_list_y).' '.floatval($config->checkpoint_list_z). '" />';
+		$ui .= '<checkpoint_ranking visible="' . (($config->checkpoint_ranking) ? 'true' : 'false') . '" pos="' . floatval($config->checkpoint_ranking_x).' '.floatval($config->checkpoint_ranking_y).' '.floatval($config->checkpoint_ranking_z). '" />';
+		$ui .= '<round_scores visible="' . (($config->round_scores) ? 'true' : 'false') . '" pos="' . floatval($config->round_scores_x).' '.floatval($config->round_scores_y).' '.floatval($config->round_scores_z). '" />';
+		$ui .= '<countdown visible="' . (($config->countdown) ? 'true' : 'false') . '" pos="' . floatval($config->countdown_x).' '.floatval($config->countdown_y).' '.floatval($config->countdown_z). '" />';
+		$ui .= '<go visible="' . (($config->go) ? 'true' : 'false') . '" />';
+		$ui .= '<chrono visible="' . (($config->chrono) ? 'true' : 'false') . '" pos="' . floatval($config->chrono_x).' '.floatval($config->chrono_y).' '.floatval($config->chrono_z). '" />';
+		$ui .= '<speed_and_distance visible="' . (($config->speed_and_distance) ? 'true' : 'false') . '" pos="' . floatval($config->speed_and_distance_x).' '.floatval($config->speed_and_distance_y).' '.floatval($config->speed_and_distance_z). '" />';
+		$ui .= '<personal_best_and_rank visible="' . (($config->personal_best_and_rank) ? 'true' : 'false') . '" pos="' . floatval($config->personal_best_and_rank_x).' '.floatval($config->personal_best_and_rank_y).' '.floatval($config->personal_best_and_rank_z). '" />';
+		$ui .= '<position visible="' . (($config->position) ? 'true' : 'false') . '" pos="' . floatval($config->position_x).' '.floatval($config->position_y).' '.floatval($config->position_z). '" />';
+		$ui .= '<checkpoint_time visible="' . (($config->checkpoint_time) ? 'true' : 'false') . '" pos="' . floatval($config->checkpoint_time_x).' '.floatval($config->checkpoint_time_y).' '.floatval($config->checkpoint_time_z). '" />';
+		$ui .= '<chat_avatar visible="' . (($config->chat_avatar) ? 'true' : 'false') . '" />';
+		$ui .= '<warmup visible="' . (($config->warmup) ? 'true' : 'false') . '" pos="' . floatval($config->warmup_x).' '.floatval($config->warmup_y).' '.floatval($config->warmup_z). '" />';
+		$ui .= '<endmap_ladder_recap visible="' . (($config->endmap_ladder_recap) ? 'true' : 'false') . '" />';
+		$ui .= '<multilap_info visible="' . (($config->multilap_info) ? 'true' : 'false') . '" pos="' . floatval($config->multilap_info_x).' '.floatval($config->multilap_info_y).' '.floatval($config->multilap_info_z). '" />';
+		$ui .= '<spectator_info visible="' . (($config->spectator_info) ? 'true' : 'false') . '" pos="' . floatval($config->spectator_info_x).' '.floatval($config->spectator_info_y).' '.floatval($config->spectator_info_z). '" />';
+		$ui .= '<scorestable alt_visible="' . (($config->scorestablealt) ? 'true' : 'false') . '" visible="' . (($config->scorestable) ? 'true' : 'false') . '" />';
+		$ui .= '<viewers_count visible="' . (($config->viewers_count) ? 'true' : 'false') . '" pos="' . floatval($config->viewers_count_x).' '.floatval($config->viewers_count_y).' '.floatval($config->viewers_count_z). '" />';
 		$ui .= '</ui_properties>';
 
         $this->connection->triggerModeScriptEvent("Trackmania.UI.SetProperties", array($ui));
 
 
 		$ui  = '<ui_properties>';
-		$ui .= '<notices visible="' . (($this->config->notices) ? 'true' : 'false') . '" />';
-		$ui .= '<map_info visible="' . (($this->config->SMmap_info) ? 'true' : 'false') . '" />';
-		$ui .= '<chat visible="' . (($this->config->SMchat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($this->config->SMchatline) . '" />';
-		$ui .= '<countdown visible="' . (($this->config->SMcountdown) ? 'true' : 'false') . '" pos="' . floatval($this->config->SMcountdown_x).' '.floatval($this->config->SMcountdown_y).' '.floatval($this->config->SMcountdown_z). '" />';
-		$ui .= '<crosshair visible="' . (($this->config->crosshair) ? 'true' : 'false') . '" />';
-		$ui .= '<gauges visible="' . (($this->config->gauges) ? 'true' : 'false') . '" />';
-		$ui .= '<consumables visible="' . (($this->config->consumables) ? 'true' : 'false') . '" />';
-		$ui .= '<go visible="' . (($this->config->SMgo) ? 'true' : 'false') . '" />';
-		$ui .= '<chat_avatar visible="' . (($this->config->SMchat_avatar) ? 'true' : 'false') . '" />';
-		$ui .= '<endmap_ladder_recap visible="' . (($this->config->SMendmap_ladder_recap) ? 'true' : 'false') . '" />';
-		$ui .= '<scorestable alt_visible="' . (($this->config->SMscorestablealt) ? 'true' : 'false') . '" visible="' . (($this->config->SMscorestable) ? 'true' : 'false') . '" />';
+		$ui .= '<notices visible="' . (($config->notices) ? 'true' : 'false') . '" />';
+		$ui .= '<map_info visible="' . (($config->SMmap_info) ? 'true' : 'false') . '" />';
+		$ui .= '<chat visible="' . (($config->SMchat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($config->SMchatline) . '" />';
+		$ui .= '<countdown visible="' . (($config->SMcountdown) ? 'true' : 'false') . '" pos="' . floatval($config->SMcountdown_x).' '.floatval($config->SMcountdown_y).' '.floatval($config->SMcountdown_z). '" />';
+		$ui .= '<crosshair visible="' . (($config->crosshair) ? 'true' : 'false') . '" />';
+		$ui .= '<gauges visible="' . (($config->gauges) ? 'true' : 'false') . '" />';
+		$ui .= '<consumables visible="' . (($config->consumables) ? 'true' : 'false') . '" />';
+		$ui .= '<go visible="' . (($config->SMgo) ? 'true' : 'false') . '" />';
+		$ui .= '<chat_avatar visible="' . (($config->SMchat_avatar) ? 'true' : 'false') . '" />';
+		$ui .= '<endmap_ladder_recap visible="' . (($config->SMendmap_ladder_recap) ? 'true' : 'false') . '" />';
+		$ui .= '<scorestable alt_visible="' . (($config->SMscorestablealt) ? 'true' : 'false') . '" visible="' . (($config->SMscorestable) ? 'true' : 'false') . '" />';
 		$ui .= '</ui_properties>';
 
 		$this->connection->triggerModeScriptEvent("Shootmania.UI.SetProperties", array($ui));
 
 
 		$ui  = '<ui_properties>';
-        $ui .= '<map_info visible="' . (($this->config->MP3map_info) ? 'true' : 'false') . '" />';
-        $ui .= '<opponents_info visible="' . (($this->config->MP3opponents_info) ? 'true' : 'false') . '" />';
-        $ui .= '<chat visible="' . (($this->config->MP3chat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($this->config->MP3chatline) . '" />';
-		$ui .= '<checkpoint_list visible="' . (($this->config->MP3checkpoint_list) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3checkpoint_list_x).' '.floatval($this->config->MP3checkpoint_list_y).' '.floatval($this->config->MP3checkpoint_list_z). '" />';
-		$ui .= '<round_scores visible="' . (($this->config->MP3round_scores) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3round_scores_x).' '.floatval($this->config->MP3round_scores_y).' '.floatval($this->config->MP3round_scores_z). '" />';
-		$ui .= '<countdown visible="' . (($this->config->MP3countdown) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3countdown_x).' '.floatval($this->config->MP3countdown_y).' '.floatval($this->config->MP3countdown_z). '" />';
-		$ui .= '<go visible="' . (($this->config->MP3go) ? 'true' : 'false') . '" />';
-		$ui .= '<chrono visible="' . (($this->config->MP3chrono) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3chrono_x).' '.floatval($this->config->MP3chrono_y).' '.floatval($this->config->MP3chrono_z). '" />';
-		$ui .= '<speed_and_distance visible="' . (($this->config->MP3speed_and_distance) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3speed_and_distance_x).' '.floatval($this->config->MP3speed_and_distance_y).' '.floatval($this->config->MP3speed_and_distance_z). '" />';
-		$ui .= '<personal_best_and_rank visible="' . (($this->config->MP3personal_best_and_rank) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3personal_best_and_rank_x).' '.floatval($this->config->MP3personal_best_and_rank_y).' '.floatval($this->config->MP3personal_best_and_rank_z). '" />';
+        $ui .= '<map_info visible="' . (($config->MP3map_info) ? 'true' : 'false') . '" />';
+        $ui .= '<opponents_info visible="' . (($config->MP3opponents_info) ? 'true' : 'false') . '" />';
+        $ui .= '<chat visible="' . (($config->MP3chat) ? 'true' : 'false') . '" offset="0. 0." linecount="' . intval($config->MP3chatline) . '" />';
+		$ui .= '<checkpoint_list visible="' . (($config->MP3checkpoint_list) ? 'true' : 'false') . '" pos="' . floatval($config->MP3checkpoint_list_x).' '.floatval($config->MP3checkpoint_list_y).' '.floatval($config->MP3checkpoint_list_z). '" />';
+		$ui .= '<round_scores visible="' . (($config->MP3round_scores) ? 'true' : 'false') . '" pos="' . floatval($config->MP3round_scores_x).' '.floatval($config->MP3round_scores_y).' '.floatval($config->MP3round_scores_z). '" />';
+		$ui .= '<countdown visible="' . (($config->MP3countdown) ? 'true' : 'false') . '" pos="' . floatval($config->MP3countdown_x).' '.floatval($config->MP3countdown_y).' '.floatval($config->MP3countdown_z). '" />';
+		$ui .= '<go visible="' . (($config->MP3go) ? 'true' : 'false') . '" />';
+		$ui .= '<chrono visible="' . (($config->MP3chrono) ? 'true' : 'false') . '" pos="' . floatval($config->MP3chrono_x).' '.floatval($config->MP3chrono_y).' '.floatval($config->MP3chrono_z). '" />';
+		$ui .= '<speed_and_distance visible="' . (($config->MP3speed_and_distance) ? 'true' : 'false') . '" pos="' . floatval($config->MP3speed_and_distance_x).' '.floatval($config->MP3speed_and_distance_y).' '.floatval($config->MP3speed_and_distance_z). '" />';
+		$ui .= '<personal_best_and_rank visible="' . (($config->MP3personal_best_and_rank) ? 'true' : 'false') . '" pos="' . floatval($config->MP3personal_best_and_rank_x).' '.floatval($config->MP3personal_best_and_rank_y).' '.floatval($config->MP3personal_best_and_rank_z). '" />';
         $ui .= '<position visible="true" />';
-		$ui .= '<checkpoint_time visible="' . (($this->config->MP3checkpoint_time) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3checkpoint_time_x).' '.floatval($this->config->MP3checkpoint_time_y).' '.floatval($this->config->MP3checkpoint_time_z). '" />';
-		$ui .= '<chat_avatar visible="' . (($this->config->MP3chat_avatar) ? 'true' : 'false') . '" />';
-		$ui .= '<warmup visible="' . (($this->config->MP3warmup) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3warmup_x).' '.floatval($this->config->MP3warmup_y).' '.floatval($this->config->MP3warmup_z). '" />';
-		$ui .= '<endmap_ladder_recap visible="' . (($this->config->MP3endmap_ladder_recap) ? 'true' : 'false') . '" />';
-		$ui .= '<multilap_info visible="' . (($this->config->MP3multilap_info) ? 'true' : 'false') . '" pos="' . floatval($this->config->MP3multilap_info_x).' '.floatval($this->config->MP3multilap_info_y).' '.floatval($this->config->MP3multilap_info_z). '" />';
+		$ui .= '<checkpoint_time visible="' . (($config->MP3checkpoint_time) ? 'true' : 'false') . '" pos="' . floatval($config->MP3checkpoint_time_x).' '.floatval($config->MP3checkpoint_time_y).' '.floatval($config->MP3checkpoint_time_z). '" />';
+		$ui .= '<chat_avatar visible="' . (($config->MP3chat_avatar) ? 'true' : 'false') . '" />';
+		$ui .= '<warmup visible="' . (($config->MP3warmup) ? 'true' : 'false') . '" pos="' . floatval($config->MP3warmup_x).' '.floatval($config->MP3warmup_y).' '.floatval($config->MP3warmup_z). '" />';
+		$ui .= '<endmap_ladder_recap visible="' . (($config->MP3endmap_ladder_recap) ? 'true' : 'false') . '" />';
+		$ui .= '<multilap_info visible="' . (($config->MP3multilap_info) ? 'true' : 'false') . '" pos="' . floatval($config->MP3multilap_info_x).' '.floatval($config->MP3multilap_info_y).' '.floatval($config->MP3multilap_info_z). '" />';
 		$ui .= '</ui_properties>';
 
         $this->connection->triggerModeScriptEvent("UI_SetProperties", $ui);

@@ -18,6 +18,7 @@ class PlainWidget extends \ManiaLive\Gui\Window
     private $_scripts = array();
     private $dicoMessages = array();
     private $calledScripts = array();
+    private $xml;
 
     protected function onConstruct()
     {
@@ -68,7 +69,6 @@ class PlainWidget extends \ManiaLive\Gui\Window
 
         foreach ($this->calledScripts as $script) {
             $this->addScriptToMain($script->getEndScript($this));
-            $script->reset();
         }
 
         $this->calledScripts = array();
@@ -84,14 +84,7 @@ class PlainWidget extends \ManiaLive\Gui\Window
     {
         $isset = !isset($this->calledScripts[$script->getRelPath()]);
 
-        if ($isset || $script->multiply()) {
-
-            $libs = $script->getLibraries();
-            if (!empty($libs)) {
-                foreach ($libs as $libSCript) {
-                    $this->applyScript($libSCript, $component);
-                }
-            }
+        if ($isset) {
 
             $this->calledScripts[$script->getRelPath()] = $script;
 

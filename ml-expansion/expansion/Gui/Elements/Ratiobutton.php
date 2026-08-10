@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 class Ratiobutton
 {
 
@@ -36,7 +38,7 @@ class Ratiobutton
     public static function getScriptML()
     {
         if (self::$script === null) {
-            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\RatiobuttonScript();
+            self::$script = new Script("Gui/Scripts/Ratiobutton");
         }
         return self::$script;
     }

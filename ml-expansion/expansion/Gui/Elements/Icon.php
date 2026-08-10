@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 class Icon
 {
 
@@ -11,7 +13,7 @@ class Icon
     public static function getScriptML()
     {
         if (self::$script === null) {
-            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ButtonScript();
+            self::$script = new Script("Gui/Scripts/Button");
         }
         return self::$script;
     }

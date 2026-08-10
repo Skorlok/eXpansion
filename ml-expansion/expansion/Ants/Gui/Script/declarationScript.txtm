@@ -1,4 +1,4 @@
-declare objCount = <?php echo $this->antCount; ?>;
+declare objCount = {{ antCount }};
 
 declare CMlQuad[] ant;
 declare Real[] antSpeed;

@@ -7,13 +7,13 @@
 #Include "TextLib" as TL
 #Include "AnimLib" as AL
 
-<?php echo $this->scriptLib ?>
+{{ scriptLib }}
 
 main () {
-    <?php echo $this->dDeclares ?>
+    {{ dDeclares }}
 
     while(True) {
         yield;
-        <?php echo  $this->wLoop ?>
+        {{ wLoop }}
     }
 }

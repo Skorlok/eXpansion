@@ -182,19 +182,19 @@ if  ((Now - lastUpdateTime) >= 500) {
     foreach (Player in Players) {
         playersOnServer[Player.Login] = Player.Name;
 
-        if(!playerNickName<?php echo $this->varName ?>.existskey(Player.Login)){
-            playerNickName<?php echo $this->varName ?>[Player.Login] = Player.Name;
+        if(!playerNickName{{ varName }}.existskey(Player.Login)){
+            playerNickName{{ varName }}[Player.Login] = Player.Name;
         }
     }
-    needUpdate<?php echo $this->varName ?> = True;
+    needUpdate{{ varName }} = True;
 }
 
-if (needUpdate<?php echo $this->varName ?> && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate{{ varName }} && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
     lastUpdateTime = Now;
 
-    needUpdate<?php echo $this->varName ?> = False;
+    needUpdate{{ varName }} = False;
 
-    playerTimes<?php echo $this->varName ?> = playerTimes<?php echo $this->varName ?>.sort();
+    playerTimes{{ varName }} = playerTimes{{ varName }}.sort();
 
     declare i = 1;
     declare nbRec = 1;
@@ -206,15 +206,15 @@ if (needUpdate<?php echo $this->varName ?> && ((exp_widgetVisibleBuffered && exp
     declare end = -1;
     declare recCount = -1;
 
-    if (playerTimes<?php echo $this->varName ?>.count > nbShow) {
+    if (playerTimes{{ varName }}.count > nbShow) {
 	    recCount = nbShow;
     } else {
-	    recCount = playerTimes<?php echo $this->varName ?>.count;
+	    recCount = playerTimes{{ varName }}.count;
     }
 
     i = 1;
 
-    foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
+    foreach (Login => Score in playerTimes{{ varName }}) {
         if (LocalUser != Null) {
             if (Login == LocalUser.Login) {
                 myRank = i;
@@ -248,7 +248,7 @@ if (needUpdate<?php echo $this->varName ?> && ((exp_widgetVisibleBuffered && exp
     zoomId = -1;
     declare scoreFirst = -1;
 
-    foreach (Login => Score in playerTimes<?php echo $this->varName ?>) {
+    foreach (Login => Score in playerTimes{{ varName }}) {
 
         if (scoreFirst == -1) {
             scoreFirst = Score;
@@ -262,7 +262,7 @@ if (needUpdate<?php echo $this->varName ?> && ((exp_widgetVisibleBuffered && exp
 
             if (nickLabel != Null) {
                 declare outScore = Score;
-                putRecordTo(i, nbRec, outScore, Login, playerNickName<?php echo $this->varName ?>[Login], Login == LocalUser.Login, myRank);
+                putRecordTo(i, nbRec, outScore, Login, playerNickName{{ varName }}[Login], Login == LocalUser.Login, myRank);
                 if (highliteQuad != Null) {
                     if (playersOnServer.existskey(Login) && i != myRank) {
                         highliteQuad.Show();

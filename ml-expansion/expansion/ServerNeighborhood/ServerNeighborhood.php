@@ -103,10 +103,10 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $trayScript = new Script("Gui/Scripts/TrayWidget");
             $trayScript->setParam('isMinimized', 'True');
             $trayScript->setParam('autoCloseTimeout', $this->config->refresh_interval * 1000);
-            $trayScript->setParam('posXMin', -33);
-            $trayScript->setParam('posX', -33);
-            $trayScript->setParam('posXMax', -3);
-            $trayScript->setParam('specilaCase', '');
+            $trayScript->setParam('posXMin', $trayScript->getNumber(-33));
+            $trayScript->setParam('posX', $trayScript->getNumber(-33));
+            $trayScript->setParam('posXMax', $trayScript->getNumber(-3));
+            $trayScript->setParam('smaller', '>');
             $this->widget->registerScript($trayScript);
             $this->widget->setDisableAxis("x");
         }

@@ -21,6 +21,7 @@ class WidgetAd extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
 
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Widgets_Advertising\Gui\Script");
         $this->script->setParam("hide", "Text[]");
+        $this->script->setParam("widgetId", $this->getId());
         $this->registerScript($this->script);
     }
 

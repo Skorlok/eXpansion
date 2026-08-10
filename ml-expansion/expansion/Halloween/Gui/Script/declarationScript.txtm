@@ -1,4 +1,4 @@
-declare objCount = <?php echo $this->spiderCount; ?>;
+declare objCount = {{ spiderCount }};
 
 declare CMlQuad[] spider;
 declare CMlQuad[] rope;

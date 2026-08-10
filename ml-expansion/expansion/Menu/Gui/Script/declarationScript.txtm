@@ -4,7 +4,7 @@ Menu.Hide(); // reduce flicker on refresh
 
 declare Boolean toggleSubmenu = False;
 
-declare Integer itemCount = <?php echo $this->itemCount ?>;
+declare Integer itemCount = {{ itemCount }};
 
 declare Boolean eXp_mouseRightState = False;
 declare eXp_mouseRightTime = 0;

@@ -43,11 +43,12 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->msg_help = eXpGetMessage("#personalmessage#Usage /pm [login] your personal message here");
 
         $this->trayScript = new Script("Gui\Scripts\TrayWidget");
+        $this->trayScript->setParam('smaller', '>=');
         $this->trayScript->setParam('isMinimized', "True");
         $this->trayScript->setParam('autoCloseTimeout', 0); //TODO: add config
-        $this->trayScript->setParam('posXMin', -92);
-        $this->trayScript->setParam('posX', -92);
-        $this->trayScript->setParam('posXMax', -4);
+        $this->trayScript->setParam('posXMin', $this->trayScript->getNumber(-92));
+        $this->trayScript->setParam('posX', $this->trayScript->getNumber(-92));
+        $this->trayScript->setParam('posXMax', $this->trayScript->getNumber(-4));
 
         $this->script = new Script("PersonalMessages\Gui\Script");
         $this->script->setParam("sendAction", 'exp:eXpansion.PersonalMessages:send');

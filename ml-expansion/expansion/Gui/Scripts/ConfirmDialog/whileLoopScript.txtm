@@ -2,7 +2,7 @@ foreach (Event in PendingEvents) {
     if (Event.Type == CMlEvent::Type::MouseClick) {
         if (Event.ControlId == "yesButton") {
             closeWindow = True;
-            TriggerPageAction("<?php echo $this->action;?>");
+            TriggerPageAction("{{ action }}");
         }
         if (Event.ControlId == "noButton") {
             closeWindow = True;

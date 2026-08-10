@@ -28,7 +28,6 @@ use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Scripts\DropDownScript;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
@@ -434,11 +433,6 @@ class ChatAdmin extends ExpPlugin
         $this->paramDialogWindow->setName("ParameterDialog");
         $this->paramDialogWindow->setSize(110, 20);
         $this->paramDialogWindow->setParam("dropdownItems", $this->paramDialogDropdownItems);
-        $dropScript = new DropDownScript();
-        $dropScript->setParam("name",     "select");
-        $dropScript->setParam("values",   $this->paramDialogDropdownItems);
-        $dropScript->setParam("selected", 0);
-        $this->paramDialogWindow->registerScript($dropScript);
 
         $this->clubLinksWindow = new Window("ChatAdmin\Gui\Windows\ClubLinksSetup.xml");
         $this->clubLinksWindow->setName("ClubLinksSetup");

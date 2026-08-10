@@ -1,12 +1,6 @@
-<?php
-    if(isset($this->specilaCase))
-	    $smaller = '>';
-    else
-	    $smaller = '>=';
-?>
 
 if (isMinimized) {
-    if (mainWindow.RelativePosition.X <?php echo $smaller ?> positionMin) {
+    if (mainWindow.RelativePosition.X {{ smaller }} positionMin) {
 	    mainWindow.RelativePosition.X -= 4;
     }
 } else if (!isMinimized) {

@@ -1,3 +1,3 @@
-declare CMlEntry passwordEntry_<?php echo $this->btName ?> <=> (Page.GetFirstChild("<?php echo $this->btName ?>") as CMlEntry);
-declare CMlLabel maskedLabel_<?php echo $this->btName ?> <=> (Page.GetFirstChild("<?php echo $this->btName ?>_masked") as CMlLabel);
-declare CMlLabel clearLabel_<?php echo $this->btName ?> <=> (Page.GetFirstChild("<?php echo $this->btName ?>_clear") as CMlLabel);
+declare CMlEntry passwordEntry_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}") as CMlEntry);
+declare CMlLabel maskedLabel_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}_masked") as CMlLabel);
+declare CMlLabel clearLabel_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}_clear") as CMlLabel);

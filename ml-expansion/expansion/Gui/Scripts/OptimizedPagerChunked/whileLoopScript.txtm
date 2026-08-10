@@ -1,8 +1,3 @@
-<?php
-$chunkCount = (int)$this->chunkCount;
-$varName    = $this->varName;
-?>
-
 if (pager_moveScroll) {
     if (pager_firstClick) {
         pager_scrollYOriginPosition = ScrollBar.RelativePosition.Y;
@@ -33,9 +28,7 @@ if (oldIndex != currentIndex) {
         declare Integer chunkIdx = absRow / pager_chunkSize;
         declare Integer inChunk  = absRow % pager_chunkSize;
         switch (chunkIdx) {
-<?php for ($c = 0; $c < $chunkCount; $c++): ?>
-            case <?php echo $c; ?>: { if (<?php echo $varName; ?>textData_<?php echo $c; ?>.existskey(inChunk)) windowItems[i] = <?php echo $varName; ?>textData_<?php echo $c; ?>[inChunk]; }
-<?php endfor; ?>
+            {{ chunkWindowCases }}
         }
     }
 
@@ -128,9 +121,7 @@ foreach (Event in PendingEvents) {
             // Lecture unique du for UI, copie en local avant d'extraire la colonne
             declare Text[] rowData = Text[];
             switch (chunkIdx) {
-<?php for ($c = 0; $c < $chunkCount; $c++): ?>
-                case <?php echo $c; ?>: { if (<?php echo $varName; ?>data_<?php echo $c; ?>.existskey(inChunk)) rowData = <?php echo $varName; ?>data_<?php echo $c; ?>[inChunk]; }
-<?php endfor; ?>
+                {{ chunkRowDataCases }}
             }
             if (rowData.count > col) actionVal = rowData[col];
             entry.Value = " " ^ actionVal;

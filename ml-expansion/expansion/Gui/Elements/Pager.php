@@ -76,7 +76,7 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
 
         $this->pager->setSize($this->sizeX - 6, $this->sizeY);
 
-        $this->myScript->setParam("pagerSizeY", $this->sizeY);
+        $this->myScript->setParam("pagerSizeY", $this->myScript->getNumber($this->sizeY));
 
         $this->scroll->setPosition($this->sizeX - 3, 0);
         $this->scrollBg->setPosition($this->sizeX - 3, -0);
@@ -154,7 +154,7 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
 
     public function getScript()
     {
-        $this->myScript->setParam("sizeY", $this->itemSizeY);
+        $this->myScript->setParam("sizeY", $this->myScript->getNumber($this->itemSizeY));
 
         return $this->myScript;
     }
@@ -201,8 +201,8 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
     public static function getScriptML($itemSizeY = 6, $pagerSizeY = 50)
     {
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\Pager");
-        $script->setParam("sizeY", $itemSizeY);
-        $script->setParam("pagerSizeY", $pagerSizeY);
+        $script->setParam("sizeY",      $script->getNumber($itemSizeY));
+        $script->setParam("pagerSizeY", $script->getNumber($pagerSizeY));
         return $script;
     }
 }

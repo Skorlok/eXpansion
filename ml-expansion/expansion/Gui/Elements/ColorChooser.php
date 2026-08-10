@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
 use ManiaLivePlugins\eXpansion\Gui\Config;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 class ColorChooser
 {
@@ -15,7 +16,7 @@ class ColorChooser
     public static function getScriptML()
     {
         if (self::$script == null) {
-            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\ColorScript();
+            self::$script = new Script("Gui/Scripts/ColorChooser");
         }
         return self::$script;
     }

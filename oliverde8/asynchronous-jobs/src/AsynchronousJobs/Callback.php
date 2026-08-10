@@ -26,6 +26,8 @@ namespace oliverde8\AsynchronousJobs;
 trait Callback
 {
     protected $__callback = null;
+    public $__additionalData = null;
+    public $query = null;
 
     public function setCallback($newCallback = null)
     {

@@ -50,6 +50,8 @@ class Map extends AbstractStructure
 	public $localRecords;
 	/** @var \ManiaLivePlugins\eXpansion\MapRatings\Structures\Rating */
 	public $mapRating;
+	/** @var int */
+	public $addTime;
 
 	/**
 	 * @return Map

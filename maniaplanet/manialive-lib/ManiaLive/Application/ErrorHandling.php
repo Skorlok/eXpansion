@@ -47,8 +47,10 @@ abstract class ErrorHandling
 	 */
 	public static function createExceptionFromError($errno, $errstr, $errfile, $errline)
 	{
-		if (strpos($errstr, "Creation of dynamic property") !== false)
+		if (strpos($errstr, "Creation of dynamic property") !== false) {
+			//echo "Warning: " . $errstr . " in file " . $errfile . " on line " . $errline . PHP_EOL;
 			return;
+		}
 
 		// We don't want to crash ML because of a silly notice or strict error.
 		static $ignores = array(2, 8, 32, 512, 1024, 2048);
@@ -63,7 +65,6 @@ abstract class ErrorHandling
 				throw $exception;
 			}
 		} else {
-			echo "Suppressed error:\n";
 			$exception =  new \ErrorException($errstr, $errno, 0, $errfile, $errline);
 			self::displayAndLogError($exception);
 		}

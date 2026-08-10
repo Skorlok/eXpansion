@@ -22,7 +22,7 @@ exp_windowLastPosRel.clear();
 // KEEP THIS, IT WILL REMOVE OLD DATA
 
 
-declare Window <=> Page.GetFirstChild("<?php echo $win->getId() ?>");
+declare Window <=> Page.GetFirstChild("{{ id }}");
 // set hidden to reduce flicker
 declare MoveWindow = False;
 declare CMlQuad quad <=> (Page.GetFirstChild("enableMove") as CMlQuad);
@@ -49,12 +49,12 @@ declare Boolean exp_widgetVisibleBuffered;
 declare persistent Text[Text][Text] EXP_widgetLayers = Text[Text][Text];  // layer can be "normal" or "scorestable" or some other for future usage
 declare Text exp_widgetLayersBuffered;  
 
-declare Text id = "<?php echo $this->name ?>";
-declare Text gameMode = "<?php echo $this->gameMode; ?>";
-declare Boolean forceReset = <?php echo $this->forceReset ?>;
-declare Text activeLayer = "<?php echo $win->getLayer(); ?>";
-declare Text visibleLayerInit = "<?php echo $this->visibleLayerInit; ?>";
-declare Boolean disablePersonalHud = <?php echo $this->disablePersonalHud; ?>;
+declare Text id = "{{ name }}";
+declare Text gameMode = "{{ gameMode }}";
+declare Boolean forceReset = {{ forceReset }};
+declare Text activeLayer = "{{ layer }}";
+declare Text visibleLayerInit = "{{ visibleLayerInit }}";
+declare Boolean disablePersonalHud = {{ disablePersonalHud }};
 
 declare Boolean exp_widgetCurrentVisible = False;
 declare Boolean exp_widgetVisibilityChanged = False;
@@ -66,7 +66,7 @@ if (!EXP_widgetVisible.existskey(id) || forceReset) {
 }
 
 if (!EXP_widgetVisible[id].existskey(gameMode) ) {
-	EXP_widgetVisible[id][gameMode] = <?php echo $win->getWidgetVisible(); ?>;
+	EXP_widgetVisible[id][gameMode] = {{ widgetVisible }};
 }
 
 if (!EXP_widgetLayers.existskey(id) || forceReset) { 
@@ -82,7 +82,7 @@ if (!EXP_widgetLastPosRel.existskey(id) || forceReset) {
 }
 
 if (!EXP_widgetLastPosRel[id].existskey(gameMode)) {
-	EXP_widgetLastPosRel[id][gameMode] = < <?php echo $this->getNumber($win->getPosX()) ?>, <?php echo $this->getNumber($win->getPosY()) ?>, -3.0>;
+	EXP_widgetLastPosRel[id][gameMode] = < {{ posX }}, {{ posY }}, -3.0>;
 }
 
 if (!disablePersonalHud) {

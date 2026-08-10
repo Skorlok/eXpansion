@@ -6,7 +6,7 @@ declare CMlQuad ScrollDown <=> (Page.GetFirstChild("scrollVDown") as CMlQuad);
 declare CMlFrame Content <=> (Page.GetFirstChild("content") as CMlFrame);
 declare CMlFrame ScrollableArea <=> (Page.GetFirstChild("scrollableArea") as CMlFrame);
 
-declare contentSizeY = <?php echo $this->contentSizeY; ?>;
+declare contentSizeY = {{ contentSizeY }};
 
 declare Real pager_scrollYOriginPosition;
 

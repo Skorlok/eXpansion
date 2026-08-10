@@ -1,19 +1,13 @@
-<?php
-$disableAutoClose = 'False';
-if (isset($this->disableAutoClose))
-    $disableAutoClose = 'True';
-?>
-
 declare mainWindow <=> Page.GetFirstChild("Frame");
-declare isMinimized = <?php echo $this->isMinimized ?>;                                          
+declare isMinimized = {{ isMinimized }};                                          
 declare isAnimation = False;                                          
 
 declare lastAction = Now;
-declare autoCloseTimeout = <?php echo $this->autoCloseTimeout ?>;
-declare disableAutoClose = <?php echo $disableAutoClose ?>;
-declare positionMin = <?php echo (is_int($this->posXMin) ? $this->posXMin . '.0' : $this->posXMin) ?>;
-declare positionMax = <?php echo (is_int($this->posXMax) ? $this->posXMax . '.0' : $this->posXMax) ?>;
-mainWindow.RelativePosition.X = <?php echo $this->posX ?>.0;
+declare autoCloseTimeout = {{ autoCloseTimeout }};
+declare disableAutoClose = False;
+declare positionMin = {{ posXMin }};
+declare positionMax = {{ posXMax }};
+mainWindow.RelativePosition.X = {{ posX }};
 
 if(autoCloseTimeout <= 0){
     disableAutoClose = True;

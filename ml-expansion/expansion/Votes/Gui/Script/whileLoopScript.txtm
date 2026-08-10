@@ -123,7 +123,7 @@ if ((Now - lastUpdateTime) >= 100) {
                     } else {
                         if (voters == 1) {
 
-                            <?php echo ($this->isTrackmania) ? "" : "/*";?>
+                            {{ disableNotTM_1 }}
 
                             if (Player.Score is CTmScore) {
                                 if (Player.Score != Null) {
@@ -145,7 +145,7 @@ if ((Now - lastUpdateTime) >= 100) {
                                 }
                             }
 
-                            <?php echo ($this->isTrackmania) ? "" : "*/";?>
+                            {{ disableNotTM_2 }}
 
                             if (Player.Score is CSmScore) {
                                 if (Player.Score.Points > 0) {

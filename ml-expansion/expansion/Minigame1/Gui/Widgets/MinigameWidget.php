@@ -65,6 +65,7 @@ class MinigameWidget extends \ManiaLivePlugins\eXpansion\Gui\Widgets\PlainWidget
 
         $this->script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Minigame1/Gui/Script");
         $this->script->setParam("action", self::$action);
+        $this->script->setParam("widgetId", $this->getId());
         $this->registerScript($this->script);
     }
 

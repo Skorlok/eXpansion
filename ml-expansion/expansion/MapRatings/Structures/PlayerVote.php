@@ -6,11 +6,11 @@ class PlayerVote extends \Maniaplanet\DedicatedServer\Structures\AbstractStructu
 {
 
     public $login;
-    public $vote;
+    public $rating;
 
-    public function __construct($login = null, $vote = null)
+    public function __construct($login = null, $rating = null)
     {
         $this->login = $login;
-        $this->vote = $vote;
+        $this->rating = $rating;
     }
 }

@@ -1,5 +1,5 @@
-declare sizeX = <?php echo (gettype($this->sizeX) == "integer") ? ($this->sizeX . '.0') : ($this->sizeX) ?>;
-declare sizeY = <?php echo (gettype($this->sizeY) == "integer") ? ($this->sizeY . '.0') : ($this->sizeY) ?>;
+declare sizeX = {{ sizeX }};
+declare sizeY = {{ sizeY }};
 
 declare CMlQuad minimizeButton <=> (Page.GetFirstChild("minimizeButton") as CMlQuad);
 declare CMlLabel TitleWidget <=> (Page.GetFirstChild("widgetTitle") as CMlLabel);

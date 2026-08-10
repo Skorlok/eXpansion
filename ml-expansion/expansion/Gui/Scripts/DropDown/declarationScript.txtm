@@ -1,6 +1,6 @@
-declare CMlFrame Frame<?php echo $this->dropdownIndex ?> <=> (Page.GetFirstChild("<?php echo $this->name ?>f") as CMlFrame);
-declare CMlLabel Label<?php echo $this->dropdownIndex ?> <=> (Page.GetFirstChild("<?php echo $this->name ?>l") as CMlLabel);
-declare CMlEntry Output<?php echo $this->dropdownIndex ?> <=> (Page.GetFirstChild("<?php echo $this->name ?>e") as CMlEntry);
-Frame<?php echo $this->dropdownIndex ?>.Hide();
+declare CMlFrame Frame{{ dropdownIndex }} <=> (Page.GetFirstChild("{{ name }}f") as CMlFrame);
+declare CMlLabel Label{{ dropdownIndex }} <=> (Page.GetFirstChild("{{ name }}l") as CMlLabel);
+declare CMlEntry Output{{ dropdownIndex }} <=> (Page.GetFirstChild("{{ name }}e") as CMlEntry);
+Frame{{ dropdownIndex }}.Hide();
 
-Output<?php echo $this->dropdownIndex ?>.Value = "<?php echo $this->selected; ?>";
+Output{{ dropdownIndex }}.Value = "{{ selected }}";

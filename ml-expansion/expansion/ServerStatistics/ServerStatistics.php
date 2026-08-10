@@ -97,7 +97,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->db->execute($q);
         }
 
-        $this->nbPlayer = 0;
         foreach ($this->storage->players as $player) {
             if ($player->isConnected) {
                 $this->players[$player->login] = $player->login;
@@ -354,7 +353,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->players = array();
         foreach ($this->storage->players as $player) {
             if ($player->isConnected) {
-                $this->nbPlayer++;
                 $this->players[$player->login] = $player->login;
             }
         }

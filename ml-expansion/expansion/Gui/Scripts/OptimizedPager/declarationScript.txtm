@@ -24,13 +24,13 @@ declare Real ScrollBgHeight = ScrollBg.Size.Y;
 declare Real pagerStartPos = ScrollBar.RelativePosition.Y;
 declare Real pagerStopPosition = pagerStartPos - ScrollBgHeight + ScrollBarHeight;
 
-declare Text[][Integer] textData <?php echo $this->items; ?>;
-declare Text[][Integer] data <?php echo $this->data;  ?>;
+declare Text[][Integer] textData {{ items }};
+declare Text[][Integer] data {{ data }};
 
-declare Integer rowsPerPage = <?php echo $this->rowPerPage;  ?>;
+declare Integer rowsPerPage = {{ rowPerPage }};
 
-declare Integer itemsPerRow = <?php echo $this->itemsPerRow; ?>;
-declare Integer totalRows = <?php echo $this->totalRows; ?>;
+declare Integer itemsPerRow = {{ itemsPerRow }};
+declare Integer totalRows = {{ totalRows }};
 
 declare Integer currentIndex = 0;
 declare Integer oldIndex = 0;

@@ -1,23 +1,23 @@
-declare Integer nbShow = <?php echo $this->nbRecord ?>;
-declare Integer nbFields =  <?php echo $this->nbFields ?>;
-declare Integer nbFirstFields =  <?php echo $this->nbFirstFields ?>;
+declare Integer nbShow = {{ nbRecord }};
+declare Integer nbFields =  {{ nbFields }};
+declare Integer nbFirstFields =  {{ nbFirstFields }};
 
 
 //Ranks of the players
-declare Integer[Text] playerTimes<?php echo $this->varName ?> for UI = Integer[Text];
-playerTimes<?php echo $this->varName ?>.clear();
-playerTimes<?php echo $this->varName ?> = <?php echo $this->playerTimes ?>;
+declare Integer[Text] playerTimes{{ varName }} for UI = Integer[Text];
+playerTimes{{ varName }}.clear();
+playerTimes{{ varName }} = {{ playerTimes }};
 
 //The latest chackpoint the player past
-declare Text[Text] playerNickName<?php echo $this->varName ?> for UI = Text[Text];
-playerNickName<?php echo $this->varName ?>.clear();
-playerNickName<?php echo $this->varName ?> = <?php echo $this->playerNicks ?>;
+declare Text[Text] playerNickName{{ varName }} for UI = Text[Text];
+playerNickName{{ varName }}.clear();
+playerNickName{{ varName }} = {{ playerNicks }};
 
 declare playersOnServer = Text[Text];
 declare nbCount = 0;
 
 // test
-declare Boolean needUpdate<?php echo $this->varName ?> for UI = True;
+declare Boolean needUpdate{{ varName }} for UI = True;
 declare lastUpdateTime = 0;
 
 declare Integer animStart = Now;

@@ -3,8 +3,8 @@ declare specsLabel = (Page.GetFirstChild("specs") as CMlLabel);
 declare playerQ = (Page.GetFirstChild("playerQ") as CMlLabel);
 declare specQ = (Page.GetFirstChild("specQ") as CMlLabel);
 
-declare Integer maxPlayers = <?php echo $this->maxPlayers; ?>;
-declare Integer maxSpecs= <?php echo $this->maxSpecs; ?>;
-declare Real div = <?php echo $this->div; ?>;
+declare Integer maxPlayers = {{ maxPlayers }};
+declare Integer maxSpecs= {{ maxSpecs }};
+declare Real div = {{ div }};
 
 declare eXp_lastNbPlayerUpdate = 0;

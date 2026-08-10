@@ -51,4 +51,15 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $netStats_PosX = 42;
     public $netStats_PosY = 0;
+
+    /*public function __unserialize(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (property_exists($this, $key)) {
+                $this->$key = $value;
+            } else {
+                echo "Warning: Unknown property '$key' in Config class. This property will be ignored." . PHP_EOL;
+            }
+        }
+    }*/
 }

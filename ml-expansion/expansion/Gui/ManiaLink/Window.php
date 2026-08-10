@@ -123,24 +123,24 @@ class Window extends ManiaLink
         $scriptLib = "";
 
         foreach ($this->userScript as $script) {
-            $dDeclares .= $script->getDeclarationScript($this, false);
-            $dDeclares .= $script->getEndScript($this, false);
-            $wLoop     .= $script->getWhileLoopScript($this, false);
-            $scriptLib .= $script->getlibScript($this, false);
+            $dDeclares .= $script->getDeclarationScript();
+            $dDeclares .= $script->getEndScript();
+            $wLoop     .= $script->getWhileLoopScript();
+            $scriptLib .= $script->getlibScript();
         }
 
         foreach ($this->overrideScripts as $script) {
-            $dDeclares .= $script->getDeclarationScript($this, false);
-            $dDeclares .= $script->getEndScript($this, false);
-            $wLoop     .= $script->getWhileLoopScript($this, false);
-            $scriptLib .= $script->getlibScript($this, false);
+            $dDeclares .= $script->getDeclarationScript();
+            $dDeclares .= $script->getEndScript();
+            $wLoop     .= $script->getWhileLoopScript();
+            $scriptLib .= $script->getlibScript();
         }
 
         foreach ($this->elementsScript as $elementScript) {
-            $dDeclares .= $elementScript->getDeclarationScript($this, false);
-            $dDeclares .= $elementScript->getEndScript($this, false);
-            $wLoop     .= $elementScript->getWhileLoopScript($this, false);
-            $scriptLib .= $elementScript->getlibScript($this, false);
+            $dDeclares .= $elementScript->getDeclarationScript();
+            $dDeclares .= $elementScript->getEndScript();
+            $wLoop     .= $elementScript->getWhileLoopScript();
+            $scriptLib .= $elementScript->getlibScript();
         }
 
         foreach ($this->moreScripts as $raw) {
@@ -158,8 +158,10 @@ class Window extends ManiaLink
         $this->windowScript->setParam("closeAction",       $this->closeAction);
         $this->windowScript->setParam("forceReset",        $this->getBoolean(DEBUG));
         $this->windowScript->setParam("disableAnimations", $this->getBoolean($this->guiConfig->disableAnimations));
+        $this->windowScript->setParam("startPosX",         (-1 * intval($this->getSizeX() / 2)) . ".0");
+        $this->windowScript->setParam("startPosY",         intval($this->getSizeY() / 2) . ".0");
 
-        return $this->windowScript->getDeclarationScript($this, false);
+        return $this->windowScript->getDeclarationScript();
     }
 
     public function registerCloseCallback($callback)

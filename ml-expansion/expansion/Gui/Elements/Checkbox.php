@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 /**
  * Description of Checkbox
  *
@@ -16,7 +18,7 @@ class Checkbox
     public static function getScriptML()
     {
         if (self::$script === null) {
-            self::$script = new \ManiaLivePlugins\eXpansion\Gui\Scripts\CheckboxScript();
+            self::$script = new Script("Gui/Scripts/Checkbox");
         }
         return self::$script;
     }

@@ -152,6 +152,14 @@ class ConfigManager
                 $this->configurations[$class] = $config;
             }
 
+            /*$scopeStorage = ScopeStorage::getInstance();
+            $scopeVar = new TypeInt($class . $var->getName(), "", $scopeStorage, Variable::SCOPE_SERVER, false);
+            $var->setScopeHandler($scopeVar);
+            $scopeClass = get_class($scopeStorage);
+            if (!isset($this->variables[$scopeClass])) {
+                $this->variables[$scopeClass] = array();
+            }
+            $this->variables[$scopeClass][$scopeVar->getName()] = $scopeVar;*/
             $scopeVar = new TypeInt($class . $var->getName(), "", Config::getInstance(), Variable::SCOPE_SERVER, false);
             $var->setScopeHandler($scopeVar);
             if (!isset($this->variables[get_class(Config::getInstance())])) {

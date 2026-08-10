@@ -1,11 +1,3 @@
-<?php
-
-$startPosX = (-1 * intval($win->getSizeX() / 2)) . ".0";
-$startPosY = intval($win->getSizeY() / 2) . ".0";
-
-?>
-
-
 <script><!--
 #Include "MathLib" as MathLib
 #Include "TextLib" as TextLib
@@ -17,7 +9,7 @@ $startPosY = intval($win->getSizeY() / 2) . ".0";
 #Include "AnimLib" as AL
 
 //Function definitions
-<?php echo $this->scriptLib ?>
+{{ scriptLib }}
 
 Void stackActivateWindow(Text window) {
     declare Text[] exp_windowStack for UI = Text[];
@@ -71,13 +63,13 @@ main () {
     declare Boolean mouseButton for Page;
     declare Integer tabIndex = -1;
 
-    declare Window <=> (Page.GetFirstChild("<?php echo $win->getId() ?>") as CMlFrame);
+    declare Window <=> (Page.GetFirstChild("{{ id }}") as CMlFrame);
     declare CMlLabel TitlebarText <=> (Page.GetFirstChild("TitlebarText") as CMlLabel);
 
     declare MoveWindow = False;
     declare Scroll = False;
     declare closeWindow = False;
-    declare Text closeAction = "<?php echo $this->closeAction; ?>";
+    declare Text closeAction = "{{ closeAction }}";
 
     declare openWindow = False;
 
@@ -90,11 +82,11 @@ main () {
     declare Vec3 DeltaPos = <0.0, 0.0, 0.0>;
     declare Vec2 Offset = <0., 0.>;
 
-    declare Text windowId = "<?php echo $win->getId() ?>";
+    declare Text windowId = "{{ id }}";
 
-    declare Text id = "<?php echo $this->name ?>";
-    declare Boolean forceReset = <?php echo $this->forceReset; ?>;
-    declare Boolean disableAnimations = <?php echo $this->disableAnimations; ?>;
+    declare Text id = "{{ name }}";
+    declare Boolean forceReset = {{ forceReset }};
+    declare Boolean disableAnimations = {{ disableAnimations }};
     //declare Boolean disableAnimations = True;
     declare persistent Vec3[Text] EXP_windowLastPosRel;
     declare Text[] exp_windowStack for UI = Text[];
@@ -106,10 +98,10 @@ main () {
 
 
     //Declarations by containers included in this window
-    <?php echo $this->dDeclares ?>
+    {{ dDeclares }}
 
     if ( !EXP_windowLastPosRel.existskey(id) || forceReset) {
-        EXP_windowLastPosRel[id] = < <?php echo $startPosX ?>, <?php echo  $startPosY ?>, 0.0>;
+        EXP_windowLastPosRel[id] = < {{ startPosX }}, {{ startPosY }}, 0.0>;
     }
 
     LastDelta = EXP_windowLastPosRel[id];
@@ -127,7 +119,7 @@ main () {
     while(True) {
 	yield;
 
-        <?php echo $this->wLoop ?>
+        {{ wLoop }}
 
         if (openWindow) {
             Window.RelativeScale = AL::Ease("SincOut", (Now - lastAction) * 1., 0.5, 0.5, 200.);
@@ -214,8 +206,6 @@ main () {
                                 stackRemoveWindow(id);
                                 continue;
                             } else {
-                           // declare Real winX = Window.RelativePosition.X + <?php echo $win->getSizeX()/2; ?>;
-                           //declare Real winY = Window.RelativePosition.Y;
 
                             declare Real winX = 0.;
                             declare Real winY = 0.;

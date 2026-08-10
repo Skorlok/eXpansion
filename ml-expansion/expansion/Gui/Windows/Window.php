@@ -163,7 +163,7 @@ abstract class Window extends \ManiaLive\Gui\Window
                     $this->addScriptToLib($script->getlibScript($this, $component));
                 }
 
-                if ($isset || $script->multiply()) {
+                if ($isset) {
                     $this->calledScripts[$script->getRelPath()] = $script;
 
                     $dec = $script->getDeclarationScript($this, $component);
@@ -195,7 +195,6 @@ abstract class Window extends \ManiaLive\Gui\Window
 
         foreach ($this->calledScripts as $script) {
             $this->addScriptToMain($script->getEndScript($this));
-            $script->reset();
         }
 
         foreach ($this->_scripts as $script) {
@@ -212,6 +211,9 @@ abstract class Window extends \ManiaLive\Gui\Window
         $this->script->setParam("wLoop", $this->wLoop);
         $this->script->setParam("closeAction", $this->_closeAction);
         $this->script->setParam("disableAnimations", Config::getInstance()->disableAnimations ? "True" : "False");
+        $this->script->setParam("startPosX", (-1 * intval($this->getSizeX() / 2)) . ".0");
+        $this->script->setParam("startPosY", intval($this->getSizeY() / 2) . ".0");
+        $this->script->setParam("id", $this->getId());
         $reset = "False";
         if (DEBUG) {
             $reset = "True";

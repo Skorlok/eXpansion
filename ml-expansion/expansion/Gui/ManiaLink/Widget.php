@@ -26,7 +26,6 @@ class Widget extends ManiaLink
         $this->axisDisabled = "";
 
         $this->eXpWidgetScript = new Script('Gui\Scripts\templateWidgetScript');
-        $this->eXpWidgetScript->setParam('disablePersonalHud', guiConfig::getInstance()->disablePersonalHud ? 'True' : 'False');
         $this->registerScript($this->eXpWidgetScript);
         $this->size = array(0, 0);
     }
@@ -62,6 +61,9 @@ class Widget extends ManiaLink
 
     protected function getMlScripts()
     {
+        /** @var guiConfig $guiConfig */
+        $guiConfig = guiConfig::getInstance();
+
         $this->scripts = array('declarationScript' => "", 'whileLoopScript' => "", 'libScript' => "", 'endDeclarationScript' => "");
 
         $this->eXpWidgetScript->setParam("name", $this->getWidgetName());
@@ -70,25 +72,30 @@ class Widget extends ManiaLink
         $this->eXpWidgetScript->setParam("activeLayer", $this->getLayer());
         $this->eXpWidgetScript->setParam("visibleLayerInit", $this->getLayer());
         $this->eXpWidgetScript->setParam("forceReset", $this->getBoolean(DEBUG));
+        $this->eXpWidgetScript->setParam('disablePersonalHud', $guiConfig->disablePersonalHud ? 'True' : 'False');
+        $this->eXpWidgetScript->setParam("posX", $this->eXpWidgetScript->getNumber($this->getPosX()));
+        $this->eXpWidgetScript->setParam("posY", $this->eXpWidgetScript->getNumber($this->getPosY()));
+        $this->eXpWidgetScript->setParam("deltaX", $this->axisDisabled == 'x' ? '' : "DeltaPos.X = MouseX - lastMouseX;");
+        $this->eXpWidgetScript->setParam("deltaY", $this->axisDisabled == 'y' ? '' : "DeltaPos.Y = MouseY - lastMouseY;");
 
         foreach ($this->userScript as $userScript) {
-            $this->scripts['declarationScript'] .= $userScript->getDeclarationScript($this, false);
-            $this->scripts['endDeclarationScript'] .= $userScript->getEndScript($this, false);
-            $this->scripts['whileLoopScript'] .= $userScript->getWhileLoopScript($this, false);
-            $this->scripts['libScript'] .= $userScript->getlibScript($this, false);
+            $this->scripts['declarationScript'] .= $userScript->getDeclarationScript();
+            $this->scripts['endDeclarationScript'] .= $userScript->getEndScript();
+            $this->scripts['whileLoopScript'] .= $userScript->getWhileLoopScript();
+            $this->scripts['libScript'] .= $userScript->getlibScript();
         }
 
         foreach ($this->elementsScript as $elementScript) {
-            $this->scripts['declarationScript'] .= $elementScript->getDeclarationScript($this, false);
-            $this->scripts['endDeclarationScript'] .= $elementScript->getEndScript($this, false);
-            $this->scripts['whileLoopScript'] .= $elementScript->getWhileLoopScript($this, false);
-            $this->scripts['libScript'] .= $elementScript->getlibScript($this, false);
+            $this->scripts['declarationScript'] .= $elementScript->getDeclarationScript();
+            $this->scripts['endDeclarationScript'] .= $elementScript->getEndScript();
+            $this->scripts['whileLoopScript'] .= $elementScript->getWhileLoopScript();
+            $this->scripts['libScript'] .= $elementScript->getlibScript();
         }
 
         $this->widgetScript->setParam("dDeclares", $this->scripts['declarationScript'] . $this->scripts['endDeclarationScript']);
         $this->widgetScript->setParam("scriptLib", $this->scripts['libScript']);
         $this->widgetScript->setParam("wLoop", $this->scripts['whileLoopScript']);
 
-        return $this->widgetScript->getDeclarationScript(false, false);
+        return $this->widgetScript->getDeclarationScript();
     }
 }

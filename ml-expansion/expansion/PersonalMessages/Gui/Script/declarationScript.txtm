@@ -1,17 +1,5 @@
-<?php
-$start = 'False';
-if (isset($this->startEdition))
-    $start = 'True';
-?>
-
-
-declare Text sendAction = "<?php echo $this->sendAction ?>";
-declare Boolean startEdition = <?php echo $start ?>;
+declare Text sendAction = "{{ sendAction }}";
 declare CMlEntry inputBox <=> (Page.GetFirstChild("messagebox") as CMlEntry);
 declare Boolean pmStatus for UI = True;
 
 isMinimized = pmStatus;
-
-if (startEdition) {    
-    inputBox.StartEdition();
-}

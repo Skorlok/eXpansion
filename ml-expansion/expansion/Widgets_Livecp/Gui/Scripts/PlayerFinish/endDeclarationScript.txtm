@@ -1,6 +1,6 @@
-declare Integer nbShow = <?php echo $this->nbRecord ?>;
-declare Integer nbFields =  <?php echo $this->nbFields ?>;
-declare Integer nbFirstFields =  <?php echo $this->nbFirstFields ?>;
+declare Integer nbShow = {{ nbRecord }};
+declare Integer nbFields =  {{ nbFields }};
+declare Integer nbFirstFields =  {{ nbFirstFields }};
 
 //Ranks of the players
 declare Text[Text] playerNickName = Text[Text];
@@ -8,7 +8,7 @@ declare Integer[Text] playerTimes = Integer[Text];
 declare Integer[Text] playerCPs = Integer[Text];
 declare Integer[Text] playerLastCP = Integer[Text];
 
-declare Integer totalCps = <?php echo $this->totalCp ?>;
+declare Integer totalCps = {{ totalCp }};
 
 declare Boolean needUpdate = True;
 

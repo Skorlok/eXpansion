@@ -1,6 +1,6 @@
 declare lastupdate = 0;
 declare Real angle = 0.;
-declare Integer particleCount = <?php echo $this->particleCount; ?>;
+declare Integer particleCount = {{ particleCount }};
 declare CMlQuad[] particle = CMlQuad[];
 
 declare Vec3[] particleMeta = Vec3[];

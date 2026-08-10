@@ -154,7 +154,8 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->syncSettings();
 
         $this->script = new Script("Votes/Gui/Script");
-        $this->script->setParam("isTrackmania", ($this->expStorage->simpleEnviTitle == "TM"));
+        $this->script->setParam("disableNotTM_1", ($this->expStorage->simpleEnviTitle != "TM" ? "/*" : " "));
+        $this->script->setParam("disableNotTM_2", ($this->expStorage->simpleEnviTitle != "TM" ? "*/" : " "));
         
 
         $this->widget = new Widget("Votes\Gui\Widgets\VoteManagerWidget.xml");

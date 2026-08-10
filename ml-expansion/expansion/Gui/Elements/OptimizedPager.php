@@ -270,15 +270,31 @@ class OptimizedPager extends \ManiaLivePlugins\eXpansion\Gui\Control implements 
             $chunk0Items = array_slice($allItems, 0, $config->chunkSize);
             $chunk0Data  = array_slice($allData,  0, $config->chunkSize);
 
+            $vn = $varName . '_';
+            $chunkDeclarations = "";
+            $chunkWindowCases  = "";
+            $chunkRowDataCases = "";
+            for ($c = 1; $c < $chunkCount; $c++) {
+                $chunkDeclarations .= "declare Text[][Integer] {$vn}textData_{$c} for UI = Text[][Integer];\n";
+                $chunkDeclarations .= "declare Text[][Integer] {$vn}data_{$c} for UI = Text[][Integer];\n";
+            }
+            for ($c = 0; $c < $chunkCount; $c++) {
+                $chunkWindowCases  .= "case {$c}: { if ({$vn}textData_{$c}.existskey(inChunk)) windowItems[i] = {$vn}textData_{$c}[inChunk]; }\n";
+                $chunkRowDataCases .= "case {$c}: { if ({$vn}data_{$c}.existskey(inChunk)) rowData = {$vn}data_{$c}[inChunk]; }\n";
+            }
+
             $script = new Script("Gui\Scripts\OptimizedPagerChunked");
-            $script->setParam("chunkSize",   $config->chunkSize);
-            $script->setParam("chunkCount",  $chunkCount);
-            $script->setParam("rowPerPage",  (int)$rowsPerPage);
-            $script->setParam("itemsPerRow", (int)$itemsPerRow);
-            $script->setParam("totalRows",   (int)$totalRows);
-            $script->setParam("varName",     $varName . '_');
-            $script->setParam("chunk0items", self::formatMsArray($chunk0Items));
-            $script->setParam("chunk0data",  self::formatMsArray($chunk0Data));
+            $script->setParam("chunkSize",         $config->chunkSize);
+            $script->setParam("chunkCount",        $chunkCount);
+            $script->setParam("rowPerPage",        (int)$rowsPerPage);
+            $script->setParam("itemsPerRow",       (int)$itemsPerRow);
+            $script->setParam("totalRows",         (int)$totalRows);
+            $script->setParam("varName",           $vn);
+            $script->setParam("chunk0items",       self::formatMsArray($chunk0Items));
+            $script->setParam("chunk0data",        self::formatMsArray($chunk0Data));
+            $script->setParam("chunkDeclarations", $chunkDeclarations);
+            $script->setParam("chunkWindowCases",  $chunkWindowCases);
+            $script->setParam("chunkRowDataCases", $chunkRowDataCases);
 
             $mlClass->registerOrOverrideScript($script);
             self::sendChunkUpdate($varName, $allItems, $allData, $totalRows, $login);

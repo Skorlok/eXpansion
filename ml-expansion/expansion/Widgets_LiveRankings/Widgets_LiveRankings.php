@@ -510,8 +510,8 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     public function getTrayScript($sizeX, $nbField)
     {
         $script = new Script("Gui/Scripts/NewTray");
-        $script->setParam("sizeX", $sizeX);
-        $script->setParam("sizeY", 3 + $nbField * 4);
+        $script->setParam("sizeX", $script->getNumber($sizeX));
+        $script->setParam("sizeY", $script->getNumber(3 + $nbField * 4));
         return $script;
     }
 

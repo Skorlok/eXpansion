@@ -20,8 +20,8 @@ declare Real pager_deltaMouseYPosition;
 declare Real pager_startMouseYPosition;                    
 declare pager_moveScroll = False;
 declare pager_firstClick = False;
-declare Real itemSizeY = <?php echo $this->getNumber($this->sizeY); ?>;
-declare Real pagerSizeY = <?php echo $this->getNumber($this->pagerSizeY); ?>;
+declare Real itemSizeY = {{ sizeY }};
+declare Real pagerSizeY = {{ pagerSizeY }};
 declare Real oldPercent = -1.0;
 declare Real percent = 0.0;
 

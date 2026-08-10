@@ -91,11 +91,12 @@ class EmotePanel extends \ManiaLivePlugins\eXpansion\Gui\Widgets\Widget
         $this->addComponent($this->_windowFrame);
 
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\TrayWidget");
+        $script->setParam('smaller', '>=');
         $script->setParam('isMinimized', 'True');
         $script->setParam('autoCloseTimeout', '3500');
-        $script->setParam('posXMin', -50);
-        $script->setParam('posX', -50);
-        $script->setParam('posXMax', -4);
+        $script->setParam('posXMin', $script->getNumber(-50));
+        $script->setParam('posX', $script->getNumber(-50));
+        $script->setParam('posXMax', $script->getNumber(-4));
         $this->registerScript($script);
 
     }

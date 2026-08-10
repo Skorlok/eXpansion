@@ -6,7 +6,7 @@ use ManiaLivePlugins\eXpansion\Emotes\Gui\Windows\EmotePanel;
 
 class Emotes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
+    private $config;
     private $timeStamps = "";
     public static $action_GG;
     public static $action_Afk;

@@ -123,6 +123,21 @@ class Player extends \Maniaplanet\DedicatedServer\Structures\Player
 	/** @var float */
 	public $ladderScore;
 
+	////////////////////////////////////////
+	// Extra fields for eXpansion         //
+	////////////////////////////////////////
+
+	/** @var int */
+	public $lastTimeUpdate;
+	/** @var int */
+	public $sessionJoinTime;
+	/** @var int */
+	public $point;
+	/** @var int */
+	public $team;
+	/** @var bool */
+	public $away;
+
 	/**
 	 * @param \Maniaplanet\DedicatedServer\Structures\Player $data
 	 */

@@ -65,11 +65,12 @@ class Communication extends ExpPlugin
         $this->msg_help = eXpGetMessage("#personalmessage#Usage /send [login] your personal message here");
 
         $this->trayScript = new Script("Gui\Scripts\TrayWidget");
+        $this->trayScript->setParam('smaller', '>=');
         $this->trayScript->setParam('isMinimized', "True");
         $this->trayScript->setParam('autoCloseTimeout', 0); //TODO: add config
-        $this->trayScript->setParam('posXMin', -116);
-        $this->trayScript->setParam('posX', -116);
-        $this->trayScript->setParam('posXMax', -4);
+        $this->trayScript->setParam('posXMin', $this->trayScript->getNumber(-116));
+        $this->trayScript->setParam('posX', $this->trayScript->getNumber(-116));
+        $this->trayScript->setParam('posXMax', $this->trayScript->getNumber(-4));
 
         $this->script = new Script("Communication\Gui\Script");
 

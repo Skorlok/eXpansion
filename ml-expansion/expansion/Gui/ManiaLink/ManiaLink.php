@@ -398,11 +398,11 @@ class ManiaLink extends Singletons
     }
 
     protected function getMlScripts() {
-        $this->widgetScript->setParam("dDeclares", $this->scripts->getDeclarationScript($this, false) . $this->scripts->getEndScript($this, false));
-        $this->widgetScript->setParam("scriptLib", $this->scripts->getlibScript($this, false));
-        $this->widgetScript->setParam("wLoop", $this->scripts->getWhileLoopScript($this, false));
+        $this->widgetScript->setParam("dDeclares", $this->scripts->getDeclarationScript() . $this->scripts->getEndScript());
+        $this->widgetScript->setParam("scriptLib", $this->scripts->getlibScript());
+        $this->widgetScript->setParam("wLoop", $this->scripts->getWhileLoopScript());
 
-        return $this->widgetScript->getDeclarationScript(false, false);
+        return $this->widgetScript->getDeclarationScript();
     }
 
     protected function getLanguages() {

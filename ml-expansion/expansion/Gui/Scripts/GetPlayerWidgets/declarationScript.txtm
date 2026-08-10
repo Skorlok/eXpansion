@@ -2,7 +2,7 @@
 declare Text outText = "";
 declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntry);
 
-declare Text action = "<?php echo $this->action;?>";
+declare Text action = "{{ action }}";
 
 
 outText = "";
