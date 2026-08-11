@@ -373,7 +373,9 @@ class MapRatings extends ExpPlugin
         $ratings = $this->db->execute("SELECT uid, rating FROM exp_ratings WHERE uid IN (" . $uids . ") AND login = " . $this->db->quote($login) . ";")->fetchArrayOfObject();
 
         foreach ($ratings as $rating) {
-            $mapsByUid[$rating->uid]->mapRating->playerVotes[$login] = $rating->rating;
+            if (isset($mapsByUid[$rating->uid]->mapRating)) {
+                $mapsByUid[$rating->uid]->mapRating->playerVotes[$login] = $rating->rating;
+            }
         }
     }
 

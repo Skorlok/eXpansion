@@ -148,6 +148,12 @@ Statistics/
   Statistics/Gui/Windows/TopVoter.php
   Statistics/Gui/Windows/TrackPlay.php
   Statistics/Gui/Windows/Winners.php
+  
+========================================
+DÉJÀ CONVERTIS EN XML avec OptimizedPager
+========================================
+
+  Maps/Gui/Windows/Maplist.php
 
 ========================================
 DÉJÀ CONVERTIS EN XML avec Pager
@@ -187,7 +193,6 @@ DÉJÀ CONVERTIS EN XML sans pager
   Gui/Windows/Notice.php
   ManiaExchange/Gui/Windows/MxInfos.php
   Maps/Gui/Windows/MapInfo.php
-  Maps/Gui/Windows/Maplist.php
   MapSuggestion/Gui/Windows/MapWish.php
   NetStat/Gui/Windows/NetStatWindow.php
   Quiz/Gui/Windows/HiddenQuestionWindow.php
