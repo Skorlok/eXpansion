@@ -147,7 +147,7 @@ class Core extends types\ExpPlugin
      */
     public function eXpOnInit()
     {
-        if (file_exists(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php")) {
+        /*if (file_exists(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php")) {
             $newFile = str_replace(
                 "define('APP_ROOT', __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);",
                 "define('APP_ROOT', substr(__DIR__, 0, -9));",
@@ -157,7 +157,7 @@ class Core extends types\ExpPlugin
             str_replace("skorlok/expansion/", "", $newFile);
 
             file_put_contents(APP_ROOT . DIRECTORY_SEPARATOR . "libraries" . DIRECTORY_SEPARATOR . "autoload.php", $newFile);
-        }
+        }*/
 
         //Listen for changes on server events
         Dispatcher::register(\ManiaLivePlugins\eXpansion\Core\Events\ServerSettingsEvent::getClass(), $this);
