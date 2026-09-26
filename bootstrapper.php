@@ -12,7 +12,7 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $optional['pcntl'] = 'pcntl';
 }
 
-$phpOk = (function_exists('version_compare') && version_compare(phpversion(), '5.5.0', '>='));
+$phpOk = (function_exists('version_compare') && version_compare(phpversion(), '5.4.0', '>='));
 
 $requiredPass = true;
 $optionalPass = true;
@@ -28,7 +28,7 @@ echo '
 echo '-----------------------------------------------------' . PHP_EOL;
 echo 'PHP Environment Compatibility Test' . PHP_EOL;
 echo '-----------------------------------------------------' . PHP_EOL;
-echo 'PHP 5.5.0 or newer    -> required  -> '.($phpOk ? ('[ Yes ] ' . phpversion()) : '[ No  ]') . PHP_EOL;
+echo 'PHP 5.4.0 or newer    -> required  -> '.($phpOk ? ('[ Yes ] ' . phpversion()) : '[ No  ]') . PHP_EOL;
 foreach ($required as $ext => $name) {
     if ($ext == 'curl') {
         
