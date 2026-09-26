@@ -403,7 +403,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
     {
         if (!$update) {
             $script = new Script("Endurance/Gui/Scripts/PlayerFinish");
-            $script->setParam("nbScores", 500);
+            $script->setParam("nbScores", 50000);
             $script->setParam("nbFields", $nbField);
             $script->setParam("nbFirstFields", $nbFirstField);
             $script->setParam('varName', 'Liverankings');

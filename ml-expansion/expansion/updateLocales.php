@@ -21,7 +21,7 @@ foreach ($iterator as $dir) {
             }
         }
 
-        $localefiles = array_merge(["en.txt"], glob($messagedir . DIRECTORY_SEPARATOR . "*.txt"));
+        $localefiles = array_merge(array("en.txt"), glob($messagedir . DIRECTORY_SEPARATOR . "*.txt"));
 
         foreach ($localefiles as $localefile) {
             $pluginMessages = array();

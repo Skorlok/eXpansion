@@ -65,7 +65,7 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function team()
     {
-        $outScores = [];
+        $outScores = array();
         $outScores[] = array("PlayerId" => 0, "Score" => 1);
         $outScores[] = array("PlayerId" => 1, "Score" => 2);
 

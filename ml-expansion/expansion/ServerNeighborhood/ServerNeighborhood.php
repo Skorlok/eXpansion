@@ -40,7 +40,6 @@ use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\ServerNeighborhood\Gui\Windows\PlayerList;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -64,6 +63,9 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     /** @var Window */
     private $serverListWindow;
 
+    /** @var Window */
+    private $playerListWindow;
+
     public function eXpOnInit()
     {
         $this->setVersion("1.6");
@@ -83,7 +85,11 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->serverListWindow->setName("ServerList");
         $this->serverListWindow->setSize(120, 105);
         $this->serverListWindow->setTitle("ServerNeighborhood - Server List");
-        $this->serverListWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(14, 87));
+
+        $this->playerListWindow = new Window("ServerNeighborhood\Gui\Windows\PlayerList.xml");
+        $this->playerListWindow->setName("ServerPlayerList");
+        $this->playerListWindow->setSize(120, 105);
+        $this->playerListWindow->setTitle("ServerNeighborhood - Server Players");
     }
 
     public function initWidget()
@@ -309,14 +315,44 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             return;
         }
 
+        /** @var Server $server */
         $server = $this->servers[$serverId];
-        PlayerList::Erase($login);
-        $w = PlayerList::Create($login);
-        $w->setTitle('ServerNeighborhood - Server Players');
-        $w->setSize(120, 105);
-        $w->setServer($server);
-        $w->centerOnScreen();
-        $w->show();
+        $sd     = $server->getServer_data();
+
+        $playersFull = ((int)$sd->server->players->current >= (int)$sd->server->players->maximum);
+        $specsFull   = ((int)$sd->server->spectators->current >= (int)$sd->server->spectators->maximum);
+
+        $playerItems = array();
+        $playerData  = array();
+        $i = 0;
+        foreach ($sd->current->players->player as $player) {
+            $playerItems[$i] = array(
+                '$000' . (string)$player->nickname,
+                '$000' . (string)$player->login,
+                // remove the first 2 parts  from nation
+                '$000' . implode('|', array_slice(explode('|', (string)$player->nation), 2)),
+                '$000' . (string)$player->ladder,
+                '$fff' . ($player->spectator == 'true' ? '🎥' : '🎮'),
+            );
+            $playerData[$i] = array(-1, -1, -1, -1);
+            $i++;
+        }
+
+        $w = $this->playerListWindow;
+        $w->setParam("srvEnv", $w->handleSpecialChars((string)$sd->current->map->environment));
+        $w->setParam("srvName", $w->handleSpecialChars((string)$sd->server->name));
+        $w->setParam("srvPlayers", (string)$sd->server->players->current . '/' . (string)$sd->server->players->maximum);
+        $w->setParam("srvPlayersColor", $playersFull ? 'F00' : '111');
+        $w->setParam("srvSpecs", (string)$sd->server->spectators->current . '/' . (string)$sd->server->spectators->maximum);
+        $w->setParam("srvSpecsColor", $specsFull ? 'F00' : '111');
+        $w->setParam("srvLadder", (string)$sd->server->ladder->minimum . ' - ' . (string)$sd->server->ladder->maximum . 'k');
+        $w->setParam("mapName", $w->handleSpecialChars((string)$sd->current->map->name));
+        $w->setParam("mapAuthor", $w->handleSpecialChars((string)$sd->current->map->author));
+        $w->setParam("mapAuthorTime", $w->handleSpecialChars((string)$sd->current->map->authortime));
+        $w->setParam("joinLink", $w->handleSpecialChars('maniaplanet://#qjoin=' . (string)$sd->server->login . '@' . (string)$sd->server->title));
+        $w->setParam("playerItems", $playerItems);
+        $w->setParam("playerData", $playerData);
+        $w->show($login);
     }
 
     public function showServerList($login)
@@ -358,6 +394,9 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
         $this->serverListWindow = null;
 
-        PlayerList::EraseAll();
+        if ($this->playerListWindow instanceof Window) {
+            $this->playerListWindow->erase();
+        }
+        $this->playerListWindow = null;
     }
 }

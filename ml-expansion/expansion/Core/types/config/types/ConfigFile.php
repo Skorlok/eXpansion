@@ -22,25 +22,17 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\types\config\types;
 
-use ManiaLivePlugins\eXpansion\Core\Gui\Windows\ConfSwitcher;
-
 class ConfigFile extends TypeString
 {
 
     public function showConfWindow($login)
     {
-        ConfSwitcher::Erase($login);
-        $win = ConfSwitcher::Create($login);
-        $win->setTitle("Config selection");
-        $win->centerOnScreen();
-        $win->setSize(100, 100);
-        $win->populate($this);
-        $win->show();
+        // defined in Core/Gui/Controller/ExpSettingsController.php
     }
 
     public function hideConfWindow($login)
     {
-        ConfSwitcher::Erase($login);
+        // defined in Core/Gui/Controller/ExpSettingsController.php
     }
 
     public function hasConfWindow()

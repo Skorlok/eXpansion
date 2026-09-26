@@ -23,6 +23,9 @@ declare Real ScrollBgHeight = ScrollBg.Size.Y;
 
 declare Real pagerStartPos = ScrollBar.RelativePosition.Y;
 declare Real pagerStopPosition = pagerStartPos - ScrollBgHeight + ScrollBarHeight;
+declare Real maxDelta = pagerStartPos - pagerStopPosition;
+
+declare Real scrollStep = 0.1;
 
 declare Boolean isScrollUp = False;
 declare Boolean isScrollDown = False;
@@ -31,3 +34,8 @@ declare Real oldPercent = 0.;
 declare Real percent = 0.;
 
 ScrollableArea.ClipWindowRelativePosition.Y = -ScrollableArea.ClipWindowSize.Y * 0.5;
+
+ScrollUp.Opacity = disabledOpacity;
+if (contentSizeY <= ScrollableArea.ClipWindowSize.Y) {
+    ScrollDown.Opacity = disabledOpacity;
+}

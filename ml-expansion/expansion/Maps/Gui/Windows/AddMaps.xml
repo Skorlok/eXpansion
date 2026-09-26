@@ -1,0 +1,89 @@
+<label posn="0 4 0" sizen="90 6" style="TextStaticSmall" text="{actualPath}"/>
+<frame posn="0 -5 1" id="Pager" scriptevents="1">
+    <frame posn="0 -1 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="122" sizeY="6"/>
+        <label id="column_0_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_0_1_" labelId="column_0_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_0_2_" labelId="column_0_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -7 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="122" sizeY="6"/>
+        <label id="column_1_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_1_1_" labelId="column_1_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_1_2_" labelId="column_1_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -13 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="122" sizeY="6"/>
+        <label id="column_2_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_2_1_" labelId="column_2_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_2_2_" labelId="column_2_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="122" sizeY="6"/>
+        <label id="column_3_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_3_1_" labelId="column_3_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_3_2_" labelId="column_3_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -25 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="122" sizeY="6"/>
+        <label id="column_4_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_4_1_" labelId="column_4_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_4_2_" labelId="column_4_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="122" sizeY="6"/>
+        <label id="column_5_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_5_1_" labelId="column_5_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_5_2_" labelId="column_5_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -37 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="122" sizeY="6"/>
+        <label id="column_6_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_6_1_" labelId="column_6_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_6_2_" labelId="column_6_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="122" sizeY="6"/>
+        <label id="column_7_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_7_1_" labelId="column_7_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_7_2_" labelId="column_7_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -49 0.0001" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="122" sizeY="6"/>
+        <label id="column_8_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_8_1_" labelId="column_8_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_8_2_" labelId="column_8_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="122" sizeY="6"/>
+        <label id="column_9_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_9_1_" labelId="column_9_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_9_2_" labelId="column_9_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -61 0.0001" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="122" sizeY="6"/>
+        <label id="column_10_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_10_1_" labelId="column_10_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_10_2_" labelId="column_10_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="122" sizeY="6"/>
+        <label id="column_11_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_11_1_" labelId="column_11_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_11_2_" labelId="column_11_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -73 0.0001" id="row_12">
+        <exp:listbg indexNumber="12" sizeX="122" sizeY="6"/>
+        <label id="column_12_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_12_1_" labelId="column_12_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_12_2_" labelId="column_12_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_13">
+        <exp:listbg indexNumber="13" sizeX="122" sizeY="6"/>
+        <label id="column_13_0" posn="0 0 1.0E-5" sizen="106 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="93 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="2a2" id="column_13_1_" labelId="column_13_1" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="107 0 1" scale="0.666666667"><exp:button sizeX="24" sizeY="5" action="eXpOptimizedPagerAction" colorize="222" textcolor="ff0" id="column_13_2_" labelId="column_13_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <exp:optimizedpager sizeX="130" sizeY="83" itemsVarName="mapItems" dataVarName="mapData" rowsPerPage="14" itemsPerRow="3" varName="addmaps"/>
+</frame>
+<frame posn="4 -94 1"><exp:button sizeX="32" sizeY="6" text="@Add all" action="exp:eXpansion.Maps:addMapsAddAll:{currentPath}" isTextId="true"/></frame>

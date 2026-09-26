@@ -127,7 +127,8 @@ class Button
         $id = null,
         $class = null,
         $attribute = null,
-        $isTextId = false
+        $isTextId = false,
+        $labelId = null
     )
     {
         /** @var Config $config */
@@ -161,11 +162,20 @@ class Button
         if ($active) {
             $xml .= '<quad posn="-0.5 0 1" sizen="' . ($sizeX+3) . ' ' . ($sizeY+2.5) . '" halign="left" valign="center" style="Icons128x128_Blink" substyle="ShareBlink"/>';
         }
-        if (!empty($text)) {
-            if ($isTextId) {
-                $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" textid="' . $text . '"/>';
+        if (!empty($text) || $labelId) {
+            if ($labelId) {
+                $labelIdAttr = 'id="' . $labelId . '" ';
+            } elseif ($id) {
+                $labelIdAttr = 'id="' . "eXp_ButtonLabel_" . $id . '" ';
             } else {
-                $xml .='<label ' . ($id ? 'id="' . "eXp_ButtonLabel_" . $id . '" ' : '') . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" text="' . $text . '"/>';
+                $labelIdAttr = '';
+            }
+            if ($isTextId) {
+                $xml .='<label ' . $labelIdAttr . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" textid="' . $text . '"/>';
+            } else if (!empty($text)) {
+                $xml .='<label ' . $labelIdAttr . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1" text="' . $text . '"/>';
+            } else {
+                $xml .='<label ' . $labelIdAttr . 'posn="' . (($sizeX+2)/2) . ' 0 2" sizen="' . $sizeX . ' ' . ($sizeY-2) . '" halign="center" valign="center2" style="TextValueSmallSm" textsize="2" ' . $textcolor . 'textemboss="1"/>';
             }
         }
 

@@ -8,8 +8,8 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\MapRatings\Gui\Windows\MapRatingsManager;
 use ManiaLivePlugins\eXpansion\MapRatings\Structures\PlayerVote;
 use ManiaLivePlugins\eXpansion\MapRatings\Classes\Connection as mxConnection;
 use ManiaLivePlugins\eXpansion\MapRatings\Events\MXKarmaEvent;
@@ -63,11 +63,12 @@ class MapRatings extends ExpPlugin
     private $widget;
     private $widgetEndMap;
 
+    /** @var Window */
+    private $ratingsManagerWindow;
+
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
-
-        Gui\Windows\MapRatingsManager::$removeId = \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm("exp:eXpansion.MapRatings:autoRemove");
 
         $this->setPublicMethod("getPlayersRatingsForAllMaps");
 
@@ -163,7 +164,12 @@ class MapRatings extends ExpPlugin
     {
         $this->registerManialinkCallback('saveRating', false, true);
         $this->registerManialinkCallback('showRatingsManager');
-        
+        $this->registerManialinkCallback('autoRemove');
+
+        $this->ratingsManagerWindow = new Window("MapRatings\Gui\Windows\MapRatingsManager.xml");
+        $this->ratingsManagerWindow->setName("MapRatingsManager");
+        $this->ratingsManagerWindow->setSize(120, 90);
+
         $this->reload();
 
         $this->showWidget();
@@ -661,7 +667,7 @@ class MapRatings extends ExpPlugin
             try {
                 $this->connection->removeMapList($filenames);
                 $this->eXpChatSendServerMessage(eXpGetMessage("Maps with bad rating removed successfully."));
-                Gui\Windows\MapRatingsManager::Erase($login);
+                $this->ratingsManagerWindow->erase($login);
             } catch (\Exception $e) {
                 $this->eXpChatSendServerMessage("#error#Error: %s", $login, array($e->getMessage()));
             }
@@ -689,13 +695,31 @@ class MapRatings extends ExpPlugin
 
     public function showRatingsManager($login)
     {
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
-            $window = Gui\Windows\MapRatingsManager::Create($login);
-            $window->setTitle(__("Ratings Manager", $login));
-            $window->setSize(120, 90);
-            $window->setRatings($this->autoMapManager_getMaps());
-            $window->show();
+        if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
+            return;
         }
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->autoMapManager_getMaps() as $rating) {
+            $items[$i] = array(
+                $rating->map->environnement,
+                Formatting::stripColors(Formatting::stripStyles($rating->map->name)),
+                '$000' . $rating->map->author,
+                \ManiaLive\Utilities\Time::fromTM($rating->map->goldTime),
+                $rating->rating,
+                $rating->totalvotes,
+            );
+            $data[$i] = array(-1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        $this->ratingsManagerWindow->setTitle("Ratings Manager");
+        $this->ratingsManagerWindow->setParam("ratingItems", $items);
+        $this->ratingsManagerWindow->setParam("ratingData",  $data);
+        $this->ratingsManagerWindow->setParam("actionRemove",  \ManiaLivePlugins\eXpansion\Gui\Gui::createConfirm("exp:eXpansion.MapRatings:autoRemove"));
+        $this->ratingsManagerWindow->show($login);
     }
 
     public function chatRating($login = null)
@@ -945,7 +969,10 @@ class MapRatings extends ExpPlugin
         $this->widgetEndMap = null;
         $this->widget->erase();
         $this->widget = null;
-        MapRatingsManager::EraseAll();
+        if ($this->ratingsManagerWindow instanceof Window) {
+            $this->ratingsManagerWindow->erase();
+        }
+        $this->ratingsManagerWindow = null;
 
         \ManiaLive\Event\Dispatcher::unregister(MXKarmaEvent::getClass(), $this);
         unset($this->mxConnection);

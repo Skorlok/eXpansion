@@ -40,7 +40,7 @@ class LocalRecords extends LocalBase
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
         //Checking for valid time
-        if (isset($this->storage->players[$login]) && $timeOrScore > 0) {
+        if ($timeOrScore > 0) {
             
             //If laps mode we need to ignore. Laps has it's own end map event(end finish lap)
             //Laps mode has it own on Player finish event
@@ -69,7 +69,7 @@ class LocalRecords extends LocalBase
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || $this->storage->getCleanGamemodeName() == "endurocup") && isset($this->storage->players[$player->login]) && $time > 0 && $time < 8388608) {
+        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || $this->storage->getCleanGamemodeName() == "endurocup") && $time > 0 && $time < 8388608) {
 
             // if normal map, don't trigger the event for first lap :)
             if ($this->storage->currentMap->nbLaps == 0) {

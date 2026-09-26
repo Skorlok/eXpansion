@@ -1,0 +1,131 @@
+<frame posn="0 1 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -1 0.0001" id="row_0">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="0" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_0_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -7 0.0001" id="row_1">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="1" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_1_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -13 0.0001" id="row_2">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="2" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_2_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_3">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="3" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_3_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -25 0.0001" id="row_4">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="4" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_4_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_5">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="5" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_5_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -37 0.0001" id="row_6">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="6" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_6_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_7">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="7" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_7_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -49 0.0001" id="row_8">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="8" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_8_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_9">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="9" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_9_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -61 0.0001" id="row_10">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="10" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_10_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_11">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="11" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_11_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -73 0.0001" id="row_12">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="12" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_12_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_13">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="13" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_13_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -85 0.0001" id="row_14">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="14" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_14_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -91 0.0001" id="row_15">
+        <frame posn="-2 0 0">
+            <exp:listbg indexNumber="15" sizeX="138" sizeY="6"/>
+        </frame>
+        <label id="column_15_0" sizen="10.3125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_15_1" posn="8.25 0 1.0E-5" sizen="25.78125 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_15_2" posn="28.875 0 2.0E-5" sizen="126.90625 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <exp:optimizedpager sizeX="140" sizeY="93" itemsVarName="chatItems" dataVarName="chatData" rowsPerPage="16" itemsPerRow="3" varName="chatlog"/>
+</frame>

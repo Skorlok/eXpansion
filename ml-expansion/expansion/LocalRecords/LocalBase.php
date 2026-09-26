@@ -3,20 +3,15 @@
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Cps;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\SecCps;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\CpDiff;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Ranks;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Records;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Sector;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\TopSumsWindow;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
@@ -33,6 +28,29 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      * @var Record[] Array int => Record
      */
     protected $currentChallengeRecords = array();
+
+    /** @var Window */
+    protected $recordsWindow;
+
+    /** @var Window */
+    protected $ranksWindow;
+
+    /** @var Window */
+    protected $topSumsWindow;
+
+    /** @var Window */
+    protected $sectorWindow;
+
+    /** @var Window */
+    protected $cpsWindow;
+
+    /** @var Window */
+    protected $cpDiffWindow;
+
+    /** @var Window Same template as $cpsWindow, filled with sector times instead */
+    protected $secCpsWindow;
+
+    protected $extendedClassName;
 
     /**
      * The best times and other statistics of the current players on the server
@@ -118,13 +136,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     public static $txt_ptime;
     public static $txt_nbRecords;
 
-    public static $openSectorsAction = -1;
-
     public static $openRecordsAction = -1;
-
-    public static $openCpsAction = -1;
-
-    public static $openSecCpsAction = -1;
 
     abstract protected function getScoreType();
 
@@ -140,10 +152,10 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function eXpOnInit()
     {
-        LocalBase::$openSectorsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showSectorWindow'));
-        LocalBase::$openRecordsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showRecsWindowExternal'));
-        LocalBase::$openCpsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showCpWindow'));
-        LocalBase::$openSecCpsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(array($this, 'showSecCpWindow'));
+        $classParts = explode('\\', get_class($this));
+        $this->extendedClassName = end($classParts);
+
+        LocalBase::$openRecordsAction = 'exp:eXpansion.' . $this->extendedClassName . ':showRecsWindow';
 
         $this->config = Config::getInstance();
 
@@ -267,16 +279,14 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $cmd = $this->registerChatCommand("sectors", "showSectorWindow", 0, true);
         $cmd->help = 'Show Players Best Sector times';
 
-        $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", "records_save");
+        $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", Permission::LOCAL_RECORDS_DELETE);
         $cmd->setHelp("Deletes all records by login");
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
         Menu::addMenuItem("LocalRecords",
             array("Records" => array(null, array(
-                "Local" => array(null, $aH->createAction(array($this, "showRecsWindow"))),
-                "Hall of Fame" => array(null, $aH->createAction(array($this, "showTopSums"))),
-                "Server Ranks" => array(null, $aH->createAction(array($this, "showRanksWindow")))
+                "Local" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showRecsWindow'),
+                "Hall of Fame" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showTopSums'),
+                "Server Ranks" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showRanksWindow')
             )))
         );
 
@@ -346,29 +356,58 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         }
 
         $this->onBeginMap("", "", "");
-        if ($this->isPluginLoaded('eXpansion\Menu')) {
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('Records'), true);
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addItem', __('Map Records'), null, array($this, 'showRecsMenuItem'), false);
-        }
 
         $this->getRanks();
 
-        Records::$parentPlugin = $this;
+        $this->registerManialinkCallback('showRecsWindow', false, true);
+        $this->registerManialinkCallback('deleteRecord', false, true);
+        $this->registerManialinkCallback('showCpWindow', false, true);
+        $this->registerManialinkCallback('showSecCpWindow', false, true);
+        $this->registerManialinkCallback('showSectorWindow');
+        $this->registerManialinkCallback('showRanksWindow');
+        $this->registerManialinkCallback('showTopSums');
+        $this->registerManialinkCallback('delRec', false, true);
+        $this->registerManialinkCallback('delRecs', false, true);
+
+        $this->recordsWindow = new Window("LocalRecords\Gui\Windows\Records.xml");
+        $this->recordsWindow->setName("Records");
+        $this->recordsWindow->setSize(180, 100);
+        $this->recordsWindow->setTitle('Records on a Map');
+
+        $this->ranksWindow = new Window("LocalRecords\Gui\Windows\Ranks.xml");
+        $this->ranksWindow->setName("Ranks");
+        $this->ranksWindow->setSize(150, 100);
+        $this->ranksWindow->setTitle('Server Ranks');
+
+        $this->topSumsWindow = new Window("LocalRecords\Gui\Windows\TopSums.xml");
+        $this->topSumsWindow->setName("TopSums");
+        $this->topSumsWindow->setSize(100, 90);
+        $this->topSumsWindow->setTitle("TopSums");
+
+        $this->sectorWindow = new Window("LocalRecords\Gui\Windows\Sector.xml");
+        $this->sectorWindow->setName("Sectors");
+        $this->sectorWindow->setSize(160, 100);
+        $this->sectorWindow->setTitle('Sector Times on Map');
+
+        $this->cpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->cpsWindow->setName("Cps");
+        $this->cpsWindow->setSize(170, 110);
+        $this->cpsWindow->setTitle('CheckPoints on Map');
+
+        $this->secCpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->secCpsWindow->setName("SecCps");
+        $this->secCpsWindow->setSize(170, 110);
+        $this->secCpsWindow->setTitle('Sectors on Map');
+
+        $this->cpDiffWindow = new Window("LocalRecords\Gui\Windows\CpDiff.xml");
+        $this->cpDiffWindow->setName("CpDiff");
+        $this->cpDiffWindow->setSize(200, 100);
+        $this->cpDiffWindow->setTitle('Local CheckPoints Difference');
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $this->config = Config::getInstance();
-    }
-
-    public function showRecsMenuItem($login)
-    {
-        $this->showRecsWindow($login);
-    }
-
-    public function showRecsWindowExternal($login, $entries = null)
-    {
-        $this->showRecsWindow($login);
     }
 
     /**
@@ -495,7 +534,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     private function checkRecordTreshold($place)
     {
-        if ($place <= Config::getInstance()->noRedirectTreshold) {
+        /** @var Config $config */
+        $config = Config::getInstance();
+        if ($place <= $config->noRedirectTreshold) {
             return true;
         }
         return false;
@@ -661,7 +702,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                     }
                 }
 
-                \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_UPDATE_RECORDS, $this->currentChallengeRecords));
+                Dispatcher::dispatch(new Event(Event::ON_UPDATE_RECORDS, $this->currentChallengeRecords));
             } else {
                 //Improved time and new Rank
                 if ($nrecord->place < $recordrank_old && !$force && $nrecord->place <= $this->config->recordsCount) {
@@ -681,7 +722,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                         $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     }
 
-                    \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
+                    Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
                 } else {
                     //First record the player drove
                     if ($nrecord->place <= $this->config->recordsCount) {
@@ -698,14 +739,14 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                             $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                         }
 
-                        \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
+                        Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
                     }
                 }
             }
-            \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_PERSONAL_BEST, $nrecord));
+            Dispatcher::dispatch(new Event(Event::ON_PERSONAL_BEST, $nrecord));
             $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         } else {
-            \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_FINISH, $login));
+            Dispatcher::dispatch(new Event(Event::ON_NEW_FINISH, $login));
             $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         }
     }
@@ -789,7 +830,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $this->getFromDbPlayerRecord($login, $uid);
         }
         //Dispatch event
-        \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_RECORDS_LOADED, $this->currentChallengeRecords));
+        Dispatcher::dispatch(new Event(Event::ON_RECORDS_LOADED, $this->currentChallengeRecords));
     }
 
     /**
@@ -991,13 +1032,22 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showTopSums($login)
     {
-        TopSumsWindow::Erase($login);
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
 
-        $win = TopSumsWindow::Create($login);
-        $win->setTitle("TopSums");
-        $win->setDatas($this->getTopSums());
-        $win->setSize(100, 90);
-        $win->show();
+        $items = array();
+        $data  = array();
+        $x     = 0;
+        foreach ($this->getTopSums() as $sumLogin => $value) {
+            $items[$x] = array($rankColor . ($x + 1), isset($value->nickName) ? $value->nickName : $sumLogin, $value->stats[0], $value->stats[1], $value->stats[2]);
+            $data[$x] = array(-1, -1, -1, -1, -1);
+            $x++;
+        }
+
+        $this->topSumsWindow->setParam("topSumItems", $items);
+        $this->topSumsWindow->setParam("topSumData", $data);
+        $this->topSumsWindow->show($login);
     }
 
     /**
@@ -1010,7 +1060,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function showRecsWindow($login, $map = null)
     {
-        Records::Erase($login);
         if ($map === null) {
             $records = array();
             foreach ($this->currentChallengeRecords as $record) {
@@ -1036,13 +1085,65 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
         }
 
-        $window = Records::Create($login);
-        /** @var Records $window */
-        $window->setTitle(__('Records on a Map', $login));
-        $window->centerOnScreen();
-        $window->setSize(180, 100);
-        $window->populateList($records, $this->config->recordsCount, $currentMap, $this);
-        $window->show();
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        while ($i < sizeof($records)) {
+            /** @var Record $record */
+            $record = $records[$i];
+
+            $recLogin = $record->login;
+            if ($recLogin == $record->nickName) {
+                $recLogin = $recLogin . ' '; // hack to make it work
+            }
+
+            $items[$i] = array(
+                $record->place,
+                Gui::fixString($record->nickName),
+                $recLogin,
+                $this->formatScore($record->time) . " ",
+                $this->formatScore($record->avgScore),
+                "#" . $record->nbFinish,
+                date('d/m/Y', $record->date),
+                'Delete',
+            );
+            $data[$i] = array(-1, -1, -1, -1, -1, -1, -1, $currentMap ? ('exp:eXpansion.' . $this->extendedClassName . ':deleteRecord:' . $record->login) : -1);
+            $i++;
+        }
+        $hideRemoveButtons = !$currentMap || !AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE);
+
+        $this->recordsWindow->setParam("hideRemoveButtons", $hideRemoveButtons);
+        $this->recordsWindow->setParam("hideMapButtons",    !$currentMap);
+        $this->recordsWindow->setParam("sectorsAction",     'exp:eXpansion.' . $this->extendedClassName . ':showSectorWindow');
+        $this->recordsWindow->setParam("cpsAction",         'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow');
+        $this->recordsWindow->setParam("secCpsAction",      'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow');
+        $this->recordsWindow->setParam("recordsItems",      $items);
+        $this->recordsWindow->setParam("recordsData",       $data);
+        $this->recordsWindow->show($login);
+    }
+
+    /**
+     * exp: callback fired by the delete cell of a row in Records.xml
+     */
+    public function deleteRecord($login, $recordLogin)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        // Gui::fixString() (used by the pager to build the ManiaScript "data" array, see
+        // OptimizedPager::formatMsArray) rewrites every "-" into an en-dash "–" to avoid "--"
+        // being read as a ManiaScript comment. Real logins never contain an en-dash, so this
+        // round-trip conversion is undone before comparing against $record->login.
+        $recordLogin = str_replace('–', '-', $recordLogin);
+
+        foreach ($this->currentChallengeRecords as $record) {
+            if ($record->login === $recordLogin) {
+                $this->actionDelete($login, $record);
+                return;
+            }
+        }
     }
 
     /**
@@ -1052,50 +1153,142 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function showRanksWindow($login)
     {
-        Ranks::Erase($login);
+        $ranks = $this->getRanks();
 
-        $window = Ranks::Create($login);
-        $window->setTitle(__('Server Ranks', $login));
-        $window->centerOnScreen();
-        $window->populateList($this->getRanks(), 100);
-        $window->setSize(150, 100);
-        $window->show();
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        while ($i < sizeof($ranks)) {
+            $rank = $ranks[$i];
+
+            $items[$i] = array(
+                ($i + 1) . ".",
+                isset($rank->player_nickname) ? $rank->player_nickname : $rank->login,
+                isset($rank->player_wins) ? $rank->player_wins : 0,
+                number_format($rank->tscore + 1, 2),
+                isset($rank->nbFinish) ? $rank->nbFinish : 0,
+                $rank->nbRecords . '/' . $rank->nbMaps,
+                $this->formatRankPlayTime(isset($rank->player_timeplayed) ? $rank->player_timeplayed : 0),
+                isset($rank->lastRec) ? date("j F Y", $rank->lastRec) : "",
+            );
+            $data[$i] = array(-1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        $this->ranksWindow->setParam("rankItems",       $items);
+        $this->ranksWindow->setParam("rankData",        $data);
+        $this->ranksWindow->show($login);
     }
 
-    public function showCpWindow($login)
+    /**
+     * Play time of a player, as shown in the server ranks window
+     */
+    private function formatRankPlayTime($time)
+    {
+        $min = (int)($time / 60);
+        $hour = (int)($min / 60);
+        $min = $min % 60;
+        $day = (int)($hour / 24);
+        $hour = $hour % 24;
+
+        return $day . 'd ' . $hour . 'h ' . $min . 'm';
+    }
+
+    public function showCpWindow($login, $offset = 0)
     {
         if ($this->config->hideRecords) {
             $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
             return;
         }
 
-        Cps::Erase($login);
+        $offset = is_numeric($offset) ? (int)$offset : 0;
 
-        $window = Cps::Create($login);
-        /** @var Cps $window */
-        $window->setTitle(__('CheckPoints on Map', $login));
-        $window->populateList($this->currentChallengeRecords, 100, $this);
-        $window->setSize(200, 100);
-        $window->centerOnScreen();
-        $window->show();
+        if ($offset > $this->storage->currentMap->nbCheckpoints - 7) {
+            $offset = $this->storage->currentMap->nbCheckpoints - 7;
+        }
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallengeRecords as $record) {
+            $row = array($rankColor . ($i + 1), $record->nickName);
+            // always 7 cells, a record without that checkpoint simply leaves it empty
+            for ($x = $offset; $x < $offset + 7; $x++) {
+                $row[] = isset($record->ScoreCheckpoints[$x]) ? Time::fromTM($record->ScoreCheckpoints[$x]) : "";
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        for ($c = 0; $c < 7; $c++) {
+            $this->cpsWindow->setParam("cp" . ($c + 1), "Cp " . ($offset + $c + 1));
+        }
+        $this->cpsWindow->setParam("cpsItems", $items);
+        $this->cpsWindow->setParam("cpsData", $data);
+        $this->cpsWindow->setParam("pagerVarName", "localCps");
+        $this->cpsWindow->setParam("prevPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow:' . ($offset - 7));
+        $this->cpsWindow->setParam("nextPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow:' . ($offset + 7));
+        $this->cpsWindow->show($login);
     }
 
-    public function showSecCpWindow($login)
+    public function showSecCpWindow($login, $offset = 0)
     {
         if ($this->config->hideRecords) {
             $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
             return;
         }
 
-        SecCps::Erase($login);
+        $offset = is_numeric($offset) ? (int)$offset : 0;
 
-        $window = SecCps::Create($login);
-        /** @var SecCps $window */
-        $window->setTitle(__('Sectors on Map', $login));
-        $window->populateList($this->currentChallengeRecords, 100, $this);
-        $window->setSize(200, 100);
-        $window->centerOnScreen();
-        $window->show();
+        if ($offset > $this->storage->currentMap->nbCheckpoints - 7) {
+            $offset = $this->storage->currentMap->nbCheckpoints - 7;
+        }
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallengeRecords as $record) {
+            $row = array($rankColor . ($i + 1), $record->nickName);
+            // always 7 cells, a record without that checkpoint simply leaves it empty
+            for ($x = $offset; $x < $offset + 7; $x++) {
+                if (!isset($record->ScoreCheckpoints[$x])) {
+                    $row[] = "";
+                } else if ($x == 0) {
+                    // the first sector is the time of the first checkpoint
+                    $row[] = Time::fromTM($record->ScoreCheckpoints[$x]);
+                } else {
+                    $row[] = Time::fromTM($record->ScoreCheckpoints[$x] - $record->ScoreCheckpoints[$x - 1]);
+                }
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        for ($c = 0; $c < 7; $c++) {
+            $this->secCpsWindow->setParam("cp" . ($c + 1), "Sector " . ($offset + $c + 1));
+        }
+        $this->secCpsWindow->setParam("cpsItems", $items);
+        $this->secCpsWindow->setParam("cpsData", $data);
+        $this->secCpsWindow->setParam("pagerVarName", "localSecCps");
+        $this->secCpsWindow->setParam("prevPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow:' . ($offset - 7));
+        $this->secCpsWindow->setParam("nextPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow:' . ($offset + 7));
+        $this->secCpsWindow->show($login);
     }
 
     public function showCpDiffWindow($login, $params)
@@ -1142,13 +1335,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         $target = $this->currentChallengeRecords[$params];
 
-        CpDiff::Erase($login);
-        $window = CpDiff::Create($login);
-        $window->setTitle(__('Local CheckPoints Difference', $login));
-        $window->populateList(array($player, $target));
-        $window->setSize(200, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $this->showCpDiff($login, $player, $target);
     }
 
     public function showCpDiffNoDediWindow($login, $params)
@@ -1170,13 +1357,52 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             return;
         }
 
-        CpDiff::Erase($login);
-        $window = CpDiff::Create($login);
-        $window->setTitle(__('Local CheckPoints Difference', $login));
-        $window->populateList(array($this->getCurrentChallangePlayerRecord($login), $this->currentChallengeRecords[$params]));
-        $window->setSize(200, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $this->showCpDiff($login, $this->getCurrentChallangePlayerRecord($login), $this->currentChallengeRecords[$params]);
+    }
+
+    /**
+     * Fill and show CpDiff.xml, comparing the checkpoints of two records
+     */
+    private function showCpDiff($login, $player, $target)
+    {
+        if (!$player) {
+            $this->eXpChatSendServerMessage("#admin_error#You have no record on this map!", $login);
+            return;
+        }
+
+        $items = array();
+        $data  = array();
+        $nbCps = count($player->ScoreCheckpoints);
+        for ($x = 0; $x < $nbCps; $x++) {
+            if (!isset($target->ScoreCheckpoints[$x])) {
+                $items[$x] = array(($x + 1) . ".", Time::fromTM($player->ScoreCheckpoints[$x]), "", "", "");
+                $data[$x]  = array(-1, -1, -1, -1, -1);
+                continue;
+            }
+
+            $diff = $player->ScoreCheckpoints[$x] - $target->ScoreCheckpoints[$x];
+            if ($x > 0 && isset($target->ScoreCheckpoints[$x - 1])) {
+                $diffCp = $diff - ($player->ScoreCheckpoints[$x - 1] - $target->ScoreCheckpoints[$x - 1]);
+            } else {
+                $diffCp = $diff;
+            }
+
+            $items[$x] = array(
+                ($x + 1) . ".",
+                Time::fromTM($player->ScoreCheckpoints[$x]),
+                Time::fromTM($target->ScoreCheckpoints[$x]),
+                ($diff   <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diff),
+                ($diffCp <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diffCp),
+            );
+            $data[$x] = array(-1, -1, -1, -1, -1);
+        }
+
+        $this->cpDiffWindow->setParam("pagerVarName", "localcpdiff");
+        $this->cpDiffWindow->setParam("headerPlayer", $this->cpDiffWindow->handleSpecialChars("#" . $player->place . ": " . $player->nickName));
+        $this->cpDiffWindow->setParam("headerTarget", $this->cpDiffWindow->handleSpecialChars("#" . $target->place . ": " . $target->nickName));
+        $this->cpDiffWindow->setParam("cpDiffItems", $items);
+        $this->cpDiffWindow->setParam("cpDiffData", $data);
+        $this->cpDiffWindow->show($login);
     }
 
     public function showSectorWindow($login)
@@ -1209,13 +1435,27 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
         }
 
-        $window = Sector::Create($login);
-        /** @var Sector $window */
-        $window->setTitle(__('Sector Times on Map', $login));
-        $window->populateList($this->currentChallangeSectorTimes, 100, $this);
-        $window->setSize(160, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallangeSectorTimes as $sector) {
+            $row = array(($i + 1) . ".");
+            foreach (array_slice($sector, 0, 5) as $best) {
+                $row[] = $best['recordObj']->nickName;
+                $row[] = $this->formatScore($best['sectorTime']);
+            }
+            // always 11 cells, even when less than 5 players have a time on this sector
+            while (count($row) < 11) {
+                $row[] = "";
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        $this->sectorWindow->setParam("sectorItems", $items);
+        $this->sectorWindow->setParam("sectorData", $data);
+        $this->sectorWindow->show($login);
     }
 
     protected function calcCP($totalcps)
@@ -1501,38 +1741,48 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function actionDelete($login, $record)
     {
-        $ac = ActionHandler::getInstance();
-        $action = $ac->createAction(array($this, "delRec"), $record);
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
 
-        Gui::showConfirmDialog($login, $action, "Delete records " . $record->place . " by " . $record->nickName . "?");
+        Gui::showConfirmDialog($login, 'exp:eXpansion.' . $this->extendedClassName . ':delRec:' . $record->login, "Delete records " . $record->place . " by " . $record->nickName . "?");
     }
 
-    public function delRec($login, $record)
+    public function delRec($login, $recordLogin)
     {
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        $record = $this->getCurrentChallangePlayerRecord($recordLogin);
+        if (!$record) {
+            $this->eXpChatSendServerMessage('Error while remove player record', $login);
+            return;
+        }
+        
         if (!$this->deleteRecordInDatabase($record, $this->getNbOfLaps())) {
             $this->eXpChatSendServerMessage('Error while remove player record', $login);
             return;
         }
 
-        $killedRecordPlace = -1;
+        unset($this->currentChallengePlayerRecords[$record->login]);
+
         foreach ($this->currentChallengeRecords as $i => $rec) {
+            if ($rec->login == $record->login) {
+                unset($this->currentChallengeRecords[$i]);
+                continue;
+            }
             if ($rec->place > $record->place) {
                 $rec->place--;
             }
-            if ($killedRecordPlace >= 0) {
-                $this->currentChallengeRecords[$i-1] = $this->currentChallengeRecords[$i];
-            }
-            if ($rec->login == $record->login) {
-                unset($this->currentChallengeRecords[$i]);
-                unset($this->currentChallengePlayerRecords[$record->login]);
-                $killedRecordPlace = $i;
-            }
         }
-        if ($killedRecordPlace >= 0) {
-            unset($this->currentChallengeRecords[count($this->currentChallengeRecords)-1]);
-        }
+        // Re-index to a clean 0-based sequential array (index i <-> place i+1), self-healing any
+        // previous gap/duplicate left by an older buggy run of this function.
+        $this->currentChallengeRecords = array_values($this->currentChallengeRecords);
 
-        \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_RECORD_DELETED, $record, $this->currentChallengeRecords));
+        Dispatcher::dispatch(new Event(Event::ON_RECORD_DELETED, $record, $this->currentChallengeRecords));
 
         $this->eXpChatSendServerMessage('Record deleted', $login);
         $this->showRecsWindow($login);
@@ -1555,14 +1805,16 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             return;
         }
 
-        $ac = ActionHandler::getInstance();
-        $action = $ac->createAction(array($this, "delRecs"), $playerLogin);
-
-        Gui::showConfirmDialog($login, $action, "Delete all records by " . $playerLogin . "?");
+        Gui::showConfirmDialog($login, 'exp:eXpansion.' . $this->extendedClassName . ':delRecs:' . $playerLogin, "Delete all records by " . $playerLogin . "?");
     }
 
     public function delRecs($login, $playerLogin)
     {
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
         $q = "DELETE FROM `exp_records` WHERE `exp_records`.`record_playerlogin` = " . $this->db->quote($playerLogin) . ";";
         try {
             $this->db->execute($q);
@@ -1634,11 +1886,40 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function eXpOnUnload()
     {
-        Sector::EraseAll();
-        Cps::EraseAll();
-        CpDiff::EraseAll();
-        SecCps::EraseAll();
-        Ranks::EraseAll();
-        Records::EraseAll();
+
+        if ($this->recordsWindow instanceof Window) {
+            $this->recordsWindow->erase();
+        }
+        $this->recordsWindow = null;
+
+        if ($this->ranksWindow instanceof Window) {
+            $this->ranksWindow->erase();
+        }
+        $this->ranksWindow = null;
+
+        if ($this->topSumsWindow instanceof Window) {
+            $this->topSumsWindow->erase();
+        }
+        $this->topSumsWindow = null;
+
+        if ($this->sectorWindow instanceof Window) {
+            $this->sectorWindow->erase();
+        }
+        $this->sectorWindow = null;
+
+        if ($this->cpsWindow instanceof Window) {
+            $this->cpsWindow->erase();
+        }
+        $this->cpsWindow = null;
+
+        if ($this->cpDiffWindow instanceof Window) {
+            $this->cpDiffWindow->erase();
+        }
+        $this->cpDiffWindow = null;
+
+        if ($this->secCpsWindow instanceof Window) {
+            $this->secCpsWindow->erase();
+        }
+        $this->secCpsWindow = null;
     }
 }

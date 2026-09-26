@@ -24,7 +24,6 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 
 /**
  * Description of Communication
@@ -245,19 +244,11 @@ class Communication extends ExpPlugin
 
     public function selectPlayer($login)
     {
-        /** @var PlayerSelection @window */
-        $window = PlayerSelection::Create($login);
-        $window->setController($this);
-        $window->setTitle('Select Player');
-        $window->setSize(85, 100);
-        $window->populateList(array($this, 'openNewTab'), 'Select');
-        $window->centerOnScreen();
-        $window->show();
+        Gui::showPlayerSelection($login, array($this, 'openNewTab'), 'Select Player', 'Select');
     }
 
     public function openNewTab($login, $target)
     {
-        PlayerSelection::Erase($login);
         $this->updateMessager($login, "openTab", $target);
     }
 

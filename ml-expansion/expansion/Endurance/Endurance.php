@@ -12,7 +12,7 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Endurance\Events\Event as EnduroEvents;
 use ManiaLivePlugins\eXpansion\Endurance\Events\Listener as EnduroListener;
-use ManiaLivePlugins\eXpansion\Endurance\Gui\Windows\EnduroScores;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 class Endurance extends ExpPlugin implements EnduroListener
 {
@@ -34,12 +34,20 @@ class Endurance extends ExpPlugin implements EnduroListener
     private $roundsdone = 0;
     private $mapsdone = 0;
 
+    /** @var Window */
+    private $scoresWindow = null;
+
 	public function eXpOnReady()
     {
         $this->enableDatabase();
         $this->enableDedicatedEvents();
 		
         $this->registerManialinkCallback('showEnduroWindow');
+
+        $this->scoresWindow = new Window("Endurance\Gui\Windows\EnduroScores.xml");
+        $this->scoresWindow->setName("EnduroScores");
+        $this->scoresWindow->setSize(170, 100);
+        $this->scoresWindow->setTitle('Current Points');
 
 		Dispatcher::register(EnduroEvents::getClass(), $this);
 
@@ -261,7 +269,9 @@ class Endurance extends ExpPlugin implements EnduroListener
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
 	{
-		EnduroScores::EraseAll();
+		if ($this->scoresWindow instanceof Window) {
+			$this->scoresWindow->erase();
+		}
 
 		self::$last_round = false;
 	
@@ -305,14 +315,18 @@ class Endurance extends ExpPlugin implements EnduroListener
 
 	public function showEnduroWindow($login)
 	{
-		EnduroScores::Erase($login);
+		$items = array();
+		$data  = array();
+		$x     = 0;
+		foreach (self::$enduro_total_points as $scoreLogin => $score) {
+			$items[$x] = array(($x + 1) . ".", isset($score['points']) ? $score['points'] : 0, isset($score['name']) ? $score['name'] : $scoreLogin, $scoreLogin);
+			$data[$x] = array(-1, -1, -1, -1);
+			$x++;
+		}
 
-        $window = EnduroScores::Create($login);
-        $window->setTitle(__('Current Points', $login));
-        $window->populateList(self::$enduro_total_points);
-        $window->setSize(170, 100);
-        $window->centerOnScreen();
-        $window->show();
+		$this->scoresWindow->setParam("scoreItems", $items);
+		$this->scoresWindow->setParam("scoreData", $data);
+		$this->scoresWindow->show($login);
 	}
 
 	public function chat_setrounds($fromLogin, $params)
@@ -624,7 +638,12 @@ class Endurance extends ExpPlugin implements EnduroListener
     {
 		self::$last_round = true;
         Dispatcher::dispatch(new EnduroEvents(EnduroEvents::HIDE_PANEL));
-		EnduroScores::EraseAll();
+
+		if ($this->scoresWindow instanceof Window) {
+			$this->scoresWindow->erase();
+		}
+		$this->scoresWindow = null;
+
 		Dispatcher::unregister(EnduroEvents::getClass(), $this);
     }
 }

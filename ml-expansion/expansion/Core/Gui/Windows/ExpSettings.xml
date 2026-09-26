@@ -1,5 +1,4 @@
 <?php
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 
 $groups     = $this->getParam("groups");
 $settings   = $this->getParam("settings");
@@ -8,9 +7,7 @@ $sizeX      = (int)$this->getParam("sizeX");
 // Layout: left column = sizeX/4, pager occupies right 3/4 minus scrollbar margin
 $colWidth    = (float)($sizeX / 4);           // 35 (140) or 42 (170)
 $pagerSizeX  = (float)($sizeX * 3 / 4) - 3;  // 102 (140) or 124 (170)
-$pagerSizeY  = 92;                           // 100 - 8
 $itemBgWidth = $pagerSizeX - 8;             // 94 or 116
-$itemSizeY   = 10;
 $menuBtnW    = $colWidth / 0.8;             // 43.75 or 53.125
 $savePosX    = $sizeX - 34;                 // 106 or 136
 
@@ -29,7 +26,7 @@ foreach ((array)$settings as $setting) {
     $openAction  = $setting['openAction'];
 
     $itemsXml .= '<frame>';
-    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemBgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemBgWidth . '" sizeY="10"/>';
     // Label width: from pos 7 to start of buttons area (pagerSizeX - 31 for list, pagerSizeX - 22 for others)
     $itemsXml .= '<label posn="7 4 0" sizen="' . ($pagerSizeX - 39) . ' 5" style="TextStaticSmall" text="' . $this->handleSpecialChars($label) . '"/>';
 
@@ -96,8 +93,10 @@ foreach ((array)$settings as $setting) {
 
     $itemsXml .= '</frame>';
 }
+
+$this->setParam("itemsXml", $itemsXml);
 ?>
-<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, $colWidth, 3); ?>
+<exp:pager sizeX="<?php echo $pagerSizeX; ?>" sizeY="92" itemsVarName="itemsXml" posX="<?php echo $colWidth; ?>" posY="3" itemSizeY="10"/>
 <frame posn="0 0 0.00034">
     <frame posn="-2 0 0">
     <?php foreach ((array)$groups as $idx => $group): ?>

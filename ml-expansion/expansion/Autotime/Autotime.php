@@ -20,7 +20,8 @@ class Autotime extends ExpPlugin
     {
         if ($statusCode == 4) {
 
-            if (!isset($this->connection->getModeScriptSettings()['S_TimeLimit'])) {
+            $scriptSettings = $this->connection->getModeScriptSettings();
+            if (!isset($scriptSettings['S_TimeLimit'])) {
                 return;
             }
 

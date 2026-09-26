@@ -8,9 +8,9 @@ use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
-use ManiaLivePlugins\eXpansion\Quiz\Gui\Windows\AddPoint;
 use ManiaLivePlugins\eXpansion\Quiz\Structures\Question;
 
 class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -65,6 +65,9 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     /** @var Window */
     private $hiddenQuestionWindow;
 
+    /** @var Window */
+    private $PlayerlistWindow;
+
     private $hiddenQuestions = array();
 
     private $config;
@@ -74,17 +77,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess */
     private $dataAccess = null;
-
-    /**
-     * onInit()
-     * Function called on initialisation of ManiaLive.
-     *
-     * @return void
-     */
-    public function eXpOnInit()
-    {
-
-    }
 
     /**
      * onLoad()
@@ -140,12 +132,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $command = $this->registerChatCommand("question", "displayQuestion", 0, true);
         $command->help = '/question Shows the current question again';
 
-        $cmd = AdminGroups::addAdminCommand('addquizpoint', $this, 'addPointsWindow', Permission::QUIZ_ADMIN);
-        $cmd->setHelp('add or remove points to a player for the quiz');
-        AdminGroups::addAlias($cmd, "quizpoints");
-        AdminGroups::addAlias($cmd, "quizpts");
-        $this->cmd_points = $cmd;
-
         $cmd = AdminGroups::addAdminCommand('resetquiz', $this, 'reset', Permission::QUIZ_ADMIN);
         $cmd->setHelp('resets the quiz points');
         AdminGroups::addAlias($cmd, "quizreset");
@@ -181,9 +167,13 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->registerManialinkCallback('hiddenOk', true);
         $this->registerManialinkCallback('questionHidden', true);
         $this->registerManialinkCallback('questionOk', true);
-        
-        Gui\Windows\Playerlist::$mainPlugin = $this;
-        Gui\Windows\AddPoint::$mainPlugin = $this;
+        $this->registerManialinkCallback('clickAddPoint', false, true);
+        $this->registerManialinkCallback('clickRemovePoint', false, true);
+
+        $this->PlayerlistWindow = new Window("Quiz\Gui\Windows\Playerlist.xml");
+        $this->PlayerlistWindow->setName("Quiz Points");
+        $this->PlayerlistWindow->setSize(72, 100);
+        $this->PlayerlistWindow->setTitle("Point Holders");
 
         $this->questionWindow = new Window("Quiz\Gui\Windows\QuestionWindow.xml");
         $this->questionWindow->setName("Quiz Question");
@@ -401,8 +391,14 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function addPoint($login, $target)
     {
         if ($login == null || AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+            // the player may have left between the window being shown and the click
+            $targetPlayer = $this->storage->getPlayerObject($target);
+            if ($targetPlayer === null && !isset($this->players[$target])) {
+                return;
+            }
+
             if (!isset($this->players[$target])) {
-                $this->players[$target] = new Structures\QuizPlayer($target, $this->storage->getPlayerObject($target)->nickName, 1);
+                $this->players[$target] = new Structures\QuizPlayer($target, $targetPlayer->nickName, 1);
                 if ($login !== null) {
                     $this->eXpChatSendServerMessage($this->msg_pointAdd, null, array($this->players[$target]->nickName));
                 }
@@ -426,7 +422,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             } else {
                 $this->db->execute(
                     "INSERT INTO `quiz_points` (login,nickName,score) values(" . $this->db->quote($target) . ", "
-                    . $this->db->quote($this->storage->getPlayerObject($target)->nickName) . ", "
+                    . $this->db->quote($this->players[$target]->nickName) . ", "
                     . $this->db->quote($this->players[$target]->points) . ");"
                 );
             }
@@ -458,7 +454,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 } else {
                     $this->db->execute(
                         "INSERT INTO `quiz_points` (login,nickName,score) values(" . $this->db->quote($target) . ", "
-                        . $this->db->quote($this->storage->getPlayerObject($target)->nickName) . ", "
+                        . $this->db->quote($this->players[$target]->nickName) . ", "
                         . $this->db->quote($this->players[$target]->points) . ");"
                     );
                 }
@@ -509,8 +505,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $maxHeight = 20;
 
 
-        $meta = array();
-        list($width, $height, $type, $attr) = getimagesizefromstring($data, $meta);
+        list($width, $height, $type, $attr) = $this->getImageSizeFromString($data);
 
         if (($type == IMAGETYPE_JPEG) || ($type == IMAGETYPE_PNG)) {
             $xRatio = $maxWidth / $width;
@@ -565,8 +560,7 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $maxWidth = 60;
         $maxHeight = 60;
 
-        $meta = array();
-        list($width, $height, $type, $attr) = getimagesizefromstring($data, $meta);
+        list($width, $height, $type, $attr) = $this->getImageSizeFromString($data);
 
         if (($type == IMAGETYPE_JPEG) || ($type == IMAGETYPE_PNG)) {
             $xRatio = $maxWidth / $width;
@@ -697,24 +691,46 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showPointsWindow($login)
     {
-        \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortDesc($this->players, "points");
-        $window = Gui\Windows\Playerlist::Create($login);
-        $window->setTitle("Point Holders");
-        $window->setSize(90, 60);
-        $window->centerOnScreen();
-        $window->Show();
+        ArrayOfObj::asortDesc($this->players, "points");
+        
+        $isAdmin = AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN);
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        // union and not array_merge(): a purely numeric login is an integer key, which array_merge()
+        // renumbers instead of overwriting, listing that player twice
+        $players = $this->players + $this->storage->players + $this->storage->spectators;
+        foreach ($players as $player) {
+            $points = isset($this->players[$player->login]) ? $this->players[$player->login]->points : 0;
+
+            $items[$i] = array($player->login, $player->nickName, $points);
+            $data[$i]  = array(-1, -1, -1, $isAdmin ? ('exp:eXpansion.Quiz:clickRemovePoint:' . $player->login) : -1, $isAdmin ? ('exp:eXpansion.Quiz:clickAddPoint:' . $player->login) : -1);
+            $i++;
+        }
+
+        $this->PlayerlistWindow->setParam("hideAdmin",   !$isAdmin);
+        $this->PlayerlistWindow->setParam("playerItems", $items);
+        $this->PlayerlistWindow->setParam("playerData",  $data);
+        $this->PlayerlistWindow->show($login);
     }
 
-    public function addPointsWindow($login)
+    public function clickAddPoint($login, $target)
     {
         if (!AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
             return;
         }
-        $window = Gui\Windows\AddPoint::Create($login);
-        $window->setSize(90, 60);
-        $window->centerOnScreen();
-        $window->setTitle("Add point to player");
-        $window->Show();
+        $this->addPoint($login, str_replace('–', '-', $target));
+        $this->showPointsWindow($login);
+    }
+
+    public function clickRemovePoint($login, $target)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::QUIZ_ADMIN)) {
+            return;
+        }
+        $this->removePoint($login, str_replace('–', '-', $target));
+        $this->showPointsWindow($login);
     }
 
     public function showPoints($login = null)
@@ -728,13 +744,25 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
         }
 
-        $this->connection->chatSendServerMessage(substr($output, 0, (strlen($output) - 2)));
+        if ($output) {
+            $this->connection->chatSendServerMessage(substr($output, 0, (strlen($output) - 2)));
+        }
+    }
+
+    private function getImageSizeFromString($data)
+    {
+        if (function_exists('getimagesizefromstring')) {
+            return getimagesizefromstring($data);
+        }
+        return getimagesize('data://application/octet-stream;base64,' . base64_encode($data));
     }
 
     public function eXpOnUnload()
     {
-        AddPoint::EraseAll();
-        Gui\Windows\Playerlist::EraseAll();
+        if ($this->PlayerlistWindow instanceof Window) {
+            $this->PlayerlistWindow->erase();
+        }
+        $this->PlayerlistWindow = null;
 
         if ($this->questionWindow instanceof Window) {
             $this->questionWindow->erase();

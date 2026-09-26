@@ -9,8 +9,8 @@ use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 class ExtendTime extends ExpPlugin
 {
 
-    protected $votes = ["yes" => 0, "no" => 0];
-    protected $voters = [];
+    protected $votes = array("yes" => 0, "no" => 0);
+    protected $voters = array();
     protected $config;
     protected $voteCount = 0;
     protected $widget;
@@ -42,8 +42,8 @@ class ExtendTime extends ExpPlugin
 
     function onBeginMatch()
     {
-        $this->votes = ["yes" => 0, "no" => 0];
-        $this->voters = [];
+        $this->votes = array("yes" => 0, "no" => 0);
+        $this->voters = array();
         $this->voteCount = 0;
         $this->showWidget();
     }
@@ -71,8 +71,8 @@ class ExtendTime extends ExpPlugin
             }
         }
 
-        $this->votes = ["yes" => 0, "no" => 0];
-        $this->voters = [];
+        $this->votes = array("yes" => 0, "no" => 0);
+        $this->voters = array();
     }
 
     public function vote($login, $vote)
@@ -100,8 +100,8 @@ class ExtendTime extends ExpPlugin
             $this->widget->erase();
         }
         $this->widget = null;
-        $this->votes = [];
-        $this->voters = [];
+        $this->votes = array();
+        $this->voters = array();
         $this->voteCount = 0;
         $this->config = null;
     }

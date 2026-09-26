@@ -3,9 +3,11 @@
 namespace ManiaLivePlugins\eXpansion\Database;
 
 use ManiaLivePlugins\eXpansion\Helpers\Formatting as StringFormatting;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
@@ -24,10 +26,12 @@ class Database extends ExpPlugin
     /** @var Window */
     private $maintainanceWindow;
 
+    /** @var Window */
+    private $backupRestoreWindow;
+
     public function eXpOnInit()
     {
         $this->config = Config::getInstance();
-        Gui\Windows\BackupRestore::$mainPlugin = $this;
     }
 
     public function eXpOnLoad()
@@ -54,7 +58,7 @@ class Database extends ExpPlugin
         $this->setPublicMethod('showDbMaintenance');
         $this->updateServerChallenges();
         // add admin command ;)
-        $cmd = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::addAdminCommand('dbtools', $this, 'showDbMaintenance', Permission::SERVER_DATABASE);
+        $cmd = AdminGroups::addAdminCommand('dbtools', $this, 'showDbMaintenance', Permission::SERVER_DATABASE);
         $cmd->setHelp('shows administrative window for database');
         $cmd->setMinParam(0);
 
@@ -62,9 +66,11 @@ class Database extends ExpPlugin
         $this->maintainanceWindow->setName("DbMaintainance");
         $this->maintainanceWindow->setSize(160, 100);
         $this->maintainanceWindow->setTitle("Database Maintenance");
-        $this->maintainanceWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 90));
-        $this->maintainanceWindow->setParam("sizeX",          160);
-        $this->maintainanceWindow->setParam("sizeY",          100);
+
+        $this->backupRestoreWindow = new Window("Database\Gui\Windows\BackupRestore.xml");
+        $this->backupRestoreWindow->setName("DbBackupRestore");
+        $this->backupRestoreWindow->setSize(160, 100);
+        $this->backupRestoreWindow->setTitle('Database Backup and Restore');
     }
 
     public function eXpOnReady()
@@ -73,6 +79,9 @@ class Database extends ExpPlugin
         $this->registerManialinkCallback('maintainanceRepair', true);
         $this->registerManialinkCallback('maintainanceOptimize', true);
         $this->registerManialinkCallback('maintainanceBackup', true);
+        $this->registerManialinkCallback('restoreFile', false, true);
+        $this->registerManialinkCallback('deleteFile', false, true);
+        $this->registerManialinkCallback('exportToSql', true);
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
@@ -90,7 +99,8 @@ class Database extends ExpPlugin
                 // check if we need to do a backup
                 $lastBackupTime = 0;
                 if (!empty($params)) {
-                    $lastBackupTime = array_keys($params)[count($params) - 1];
+                    $backupTimes = array_keys($params);
+                    $lastBackupTime = end($backupTimes);
                 }
                 if (time() - $lastBackupTime < ($this->config->backupInterval * 60 * 60)) {
                     return;
@@ -482,7 +492,7 @@ class Database extends ExpPlugin
 
     public function showDbMaintenance($login)
     {
-        if (!\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
             return;
         }
         /** @var \ManiaLive\Database\Config $dbConfig */
@@ -498,6 +508,9 @@ class Database extends ExpPlugin
 
     public function maintainanceRepair($login, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
         foreach ($params as $key => $value) {
             if (strpos($key, 'cb_') === 0 && $value == '1') {
                 $tableName = substr($key, 3);
@@ -512,6 +525,9 @@ class Database extends ExpPlugin
 
     public function maintainanceOptimize($login, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
         foreach ($params as $key => $value) {
             if (strpos($key, 'cb_') === 0 && $value == '1') {
                 $tableName = substr($key, 3);
@@ -526,6 +542,9 @@ class Database extends ExpPlugin
 
     public function maintainanceTruncate($login, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
         foreach ($params as $key => $value) {
             if (strpos($key, 'cb_') === 0 && $value == '1') {
                 $tableName = substr($key, 3);
@@ -540,12 +559,10 @@ class Database extends ExpPlugin
 
     public function maintainanceBackup($login, $params = array())
     {
-        $window = Gui\Windows\BackupRestore::Create($login);
-        $window->init($this->db);
-        $window->setTitle(__('Database Backup and Restore'));
-        $window->centerOnScreen();
-        $window->setSize(160, 100);
-        $window->show();
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+        $this->showBackupRestore($login);
     }
 
     public function eXpOnUnload()
@@ -554,22 +571,103 @@ class Database extends ExpPlugin
             $this->maintainanceWindow->erase();
         }
         $this->maintainanceWindow = null;
+
+        if ($this->backupRestoreWindow !== null) {
+            $this->backupRestoreWindow->erase();
+        }
+        $this->backupRestoreWindow = null;
     }
 
     public function showBackupRestore($login)
     {
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
-            $window = Gui\Windows\BackupRestore::Create($login);
-            $window->init($this->db);
-            $window->setTitle(__('Database Backup and Restore'));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-            $window->show();
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
         }
+
+        if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                $this->connection->chatSendServerMessage("Error while creating backup folder", $login);
+                return;
+            }
+        }
+
+        $files = glob("./backup/*.sql");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($files as $file) {
+            $name      = basename($file);
+            $items[$i] = array(Gui::fixString($name));
+            $data[$i]  = array(
+                -1,
+                'exp:eXpansion.Database:restoreFile:' . $name,
+                'exp:eXpansion.Database:deleteFile:' . $name,
+            );
+            $i++;
+        }
+
+        $this->backupRestoreWindow->setParam('backupItems', $items);
+        $this->backupRestoreWindow->setParam('backupData', $data);
+        $this->backupRestoreWindow->show($login);
+    }
+
+    public function restoreFile($login, $file)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+
+        $file = str_replace('–', '-', $file);
+        $path = './backup/' . basename($file);
+        if (!is_file($path)) {
+            $this->connection->chatSendServerMessage("Backup file not found.", $login);
+            return;
+        }
+
+        $tempLine = '';
+        $lines    = file($path);
+        foreach ($lines as $line) {
+            if (substr($line, 0, 2) == '--' || $line == '') {
+                continue;
+            }
+
+            $tempLine .= $line;
+            if (substr(trim($line), -1, 1) == ';') {
+                try {
+                    $this->db->execute($tempLine);
+                } catch (\Exception $e) {
+                    $this->connection->chatSendServerMessage("Error while restoring file: " . $e->getMessage(), $login);
+                    return;
+                }
+                $tempLine = '';
+            }
+        }
+
+        $this->connection->chatSendServerMessage("Backup restored successfully.", $login);
+    }
+
+    public function deleteFile($login, $file)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+
+        $file = str_replace('–', '-', $file);
+        $path = './backup/' . basename($file);
+        if (is_file($path)) {
+            unlink($path);
+        }
+        $this->connection->chatSendServerMessage("Deleted.", $login);
+        $this->showBackupRestore($login);
     }
 
     public function exportToSql($login, $inputboxes = "")
     {
+        if ($login !== null && !AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return false;
+        }
+
         if (empty($inputboxes['filename'])) {
             if ($login !== null) {
                 $this->connection->chatSendServerMessage("No backup filename given, canceling backup!", $login);
@@ -644,7 +742,6 @@ class Database extends ExpPlugin
 
         if ($login !== null) {
             $this->connection->chatSendServerMessage("Backup Complete!", $login);
-            Gui\Windows\BackupRestore::erase($login);
             $this->showBackupRestore($login);
         }
     }

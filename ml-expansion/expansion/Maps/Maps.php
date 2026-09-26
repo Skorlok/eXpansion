@@ -17,8 +17,6 @@ use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
-use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\AddMaps;
-use ManiaLivePlugins\eXpansion\Maps\Gui\Windows\Jukelist;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapSortMode;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapWish;
 use ManiaLivePlugins\eXpansion\Maps\Structures\MapInfos;
@@ -60,8 +58,10 @@ class Maps extends ExpPlugin
     private $removeAllAction;
     
     private $mapInfoWindow;
+    private $jukeListWindow;
     private $mapListWindow;
     private $filterWindow;
+    private $addMapsWindow;
 
     private $mapListWindowOpened = array();
 
@@ -129,6 +129,12 @@ class Maps extends ExpPlugin
     public function eXpOnReady()
     {
         $this->registerManialinkCallback('addMaps');
+        $this->registerManialinkCallback('addMapsChangeDir', false, true);
+        $this->registerManialinkCallback('addMapsAddMap', false, true);
+        $this->registerManialinkCallback('addMapsDeleteMap', false, true);
+        $this->registerManialinkCallback('addMapsConfirmDeleteDir', false, true);
+        $this->registerManialinkCallback('addMapsDeleteDir', false, true);
+        $this->registerManialinkCallback('addMapsAddAll', false, true);
         $this->registerManialinkCallback('chat_removeMap');
         $this->registerManialinkCallback('chat_eraseMap');
         $this->registerManialinkCallback('playerQueueMap', false, true);
@@ -147,6 +153,8 @@ class Maps extends ExpPlugin
         $this->registerManialinkCallback('applyFilter', true, true);
         $this->registerManialinkCallback('applySortFilter', true, true);
         $this->registerManialinkCallback('removeAllMaps');
+        $this->registerManialinkCallback('dropQueue', false, true);
+        $this->registerManialinkCallback('emptyWishesGui');
         
         $cmd = AdminGroups::addAdminCommand('removethis', $this, 'chat_removeMap', Permission::MAP_REMOVE_MAP);
         $cmd->setHelp(eXpGetMessage('Removes current map from the playlist.'));
@@ -202,8 +210,10 @@ class Maps extends ExpPlugin
 
         $this->nextMap = $this->storage->nextMap;
 
-        Jukelist::$mainPlugin = $this;
-        AddMaps::$mapsPlugin = $this;
+        $this->addMapsWindow = new Window("Maps\Gui\Windows\AddMaps.xml");
+        $this->addMapsWindow->setName("AddMaps");
+        $this->addMapsWindow->setSize(130, 100);
+        $this->addMapsWindow->setTitle('Add Maps on server');
 
         $this->mapInfoWindow = new Window("Maps\Gui\Windows\MapInfo.xml");
         $this->mapInfoWindow->setSize(160, 90);
@@ -222,6 +232,10 @@ class Maps extends ExpPlugin
         $this->mapListWindow->setName('Maplist');
         $this->mapListWindow->setSize(214, 100);
         $this->mapListWindow->registerCloseCallback(array($this, 'onMapListWindowClosed'));
+
+        $this->jukeListWindow = new Window('Maps\Gui\Windows\Jukelist.xml');
+        $this->jukeListWindow->setName('Jukelist');
+        $this->jukeListWindow->setSize(180, 100);
 
         $this->removeAllAction = Gui::createConfirm("exp:eXpansion.Maps:removeAllMaps");
     }
@@ -558,12 +572,36 @@ class Maps extends ExpPlugin
 
     public function showJukeList($login)
     {
-        $window = Jukelist::Create($login);
-        $window->setList($this->queue);
-        $window->centerOnScreen();
-        $window->setTitle(__("Jukebox", $login));
-        $window->setSize(180, 100);
-        $window->show();
+        $isAdmin = AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN);
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->queue as $wish) {
+            // Column index must match the id="column_N_x" attributes in Jukelist.xml
+            $items[$i] = array(
+                ($i + 1) . '.',                                                    // 0 rank
+                Gui::fixString(Formatting::stripColors($wish->map->name, '999f')), // 1 map name
+                Time::fromTM($wish->map->goldTime),                                // 2 gold time
+                Gui::fixString($wish->player->nickName),                           // 3 wisher nickname
+            );
+
+            $canDrop = $isAdmin || $wish->player->login === $login;
+            $data[$i] = array(
+                -1,
+                -1,
+                -1,
+                -1,
+                $canDrop ? 'exp:eXpansion.Maps:dropQueue:' . $wish->map->uId : -1, // 4 Drop button
+            );
+            $i++;
+        }
+
+        $this->jukeListWindow->setTitle("Jukebox");
+        $this->jukeListWindow->setParam("hideClearJukebox", !$isAdmin);
+        $this->jukeListWindow->setParam("wishItems", $items);
+        $this->jukeListWindow->setParam("wishData",  $data);
+        $this->jukeListWindow->show($login);
     }
 
     public function onPluginLoaded($pluginId)
@@ -682,6 +720,9 @@ class Maps extends ExpPlugin
 
     public function removeAllMaps($login)
     {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
+            return;
+        }
         $chunkSize  = 1000;
         $offset     = 0;
         $removed    = 0;
@@ -1315,6 +1356,9 @@ class Maps extends ExpPlugin
      */
     public function gotoMap($login, $uid)
     {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN)) {
+            return;
+        }
         $map = $this->findMapByUId($uid);
         if (!$map) {
             $this->eXpChatSendServerMessage('Map not found', $login);
@@ -1559,6 +1603,9 @@ class Maps extends ExpPlugin
      */
     public function chat_removeMap($login)
     {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
+            return;
+        }
         try {
             $this->removeMap($login, $this->storage->currentMap->uId);
         } catch (Exception $e) {
@@ -1574,6 +1621,9 @@ class Maps extends ExpPlugin
      */
     public function chat_eraseMap($login)
     {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_REMOVE_MAP)) {
+            return;
+        }
         try {
             $this->eraseMap($login, $this->storage->currentMap->uId);
         } catch (Exception $e) {
@@ -1628,11 +1678,23 @@ class Maps extends ExpPlugin
      * @param $login
      * @param $map
      */
-    public function dropQueue($login, $map)
+    public function dropQueue($login, $uid)
     {
+        // Gui::fixString() (used by the pager to build the ManiaScript "data" array, see
+        // OptimizedPager::formatMsArray) rewrites every "-" into an en-dash "–" to avoid "--"
+        // being read as a ManiaScript comment. Map uids never contain an en-dash, so this
+        // round-trip conversion is undone before matching against the real uid.
+        $uid = str_replace('–', '-', $uid);
+
+        $isAdmin = AdminGroups::hasPermission($login, Permission::MAP_JUKEBOX_ADMIN);
+
         $i = 0;
         foreach ($this->queue as $queue) {
-            if ($queue->map->uId == $map->uId) {
+            if ($queue->map->uId == $uid) {
+                if (!$isAdmin && $queue->player->login !== $login) {
+                    $this->eXpChatSendServerMessage(AdminGroups::getNoPermissionMsg(), $login);
+                    return;
+                }
                 array_splice($this->queue, $i, 1);
                 $msg = eXpGetMessage('#variable#%1$s #queue#removed #variable#%2$s #queue#from the queue..');
                 $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($this->storage->getPlayerObject($login)->cleanNickName, 'wosnm'), Formatting::stripCodes($queue->map->name, 'wosnm')));
@@ -1825,11 +1887,283 @@ class Maps extends ExpPlugin
             $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#Can't continue, since this instance of eXpansion is running remote agains the server"), $login);
             return;
         }
-        $window = AddMaps::Create($login);
-        $window->setTitle('Add Maps on server');
-        $window->centerOnScreen();
-        $window->setSize(130, 100);
-        $window->show();
+        $this->showAddMaps($login);
+    }
+
+    /**
+     * Build & show the local maps browser.
+     *
+     * @param string $login
+     * @param string $folder Absolute path of the browsed folder, empty for the server map directory
+     */
+    public function showAddMaps($login, $folder = "")
+    {
+        $rootPath = \realpath(Helper::getPaths()->getMapPath());
+        if ($rootPath === false) {
+            return;
+        }
+
+        $mapPath = ($folder === "") ? $rootPath : $this->addMapsRealPath($folder);
+        if ($mapPath === false || !is_dir($mapPath)) {
+            // outside of the map directory, gone missing: fall back on the map directory itself
+            $mapPath = $rootPath;
+        }
+
+        $txtOpen = __("Open", $login);
+        $txtAdd  = __("Add", $login);
+        $txtDel  = __("Delete", $login);
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+
+        if ($mapPath !== $rootPath) {
+            $items[$i] = array('$o$999Parent directory (..)', $txtOpen, '');
+            $data[$i]  = array(-1, 'exp:eXpansion.Maps:addMapsChangeDir:' . dirname($mapPath), -1);
+            $i++;
+        }
+        foreach (new \DirectoryIterator($mapPath) as $dir) {
+            if (!$dir->isDir() || $dir->isDot()) {
+                continue;
+            }
+
+            $items[$i] = array('$o$3af$fff ' . $dir->getFilename() . '/', $txtOpen, '$f00' . $txtDel);
+            $data[$i]  = array(-1, 'exp:eXpansion.Maps:addMapsChangeDir:' . $dir->getPathname(), 'exp:eXpansion.Maps:addMapsConfirmDeleteDir:' . $dir->getPathname());
+            $i++;
+        }
+
+        foreach (new \DirectoryIterator($mapPath) as $dir) {
+            if (!$dir->isFile()) {
+                continue;
+            }
+
+            $path = $dir->getRealPath();
+
+            $items[$i] = array($dir->getBasename(), $txtAdd, $txtDel);
+            $data[$i]  = array(-1, 'exp:eXpansion.Maps:addMapsAddMap:' . $path, Gui::createConfirm("exp:eXpansion.Maps:addMapsDeleteMap:" . $path));
+            $i++;
+        }
+
+        $actualPath = DIRECTORY_SEPARATOR . ltrim(substr($mapPath, strlen($rootPath)), DIRECTORY_SEPARATOR);
+        $this->addMapsWindow->setParam("actualPath",  $this->addMapsWindow->handleSpecialChars($actualPath));
+        $this->addMapsWindow->setParam("currentPath", $this->addMapsWindow->handleSpecialChars($mapPath));
+        $this->addMapsWindow->setParam("mapItems",    $items);
+        $this->addMapsWindow->setParam("mapData",     $data);
+        $this->addMapsWindow->show($login);
+    }
+
+    /**
+     * Resolve a path coming from the AddMaps window and make sure it stays inside the server map
+     * directory. Every AddMaps callback receives its path from the client, so none of them may
+     * trust it.
+     *
+     * @param string $path
+     *
+     * @return string|false The real path, or false when it is missing or outside the map directory
+     */
+    private function addMapsRealPath($path)
+    {
+        $rootPath = \realpath(Helper::getPaths()->getMapPath());
+        $realPath = \realpath($path);
+
+        if ($rootPath === false || $realPath === false) {
+            return false;
+        }
+
+        if ($realPath !== $rootPath && strpos($realPath, $rootPath . DIRECTORY_SEPARATOR) !== 0) {
+            return false;
+        }
+
+        return $realPath;
+    }
+
+    /**
+     * exp: callback fired by a row's "Open" button in AddMaps.xml
+     */
+    public function addMapsChangeDir($login, $folder)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+
+        $this->showAddMaps($login, str_replace('–', '-', $folder));
+    }
+
+    /**
+     * exp: callback fired by a row's "Add" button in AddMaps.xml
+     */
+    public function addMapsAddMap($login, $file)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+        $file = $this->addMapsRealPath(str_replace('–', '-', $file));
+        if ($file === false || !is_file($file)) {
+            return;
+        }
+
+        try {
+            $this->connection->addMap($file);
+            $info = $this->connection->getMapInfo($file);
+            $this->eXpChatSendServerMessage(eXpGetMessage('Map %s $z$s$fffadded to playlist.'), $login, array($info->name));
+        } catch (\Exception $e) {
+            $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#Error: %s"), $login, array($e->getMessage()));
+        }
+    }
+
+    /**
+     * exp: callback fired by a row's "Delete" button in AddMaps.xml, once the confirm dialog was accepted.
+     */
+    public function addMapsDeleteMap($login, $file)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+        if ($this->expStorage->isRemoteControlled) {
+            $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#This instance of eXpansion is running remote! Can't delete file #variable#'%s'"), $login, array(basename($file)));
+            return;
+        }
+        $file = $this->addMapsRealPath(str_replace('–', '-', $file));
+        if ($file === false || !is_file($file)) {
+            return;
+        }
+
+        try {
+            unlink($file);
+            $this->eXpChatSendServerMessage(eXpGetMessage("File '%s' deleted from filesystem!"), $login, array(basename($file)));
+        } catch (\Exception $e) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#Error: %s'), $login, array($e->getMessage()));
+        }
+
+        $this->showAddMaps($login, dirname($file));
+    }
+
+    /**
+     * exp: callback fired by a folder row's "Delete" button in AddMaps.xml. Counts what would be
+     * lost and asks for confirmation before handing over to addMapsDeleteDir().
+     */
+    public function addMapsConfirmDeleteDir($login, $folder)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+
+        $folder = $this->addMapsRealPath(str_replace('–', '-', $folder));
+        if ($folder === false || !is_dir($folder) || $folder === \realpath(Helper::getPaths()->getMapPath())) {
+            return;
+        }
+
+        $nbFiles = 0;
+        $nbDirs  = 0;
+        $this->addMapsCountTree($folder, $nbFiles, $nbDirs);
+
+        Gui::showConfirmDialog($login, 'exp:eXpansion.Maps:addMapsDeleteDir:' . $folder, __('Delete folder %1$s and everything in it: %2$s file(s), %3$s sub-folder(s)?', $login, basename($folder), $nbFiles, $nbDirs));
+    }
+
+    /**
+     * exp: callback fired once the folder deletion was confirmed.
+     */
+    public function addMapsDeleteDir($login, $folder)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+        if ($this->expStorage->isRemoteControlled) {
+            $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#This instance of eXpansion is running remote! Can't delete file #variable#'%s'"), $login, array(basename($folder)));
+            return;
+        }
+
+        $folder = $this->addMapsRealPath(str_replace('–', '-', $folder));
+        if ($folder === false || !is_dir($folder) || $folder === \realpath(Helper::getPaths()->getMapPath())) {
+            return;
+        }
+
+        $parent = dirname($folder);
+
+        if ($this->addMapsDeleteTree($folder)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage("Folder '%s' deleted from filesystem!"), $login, array(basename($folder)));
+        } else {
+            $this->eXpChatSendServerMessage(eXpGetMessage("#admin_error#Folder '%s' could not be fully deleted, check the file permissions"), $login, array(basename($folder)));
+        }
+
+        $this->showAddMaps($login, $parent);
+    }
+
+    /**
+     * Count the files and sub-folders under a folder. Symbolic links count as one file and are
+     * never followed.
+     *
+     * @param string $path
+     * @param int    $nbFiles
+     * @param int    $nbDirs
+     */
+    private function addMapsCountTree($path, &$nbFiles, &$nbDirs)
+    {
+        foreach (new \DirectoryIterator($path) as $entry) {
+            if ($entry->isDot()) {
+                continue;
+            }
+            if ($entry->isLink() || !$entry->isDir()) {
+                $nbFiles++;
+            } else {
+                $nbDirs++;
+                $this->addMapsCountTree($entry->getPathname(), $nbFiles, $nbDirs);
+            }
+        }
+    }
+
+    /**
+     * Recursively delete a folder. A symbolic link is removed as a link, its target is left alone.
+     *
+     * @param string $path
+     *
+     * @return bool True when everything below $path could be removed
+     */
+    private function addMapsDeleteTree($path)
+    {
+        $done = true;
+
+        foreach (new \DirectoryIterator($path) as $entry) {
+            if ($entry->isDot()) {
+                continue;
+            }
+            if ($entry->isLink() || !$entry->isDir()) {
+                $done = unlink($entry->getPathname()) && $done;
+            } else {
+                $done = $this->addMapsDeleteTree($entry->getPathname()) && $done;
+            }
+        }
+
+        return rmdir($path) && $done;
+    }
+
+    /**
+     * exp: callback fired by the "Add all" button of AddMaps.xml
+     */
+    public function addMapsAddAll($login, $folder)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_LOCAL)) {
+            return;
+        }
+        $folder = $this->addMapsRealPath(str_replace('–', '-', $folder));
+        if ($folder === false || !is_dir($folder)) {
+            return;
+        }
+
+        $maps = array();
+        foreach (new \DirectoryIterator($folder) as $file) {
+            if ($file->isFile() && preg_match('/\.Map\.Gbx$/i', $file->getFilename())) {
+                $maps[] = $file->getRealPath();
+            }
+        }
+
+        if (empty($maps)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage("No maps found in current directory."), $login);
+            return;
+        }
+
+        $this->connection->addMapList($maps);
+        $this->eXpChatSendServerMessage(eXpGetMessage("Added %s maps to playlist."), $login, array(count($maps)));
     }
 
     public function showMapInfo($login, $uid = null)
@@ -1933,8 +2267,10 @@ class Maps extends ExpPlugin
         $widget->setLayer("scorestable");
         $widget->erase();
 
-        AddMaps::EraseAll();
-        Jukelist::EraseAll();
+        if ($this->addMapsWindow instanceof Window) {
+            $this->addMapsWindow->erase();
+        }
+        $this->addMapsWindow = null;
 
         if ($this->mapInfoWindow instanceof Window) {
             $this->mapInfoWindow->erase();
@@ -1948,6 +2284,10 @@ class Maps extends ExpPlugin
             $this->mapListWindow->erase();
         }
         $this->mapListWindow = null;
+        if ($this->jukeListWindow instanceof Window) {
+            $this->jukeListWindow->erase();
+        }
+        $this->jukeListWindow = null;
 
         $this->mapListWindowOpened = array();
 

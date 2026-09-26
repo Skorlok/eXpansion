@@ -4,40 +4,26 @@ namespace ManiaLivePlugins\eXpansion\ChatAdmin;
 
 use Exception;
 use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLib\Utils\Path;
 use ManiaLive\Application\Application;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\PluginHandler\Dependency;
-use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Adm\Gui\Windows\ScriptSettings;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\AdminGroups\types\Arraylist;
 use ManiaLivePlugins\eXpansion\AdminGroups\types\Boolean;
 use ManiaLivePlugins\eXpansion\AdminGroups\types\Integer;
 use ManiaLivePlugins\eXpansion\AdminGroups\types\Time_ms;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\BannedPlayeritem;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\BlacklistPlayeritem;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\GuestPlayeritem;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Controls\IgnoredPlayeritem;
-use ManiaLivePlugins\eXpansion\ChatAdmin\Gui\Windows\GenericPlayerList;
 use ManiaLivePlugins\eXpansion\ChatAdmin\Structures\ActionDuration;
-use ManiaLivePlugins\eXpansion\Core\Config;
 use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
-use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
 use ManiaLivePlugins\eXpansion\Helpers\ColorConversion;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
-use Maniaplanet\DedicatedServer\Structures\Player;
-use Maniaplanet\DedicatedServer\Structures\PlayerBan;
-use oliverde8\AsynchronousJobs\Job\Curl;
-use Phine\Exception\Exception as Exception2;
 
 /**
  * Description of Admin
@@ -60,7 +46,9 @@ class ChatAdmin extends ExpPlugin
     protected $paramDialogWindow;
     /** @var Window */
     protected $teamSetupWindow;
-    
+    /** @var Window */
+    protected $genericPlayerListWindow;
+
     protected $paramDialogDropdownItems = array("permanent", "30 seconds", "5 min", "10 min", "15 min", "30 min", "1 hour", "1 day", "5 day", "week", "month");
 
     public static $showActions = array();
@@ -154,7 +142,7 @@ class ChatAdmin extends ExpPlugin
         $cmd->addLineHelpMore('All banned players will be able to rejoin the server.');
         $cmd->setMinParam(0);
 
-        $cmd = AdminGroups::addAdminCommand('getbanlist', $this, 'showBanList', Permission::SERVER_GENERIC_OPTIONS);
+        $cmd = AdminGroups::addAdminCommand('getbanlist', $this, 'showBanList', Permission::PLAYER_UNBAN);
         $cmd->setHelp('shows the current banlist of players');
         $cmd->setMinParam(0);
 
@@ -164,11 +152,11 @@ class ChatAdmin extends ExpPlugin
         $cmd->addLineHelpMore('All blacklist players will be able to rejoin the server.');
         $cmd->setMinParam(0);
 
-        $cmd = AdminGroups::addAdminCommand('getblacklist', $this, 'showBlackList', Permission::SERVER_GENERIC_OPTIONS);
+        $cmd = AdminGroups::addAdminCommand('getblacklist', $this, 'showBlackList', Permission::PLAYER_UNBLACK);
         $cmd->setHelp('shows the current banlist of players');
         $cmd->setMinParam(0);
 
-        $cmd = AdminGroups::addAdminCommand('getguestlist', $this, 'showGuestList', Permission::SERVER_GENERIC_OPTIONS);
+        $cmd = AdminGroups::addAdminCommand('getguestlist', $this, 'showGuestList', Permission::PLAYER_GUEST);
         $cmd->setHelp('shows the current guest of players');
         $cmd->setMinParam(0);
 
@@ -206,6 +194,11 @@ class ChatAdmin extends ExpPlugin
         $cmd->addLineHelpMore('This player will be able to communicate with other players');
         $cmd->setMinParam(1);
         AdminGroups::addAlias($cmd, "unmute");
+
+        $cmd = AdminGroups::addAdminCommand('warn', $this, 'warn', Permission::PLAYER_WARN);
+        $cmd->setHelp('Warns a player');
+        $cmd->addLineHelpMore('$w//warn #login$z will warn the player');
+        $cmd->setMinParam(1);
         //ENDSUPER
 
         /*
@@ -428,6 +421,15 @@ class ChatAdmin extends ExpPlugin
         $this->registerManialinkCallback('addIgnore', true);
         $this->registerManialinkCallback('addBan', true);
         $this->registerManialinkCallback('addBlack', true);
+        $this->registerManialinkCallback('closeWarnManialink');
+        $this->registerManialinkCallback('unbanClick', false, true);
+        $this->registerManialinkCallback('unBlackListClick', false, true);
+        $this->registerManialinkCallback('unignoreClick', false, true);
+        $this->registerManialinkCallback('removeGuestClick', false, true);
+
+        $this->genericPlayerListWindow = new Window("ChatAdmin\Gui\Windows\GenericPlayerList.xml");
+        $this->genericPlayerListWindow->setName("GenericPlayerList");
+        $this->genericPlayerListWindow->setSize(90, 120);
 
         $this->paramDialogWindow = new Window("ChatAdmin\Gui\Windows\ParameterDialog.xml");
         $this->paramDialogWindow->setName("ParameterDialog");
@@ -844,6 +846,10 @@ class ChatAdmin extends ExpPlugin
 
     public function teamSetupOk($login, $data)
     {
+        if (!AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to do that.'));
+            return;
+        }
         $this->teamSetupWindow->erase($login);
         $this->setTeamDisplayAfterWindow($login, $data);
     }
@@ -888,6 +894,10 @@ class ChatAdmin extends ExpPlugin
 
     public function clubLinksOk($login, $data)
     {
+        if (!AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to do that.'));
+            return;
+        }
         $this->clubLinksWindow->erase($login);
         $this->getClubLinks($login, $data);
     }
@@ -897,7 +907,34 @@ class ChatAdmin extends ExpPlugin
         $action = isset($inputbox['adminAction']) ? $inputbox['adminAction'] : '';
         $target = isset($inputbox['adminTarget']) ? $inputbox['adminTarget'] : '';
 
+        if ($action == "warn") {
+            if (!AdminGroups::hasPermission($login, Permission::PLAYER_WARN)) {
+                $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to warn players.'));
+                return;
+            }
+        } else if ($action == "kick") {
+            if (!AdminGroups::hasPermission($login, Permission::PLAYER_KICK)) {
+                $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to kick players.'));
+                return;
+            }
+        } else if ($action == "ban") {
+            if (!AdminGroups::hasPermission($login, Permission::PLAYER_BAN)) {
+                $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to ban players.'));
+                return;
+            }
+        } else if ($action == "black") {
+            if (!AdminGroups::hasPermission($login, Permission::PLAYER_BLACK)) {
+                $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to blacklist players.'));
+                return;
+            }
+        } else {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#Invalid action specified.'));
+            return;
+        }
+
         if ($action === "kick") {
+            $cmd = $action . " " . $target . " " . $inputbox['parameter'];
+        } else if ($action === "warn") {
             $cmd = $action . " " . $target . " " . $inputbox['parameter'];
         } else {
             $select   = isset($inputbox['select']) ? intval($inputbox['select']) : 0;
@@ -905,8 +942,8 @@ class ChatAdmin extends ExpPlugin
             $cmd      = $action . " " . $target . " " . $inputbox['parameter'] . ", duration: " . $duration;
             $this->addActionDuration($target, $action, $duration);
         }
-        AdminGroups::getInstance()->adminCmd($login, $cmd);
         $this->paramDialogWindow->erase($login);
+        AdminGroups::getInstance()->adminCmd($login, $cmd);
     }
 
     public function getClubLinks($login, $data)
@@ -1763,12 +1800,16 @@ class ChatAdmin extends ExpPlugin
     }
 
     /**
-     * @param $fromLogin
-     * @param $params
+     * exp: callback fired by a row's "Remove" button in GenericPlayerList.xml (blacklist)
      */
-    public function unBlackListClick($fromLogin, $params)
+    public function unBlackListClick($fromLogin, $target)
     {
-        $this->unBlacklist($fromLogin, $params);
+        if (!AdminGroups::hasPermission($fromLogin, Permission::PLAYER_UNBLACK)) {
+            $this->sendErrorChat($fromLogin, eXpGetMessage('#admin_error#You do not have permission to unblacklist players.'));
+            return;
+        }
+        $target = str_replace('–', '-', $target);
+        $this->unBlacklist($fromLogin, array($target));
         $this->showBlackList($fromLogin);
     }
 
@@ -1828,19 +1869,104 @@ class ChatAdmin extends ExpPlugin
      * @param $fromLogin
      * @param $params
      */
-    public function unignoreClick($fromLogin, $params)
+    public function unignoreClick($fromLogin, $target)
     {
-        $this->unignore($fromLogin, $params);
+        if (!AdminGroups::hasPermission($fromLogin, Permission::PLAYER_IGNORE)) {
+            $this->sendErrorChat($fromLogin, eXpGetMessage('#admin_error#You do not have permission to unignore players.'));
+            return;
+        }
+        $target = str_replace('–', '-', $target);
+        $this->unignore($fromLogin, array($target));
         $this->showIgnoreList($fromLogin);
+    }
+
+    /**
+     * @param $fromLogin
+     * @param $params
+     */
+    public function warn($fromLogin, $params)
+    {
+        $target = array_shift($params);
+        $reason = implode(" ", $params);
+        $reason = trim($reason);
+        $player = $this->storage->getPlayerObject($target);
+        if ($player == null) {
+            $this->eXpChatSendServerMessage("#admin_error#Player #variable# %s doesn' exist.", $fromLogin, array($target));
+            return;
+        }
+        if (empty($reason)) {
+            $this->paramDialogWindow->setTitle("warn %s", array($player->cleanNickName));
+            $this->paramDialogWindow->setParam("adminAction", "warn");
+            $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->show($fromLogin);
+
+            return;
+        }
+        $admin = $this->storage->getPlayerObject($fromLogin);
+        try {
+            $this->sendWarnManialink($target, $reason);
+            $this->eXpChatSendServerMessage('#admin_action#Admin#variable# %1$s #admin_action#warns the player#variable# %2$s (%3$s) #variable#Reason: #admin_error#%4$s', null, array($admin->cleanNickName, $player->cleanNickName, $target, $reason));
+        } catch (Exception $e) {
+            $this->sendErrorChat($fromLogin, $e->getMessage());
+        }
+    }
+
+    /**
+     * Sends a full-screen "you have been warned" overlay directly, with no template file:
+     * a near-opaque black background covering the whole screen (-160,90 / 320x180) plus
+     * the warning message and the reason, self-hiding after a few seconds.
+     */
+    private function sendWarnManialink($login, $reason)
+    {
+        $reason = htmlspecialchars($reason, ENT_QUOTES, 'UTF-8');
+
+        $xml = '<manialink id="eXpWarnMessage" version="2" layer="Normal" name="eXpWarnMessage">
+                <frame posn="0 0 30" id="warnFrame">
+                <quad posn="-160 90 0" sizen="320 180" bgcolor="000" opacity="0.90"/>
+                <label posn="-25 75 1" text="$f00" textsize="50"/>
+                <label posn="0 20 1" sizen="300 30" halign="center" valign="center" style="TextTitle1" textsize="8" textcolor="fff" text="YOU HAVE BEEN WARNED BY AN ADMINISTRATOR" textfont="Oswald"/>
+                <label posn="0 -5 1" sizen="280 20" halign="center" valign="center" style="TextCardSmall" textsize="3" textcolor="fff" text="Reason:"/>
+                <label posn="0 -20 1" sizen="280 20" halign="center" valign="center" style="TextRaceStaticSmall" textsize="5" textcolor="fff" text="' . $reason . '" textfont="RajdhaniMono" autonewline="1"/>
+                <label posn="0 -40" sizen="10 6" style="CardButtonMedium" halign="center" id="eXpWarnButton" text="$fffOK" scriptevents="1"/>
+                </frame>
+                <script><!--
+                main () {
+                    while(True) {
+                        yield;
+                        foreach (Event in PendingEvents) {
+                            if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "eXpWarnButton")  {
+                                declare Window <=> Page.GetFirstChild("warnFrame");
+                                Window.Hide();
+                                TriggerPageAction("exp:eXpansion.ChatAdmin:closeWarnManialink");
+                            }
+                        }
+                    }
+                }
+                --></script>
+                </manialink>';
+
+        $this->connection->sendDisplayManialinkPage($login, $xml);
+    }
+
+    public function closeWarnManialink($login)
+    {
+        $AdminGroups = AdminGroups::getInstance();
+        $this->connection->sendDisplayManialinkPage($login, '<manialink id="eXpWarnMessage"></manialink>');
+        $AdminGroups->announceToPermission(Permission::PLAYER_WARN, '#admin_action#Player #variable# %s #admin_action#closed the warning message.', array($this->storage->getPlayerObject($login)->cleanNickName));
     }
 
     /**
      * @param $fromlogin
      * @param $params
      */
-    public function unbanClick($fromlogin, $params)
+    public function unbanClick($fromlogin, $target)
     {
-        $this->unban($fromlogin, $params);
+        if (!AdminGroups::hasPermission($fromlogin, Permission::PLAYER_UNBAN)) {
+            $this->sendErrorChat($fromlogin, eXpGetMessage('#admin_error#You do not have permission to unban players.'));
+            return;
+        }
+        $target = str_replace('–', '-', $target);
+        $this->unban($fromlogin, array($target));
         $this->showBanList($fromlogin);
     }
 
@@ -1969,9 +2095,14 @@ class ChatAdmin extends ExpPlugin
      * @param $fromLogin
      * @param $params
      */
-    public function removeGuestClick($fromLogin, $params)
+    public function removeGuestClick($fromLogin, $target)
     {
-        $this->guestRemove($fromLogin, $params);
+        if (!AdminGroups::hasPermission($fromLogin, Permission::PLAYER_GUEST)) {
+            $this->sendErrorChat($fromLogin, eXpGetMessage('#admin_error#You do not have permission to unguestlist players.'));
+            return;
+        }
+        $target = str_replace('–', '-', $target);
+        $this->guestRemove($fromLogin, array($target));
         $this->showGuestList($fromLogin);
     }
 
@@ -2458,7 +2589,7 @@ class ChatAdmin extends ExpPlugin
             $gamemode = "Rounds";
         }
 
-        $this->loadScript($fromLogin, [ucfirst($gamemode)]);
+        $this->loadScript($fromLogin, array(ucfirst($gamemode)));
         return;
     }
 
@@ -2540,30 +2671,43 @@ class ChatAdmin extends ExpPlugin
     /* Graphical Methods */
 
     /**
+     * Builds and shows GenericPlayerList.xml for one of the ban/black/guest/ignore lists.
+     *
+     * @param string $login
+     * @param string $title
+     * @param array $players list of objects having a ->login property
+     * @param string $removeMethod name of the exp:eXpansion.ChatAdmin: method fired by a row's "Remove" button
+     * @param string $addActionKey key into self::$showActions for the "add" button's action
+     */
+    private function showGenericPlayerList($login, $title, $players, $removeMethod, $addActionKey)
+    {
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($players as $player) {
+            $items[$i] = array(Gui::fixString($player->login));
+            $data[$i]  = array(-1, 'exp:eXpansion.ChatAdmin:' . $removeMethod . ':' . $player->login);
+            $i++;
+        }
+
+        $this->genericPlayerListWindow->setTitle($title);
+        $this->genericPlayerListWindow->setParam("addAction",   self::$showActions[$addActionKey]);
+        $this->genericPlayerListWindow->setParam("playerItems", $items);
+        $this->genericPlayerListWindow->setParam("playerData",  $data);
+        $this->genericPlayerListWindow->show($login);
+    }
+
+    /**
      * @param $login
      */
     public function showBanList($login)
     {
-        GenericPlayerList::Erase($login);
-
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_UNBAN)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to ban players.'));
+            return;
+        }
         try {
-            /** @var GenericPlayerList $window */
-            $window = GenericPlayerList::Create($login);
-            $window->setTitle('Banned Players on the server');
-            $indexNumber = 0;
-            $items = array();
-
-            /**
-             * @var PlayerBan
-             */
-            foreach ($this->connection->getBanList(-1, 0) as $player) {
-                $items[] = new BannedPlayeritem($indexNumber, $player, $this, $login);
-            }
-            $window->setAction(self::$showActions['banPlayer']);
-            $window->populateList($items);
-            $window->setSize(90, 120);
-            $window->centerOnScreen();
-            $window->show();
+            $this->showGenericPlayerList($login, 'Banned Players on the server', $this->connection->getBanList(-1, 0), 'unbanClick', 'banPlayer');
         } catch (Exception $e) {
             $this->sendErrorChat($login, $e->getMessage());
         }
@@ -2575,6 +2719,10 @@ class ChatAdmin extends ExpPlugin
      */
     public function addBan($login, $entries)
     {
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_BAN)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to ban players.'));
+            return;
+        }
         $this->ban($login, array($entries['login']));
         $this->showBanList($login);
     }
@@ -2585,6 +2733,10 @@ class ChatAdmin extends ExpPlugin
      */
     public function addBlack($login, $entries)
     {
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_BLACK)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to blacklist players.'));
+            return;
+        }
         $this->blacklist($login, array($entries['login']), true);
     }
 
@@ -2594,6 +2746,10 @@ class ChatAdmin extends ExpPlugin
      */
     public function addIgnore($login, $entries)
     {
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to ignore players.'));
+            return;
+        }
         $this->ignore($login, array($entries['login']));
         $this->showIgnoreList($login);
     }
@@ -2604,6 +2760,10 @@ class ChatAdmin extends ExpPlugin
      */
     public function addGuestList($login, $entries)
     {
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_GUEST)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to guestlist players.'));
+            return;
+        }
         $this->guest($login, array($entries['login']));
         $this->showGuestList($login);
     }
@@ -2614,26 +2774,11 @@ class ChatAdmin extends ExpPlugin
      */
     public function showBlackList($login)
     {
-        GenericPlayerList::Erase($login);
-
-        //	try {
-        /** @var GenericPlayerList $window */
-        $window = GenericPlayerList::Create($login);
-        $window->setTitle(__('Blacklisted Players on the server', $login));
-        $indexNumber = 0;
-        $items = array();
-
-        /**
-         * @var Player
-         */
-        foreach ($this->connection->getBlackList(-1, 0) as $player) {
-            $items[] = new BlacklistPlayeritem($indexNumber, $player, $this, $login);
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_UNBLACK)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to blacklist players.'));
+            return;
         }
-        $window->setAction(self::$showActions['blackPlayer']);
-        $window->populateList($items);
-        $window->setSize(90, 120);
-        $window->centerOnScreen();
-        $window->show();
+        $this->showGenericPlayerList($login, 'Blacklisted Players on the server', $this->connection->getBlackList(-1, 0), 'unBlackListClick', 'blackPlayer');
     }
 
     /**
@@ -2641,27 +2786,12 @@ class ChatAdmin extends ExpPlugin
      */
     public function showGuestList($login)
     {
-        GenericPlayerList::Erase($login);
-
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_GUEST)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to guestlist players.'));
+            return;
+        }
         try {
-            /** @var GenericPlayerList $window */
-            $window = GenericPlayerList::Create($login);
-            $window->setTitle(__('Guest Players on the server'));
-            $indexNumber = 0;
-            $items = array();
-
-            /**
-             * @var Player
-             */
-            foreach ($this->connection->getGuestList(-1, 0) as $player) {
-                $items[] = new GuestPlayeritem($indexNumber, $player, $this, $login);
-            }
-
-            $window->populateList($items);
-            $window->setAction(self::$showActions['guestPlayer']);
-            $window->setSize(90, 120);
-            $window->centerOnScreen();
-            $window->show();
+            $this->showGenericPlayerList($login, 'Guest Players on the server', $this->connection->getGuestList(-1, 0), 'removeGuestClick', 'guestPlayer');
         } catch (Exception $e) {
             $this->sendErrorChat($login, $e->getMessage());
         }
@@ -2672,26 +2802,12 @@ class ChatAdmin extends ExpPlugin
      */
     public function showIgnoreList($login)
     {
-        GenericPlayerList::Erase($login);
-
+        if (!AdminGroups::hasPermission($login, Permission::PLAYER_IGNORE)) {
+            $this->sendErrorChat($login, eXpGetMessage('#admin_error#You do not have permission to ignore players.'));
+            return;
+        }
         try {
-            /** @var GenericPlayerList $window */
-            $window = GenericPlayerList::Create($login);
-            $window->setTitle(__('Ignored Players on the server'));
-            $indexNumber = 0;
-            $items = array();
-
-            /**
-             * @var Player
-             */
-            foreach ($this->connection->getIgnoreList(-1, 0) as $player) {
-                $items[] = new IgnoredPlayeritem($indexNumber, $player, $this, $login);
-            }
-            $window->setAction(self::$showActions['ignorePlayer']);
-            $window->populateList($items);
-            $window->setSize(90, 120);
-            $window->centerOnScreen();
-            $window->show();
+            $this->showGenericPlayerList($login, 'Ignored Players on the server', $this->connection->getIgnoreList(-1, 0), 'unignoreClick', 'ignorePlayer');
         } catch (Exception $e) {
             $this->sendErrorChat($login, $e->getMessage());
         }
@@ -2703,8 +2819,12 @@ class ChatAdmin extends ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
-        GenericPlayerList::EraseAll();
         self::$showActions = null;
+
+        if ($this->genericPlayerListWindow instanceof Window) {
+            $this->genericPlayerListWindow->erase();
+        }
+        $this->genericPlayerListWindow = null;
 
         if ($this->teamSetupWindow instanceof Window) {
             $this->teamSetupWindow->erase();

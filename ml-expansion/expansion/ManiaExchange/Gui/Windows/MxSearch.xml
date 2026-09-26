@@ -1,0 +1,155 @@
+<frame posn="0 -3 0">
+    <frame posn="0 0 1"><exp:inputbox name="mapName" sizeX="35" text="{searchMapName}" label="@Map name" isTextId="true"/></frame>
+    <frame posn="38 0 1"><exp:inputbox name="author" sizeX="35" text="{searchAuthor}" label="@Author name" isTextId="true"/></frame>
+    <frame posn="76 0 1"><exp:dropdown name="style" itemsVarName="styleOptions" selectedIndex="{styleSelected}" sizeX="35"/></frame>
+    <frame posn="114 0 1"><exp:dropdown name="length" itemsVarName="lengthOptions" selectedIndex="{lengthSelected}" sizeX="35"/></frame>
+    <frame posn="149 0 1"><exp:checkbox name="filterAllPacks" active="{filterAllPacks}" textWidth="25" text="@Maps from all titles pack" isTextId="true"/></frame>
+    <frame posn="186 0 1" scale="0.8"><exp:button sizeX="24" sizeY="6" text="@Search" colorize="0a0" action="exp:eXpansion.ManiaExchange:mxSearchDo" isTextId="true"/></frame>
+</frame>
+<frame posn="0 -11 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -0.5 0" hidden="{hideNotice}">
+        <quad posn="-2 0 0" sizen="199 5.5" halign="left" valign="center" bgcolor="aaa4"/>
+        <label sizen="120 4" halign="left" valign="center" style="TextCardSmallScores2" scriptevents="1" text="$fff{noticeText}"/>
+    </frame>
+    <frame posn="0 -7 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_0_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_0_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_0_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_0_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_0_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_0_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_0_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_0_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_0_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_0_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_0_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_0_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_1_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_1_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_1_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_1_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_1_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_1_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_1_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_1_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_1_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_1_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_1_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_1_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_2_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_2_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_2_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_2_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_2_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_2_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_2_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_2_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_2_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_2_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_2_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_2_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_3_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_3_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_3_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_3_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_3_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_3_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_3_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_3_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_3_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_3_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_3_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_3_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_4_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_4_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_4_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_4_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_4_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_4_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_4_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_4_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_4_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_4_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_4_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_4_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_5_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_5_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_5_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_5_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_5_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_5_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_5_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_5_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_5_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_5_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_5_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_5_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="201" sizeY="12"/>
+        <frame posn="0 3 1.0E-5">
+            <label id="column_6_0" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_6_1" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" textemboss="1"/>
+            <label id="column_6_2" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_6_3" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <frame posn="180 0 1" hidden="{hideQueue}"><exp:button sizeX="24" sizeY="5" text="@Queue" action="eXpOptimizedPagerAction" colorize="0d0" id="column_6_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="180 -6 1" hidden="{hideInstall}"><exp:button sizeX="24" sizeY="5" text="@Install" action="eXpOptimizedPagerAction" colorize="0d0" id="column_6_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="160.5 0 1" hidden="{hideSuggest}"><exp:button sizeX="24" sizeY="5" text="@Suggest" action="eXpOptimizedPagerAction" colorize="0d0" id="column_6_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+        <frame posn="0 -3 6.0E-5">
+            <label id="column_6_4" sizen="36 6" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_6_5" posn="36 0 1.0E-5" sizen="80 6" halign="left" valign="center" style="TextCardSmallScores2" action="eXpOptimizedPagerAction" class="eXpOptimizedPagerAction" scriptevents="1"/>
+            <label id="column_6_6" posn="116 0 2.0E-5" sizen="24 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <label id="column_6_7" posn="140 0 3.0E-5" sizen="18 4" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="156 3 1.5" sizen="4 4" halign="center" valign="center" style="Icons64x64_1" substyle="OfficialRace"/>
+            <label id="column_6_8" posn="159.5 3 1.5" sizen="12 5" halign="center" valign="center" style="TextStaticSmall"/>
+        </frame>
+    </frame>
+    <exp:optimizedpager sizeX="207" sizeY="83" itemsVarName="mapItems" dataVarName="mapData" rowsPerPage="7" itemsPerRow="9" varName="mxsearch"/>
+</frame>

@@ -1,5 +1,5 @@
 <frame>
-    <quad sizen="100 8" halign="center" valign="top" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" action="{action}" colorize="ff0"/>
+    <quad sizen="100 8" halign="center" valign="top" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" action="exp:eXpansion.MusicBox:musicList" colorize="ff0"/>
     <frame posn="-45 -3.5 1.0E-5">
         <frame>
             <label sizen="16 8" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="Now Playing: "/>

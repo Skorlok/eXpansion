@@ -3,12 +3,6 @@ $plugins         = $this->getParam("plugins");
 $groups          = $this->getParam("groups");
 $currentGroupIdx = $this->getParam("currentGroupIdx");
 
-// Pager: window 172×90, pager occupies right 139px, height 86
-$pagerSizeX  = 139;  // 172 - 33 (category column)
-$pagerSizeY  = 86;   // 90 - 4
-$itemSizeY   = 8;
-$itemBgWidth = 134;  // pagerSizeX - 6 + 1
-
 $itemsXml = "";
 foreach ((array)$plugins as $plugin) {
     $i = $plugin['index'];
@@ -16,7 +10,7 @@ foreach ((array)$plugins as $plugin) {
     $itemsXml .= '<frame>';
 
     // Background
-    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="' . $itemBgWidth . '" sizeY="' . $itemSizeY . '"/>';
+    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="134" sizeY="8"/>';
 
     // Toggle icon (load/unload)
     $itemsXml .= '<frame posn="0 0 1">';
@@ -58,6 +52,8 @@ foreach ((array)$plugins as $plugin) {
 
     $itemsXml .= '</frame>';
 }
+
+$this->setParam("itemsXml", $itemsXml);
 ?>
 <frame>
 <?php foreach ((array)$groups as $idx => $group): ?>
@@ -66,7 +62,7 @@ foreach ((array)$plugins as $plugin) {
 </frame>
 <?php endforeach; ?>
 </frame>
-<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 33, -2); ?>
+<exp:pager sizeX="139" sizeY="86" itemsVarName="itemsXml" posX="33" posY="-2" itemSizeY="8"/>
 <frame posn="33 -1 0.00127">
 	<frame>
 		<frame posn="0 0 1">

@@ -19,7 +19,12 @@
 
 namespace ManiaLivePlugins\eXpansion\Notifications\types;
 
-use ManiaLivePlugins\eXpansion\Notifications\Gui\Windows\ConfPluginList;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ActionManager;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Notifications\MetaData;
 
 /**
  * Description of HashListToggable
@@ -29,30 +34,78 @@ use ManiaLivePlugins\eXpansion\Notifications\Gui\Windows\ConfPluginList;
 class NotificationPluginlist extends \ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList
 {
 
+    /** @var Window */
+    private $confPluginListWindow;
+
     public function __construct($name, $visibleName = "", $configInstance = null, $scope = false, $showMain = false)
     {
         parent::__construct($name, $visibleName, $configInstance, $scope, $showMain);
         $this->setType(new \ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString(""));
+
+        /** @var ActionManager */
+        $aM = ActionManager::getInstance();
+        $closeAction = $aM->createAction(array($this, 'confPluginListApply'));
+
+        $this->confPluginListWindow = new Window("Notifications\Gui\Windows\ConfPluginList.xml");
+        $this->confPluginListWindow->setName("ConfPluginList");
+        $this->confPluginListWindow->setSize(100, 100);
+        $this->confPluginListWindow->setTitle("Config selection");
+        $this->confPluginListWindow->setParam("closeAction", $closeAction);
     }
 
     public function showConfWindow($login)
     {
-        ConfPluginList::Erase($login);
-        $win = ConfPluginList::Create($login);
-        $win->setTitle("Config selection");
-        $win->centerOnScreen();
-        $win->setSize(100, 100);
-        $win->populate($this);
-        $win->show();
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            return;
+        }
+        
+        $var  = MetaData::getInstance()->getVariable('redirectedPlugins');
+        $list = ($var === null) ? array() : (array)$var->getRawValue();
+
+        $plugins = array();
+        foreach (AutoLoad::getAvailablePlugins() as $pluginId => $meta) {
+            $plugins[] = array(
+                'name'   => 'cb_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $pluginId),
+                'text'   => $meta->getName(),
+                'active' => in_array($pluginId, $list),
+            );
+        }
+
+        $this->confPluginListWindow->setParam("plugins", $plugins);
+        $this->confPluginListWindow->show($login);
     }
 
     public function hideConfWindow($login)
     {
-        ConfPluginList::Erase($login);
+        if ($this->confPluginListWindow instanceof Window) {
+            $this->confPluginListWindow->erase($login);
+        }
     }
 
     public function hasConfWindow()
     {
         return true;
+    }
+
+    public function confPluginListApply($login, $entries = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            return;
+        }
+
+        $outArray = array();
+        foreach (AutoLoad::getAvailablePlugins() as $pluginId => $meta) {
+            $cbName = 'cb_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $pluginId);
+            if (isset($entries[$cbName]) && $entries[$cbName] == '1') {
+                $outArray[] = (string)$pluginId;
+            }
+        }
+
+        $var = MetaData::getInstance()->getVariable('redirectedPlugins');
+        if ($var !== null) {
+            $var->setRawValue($outArray);
+        }
+
+        $this->hideConfWindow($login);
     }
 }

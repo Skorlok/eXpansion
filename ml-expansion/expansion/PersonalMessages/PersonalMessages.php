@@ -5,9 +5,9 @@ namespace ManiaLivePlugins\eXpansion\PersonalMessages;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Config;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 use ManiaLivePlugins\eXpansion\PersonalMessages\Config as PersonalMessagesConfig;
 
 class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -113,7 +113,7 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         try {
             $color = '$z$s' . $this->config->Colors_personalmessage;
-            PlayerSelection::Erase($login);
+            Gui::erasePlayerSelection($login);
 
             if (!array_key_exists($target, $this->storage->players) && !array_key_exists($target, $this->storage->spectators)) {
                 $this->eXpChatSendServerMessage($this->msg_noLogin, $login, array($target));
@@ -190,20 +190,12 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function setTargetPlayer($login, $target)
     {
         $this->targetPlayer[$login] = $target;
-        PlayerSelection::Erase($login);
         $this->sendWidget($login);
     }
 
     public function players($login, $args = array())
     {
-        /** @var PlayerSelection $window */
-        $window = PlayerSelection::Create($login);
-        $window->setController($this);
-        $window->setTitle('Select Player to send message');
-        $window->setSize(85, 100);
-        $window->populateList(array($this, 'setTargetPlayer'), 'send');
-        $window->centerOnScreen();
-        $window->show();
+        Gui::showPlayerSelection($login, array($this, 'setTargetPlayer'), 'Select Player to send message', 'send');
     }
 
     public function send($login, $args)

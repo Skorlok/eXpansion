@@ -7,10 +7,10 @@ use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 use ManiaLivePlugins\eXpansion\Votes\Structures\Vote;
@@ -173,7 +173,6 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->voteSettingsWindow->setName("VoteSettings");
         $this->voteSettingsWindow->setSize(120, 96);
         $this->voteSettingsWindow->setTitle("Configure Votes");
-        $this->voteSettingsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(10, 88));
         $this->voteSettingsWindow->setParam("voterOptions", array("Select", "Active Players", "Players", "Everybody"));
     }
 
@@ -590,7 +589,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->selectPlayers($login, "vote_kick");
             return;
         }
-        PlayerSelection::Erase($login);
+        Gui::erasePlayerSelection($login);
         $this->startNewVote($login, 'Kick', 'Kick ' . $this->widget->handleSpecialChars($player->cleanNickName) . ' $z$z?', $target);
     }
 
@@ -603,19 +602,13 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->selectPlayers($login, "vote_ban");
             return;
         }
-        PlayerSelection::Erase($login);
+        Gui::erasePlayerSelection($login);
         $this->startNewVote($login, 'Ban', 'Ban ' . $this->widget->handleSpecialChars($player->cleanNickName) . ' $z$z?', $target);
     }
 
     public function selectPlayers($login, $callback)
     {
-        /** @var PlayerSelection */
-        $win = PlayerSelection::Create($login);
-        $win->setTitle('Select Player');
-        $win->setSize(85, 100);
-        $win->populateList(array($this, $callback), 'select');
-        $win->centerOnScreen();
-        $win->show();
+        Gui::showPlayerSelection($login, array($this, $callback), 'Select Player', 'select');
     }
 
     public function onVoteUpdated($stateName, $login, $cmdName, $cmdParam)
@@ -723,6 +716,10 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showVotesConfig($login)
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_VOTES)) {
+            return;
+        }
+        
         $config   = Config::getInstance();
         /** @var \ManiaLivePlugins\eXpansion\ManiaExchange\Config $mxConfig */
         $mxConfig = \ManiaLivePlugins\eXpansion\ManiaExchange\Config::getInstance();
@@ -760,13 +757,14 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $this->voteSettingsWindow->setParam("limits",      $limitsData);
         $this->voteSettingsWindow->setParam("votes",       $votesData);
-        $this->voteSettingsWindow->setParam("sizeX",       120);
-        $this->voteSettingsWindow->setParam("sizeY",       100);
         $this->voteSettingsWindow->show($login);
     }
 
     public function applyVoteSettings($login, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_VOTES)) {
+            return;
+        }
         foreach ($params as $key => $value) {
             $exploded = explode("_", $key);
 

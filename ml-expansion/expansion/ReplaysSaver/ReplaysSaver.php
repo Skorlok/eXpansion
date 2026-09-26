@@ -48,8 +48,6 @@ class ReplaysSaver extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->console("Error saving validation replay: " . $e->getMessage());
             return;
         }
-        
-        $this->console("Replay saved for " . $data->login);
     }
 
     public function eXpOnUnload()

@@ -3,14 +3,11 @@
 namespace ManiaLivePlugins\eXpansion\Faq;
 
 use DirectoryIterator;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Faq\Gui\Windows\FaqWidget;
-use ManiaLivePlugins\eXpansion\Gui\Elements\ScrollableArea;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
-use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
@@ -22,9 +19,6 @@ class Faq extends ExpPlugin
 
     /** @var Window */
     private $faqWindow;
-
-    /** @var Script */
-    private $scrollScript;
 
     public function eXpOnLoad()
     {
@@ -54,7 +48,7 @@ class Faq extends ExpPlugin
 
     public function eXpOnReady()
     {
-        $this->registerManialinkCallback('showFaq');
+        $this->registerManialinkCallback('showFaq', false, true);
         
         $this->registerChatCommand("faq", "showFaq", 0, true);
         $this->registerChatCommand("faq", "showFaq", 1, true);
@@ -65,9 +59,6 @@ class Faq extends ExpPlugin
         $this->faqWindow = new Window("Faq\\Gui\\Windows\\FaqWindow.xml");
         $this->faqWindow->setName("Faq Help");
         $this->faqWindow->setSize(160, 90);
-
-        $this->scrollScript = ScrollableArea::getScriptML();
-        $this->faqWindow->registerScript($this->scrollScript);
     }
 
     public function showFaq($login, $topic = "toc", $recipient = null)
@@ -105,7 +96,7 @@ class Faq extends ExpPlugin
         $file = file_get_contents($filePath);
         list($contentXml, $totalHeight, $title) = $this->parseFaq($file);
 
-        $this->scrollScript->setParam("contentSizeY", Maniascript::getReal($totalHeight));
+        $this->faqWindow->setParam("contentSizeY", Maniascript::getReal($totalHeight));
         $this->faqWindow->setTitle("Help " . $title);
         $this->faqWindow->setParam("contentXml", $contentXml);
         $this->faqWindow->show($showTo);
@@ -250,9 +241,7 @@ class Faq extends ExpPlugin
                 $text = $um['textb'] . '$3af$l[' . str_replace('##', '', $um['url']) . ']' . $um['text'] . '$l$z' . $um['texta'];
             } else {
                 $linkFile  = str_replace("#", "", $um['url']);
-                /** @var ActionHandler $aH */
-                $aH        = ActionHandler::getInstance();
-                $action    = $aH->createAction(array($this, "showFaq"), $linkFile, null);
+                $action    = 'exp:eXpansion.Faq:showFaq:' . $linkFile;
                 $textColor = '3af';
                 $style     = 'TextCardMedium';
                 $text      = $um['textb'] . $um['text'] . $um['texta'];

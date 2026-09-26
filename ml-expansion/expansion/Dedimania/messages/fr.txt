@@ -19,8 +19,8 @@
 Cps
 Cps
 
-Dedimania -records for
-Records Dedimania pour
+Dedimania records for %s
+Records Dedimania pour %s
 
 Dedimania cps for 
 Cps Dedimania pour

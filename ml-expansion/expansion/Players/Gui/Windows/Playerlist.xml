@@ -1,0 +1,234 @@
+<frame posn="48 2 1">
+    <frame posn="0 0 1" hidden="{hideIgnoreListBtn}"><exp:button sizeX="32" sizeY="6" text="@Ignore List" action="{ignoreListAction}" isTextId="true"/></frame>
+    <frame posn="25.5 0 1" hidden="{hideGuestListBtn}"><exp:button sizeX="32" sizeY="6" text="@Guest List" action="{guestListAction}" isTextId="true"/></frame>
+    <frame posn="51 0 1" hidden="{hideBanListBtn}"><exp:button sizeX="32" sizeY="6" text="@Ban List" action="{banListAction}" isTextId="true"/></frame>
+    <frame posn="76.5 0 1" hidden="{hideBlackListBtn}"><exp:button sizeX="32" sizeY="6" text="@Black List" action="{blackListAction}" isTextId="true"/></frame>
+</frame>
+<frame posn="0 -6 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 0 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="187" sizeY="6"/>
+        <label id="column_0_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_0_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_0_3_" labelId="column_0_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_0_4_" labelId="column_0_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_0_5_" labelId="column_0_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_0_6_" labelId="column_0_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_0_7_" labelId="column_0_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_0_8_" labelId="column_0_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_0_9_" labelId="column_0_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_0_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_0_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -6 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="187" sizeY="6"/>
+        <label id="column_1_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_1_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_1_3_" labelId="column_1_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_1_4_" labelId="column_1_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_1_5_" labelId="column_1_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_1_6_" labelId="column_1_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_1_7_" labelId="column_1_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_1_8_" labelId="column_1_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_1_9_" labelId="column_1_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_1_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_1_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -12 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="187" sizeY="6"/>
+        <label id="column_2_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_2_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_2_3_" labelId="column_2_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_2_4_" labelId="column_2_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_2_5_" labelId="column_2_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_2_6_" labelId="column_2_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_2_7_" labelId="column_2_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_2_8_" labelId="column_2_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_2_9_" labelId="column_2_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_2_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_2_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -18 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="187" sizeY="6"/>
+        <label id="column_3_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_3_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_3_3_" labelId="column_3_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_3_4_" labelId="column_3_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_3_5_" labelId="column_3_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_3_6_" labelId="column_3_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_3_7_" labelId="column_3_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_3_8_" labelId="column_3_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_3_9_" labelId="column_3_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_3_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_3_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -24 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="187" sizeY="6"/>
+        <label id="column_4_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_4_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_4_3_" labelId="column_4_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_4_4_" labelId="column_4_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_4_5_" labelId="column_4_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_4_6_" labelId="column_4_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_4_7_" labelId="column_4_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_4_8_" labelId="column_4_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_4_9_" labelId="column_4_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_4_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_4_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -30 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="187" sizeY="6"/>
+        <label id="column_5_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_5_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_5_3_" labelId="column_5_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_5_4_" labelId="column_5_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_5_5_" labelId="column_5_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_5_6_" labelId="column_5_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_5_7_" labelId="column_5_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_5_8_" labelId="column_5_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_5_9_" labelId="column_5_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_5_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_5_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -36 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="187" sizeY="6"/>
+        <label id="column_6_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_6_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_6_3_" labelId="column_6_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_6_4_" labelId="column_6_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_6_5_" labelId="column_6_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_6_6_" labelId="column_6_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_6_7_" labelId="column_6_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_6_8_" labelId="column_6_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_6_9_" labelId="column_6_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_6_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_6_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -42 0.0001" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="187" sizeY="6"/>
+        <label id="column_7_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_7_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_7_3_" labelId="column_7_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_7_4_" labelId="column_7_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_7_5_" labelId="column_7_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_7_6_" labelId="column_7_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_7_7_" labelId="column_7_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_7_8_" labelId="column_7_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_7_9_" labelId="column_7_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_7_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_7_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -48 0.0001" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="187" sizeY="6"/>
+        <label id="column_8_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_8_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_8_3_" labelId="column_8_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_8_4_" labelId="column_8_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_8_5_" labelId="column_8_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_8_6_" labelId="column_8_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_8_7_" labelId="column_8_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_8_8_" labelId="column_8_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_8_9_" labelId="column_8_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_8_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_8_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -54 0.0001" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="187" sizeY="6"/>
+        <label id="column_9_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_9_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_9_3_" labelId="column_9_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_9_4_" labelId="column_9_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_9_5_" labelId="column_9_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_9_6_" labelId="column_9_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_9_7_" labelId="column_9_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_9_8_" labelId="column_9_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_9_9_" labelId="column_9_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_9_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_9_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -60 0.0001" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="187" sizeY="6"/>
+        <label id="column_10_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_10_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_10_3_" labelId="column_10_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_10_4_" labelId="column_10_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_10_5_" labelId="column_10_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_10_6_" labelId="column_10_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_10_7_" labelId="column_10_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_10_8_" labelId="column_10_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_10_9_" labelId="column_10_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_10_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_10_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -66 0.0001" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="187" sizeY="6"/>
+        <label id="column_11_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_11_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_11_3_" labelId="column_11_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_11_4_" labelId="column_11_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_11_5_" labelId="column_11_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_11_6_" labelId="column_11_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_11_7_" labelId="column_11_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_11_8_" labelId="column_11_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_11_9_" labelId="column_11_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_11_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_11_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -72 0.0001" id="row_12">
+        <exp:listbg indexNumber="12" sizeX="187" sizeY="6"/>
+        <label id="column_12_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_12_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_12_3_" labelId="column_12_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_12_4_" labelId="column_12_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_12_5_" labelId="column_12_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_12_6_" labelId="column_12_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_12_7_" labelId="column_12_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_12_8_" labelId="column_12_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_12_9_" labelId="column_12_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_12_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_12_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -78 0.0001" id="row_13">
+        <exp:listbg indexNumber="13" sizeX="187" sizeY="6"/>
+        <label id="column_13_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_13_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_13_3_" labelId="column_13_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_13_4_" labelId="column_13_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_13_5_" labelId="column_13_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_13_6_" labelId="column_13_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_13_7_" labelId="column_13_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_13_8_" labelId="column_13_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_13_9_" labelId="column_13_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_13_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_13_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -84 0.0001" id="row_14">
+        <exp:listbg indexNumber="14" sizeX="187" sizeY="6"/>
+        <label id="column_14_0" sizen="50 4" halign="left" valign="center" style="TextStaticSmall" scriptevents="1"/>
+        <label id="column_14_1" posn="50 0 1.0E-5" sizen="28 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_2" posn="80 0 1" sizen="14 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <frame posn="83 0 1" hidden="{hideWarn}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="ffffff" id="column_14_3_" labelId="column_14_3" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="96 0 1" hidden="{hideIgnore}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="56b136fff" id="column_14_4_" labelId="column_14_4" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="109 0 1" hidden="{hideKick}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="2476e5fff" id="column_14_5_" labelId="column_14_5" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="122 0 1" hidden="{hideBan}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="bf2d2aff" id="column_14_6_" labelId="column_14_6" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="135 0 1" hidden="{hideBlacklist}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="4d4d4dfff" id="column_14_7_" labelId="column_14_7" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="148 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_14_8_" labelId="column_14_8" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="161 0 1" hidden="{hideForceSpecActions}"><exp:button sizeX="15" sizeY="5" action="eXpOptimizedPagerAction" colorize="e5a11f" id="column_14_9_" labelId="column_14_9" class="eXpOptimizedPagerAction"/></frame>
+        <frame posn="174 0 1" hidden="{hideGuest}"><exp:icon sizeX="5" sizeY="5" description="@Add to guest list" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x128_1" iconSub="Buddies" id="column_14_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="180 0 1" hidden="{hideTeam}"><exp:icon sizeX="5" sizeY="5" description="@Switch player team" descSizeX="50" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="RT_Team" id="column_14_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <exp:optimizedpager sizeX="191" sizeY="90" itemsVarName="playerItems" dataVarName="playerData" rowsPerPage="15" itemsPerRow="10" varName="playerslist"/>
+</frame>

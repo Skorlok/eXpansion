@@ -14,7 +14,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Tool: Endurance integration");
+        $this->setName("GameMode: Endurance integration");
 
         $this->addTitleSupport("TM");
         $this->addTitleSupport("Trackmania");
@@ -22,7 +22,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->addGameModeCompability(GameInfos::GAMEMODE_SCRIPT, "endurocup");
 
         $this->setDescription("Provides integration for EnduroCup gamemode");
-        $this->setGroups(array('Tools'));
+        $this->setGroups(array('Games', 'Tools'));
 
         $config = Config::getInstance();
 

@@ -7,159 +7,47 @@ OBSOLÈTE - ne pas convertir
   Faq/Gui/Windows/FaqWidget.php
 
 ========================================
-à convertir
-========================================
-
-========================================
-Déjà sur OptimizedPager
-========================================
-
-  Core/Gui/Windows/ExpListSetting.php
-  LocalRecords/Gui/Windows/Records.php
-  MusicBox/Gui/Windows/MusicListWindow.php
-  Players/Gui/Windows/Playerlist.php
-
-========================================
-Convertibles en OptimizedPager
-========================================
-
-  -- liste pure (aucune action par ligne) --
-  Chatlog/Gui/Windows/ChatlogWindow.php
-  Dedimania/Gui/Windows/CpDiff.php
-  Dedimania/Gui/Windows/RecordCps.php
-  Dedimania/Gui/Windows/RecordSecCps.php
-  Endurance/Gui/Windows/EnduroScores.php
-  LocalRecords/Gui/Windows/CpDiff.php
-  LocalRecords/Gui/Windows/Cps.php
-  LocalRecords/Gui/Windows/Ranks.php
-  LocalRecords/Gui/Windows/SecCps.php
-  LocalRecords/Gui/Windows/Sector.php
-  LocalRecords/Gui/Windows/TopSumsWindow.php
-  ServerNeighborhood/Gui/Windows/PlayerList.php
-  Statistics/Gui/Windows/Country.php
-  Statistics/Gui/Windows/CountryFinish.php
-  Statistics/Gui/Windows/CountryOnlineTime.php
-  Statistics/Gui/Windows/CountryWinner.php
-  Statistics/Gui/Windows/Finish.php
-  Statistics/Gui/Windows/OnlineTime.php
-  Statistics/Gui/Windows/ServerDonationAmount.php
-  Statistics/Gui/Windows/ServerDonationAmountTotal.php
-  Statistics/Gui/Windows/ServerDonationCount.php
-  Statistics/Gui/Windows/ServerDonationCountTotal.php
-  Statistics/Gui/Windows/ServerTopIncome.php
-  Statistics/Gui/Windows/TopActive.php
-  Statistics/Gui/Windows/TopVoter.php
-  Statistics/Gui/Windows/TrackPlay.php
-  Statistics/Gui/Windows/Winners.php
-
-  -- actions uniformes par ligne (boutons identiques pour tous les éléments) --
-  AdminGroups/Gui/Windows/Groups.php
-  AdminGroups/Gui/Windows/Help.php
-  AdminGroups/Gui/Windows/Players.php
-  ChatAdmin/Gui/Windows/GenericPlayerList.php
-  Core/Gui/Windows/ConfSwitcher.php
-  Database/Gui/Windows/BackupRestore.php
-  Dedimania/Gui/Windows/Records.php
-  Gui/Windows/PlayerSelection.php
-  ManiaExchange/Gui/Windows/MxSearch.php
-  ManiaExchange/Gui/Windows/MxUpdate.php
-  MapRatings/Gui/Windows/MapRatingsManager.php
-  Maps/Gui/Windows/AddMaps.php            (Mapitem déjà préparé : column_i_j + eXpOptimizedPagerAction)
-  Maps/Gui/Windows/Jukelist.php           (idem)
-  Notifications/Gui/Windows/ConfPluginList.php
-  Quiz/Gui/Windows/AddPoint.php
-  Quiz/Gui/Windows/Playerlist.php
-
-========================================
-liste complète à convertir (ordre original)
-========================================
-
-AdminGroups/
-  AdminGroups/Gui/Windows/Groups.php
-  AdminGroups/Gui/Windows/Help.php
-  AdminGroups/Gui/Windows/Players.php
-
-ChatAdmin/
-  ChatAdmin/Gui/Windows/GenericPlayerList.php
-
-Core/
-  Core/Gui/Windows/ConfSwitcher.php
-  Core/Gui/Windows/ExpListSetting.php
-
-Database/
-  Database/Gui/Windows/BackupRestore.php
-
-Dedimania/
-  Dedimania/Gui/Windows/CpDiff.php
-  Dedimania/Gui/Windows/RecordCps.php
-  Dedimania/Gui/Windows/RecordSecCps.php
-  Dedimania/Gui/Windows/Records.php
-
-LocalRecords/
-  LocalRecords/Gui/Windows/CpDiff.php
-  LocalRecords/Gui/Windows/Cps.php
-  LocalRecords/Gui/Windows/Ranks.php
-  LocalRecords/Gui/Windows/Records.php
-  LocalRecords/Gui/Windows/SecCps.php
-  LocalRecords/Gui/Windows/Sector.php
-  LocalRecords/Gui/Windows/TopSumsWindow.php
-
-ManiaExchange/
-  ManiaExchange/Gui/Windows/MxSearch.php
-  ManiaExchange/Gui/Windows/MxUpdate.php
-
-MapRatings/
-  MapRatings/Gui/Windows/MapRatingsManager.php
-
-Maps/
-  Maps/Gui/Windows/AddMaps.php
-  Maps/Gui/Windows/Jukelist.php
-
-MusicBox/
-  MusicBox/Gui/Windows/MusicListWindow.php
-
-Notifications/
-  Notifications/Gui/Windows/ConfPluginList.php
-
-Players/
-  Players/Gui/Windows/Playerlist.php
-
-Quiz/
-  Quiz/Gui/Windows/AddPoint.php
-  Quiz/Gui/Windows/Playerlist.php
-
-ServerNeighborhood/
-  ServerNeighborhood/Gui/Windows/PlayerList.php
-
-Statistics/
-  Statistics/Gui/Windows/StatsWindow.php
-  Statistics/Gui/Windows/Country.php
-  Statistics/Gui/Windows/CountryFinish.php
-  Statistics/Gui/Windows/CountryOnlineTime.php
-  Statistics/Gui/Windows/CountryWinner.php
-  Statistics/Gui/Windows/Finish.php
-  Statistics/Gui/Windows/OnlineTime.php
-  Statistics/Gui/Windows/ServerDonationAmount.php
-  Statistics/Gui/Windows/ServerDonationAmountTotal.php
-  Statistics/Gui/Windows/ServerDonationCount.php
-  Statistics/Gui/Windows/ServerDonationCountTotal.php
-  Statistics/Gui/Windows/ServerTopIncome.php
-  Statistics/Gui/Windows/TopActive.php
-  Statistics/Gui/Windows/TopVoter.php
-  Statistics/Gui/Windows/TrackPlay.php
-  Statistics/Gui/Windows/Winners.php
-  
-========================================
 DÉJÀ CONVERTIS EN XML avec OptimizedPager
 ========================================
 
+  Adm/Gui/Windows/MatchSettings.php
+  AdminGroups/Gui/Windows/Groups.php
+  AdminGroups/Gui/Windows/Help.php
+  AdminGroups/Gui/Windows/Players.php
+  ChatAdmin/Gui/Windows/GenericPlayerList.php
+  Chatlog/Gui/Windows/ChatlogWindow.php
+  Core/Gui/Windows/ConfSwitcher.php
+  Core/Gui/Windows/ExpListSetting.php
+  Database/Gui/Windows/BackupRestore.php
+  Dedimania/Gui/Windows/CpDiff.php "utilise" LocalRecords/Gui/Windows/CpDiff.xml
+  Dedimania/Gui/Windows/RecordCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
+  Dedimania/Gui/Windows/RecordSecCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
+  Dedimania/Gui/Windows/Records.php
+  Endurance/Gui/Windows/EnduroScores.php
+  Gui/Windows/PlayerSelection.php
+  LocalRecords/Gui/Windows/CpDiff.php
+  LocalRecords/Gui/Windows/Cps.php
+  LocalRecords/Gui/Windows/Ranks.php
+  LocalRecords/Gui/Windows/Records.php
+  LocalRecords/Gui/Windows/SecCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
+  LocalRecords/Gui/Windows/Sector.php
+  LocalRecords/Gui/Windows/TopSumsWindow.php
+  ManiaExchange/Gui/Windows/MxSearch.php
+  ManiaExchange/Gui/Windows/MxUpdate.php
+  MapRatings/Gui/Windows/MapRatingsManager.php
+  Maps/Gui/Windows/AddMaps.php
+  Maps/Gui/Windows/Jukelist.php
   Maps/Gui/Windows/Maplist.php
+  MusicBox/Gui/Windows/MusicListWindow.php
+  Players/Gui/Windows/Playerlist.php
+  Quiz/Gui/Windows/AddPoint.php "fusionné avec" Quiz/Gui/Windows/Playerlist.php
+  ServerNeighborhood/Gui/Windows/PlayerList.php
+  Statistics/Gui/Windows/StatsWindow.php
 
 ========================================
 DÉJÀ CONVERTIS EN XML avec Pager
 ========================================
 
-  Adm/Gui/Windows/MatchSettings.php (à convertir en OptimizedPager)
   Adm/Gui/Windows/ForceScores.php
   Adm/Gui/Windows/RoundPoints.php
   Adm/Gui/Windows/ScriptSettings.php
@@ -169,6 +57,7 @@ DÉJÀ CONVERTIS EN XML avec Pager
   Core/Gui/Windows/ExpSettings.php
   Database/Gui/Windows/Maintainance.php
   Gui/Windows/Configuration.php
+  Notifications/Gui/Windows/ConfPluginList.php
   ServerNeighborhood/Gui/Windows/ServerList.php
   Votes/Gui/Windows/VoteSettingsWindow.php
 

@@ -2,63 +2,47 @@
 
 namespace ManiaLivePlugins\eXpansion\Statistics;
 
-use ManiaLive\Gui\ActionHandler;
+use ManiaLivePlugins\eXpansion\Gui\Formaters\Country;
+use ManiaLivePlugins\eXpansion\Gui\Formaters\DaysDiff;
+use ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
-    public function eXpOnInit()
-    {
-        //The Database plugin is needed.
-        $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database"));
-    }
+    /** @var Window */
+    protected $statsWindow = null;
 
     public function eXpOnLoad()
     {
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-        Menu::addMenuItem("Statistics",
-            array("Statistics" => array(null, $aH->createAction(array($this, "showTopWinners"))))
-        );
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+
+        Menu::addMenuItem("Statistics", array("Statistics" => array(null, "exp:eXpansion.Statistics:showTopWinners")));
     }
 
     public function eXpOnReady()
     {
-        parent::eXpOnReady();
-        $this->enableDatabase();
-        /** @var ActionHandler $aHandler */
-        $aHandler = ActionHandler::getInstance();
+        $this->registerManialinkCallback('showTopIncome');
+        $this->registerManialinkCallback('showTopDonators');
+        $this->registerManialinkCallback('showQTopDonators');
+        $this->registerManialinkCallback('showTopDonatorsTotal');
+        $this->registerManialinkCallback('showTopQDonatorsTotal');
+        $this->registerManialinkCallback('showTopWinners');
+        $this->registerManialinkCallback('showTopOnline');
+        $this->registerManialinkCallback('showTopPlayTime');
+        $this->registerManialinkCallback('showTopFinish');
+        $this->registerManialinkCallback('showTopTrackPlay');
+        $this->registerManialinkCallback('showTopVoter');
+        $this->registerManialinkCallback('showTopActive');
+        $this->registerManialinkCallback('showTopFinishCountry');
+        $this->registerManialinkCallback('showTopOnlineCountry');
+        $this->registerManialinkCallback('showTopWinnerCountry');
+        $this->registerManialinkCallback('showTopCountry');
 
-        $menu = new Gui\Controls\Menu();
-        $menu->setSize(70, 100);
-        $menu->setScale(.8);
-
-        $menu->addItem('SERVER STATISTICS', -1, '2B2');
-        $menu->addItem('Top Income sources', $aHandler->createAction(array($this, 'showTopIncome')));
-        $menu->addItem('Top Donators', $aHandler->createAction(array($this, 'showTopDonators')));
-        $menu->addItem('Top nb Donations', $aHandler->createAction(array($this, 'showQTopDonators')));
-
-        $menu->addItem('ALL SERVER STATISTICS', -1, '2B2');
-        $menu->addItem('Top Donators All servers', $aHandler->createAction(array($this, 'showTopDonatorsTotal')));
-        $menu->addItem('Top nb Donations All Servers', $aHandler->createAction(array($this, 'showTopQDonatorsTotal')));
-
-        $menu->addItem('Players Related', -1, '2B2');
-        $menu->addItem('Top Winners', $aHandler->createAction(array($this, 'showTopWinners')));
-        $menu->addItem('Top Online Time', $aHandler->createAction(array($this, 'showTopOnline')));
-        $menu->addItem('Top Play Time', $aHandler->createAction(array($this, 'showTopPlayTime')));
-        $menu->addItem('Top nb Finish', $aHandler->createAction(array($this, 'showTopFinish')));
-        $menu->addItem('Top nb Map Played', $aHandler->createAction(array($this, 'showTopTrackPlay')));
-        $menu->addItem('Top Karma Voter', $aHandler->createAction(array($this, 'showTopVoter')));
-        $menu->addItem('Top Active Players', $aHandler->createAction(array($this, 'showTopActive')));
-
-        $menu->addItem('Country Related', -1, '2B2');
-        $menu->addItem('Top Country by Finish', $aHandler->createAction(array($this, 'showTopFinishCountry')));
-        $menu->addItem('Top Country Online', $aHandler->createAction(array($this, 'showTopOnlineCountry')));
-        $menu->addItem('Top Winning Country', $aHandler->createAction(array($this, 'showTopWinnerCountry')));
-        $menu->addItem('Top Country by nb Player', $aHandler->createAction(array($this, 'showTopCountry')));
-
-        Gui\Windows\StatsWindow::$menuFrame = $menu;
+        $this->statsWindow = new Window("Statistics\Gui\Windows\StatsWindow.xml");
+        $this->statsWindow->setName("Statistics");
+        $this->statsWindow->setSize(140, 110);
 
         $this->setPublicMethod("showTopWinners");
         $this->registerChatCommand("stats", "showTopWinners", 0, true);
@@ -67,30 +51,8 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->registerChatCommand("laston", "chat_laston", 1, true);
     }
 
-    public function closeAllWindows($login)
-    {
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerTopIncome::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmount::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmountTotal::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCountTotal::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCountTotal::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCount::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Winners::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TrackPlay::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Finish::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryFinish::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryWinner::Erase($login);
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Country::Erase($login);
-    }
-
     public function chat_wins($login)
     {
-        $this->storage->serverLogin;
         $sql = 'SELECT player_wins FROM exp_players WHERE player_login LIKE "' . $login . '"';
         $wins = $this->db->execute($sql)->fetchArrayOfObject();
 
@@ -100,8 +62,6 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function chat_laston($login, $params = null)
     {
-        $this->storage->serverLogin;
-
         if ($params == null) {
             $params = $login;
         }
@@ -124,36 +84,26 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showTopIncome($login)
     {
-
-        if (!empty($this->donateConfig->toLogin)) {
-            $toLogin = $this->donateConfig->toLogin;
-        } else {
-            $toLogin = $this->storage->serverLogin;
-        }
-
         $sql = 'SELECT transaction_plugin as plugin, transaction_subject as subject, '
             .'SUM(transaction_amount) as totalPlanets'
             . ' FROM exp_planet_transaction'
-            . ' WHERE transaction_toLogin = ' . $this->db->quote($toLogin)
+            . ' WHERE transaction_toLogin = ' . $this->db->quote($this->storage->serverLogin)
             . ' GROUP BY transaction_plugin, transaction_subject'
             . ' ORDER BY totalPlanets DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerTopIncome::Create($login);
-        $window->setTitle(__('Top Planet Incomes', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Planet Incomes',
+            array('source', 'Amount of Planets'),
+            array(null, 'subject', 'totalPlanets'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopDonatorsTotal($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT transaction_fromLogin as login, player_nickname as nickname, '
             .'SUM(transaction_amount) as totalPlanets'
             . ' FROM exp_planet_transaction, exp_players'
@@ -161,23 +111,20 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . ' AND transaction_fromLogin = player_login'
             . ' GROUP BY transaction_fromLogin, player_nickname'
             . ' ORDER BY totalPlanets DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmountTotal::Create($login);
-        $window->setTitle(__('Top Donators(Amount)', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Donators(Amount)',
+            array('NickName', 'Amount of Planets'),
+            array(null, 'nickname', 'totalPlanets'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopDonators($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT transaction_fromLogin as login, player_nickname as nickname, '
             .'SUM(transaction_amount) as totalPlanets'
             . ' FROM exp_planet_transaction, exp_players'
@@ -186,46 +133,40 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . ' AND transaction_fromLogin = player_login'
             . ' GROUP BY transaction_fromLogin, player_nickname'
             . ' ORDER BY totalPlanets DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmount::Create($login);
-        $window->setTitle(__('Top Server Donators(Amount)', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Server Donators(Amount)',
+            array('NickName', 'Amount of Planets'),
+            array(null, 'nickname', 'totalPlanets'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopQDonatorsTotal($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT transaction_fromLogin as login, player_nickname as nickname, count(*) as nb'
             . ' FROM exp_planet_transaction, exp_players'
             . ' WHERE transaction_subject = \'server_donation\''
             . ' AND transaction_fromLogin = player_login'
             . ' GROUP BY transaction_fromLogin, player_nickname'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCountTotal::Create($login);
-        $window->setTitle(__('Top Donators(Amount)', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Donators(Amount)',
+            array('NickName', 'nbDonation'),
+            array(null, 'nickname', 'nb'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showQTopDonators($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT transaction_fromLogin as login, player_nickname as nickname, count(*) as nb'
             . ' FROM exp_planet_transaction, exp_players'
             . ' WHERE transaction_toLogin = ' . $this->db->quote($this->storage->serverLogin) . ''
@@ -233,58 +174,51 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . ' AND transaction_fromLogin = player_login'
             . ' GROUP BY transaction_fromLogin, player_nickname'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCount::Create($login);
-        $window->setTitle(__('Top Server Donators(Amount)', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Server Donators(Amount)',
+            array('NickName', 'nbDonation'),
+            array(null, 'nickname', 'nb'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopWinners($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, player_wins as wins'
             . ' FROM exp_players'
             . ' WHERE player_wins > 0'
             . ' ORDER BY wins DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Winners::Create($login);
-        $window->setTitle(__('Top Server Winners', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Server Winners',
+            array('NickName', 'nb Wins'),
+            array(null, 'nickname', 'wins'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopOnline($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, player_timeplayed as time'
             . ' FROM exp_players'
             . ' ORDER BY time DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Create($login);
-        $window->setTitle(__('Top Online Time', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Online Time',
+            array('NickName', 'Time Online'),
+            array(null, 'nickname', 'time'),
+            array(null, null, LongDate::getInstance()),
+            $this->getData($sql)
+        );
     }
 
     public function showTopPlayTime($login)
@@ -293,7 +227,6 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, '
             .'SUM(record_nbFinish * record_avgScore)/1000 as time'
             . ' FROM exp_records, exp_players'
@@ -301,17 +234,16 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             . '	AND record_nbFinish > 0'
             . ' GROUP BY player_login, player_nickname'
             . ' ORDER BY time DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::Create($login);
-        $window->setTitle(__('Top Play Time', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Play Time',
+            array('NickName', 'Time Online'),
+            array(null, 'nickname', 'time'),
+            array(null, null, LongDate::getInstance()),
+            $this->getData($sql)
+        );
     }
 
     public function showTopTrackPlay($login)
@@ -320,24 +252,22 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, count(*) as nb'
             . ' FROM exp_records, exp_players'
             . ' WHERE record_playerlogin = player_login'
             . ' GROUP BY player_login, player_nickname'
             . ' HAVING count(*) > 0'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TrackPlay::Create($login);
-        $window->setTitle(__('Top Number tracks played', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Number tracks played',
+            array('NickName', 'nb Maps'),
+            array(null, 'nickname', 'nb'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopVoter($login)
@@ -346,44 +276,39 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, count(*) as nb'
             . ' FROM exp_ratings, exp_players'
             . ' WHERE login = player_login'
             . ' GROUP BY player_login, player_nickname'
             . ' HAVING count(*) > 0'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::Create($login);
-        $window->setTitle(__('Top Karma Voter', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Karma Voter',
+            array('NickName', 'nb Votes'),
+            array(null, 'nickname', 'nb'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopActive($login)
     {
-
-        $this->storage->serverLogin;
         $sql = "SELECT player_login as login, player_nickname as nickname, DATEDIFF('". date('Y-m-d H:i:s', time() - date('Z')) ."', FROM_UNIXTIME(`player_updated`)) AS `days`"
             . ' FROM exp_players'
             . ' ORDER BY days ASC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::Create($login);
-        $window->setTitle(__('Top Active Players', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Active Players',
+            array('NickName', 'Last connection'),
+            array(null, 'nickname', 'days'),
+            array(null, null, DaysDiff::getInstance()),
+            $this->getData($sql)
+        );
     }
 
     public function showTopFinish($login)
@@ -392,24 +317,22 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->storage->serverLogin;
         $sql = 'SELECT player_login as login, player_nickname as nickname, SUM(record_nbFinish) as nb'
             . ' FROM exp_records, exp_players'
             . ' WHERE record_playerlogin = player_login'
             . ' GROUP BY player_login, player_nickname'
             . ' HAVING SUM(record_nbFinish) > 0'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Finish::Create($login);
-        $window->setTitle(__('Top Finish', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Top Finish',
+            array('NickName', 'nb Finish'),
+            array(null, 'nickname', 'nb'),
+            array(),
+            $this->getData($sql)
+        );
     }
 
     public function showTopFinishCountry($login)
@@ -418,88 +341,154 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
-        $this->storage->serverLogin;
         $sql = 'SELECT player_nation as nation, SUM(record_nbFinish) as nb'
             . ' FROM exp_records, exp_players'
             . ' WHERE record_playerlogin = player_login'
             . ' GROUP BY player_nation'
             . ' HAVING SUM(record_nbFinish) > 0'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryFinish::Create($login);
-        $window->setTitle(__('Country with top Finish', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Country with top Finish',
+            array('Country', 'nb Finish'),
+            array(null, 'nation', 'nb'),
+            array(null, Country::getInstance(), null),
+            $this->groupByCountry($this->getData($sql), 'nb')
+        );
     }
 
     public function showTopOnlineCountry($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT player_nation as nation, SUM(player_timeplayed) as time'
             . ' FROM exp_players'
             . ' GROUP BY player_nation'
             . ' ORDER BY time DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::Create($login);
-        $window->setTitle(__('Country with top Online Time', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Country with top Online Time',
+            array('Country', 'Time Online'),
+            array(null, 'nation', 'time'),
+            array(null, Country::getInstance(), LongDate::getInstance()),
+            $this->groupByCountry($this->getData($sql), 'time')
+        );
     }
 
     public function showTopWinnerCountry($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT player_nation as nation, SUM(player_wins) as nb'
             . ' FROM exp_players'
             . ' GROUP BY player_nation'
             . ' HAVING SUM(player_wins) > 0'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
-
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Country::Create($login);
-        $window->setTitle(__('Most winning country', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+        $this->showStats(
+            $login,
+            'Most winning country',
+            array('Country', 'nb Players'),
+            array(null, 'nation', 'nb'),
+            array(null, Country::getInstance(), null),
+            $this->groupByCountry($this->getData($sql), 'nb')
+        );
     }
 
     public function showTopCountry($login)
     {
-
-        $this->storage->serverLogin;
         $sql = 'SELECT player_nation as nation, COUNT(*) as nb'
             . ' FROM exp_players'
             . ' GROUP BY player_nation'
             . ' ORDER BY nb DESC'
-            . ' LIMIT 0, 100';
+            . ' LIMIT 0, 1000';
 
-        $datas = $this->getData($sql);
+        $this->showStats(
+            $login,
+            'Country with most players',
+            array('Country', 'nb Players'),
+            array(null, 'nation', 'nb'),
+            array(null, Country::getInstance(), null),
+            $this->groupByCountry($this->getData($sql), 'nb')
+        );
+    }
 
-        $this->closeAllWindows($login);
-        $window = \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Country::Create($login);
-        $window->setTitle(__('Country with most players', $login));
-        $window->centerOnScreen();
-        $window->populateList($datas);
-        $window->setSize(140, 110);
-        $window->show();
+    private function showStats($login, $title, $labels, $keys, $formatters, $datas)
+    {
+        if (!isset($labels[0]) || !isset($labels[1])) {
+            return;
+        }
+        $this->statsWindow->setParam("h0", $this->statsWindow->addLang($labels[0]));
+        $this->statsWindow->setParam("h1", $this->statsWindow->addLang($labels[1]));
+
+        $items = array();
+        $data  = array();
+        $x     = 0;
+        foreach ($datas as $row) {
+            $cells = array();
+            for ($c = 0; $c < 3; $c++) {
+                if (!array_key_exists($c, $keys)) {
+                    $cells[] = "";
+                    continue;
+                }
+                if ($keys[$c] === null) {
+                    $cells[] = $x + 1;
+                    continue;
+                }
+                $value = "";
+                if (isset($row[$keys[$c]])) {
+                    $value = $row[$keys[$c]];
+                    if (isset($formatters[$c]) && $formatters[$c] !== null) {
+                        $value = $formatters[$c]->format($value);
+                    }
+                }
+                $cells[] = $value;
+            }
+            $items[$x] = $cells;
+            $data[$x]  = array(-1, -1, -1, -1);
+            $x++;
+        }
+
+        $this->statsWindow->setTitle($title);
+        $this->statsWindow->setParam("statsItems", $items);
+        $this->statsWindow->setParam("statsData", $data);
+        $this->statsWindow->show($login);
+    }
+
+    private function groupByCountry($datas, $sumKey)
+    {
+        /** @var Country $formatter */
+        $formatter = Country::getInstance();
+
+        $newData = array();
+        foreach ($datas as $row) {
+            if (!isset($row['nation'])) {
+                continue;
+            }
+            $country = $formatter->format($row['nation']);
+            if ($country == "") {
+                continue;
+            }
+            if (isset($newData[$country])) {
+                $newData[$country][$sumKey] += $row[$sumKey];
+            } else {
+                $newData[$country] = $row;
+            }
+        }
+
+        $sums = array();
+        foreach ($newData as $country => $row) {
+            $sums[$country] = isset($row[$sumKey]) ? $row[$sumKey] : 0;
+        }
+        arsort($sums);
+
+        $sorted = array();
+        foreach ($sums as $country => $sum) {
+            $sorted[] = $newData[$country];
+        }
+
+        return $sorted;
     }
 
     public function getData($sql)
@@ -524,22 +513,9 @@ class Statistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function eXpOnUnload()
     {
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerTopIncome::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmount::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationAmountTotal::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCountTotal::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCountTotal::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\ServerDonationCount::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Winners::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\OnlineTime::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TrackPlay::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopVoter::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\TopActive::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Finish::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryFinish::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryOnlineTime::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\CountryWinner::EraseAll();
-        \ManiaLivePlugins\eXpansion\Statistics\Gui\Windows\Country::EraseAll();
+        if ($this->statsWindow instanceof Window) {
+            $this->statsWindow->erase();
+        }
+        $this->statsWindow = null;
     }
 }

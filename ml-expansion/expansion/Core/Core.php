@@ -26,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.2.7";
+    const EXP_VERSION = "1.2.2.8";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -345,7 +345,17 @@ EOT;
     public function eXpOnReady()
     {
         $this->registerManialinkCallback('showInfo');
-        
+        $this->registerManialinkCallback('addListValue', true, true);
+        $this->registerManialinkCallback('removeListValue', false, true);
+        $this->registerManialinkCallback('confSwitcherLoad', false, true);
+        $this->registerManialinkCallback('confSwitcherSave', false, true);
+        $this->registerManialinkCallback('confSwitcherSelect', false, true);
+        $this->registerManialinkCallback('confSwitcherSaveAs', true, true);
+        $this->registerManialinkCallback('expSettingsSwitchGroup', false, true);
+        $this->registerManialinkCallback('expSettingsSave', true, true);
+        $this->registerManialinkCallback('expSettingsResetVar', false, true);
+        $this->registerManialinkCallback('expSettingsOpenWin', false, true);
+
         $this->lastTick = time();
         $this->config = Config::getInstance();
 
@@ -1283,7 +1293,7 @@ EOT;
     {
         $statsAction = -1;
         if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics')) {
-            $statsAction = \ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics::$serverStatAction;
+            $statsAction = "exp:eXpansion.ServerStatistics:showStats";
         }
         $this->infoWindow->setParam("statsAction", $statsAction);
         $this->infoWindow->show($login);
@@ -1372,6 +1382,76 @@ EOT;
     {
         if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
             $this->expSettingsController->show($login, $confName);
+        }
+    }
+
+    public function expSettingsSwitchGroup($login, $compound)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->switchGroup($login, $compound);
+        }
+    }
+
+    public function expSettingsSave($login, $compound, $params = array())
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->save($login, $compound, $params);
+        }
+    }
+
+    public function expSettingsResetVar($login, $compound)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->resetVar($login, $compound);
+        }
+    }
+
+    public function expSettingsOpenWin($login, $compound)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->openWin($login, $compound);
+        }
+    }
+
+    public function addListValue($login, $compound, $params = array())
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->addListValue($login, $compound, $params);
+        }
+    }
+
+    public function removeListValue($login, $compound)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->removeListValue($login, $compound);
+        }
+    }
+
+    public function confSwitcherLoad($login, $full)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->confSwitcherLoad($login, $full);
+        }
+    }
+
+    public function confSwitcherSave($login, $full)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->confSwitcherSave($login, $full);
+        }
+    }
+
+    public function confSwitcherSelect($login, $full)
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->confSwitcherSelect($login, $full);
+        }
+    }
+
+    public function confSwitcherSaveAs($login, $compound, $params = array())
+    {
+        if (AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_SETTINGS)) {
+            $this->expSettingsController->confSwitcherSaveAs($login, $compound, $params);
         }
     }
 

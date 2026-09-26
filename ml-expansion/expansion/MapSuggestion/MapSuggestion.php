@@ -2,15 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\MapSuggestion;
 
-use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
-use ManiaLivePlugins\eXpansion\Gui\Structures\ButtonHook;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Hooks\ListButtons;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Hooks\ListButtons_Event;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\HookData;
 
-class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements ListButtons_Event
+class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
     protected $mapWishWindow;
@@ -21,6 +16,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
         
         $this->registerManialinkCallback('mapWishOk', true);
         $this->registerManialinkCallback('showMapWishWindow');
+        $this->registerManialinkCallback('addMapToWish', true, true);
 
         $this->mapWishWindow = new Window("MapSuggestion\Gui\Windows\MapWish.xml");
         $this->mapWishWindow->setName("MapSuggestion window");
@@ -29,7 +25,6 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
         $this->registerChatCommand("mapwish", "showMapWishWindow", 0, true);
         $this->setPublicMethod("showMapWishWindow");
-        Dispatcher::register(ListButtons::getClass(), $this);
     }
 
     public function showMapWishWindow($login)
@@ -49,11 +44,9 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
     public function addMapToWish($login, $mxid, $description = null)
     {
-
         if (is_array($mxid)) {
             $mxid = $mxid[0];
         }
-
 
         if ($description == null || is_array($description)) {
             $description = 'Add with MX Search Window';
@@ -61,7 +54,6 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
         $player = $this->storage->getPlayerObject($login);
         $from = '"' . $player->nickName . '$z$s$fff (' . $login . ')' . '"';
-
         $data = "";
 
         /** @var \ManiaLivePlugins\eXpansion\Core\DataAccess $dataAccess */
@@ -71,7 +63,6 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
             $mxid = intval($mxid);
             if (empty($description)) {
                 Gui::showNotice(eXpGetMessage("Looks like you have not entered any description."), $login);
-
                 return;
             }
 
@@ -80,13 +71,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
 
             $data .= $mxid . ";" . $from . ";\"" . $description . "\"\r\n";
             $dataAccess->save($file, $data, true);
-            Gui::showNotice(
-                eXpGetMessage(
-                    "Your wish has been saved\nThe server "
-                    ."admin will review the wish\nand add the map if it's good enough."
-                ),
-                $login
-            );
+            Gui::showNotice(eXpGetMessage("Your wish has been saved\nThe server admin will review the wish\nand add the map if it's good enough."), $login);
             $this->mapWishWindow->erase($login);
 
             return;
@@ -94,34 +79,11 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin imp
         Gui::showNotice(eXpGetMessage("Looks like mx id is missing or is invalid."), $login);
     }
 
-    /**
-     *
-     * @param HookData $buttons
-     * @param          $login
-     *
-     * @return mixed
-     */
-    public function hook_ManiaExchangeListButtons($buttons, $login)
-    {
-        if (isset($buttons->data['queue'])) {
-            unset($buttons->data['queue']);
-        }
-
-        $button = new ButtonHook();
-        $button->callback = array($this, 'addMapToWish');
-        $button->label = 'Suggest';
-        $buttons->data['suggest'] = $button;
-    }
-
-
     public function eXpOnUnload()
     {
         if ($this->mapWishWindow instanceof Window) {
             $this->mapWishWindow->erase();
         }
         $this->mapWishWindow = null;
-        Dispatcher::unregister(ListButtons::getClass(), $this);
-        parent::eXpOnUnload();
-
     }
 }

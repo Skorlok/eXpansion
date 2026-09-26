@@ -1,14 +1,6 @@
 <?php
-use ManiaLivePlugins\eXpansion\Gui\Elements\Pager;
 
 $items       = $this->getParam("items");
-$sizeX       = (int)$this->getParam("sizeX");
-$sizeY       = (int)$this->getParam("sizeY");
-
-$pagerSizeX = $sizeX;
-$pagerSizeY = $sizeY - 8;
-$applyPosX  = $sizeX - 26;
-$applyPosY  = -($sizeY - 5);
 
 $itemsXml = "";
 $n        = 0;
@@ -21,8 +13,10 @@ foreach ((array)$items as $item) {
     $itemsXml .= '</frame>';
     $n++;
 }
+
+$this->setParam("itemsXml", $itemsXml);
 ?>
-<?php echo Pager::getXML($pagerSizeX, $pagerSizeY, $itemsXml, 0, 0); ?>
-<frame posn="<?php echo $applyPosX; ?> <?php echo $applyPosY; ?> 1">
+<exp:pager sizeX="120" sizeY="82" itemsVarName="itemsXml" posX="0" posY="0" itemSizeY="6"/>
+<frame posn="94 -85 1">
     <exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0D0" action="exp:eXpansion.Gui:configurationOk" isTextId="true"/>
 </frame>

@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
 use ManiaLivePlugins\eXpansion\Gui\Config;
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 /**
  * Description of Pager
@@ -160,21 +161,34 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
     }
 
     /**
-     * Generate the Pager HTML structure (scrollable container + scrollbar chrome).
+     * Generate the Pager XML structure (scrollable container + scrollbar chrome).
      *
+     * @param \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window $mlClass   ManiaLink class name (e.g. "ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window")
      * @param float  $sizeX  Total width
      * @param float  $sizeY  Total height
-     * @param string $items  Pre-generated XML string of items to embed in the Pager frame
+     * @param string $itemsVarName  Name of the variable containing the pre-generated XML string of items to embed in the Pager frame
      * @param float  $posX   Horizontal position
      * @param float  $posY   Vertical position
+     * @param float  $itemSizeY  Height of one item row
      * @return string
      */
-    public static function getXML($sizeX = 100, $sizeY = 50, $items = "", $posX = 0, $posY = 0)
+    public static function getXML($mlClass, $sizeX = 100, $sizeY = 50, $itemsVarName = "", $posX = 0, $posY = 0, $itemSizeY = 6)
     {
+        if (!is_object($mlClass)) {
+            Helper::logError('Pager: Invalid $mlClass parameter', array("Gui", "Pager"));
+            return "";
+        }
+        if (!$mlClass instanceof \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window) {
+            Helper::logError('Pager: $mlClass parameter must be an instance of ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window', array("Gui", "Pager"));
+            return "";
+        }
+
         $pagerWidth  = $sizeX - 6;
         $scrollX     = $sizeX - 3;
         $scrollBgH   = $sizeY - 9;
         $scrollDownY = $sizeY - 10;
+
+        $items = $mlClass->getParam($itemsVarName);
 
         $xml  = '<frame posn="' . $posX . ' ' . $posY . ' 0">';
         $xml .= '<frame id="Pager" sizen="' . $pagerWidth . ' ' . $sizeY . '" scriptevents="1">';
@@ -188,21 +202,11 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
         $xml .= '</frame>';
         $xml .= '</frame>';
 
-        return $xml;
-    }
-
-    /**
-     * Return a Script instance for the Pager ManiaScript, with parameters set.
-     *
-     * @param float $itemSizeY  Height of one item row
-     * @param float $pagerSizeY Total visible height of the pager
-     * @return \ManiaLivePlugins\eXpansion\Gui\Structures\Script
-     */
-    public static function getScriptML($itemSizeY = 6, $pagerSizeY = 50)
-    {
         $script = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\Pager");
         $script->setParam("sizeY",      $script->getNumber($itemSizeY));
-        $script->setParam("pagerSizeY", $script->getNumber($pagerSizeY));
-        return $script;
+        $script->setParam("pagerSizeY", $script->getNumber($sizeY));
+        $mlClass->registerOrOverrideScript($script);
+
+        return $xml;
     }
 }

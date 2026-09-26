@@ -1,7 +1,7 @@
 <?php
 $adminAction   = $this->getParam("adminAction");
 $adminTarget   = $this->getParam("adminTarget");
-$showDrop      = ($adminAction !== "kick");
+$showDrop      = ($adminAction !== "kick" && $adminAction !== "warn");
 ?>
 <frame posn="2 1 1">
 	<frame posn="0 0 1">

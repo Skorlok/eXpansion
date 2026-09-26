@@ -4,8 +4,6 @@ namespace ManiaLivePlugins\eXpansion\AdminGroups;
 use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Admin\AdminGroup;
-use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\Groups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Gui\Windows\Help;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
@@ -121,11 +119,19 @@ class AdminGroups extends ExpPlugin
 
     /** @var Window */
     private $inheritsWindow;
-    private $inheritsGroupPerLogin = array();
 
     /** @var Window */
     private $permissionsWindow;
-    private $permissionsGroupPerLogin = array();
+
+    /** @var Window */
+    private $groupPlayersWindow;
+
+    /** @var Window */
+    private $groupsWindow;
+
+    /** @var Window */
+    private $helpWindow;
+
     public static $txt_msg_cmdDontEx;
     public static $txt_groupsTitle;
     public static $txt_helpTitle;
@@ -229,9 +235,19 @@ class AdminGroups extends ExpPlugin
     {
         $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
 
-        $this->registerManialinkCallback('inheritsOk', true);
-        $this->registerManialinkCallback('permissionsOk', true);
-        
+        $this->registerManialinkCallback('inheritsOk', true, true);
+        $this->registerManialinkCallback('permissionsOk', true, true);
+        $this->registerManialinkCallback('clickAddGroupPlayer', true, true);
+        $this->registerManialinkCallback('clickSelectGroupPlayer', false, true);
+        $this->registerManialinkCallback('clickRemoveGroupPlayer', false, true);
+        $this->registerManialinkCallback('clickAddGroup', true);
+        $this->registerManialinkCallback('showGroupPlayers', false, true);
+        $this->registerManialinkCallback('showPermissionsWindow', false, true);
+        $this->registerManialinkCallback('showInheritsWindow', false, true);
+        $this->registerManialinkCallback('clickGroupDelete', false, true);
+        $this->registerManialinkCallback('helpSearch', true);
+        $this->registerManialinkCallback('clickCmdMore', false, true);
+
         $this->cmdMoreWindow = new Window("AdminGroups\Gui\Windows\CmdMore.xml");
         $this->cmdMoreWindow->setName("CmdMore");
         $this->cmdMoreWindow->setSize(120, 100);
@@ -240,17 +256,23 @@ class AdminGroups extends ExpPlugin
         $this->inheritsWindow = new Window("AdminGroups\Gui\Windows\Inherits.xml");
         $this->inheritsWindow->setName("Inherits");
         $this->inheritsWindow->setSize(74, 100);
-        $this->inheritsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(4, 88));
-        $this->inheritsWindow->setParam("sizeX", 74);
-        $this->inheritsWindow->setParam("sizeY", 100);
 
         $this->permissionsWindow = new Window("AdminGroups\Gui\Windows\Permissions.xml");
         $this->permissionsWindow->setName("Permissions");
         $this->permissionsWindow->setSize(130, 100);
-        $this->permissionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(4, 88));
         $this->permissionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox::getScriptML());
-        $this->permissionsWindow->setParam("sizeX", 130);
-        $this->permissionsWindow->setParam("sizeY", 100);
+
+        $this->groupPlayersWindow = new Window("AdminGroups\Gui\Windows\Players.xml");
+        $this->groupPlayersWindow->setName("AdminGroupPlayers");
+        $this->groupPlayersWindow->setSize(88, 100);
+
+        $this->groupsWindow = new Window("AdminGroups\Gui\Windows\Groups.xml");
+        $this->groupsWindow->setName("AdminGroupsList");
+        $this->groupsWindow->setSize(160, 100);
+
+        $this->helpWindow = new Window("AdminGroups\Gui\Windows\Help.xml");
+        $this->helpWindow->setName("AdminHelp");
+        $this->helpWindow->setSize(158, 100);
     }
 
     /**
@@ -1362,10 +1384,19 @@ class AdminGroups extends ExpPlugin
      * Show the Inherits MLWindow for a given group.
      *
      * @param string $login
-     * @param Group  $group
+     * @param string $groupName
      */
-    public function showInheritsWindow($login, Group $group)
+    public function showInheritsWindow($login, $groupName)
     {
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            return;
+        }
+
+        $group = $this->getGroup(str_replace('–', '-', $groupName));
+        if ($group === null) {
+            return;
+        }
+
         $inherits = $group->getInherits();
         $groups   = array();
         foreach (self::$groupList as $g) {
@@ -1377,8 +1408,8 @@ class AdminGroups extends ExpPlugin
                 );
             }
         }
-        $this->inheritsGroupPerLogin[$login] = $group;
         $this->inheritsWindow->setTitle(__(self::$txt_permissionsTitle, $login, $group->getGroupName()));
+        $this->inheritsWindow->setParam("groupName", $group->getGroupName());
         $this->inheritsWindow->setParam("groups", $groups);
         $this->inheritsWindow->show($login);
     }
@@ -1389,12 +1420,17 @@ class AdminGroups extends ExpPlugin
      * @param string $login
      * @param array  $params
      */
-    public function inheritsOk($login, $params = array())
+    public function inheritsOk($login, $groupName = null, $params = array())
     {
-        if (!isset($this->inheritsGroupPerLogin[$login])) {
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
             return;
         }
-        $group           = $this->inheritsGroupPerLogin[$login];
+
+        $group = $this->getGroup($groupName);
+        if ($group === null) {
+            return;
+        }
+
         $newInheritances = array();
         foreach ($params as $key => $value) {
             if (strpos($key, 'cb_') !== 0 || $value != '1') {
@@ -1411,24 +1447,25 @@ class AdminGroups extends ExpPlugin
         }
         $this->changeInheritanceOfGroup($login, $group, $newInheritances);
         $this->inheritsWindow->erase($login);
-        unset($this->inheritsGroupPerLogin[$login]);
-
-        $windows = Gui\Windows\Groups::GetAll();
-        foreach ($windows as $window) {
-            $wLogin = $window->getRecipient();
-            $window->onShow();
-            $window->redraw($wLogin);
-        }
     }
 
     /**
      * Show the Permissions MLWindow for a given group.
      *
      * @param string $login
-     * @param Group  $group
+     * @param string $groupName
      */
-    public function showPermissionsWindow($login, Group $group)
+    public function showPermissionsWindow($login, $groupName)
     {
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            return;
+        }
+
+        $group = $this->getGroup(str_replace('–', '-', $groupName));
+        if ($group === null) {
+            return;
+        }
+
         $inherits    = $group->getInherits();
         $hasInherits = !empty($inherits);
         $permissions = array();
@@ -1440,8 +1477,8 @@ class AdminGroups extends ExpPlugin
                 'checked_inherit' => ($group->getPermission($key) == self::UNKNOWN_PERMISSION),
             );
         }
-        $this->permissionsGroupPerLogin[$login] = $group;
         $this->permissionsWindow->setTitle(__(self::$txt_permissionsTitle, $login, $group->getGroupName()));
+        $this->permissionsWindow->setParam("groupName", $group->getGroupName());
         $this->permissionsWindow->setParam("permissions", $permissions);
         $this->permissionsWindow->setParam("hasInherits", $hasInherits);
         $this->permissionsWindow->setParam("inheritLabel", __(self::$txt_inherits, $login) . "?");
@@ -1454,13 +1491,18 @@ class AdminGroups extends ExpPlugin
      * @param string $login
      * @param array  $params
      */
-    public function permissionsOk($login, $params = array())
+    public function permissionsOk($login, $groupName = null, $params = array())
     {
-        if (!isset($this->permissionsGroupPerLogin[$login])) {
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
             return;
         }
-        $group       = $this->permissionsGroupPerLogin[$login];
-        $hasInherits = !empty($group->getInherits());
+
+        $group = $this->getGroup($groupName);
+        if ($group === null) {
+            return;
+        }
+
+        $hasInherits = (bool) $group->getInherits();
 
         $inheritChecked = array();
         foreach ($params as $key => $value) {
@@ -1491,15 +1533,135 @@ class AdminGroups extends ExpPlugin
         }
         $this->changePermissionOfGroup($login, $group, $newPermissions);
         $this->permissionsWindow->erase($login);
-        unset($this->permissionsGroupPerLogin[$login]);
+    }
 
-        $windows = Gui\Windows\Groups::GetAll();
-        foreach ($windows as $window) {
-            $wLogin = $window->getRecipient();
-            $window->onShow();
-            $window->redraw($wLogin);
-            $window->refreshAll();
+    public function canManageGroup($login, $groupName)
+    {
+        $canAll = self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS);
+        $canOwn = self::hasPermission($login, Permission::ADMINGROUPS_ONLY_OWN_GROUP);
+        $admin  = self::getAdmin($login);
+        $ownGroupName = ($admin !== null && $admin->getGroup() !== null) ? $admin->getGroup()->getGroupName() : null;
+
+        $canManage = $canAll || ($canOwn && $ownGroupName === $groupName);
+
+        return $canManage;
+    }
+
+    /**
+     * Show the group's Players MLWindow (Players.xml).
+     *
+     * @param string $login
+     * @param string $groupName
+     */
+    public function showGroupPlayers($login, $groupName)
+    {
+        $group = $this->getGroup(str_replace('–', '-', $groupName));
+        if ($group === null) {
+            return;
         }
+
+        $canRemove = self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS);
+        $canAdd    = $this->canManageGroup($login, $group->getGroupName());
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($group->getGroupUsers() as $admin) {
+            $player = \ManiaLive\Data\Storage::getInstance()->getPlayerObject($admin->getLogin());
+
+            $items[$i] = array(
+                \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($admin->getLogin()),
+                $player !== null ? \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($player->nickName) : '',
+            );
+            $data[$i] = array(
+                -1,
+                -1,
+                $canRemove ? ('exp:eXpansion.AdminGroups:clickRemoveGroupPlayer:' . $admin->getLogin() . ':' . $group->getGroupName()) : -1,
+            );
+            $i++;
+        }
+
+        $this->groupPlayersWindow->setTitle(__(self::$txt_playersTitle, $login, $group->getGroupName()));
+        $this->groupPlayersWindow->setParam("hideRemoveButtons", !$canRemove);
+        $this->groupPlayersWindow->setParam("hideAddButtons", !$canAdd);
+        $this->groupPlayersWindow->setParam("groupPlayerItems", $items);
+        $this->groupPlayersWindow->setParam("groupPlayerData",  $data);
+        $this->groupPlayersWindow->setParam("groupName",  $group->getGroupName());
+        $this->groupPlayersWindow->show($login);
+    }
+
+    /**
+     * exp: callback fired by the "Add" button of Players.xml (entries-based, "login" field)
+     */
+    public function clickAddGroupPlayer($login, $groupName = null, $entries = array())
+    {
+        $group = $this->getGroup($groupName);
+        if ($group === null) {
+            return;
+        }
+        if (!$this->canManageGroup($login, $group->getGroupName())) {
+            return;
+        }
+        $newLogin = isset($entries['login']) ? trim($entries['login']) : '';
+        if ($newLogin !== '') {
+            $this->addToGroup($login, $group, $newLogin);
+        }
+
+        $this->showGroupPlayers($login, $groupName);
+    }
+
+    /**
+     * exp: callback fired by the "Select" button of Players.xml - opens the generic player-selection dialog.
+     */
+    public function clickSelectGroupPlayer($login, $groupName = null)
+    {
+        $group = $this->getGroup($groupName);
+        if ($group === null) {
+            return;
+        }
+        if (!$this->canManageGroup($login, $group->getGroupName())) {
+            return;
+        }
+        \ManiaLivePlugins\eXpansion\Gui\Gui::showPlayerSelection($login, array($this, 'selectGroupPlayer'), 'Select Player to add to ' . $group->getGroupName(), 'select', $groupName);
+    }
+
+    /**
+     * PlayerSelection callback (see \ManiaLivePlugins\eXpansion\Gui\Gui::showPlayerSelection) once a player was picked to add to the group.
+     */
+    public function selectGroupPlayer($login, $newLogin, $groupName = null)
+    {
+        $group = $this->getGroup($groupName);
+        if ($group === null) {
+            return;
+        }
+        if (!$this->canManageGroup($login, $group->getGroupName())) {
+            return;
+        }
+        $this->addToGroup($login, $group, $newLogin);
+
+        $this->showGroupPlayers($login, $groupName);
+    }
+
+    /**
+     * exp: callback fired by a row's "Remove Player" button in Players.xml
+     */
+    public function clickRemoveGroupPlayer($login, $target)
+    {
+        $target = explode(":", $target, 2);
+        $targetLogin = str_replace('–', '-', $target[0]);
+        $group  = $this->getGroup($target[1]);
+        if ($group === null) {
+            return;
+        }
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            return;
+        }
+
+        if (isset(self::$admins[$targetLogin])) {
+            $this->removeFromGroup($login, $group, self::$admins[$targetLogin]);
+        }
+
+        $this->showGroupPlayers($login, $group->getGroupName());
     }
 
     /**
@@ -1509,13 +1671,68 @@ class AdminGroups extends ExpPlugin
      */
     public function windowGroups($login)
     {
-        Gui\Windows\Groups::Erase($login);
-        /** @var Groups $window */
-        $window = Gui\Windows\Groups::Create($login);
-        $window->setTitle(__(self::$txt_groupsTitle, $login));
-        $window->setSize(160, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $canAll = self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS);
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach (self::getGroupList() as $group) {
+            $groupName = $group->getGroupName();
+            $isGuest   = ($group instanceof GuestGroup);
+
+            $items[$i] = array(
+                \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($groupName),
+                sizeof($group->getGroupUsers()),
+            );
+            $data[$i] = array(
+                -1,
+                -1,
+                (!$isGuest) ? ('exp:eXpansion.AdminGroups:showGroupPlayers:' . $groupName) : -1,
+                $canAll ? ('exp:eXpansion.AdminGroups:showPermissionsWindow:' . $groupName) : -1,
+                ($canAll && !$isGuest) ? ('exp:eXpansion.Gui:showConfirmDialogMl:exp:eXpansion.AdminGroups:clickGroupDelete:' . $groupName) : -1,
+                ($canAll && !$isGuest) ? ('exp:eXpansion.AdminGroups:showInheritsWindow:' . $groupName) : -1,
+            );
+            $i++;
+        }
+
+        $this->groupsWindow->setTitle(__(self::$txt_groupsTitle, $login));
+        $this->groupsWindow->setParam("hideNotAllPerms", !$canAll);
+        $this->groupsWindow->setParam("groupItems", $items);
+        $this->groupsWindow->setParam("groupData",  $data);
+        $this->groupsWindow->show($login);
+    }
+
+    /**
+     * exp: callback fired by the "Add" button of Groups.xml (entries-based, "group_name" field)
+     */
+    public function clickAddGroup($login, $entries = array())
+    {
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            return;
+        }
+        $groupName = isset($entries['group_name']) ? trim($entries['group_name']) : '';
+        if ($groupName !== '') {
+            $this->addGroup($login, $groupName);
+        }
+
+        $this->windowGroups($login);
+    }
+
+    /**
+     * exp: callback fired by a row's "Delete Group" button in Groups.xml, once the confirm dialog was accepted.
+     */
+    public function clickGroupDelete($login, $groupName)
+    {
+        $group = $this->getGroup(str_replace('–', '-', $groupName));
+        if ($group === null) {
+            return;
+        }
+        if (!self::hasPermission($login, Permission::ADMINGROUPS_ADMIN_ALL_GROUPS)) {
+            return;
+        }
+        $this->removeGroup($login, $group);
+
+        $this->windowGroups($login);
     }
 
     /**
@@ -1525,13 +1742,108 @@ class AdminGroups extends ExpPlugin
      */
     public function windowHelp($login)
     {
-        Gui\Windows\Help::Erase($login);
-        /** @var Help $window */
-        $window = Gui\Windows\Help::Create($login);
-        $window->setTitle(__(self::$txt_helpTitle, $login));
-        $window->setSize(158, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $this->showHelp($login, "");
+    }
+
+    /**
+     * Build & show the admin commands help list.
+     *
+     * @param string $login
+     * @param string $searchCriteria
+     */
+    public function showHelp($login, $searchCriteria = "")
+    {
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->getAdminCommands() as $cmdName => $cmd) {
+            if (!$this->validateCmd($cmd, $searchCriteria)) {
+                continue;
+            }
+            if (!$this->hasPermission($login, $cmd->getPermission())) {
+                continue;
+            }
+
+            $aliases = $cmd->getAliases();
+            $items[$i] = array(
+                $cmd->getCmd(),
+                empty($aliases) ? "" : array_pop($aliases),
+                ($cmd->getHelp() != null) ? __($cmd->getHelp(), $login) : "",
+            );
+            $data[$i] = array(
+                -1,
+                -1,
+                -1,
+                'exp:eXpansion.AdminGroups:clickCmdMore:' . $cmdName,
+            );
+            $i++;
+        }
+
+        $this->helpWindow->setTitle(__(self::$txt_helpTitle, $login));
+        $this->helpWindow->setParam("searchTerm", $this->helpWindow->handleSpecialChars($searchCriteria));
+        $this->helpWindow->setParam("helpItems",  $items);
+        $this->helpWindow->setParam("helpData",   $data);
+        $this->helpWindow->show($login);
+    }
+
+    /**
+     * exp: callback fired by the "Search" button of Help.xml (entries-based, "search" field)
+     */
+    public function helpSearch($login, $entries = array())
+    {
+        $search = isset($entries['search']) ? $entries['search'] : "";
+
+        $this->showHelp($login, $search);
+    }
+
+    /**
+     * exp: callback fired by a row's "More" button in Help.xml
+     */
+    public function clickCmdMore($login, $cmdName)
+    {
+        $cmdName  = str_replace('–', '-', $cmdName);
+        $commands = $this->getAdminCommands();
+
+        if (!isset($commands[$cmdName])) {
+            return;
+        }
+
+        $this->showCmdMore($login, $commands[$cmdName]);
+    }
+
+    /**
+     * Tells if a command matches the search criteria.
+     *
+     * @param AdminCmd $cmd
+     * @param string   $searchCriteria
+     *
+     * @return bool
+     */
+    protected function validateCmd(AdminCmd $cmd, $searchCriteria)
+    {
+        if (empty($searchCriteria)) {
+            return true;
+        } else if (!is_null($cmd->getCmd())) {
+            if (strpos($cmd->getCmd(), $searchCriteria) !== false) {
+                return true;
+            }
+        } else if (!is_null($cmd->getHelp())) {
+            if (strpos($cmd->getHelp(), $searchCriteria)) {
+                return true;
+            }
+        } else if (!is_null($cmd->getHelpMore())) {
+            if (strpos($cmd->getHelpMore(), $searchCriteria)) {
+                return true;
+            }
+        } else {
+            foreach ($cmd->getAliases() as $alias) {
+                if (strpos($alias, $searchCriteria)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1560,13 +1872,26 @@ class AdminGroups extends ExpPlugin
             $this->inheritsWindow->erase();
         }
         $this->inheritsWindow = null;
-        $this->inheritsGroupPerLogin = array();
 
         if ($this->permissionsWindow instanceof Window) {
             $this->permissionsWindow->erase();
         }
         $this->permissionsWindow = null;
-        $this->permissionsGroupPerLogin = array();
+
+        if ($this->groupPlayersWindow instanceof Window) {
+            $this->groupPlayersWindow->erase();
+        }
+        $this->groupPlayersWindow = null;
+
+        if ($this->groupsWindow instanceof Window) {
+            $this->groupsWindow->erase();
+        }
+        $this->groupsWindow = null;
+
+        if ($this->helpWindow instanceof Window) {
+            $this->helpWindow->erase();
+        }
+        $this->helpWindow = null;
 
         self::$admins = array();
         self::$commands = array();

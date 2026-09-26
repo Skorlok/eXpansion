@@ -17,7 +17,8 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
-        if (strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
+        $scriptName = $this->connection->getScriptName();
+        if (strtolower($scriptName['CurrentValue']) != "endurocup.script.txt") {
             $this->displayWidget();
         }
     }
@@ -120,7 +121,8 @@ class Widgets_Livecp extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        if (strtolower($this->connection->getScriptName()['CurrentValue']) != "endurocup.script.txt") {
+        $scriptName = $this->connection->getScriptName();
+        if (strtolower($scriptName['CurrentValue']) != "endurocup.script.txt") {
             $this->displayWidget();
         }
     }

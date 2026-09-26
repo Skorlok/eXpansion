@@ -11,6 +11,9 @@ use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
 class ManiaLink extends Singletons
 {
+    /** Safety net for a component returning XML that contains its own tag */
+    const MAX_COMPONENT_DEPTH = 5;
+
     private static $templateCache = array();
 
     private static $components = array(
@@ -25,7 +28,7 @@ class ManiaLink extends Singletons
             'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\Pager',
             'method' => 'getXML',
             'ml'     => true,
-            'params' => array('sizeX', 'sizeY', 'items', 'posX', 'posY'),
+            'params' => array('sizeX', 'sizeY', 'itemsVarName', 'posX', 'posY', 'itemSizeY'),
         ),
         // ml = true : $this (ManiaLink instance) is prepended as first argument
         'dropdown' => array(
@@ -40,13 +43,19 @@ class ManiaLink extends Singletons
             'ml'     => true,
             'params' => array('name', 'sizeX', 'editable', 'label', 'text', 'showClearText', 'id', 'class', 'isTextId'),
         ),
+        'scrollablearea' => array(
+            'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\ScrollableArea',
+            'method' => 'getXML',
+            'ml'     => true,
+            'params' => array('sizeX', 'sizeY', 'contentVarName', 'contentSizeY'),
+        ),
         // ml = false (or absent) : called without $this
         // script is optional, if present the script is registered to the ManiaLink instance
         'button' => array(
             'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\Button',
             'method' => 'getButtonXML',
             /*'script' => 'getScriptML',*/ // IGNORED, the hoover is broken and i'm lazy to fix it xD
-            'params' => array('sizeX', 'sizeY', 'text', 'active', 'colorize', 'textcolor', 'value', 'action', 'manialink', 'url', 'id', 'class', 'attribute', 'isTextId'),
+            'params' => array('sizeX', 'sizeY', 'text', 'active', 'colorize', 'textcolor', 'value', 'action', 'manialink', 'url', 'id', 'class', 'attribute', 'isTextId', 'labelId'),
         ),
         'checkbox' => array(
             'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox',
@@ -71,12 +80,6 @@ class ManiaLink extends Singletons
             'method' => 'getXML',
             'script' => 'getScriptML',
             'params' => array('group', 'index', 'entryName', 'active', 'textWidth', 'text', 'isTextId'),
-        ),
-        'scrollablearea' => array(
-            'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\ScrollableArea',
-            'method' => 'getXML',
-            'script' => 'getScriptML',
-            'params' => array('sizeX', 'sizeY', 'content'),
         ),
         // no script, no $this
         'inputbox' => array(
@@ -299,26 +302,31 @@ class ManiaLink extends Singletons
         $output = !empty($search) ? str_replace($search, $replace, $output) : $output;
 
         if (strpos($output, '{@') !== false) {
-            $output = preg_replace_callback('/\{@([^}]+)\}/', function($m) {
-                return $this->addLang($m[1]);
+            $self = $this;
+            $output = preg_replace_callback('/\{@([^}]+)\}/', function($m) use ($self) {
+                return $self->addLang($m[1]);
             }, $output);
         }
 
         return $this->expandComponents($output, $login);
     }
 
-    private function expandComponents($output, $login)
+    private function expandComponents($output, $login, $depth = 0)
     {
         if (strpos($output, '<exp:') === false) return $output;
+        if ($depth > self::MAX_COMPONENT_DEPTH) {
+            Helper::logError('ManiaLink: <exp:> components nested deeper than ' . self::MAX_COMPONENT_DEPTH . ' levels, giving up', array("Gui", "ManiaLink"));
+            return $output;
+        }
         $self = $this;
         return preg_replace_callback(
             '/<exp:([a-zA-Z_][a-zA-Z0-9_]*)((?:\s+[a-zA-Z_][a-zA-Z0-9_]*="[^"]*")*)\s*\/>/',
-            function($m) use ($self, $login) { return $self->expandComponent($m, $login); },
+            function($m) use ($self, $login, $depth) { return $self->expandComponent($m, $login, $depth); },
             $output
         );
     }
 
-    private function expandComponent($m, $login)
+    public function expandComponent($m, $login, $depth = 0)
     {
         $name = $m[1];
         if (!isset(self::$components[$name])) return $m[0];
@@ -350,7 +358,9 @@ class ManiaLink extends Singletons
 
         while (!empty($args) && end($args) === null) array_pop($args);
 
-        return call_user_func_array(array($def['class'], $def['method']), $args);
+        $xml = call_user_func_array(array($def['class'], $def['method']), $args);
+
+        return $this->expandComponents((string)$xml, $login, $depth + 1);
     }
 
     /**
@@ -437,9 +447,13 @@ class ManiaLink extends Singletons
         if ($login !== null) {
             if (is_array($login)) {
                 // check if login exists in $this->storage->players and $this->storage->spectators
-                $login = array_filter($login, function ($l) {
-                    return isset($this->storage->players[$l]) || isset($this->storage->spectators[$l]);
-                });
+                $connected = array();
+                foreach ($login as $l) {
+                    if (isset($this->storage->players[$l]) || isset($this->storage->spectators[$l])) {
+                        $connected[] = $l;
+                    }
+                }
+                $login = $connected;
             }
             try {
                 $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, false); // fix the bug where player leave so method return `login unknown`

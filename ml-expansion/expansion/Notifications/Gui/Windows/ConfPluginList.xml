@@ -1,0 +1,15 @@
+<?php
+$plugins = $this->getParam("plugins");
+
+$itemsXml = "";
+foreach ((array)$plugins as $plugin) {
+    $itemsXml .= '<exp:checkbox name="' . $plugin['name'] . '" active="' . ($plugin['active'] ? 'true' : 'false') . '" textWidth="60" text="' . $this->handleSpecialChars($plugin['text']) . '"/>';
+}
+$this->setParam("itemsXml", $itemsXml);
+?>
+<frame posn="0 0 1">
+<exp:pager sizeX="97" sizeY="92" itemsVarName="itemsXml" posX="0" posY="-2" itemSizeY="6"/>
+</frame>
+<frame posn="50 -3 1">
+	<exp:button sizeX="30" sizeY="5" text="@Save" action="{closeAction}" isTextId="true"/>
+</frame>

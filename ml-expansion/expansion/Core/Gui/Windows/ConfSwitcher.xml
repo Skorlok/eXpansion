@@ -1,0 +1,104 @@
+<frame posn="0 -3 1" scale="0.8"><exp:inputbox name="name" sizeX="65" editable="true" label=""/></frame>
+<frame posn="56.25 -3 1" scale="1.066666667"><exp:button sizeX="25" sizeY="5" text="@Save" action="exp:eXpansion.Core:confSwitcherSaveAs:{compound}" isTextId="true"/></frame>
+<frame posn="0 -7 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -3 0.0001" id="row_0">
+        <frame scale="0.8">
+            <label id="column_0_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="0" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_0_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_0_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_0_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -11 0.0001" id="row_1">
+        <frame scale="0.8">
+            <label id="column_1_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="1" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_1_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_1_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_1_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_2">
+        <frame scale="0.8">
+            <label id="column_2_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="2" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_2_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_2_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_2_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -27 0.0001" id="row_3">
+        <frame scale="0.8">
+            <label id="column_3_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="3" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_3_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_3_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_3_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -35 0.0001" id="row_4">
+        <frame scale="0.8">
+            <label id="column_4_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="4" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_4_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_4_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_4_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_5">
+        <frame scale="0.8">
+            <label id="column_5_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="5" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_5_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_5_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_5_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -51 0.0001" id="row_6">
+        <frame scale="0.8">
+            <label id="column_6_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="6" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_6_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_6_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_6_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -59 0.0001" id="row_7">
+        <frame scale="0.8">
+            <label id="column_7_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="7" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_7_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_7_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_7_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_8">
+        <frame scale="0.8">
+            <label id="column_8_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="8" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_8_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_8_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_8_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -75 0.0001" id="row_9">
+        <frame scale="0.8">
+            <label id="column_9_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="9" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_9_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_9_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_9_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -83 0.0001" id="row_10">
+        <frame scale="0.8">
+            <label id="column_10_0" posn="7 4 0" sizen="86.25 5" style="TextStaticSmall"/>
+            <frame posn="0 0 1.0E-5"><exp:listbg indexNumber="10" sizeX="113.25" sizeY="10"/></frame>
+            <frame posn="97.25 0 1"><exp:button sizeX="15" sizeY="6" text="Charger" action="eXpOptimizedPagerAction" id="column_10_1" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="84.25 0 1"><exp:button sizeX="15" sizeY="6" text="Enregistrer" action="eXpOptimizedPagerAction" id="column_10_2" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+            <frame posn="72.25 0 1"><exp:button sizeX="15" sizeY="6" text="Choisir" action="eXpOptimizedPagerAction" id="column_10_3" colorize="A54B4B" class="eXpOptimizedPagerAction"/></frame>
+        </frame>
+    </frame>
+    <exp:optimizedpager sizeX="97" sizeY="87" itemsVarName="confItems" dataVarName="confData" rowsPerPage="11" itemsPerRow="1" varName="confswitcher"/>
+</frame>

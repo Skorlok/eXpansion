@@ -2,16 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerStatistics;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
-    public static $serverStatAction = -1;
-    public static $serverMemAction = -1;
-    public static $serverCpuAction = -1;
-    public static $serverPlayerAction = -1;
 
     /** @var Window */
     private $statsWindow;
@@ -41,10 +35,6 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         $this->startTime = time();
-
-        /** @var ActionHandler $aHandler */
-        $aHandler = ActionHandler::getInstance();
-        self::$serverStatAction = $aHandler->createAction(array($this, 'showStats'));
     }
 
     public function eXpOnLoad()
@@ -58,6 +48,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         parent::eXpOnReady();
         $this->enableTickerEvent();
 
+        $this->registerManialinkCallback('showStats');
         $this->registerManialinkCallback('showPlayers');
         $this->registerManialinkCallback('showMemory');
         $this->registerManialinkCallback('showCpu');

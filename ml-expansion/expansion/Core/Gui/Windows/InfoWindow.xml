@@ -125,7 +125,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 		</frame>
 	</frame>
 </frame>
-<?php if ($statsAction > 0): ?>
+<?php if ($statsAction != -1): ?>
 <frame posn="78 -69 1">
 	<exp:button sizeX="30" sizeY="6" text="@Server Stats" action="<?php echo $statsAction; ?>" isTextId="true"/>
 </frame>

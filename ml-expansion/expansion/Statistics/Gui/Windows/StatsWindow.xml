@@ -1,0 +1,168 @@
+<frame posn="47 2 0.004">
+    <label sizen="10.555555555556 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textid="{@#}"/>
+    <label posn="8.4444444444444 0 1.0E-5" sizen="52.777777777778 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textid="{h0}"/>
+    <label posn="50.666666666667 0 2.0E-5" sizen="31.666666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textid="{h1}"/>
+</frame>
+<frame posn="47 -5 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 1 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="90" sizeY="4"/>
+        <label id="column_0_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -3 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="90" sizeY="4"/>
+        <label id="column_1_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -7 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="90" sizeY="4"/>
+        <label id="column_2_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -11 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="90" sizeY="4"/>
+        <label id="column_3_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -15 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="90" sizeY="4"/>
+        <label id="column_4_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="90" sizeY="4"/>
+        <label id="column_5_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -23 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="90" sizeY="4"/>
+        <label id="column_6_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -27 0.0001" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="90" sizeY="4"/>
+        <label id="column_7_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="90" sizeY="4"/>
+        <label id="column_8_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -35 0.0001" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="90" sizeY="4"/>
+        <label id="column_9_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -39 0.0001" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="90" sizeY="4"/>
+        <label id="column_10_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="90" sizeY="4"/>
+        <label id="column_11_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -47 0.0001" id="row_12">
+        <exp:listbg indexNumber="12" sizeX="90" sizeY="4"/>
+        <label id="column_12_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -51 0.0001" id="row_13">
+        <exp:listbg indexNumber="13" sizeX="90" sizeY="4"/>
+        <label id="column_13_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_14">
+        <exp:listbg indexNumber="14" sizeX="90" sizeY="4"/>
+        <label id="column_14_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -59 0.0001" id="row_15">
+        <exp:listbg indexNumber="15" sizeX="90" sizeY="4"/>
+        <label id="column_15_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_15_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_15_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -63 0.0001" id="row_16">
+        <exp:listbg indexNumber="16" sizeX="90" sizeY="4"/>
+        <label id="column_16_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_16_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_16_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_17">
+        <exp:listbg indexNumber="17" sizeX="90" sizeY="4"/>
+        <label id="column_17_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_17_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_17_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -71 0.0001" id="row_18">
+        <exp:listbg indexNumber="18" sizeX="90" sizeY="4"/>
+        <label id="column_18_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_18_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_18_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -75 0.0001" id="row_19">
+        <exp:listbg indexNumber="19" sizeX="90" sizeY="4"/>
+        <label id="column_19_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_19_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_19_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_20">
+        <exp:listbg indexNumber="20" sizeX="90" sizeY="4"/>
+        <label id="column_20_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_20_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_20_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -83 0.0001" id="row_21">
+        <exp:listbg indexNumber="21" sizeX="90" sizeY="4"/>
+        <label id="column_21_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_21_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_21_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <frame posn="0 -87 0.0001" id="row_22">
+        <exp:listbg indexNumber="22" sizeX="90" sizeY="4"/>
+        <label id="column_22_0" sizen="12.638888888889 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_22_1" posn="10.111111111111 0 1.0E-5" sizen="63.194444444444 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_22_2" posn="60.666666666667 0 2.0E-5" sizen="37.916666666667 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+    </frame>
+    <exp:optimizedpager sizeX="95" sizeY="90" itemsVarName="statsItems" dataVarName="statsData" rowsPerPage="23" itemsPerRow="3" varName="statistics"/>
+</frame>
+<frame posn="0 0 0.005" scale="0.8">
+    <frame posn="0 -0 1"><exp:button sizeX="70" sizeY="6" text="@SERVER STATISTICS" isTextId="true" colorize="2B2"/></frame>
+    <frame posn="0 -6 1"><exp:button sizeX="70" sizeY="6" text="@Top Income sources" isTextId="true" action="exp:eXpansion.Statistics:showTopIncome"/></frame>
+    <frame posn="0 -12 1"><exp:button sizeX="70" sizeY="6" text="@Top Donators" isTextId="true" action="exp:eXpansion.Statistics:showTopDonators"/></frame>
+    <frame posn="0 -18 1"><exp:button sizeX="70" sizeY="6" text="@Top nb Donations" isTextId="true" action="exp:eXpansion.Statistics:showQTopDonators"/></frame>
+    <frame posn="0 -24 1"><exp:button sizeX="70" sizeY="6" text="@ALL SERVER STATISTICS" isTextId="true" colorize="2B2"/></frame>
+    <frame posn="0 -30 1"><exp:button sizeX="70" sizeY="6" text="@Top Donators All servers" isTextId="true" action="exp:eXpansion.Statistics:showTopDonatorsTotal"/></frame>
+    <frame posn="0 -36 1"><exp:button sizeX="70" sizeY="6" text="@Top nb Donations All Servers" isTextId="true" action="exp:eXpansion.Statistics:showTopQDonatorsTotal"/></frame>
+    <frame posn="0 -42 1"><exp:button sizeX="70" sizeY="6" text="@Players Related" isTextId="true" colorize="2B2"/></frame>
+    <frame posn="0 -48 1"><exp:button sizeX="70" sizeY="6" text="@Top Winners" isTextId="true" action="exp:eXpansion.Statistics:showTopWinners"/></frame>
+    <frame posn="0 -54 1"><exp:button sizeX="70" sizeY="6" text="@Top Online Time" isTextId="true" action="exp:eXpansion.Statistics:showTopOnline"/></frame>
+    <frame posn="0 -60 1"><exp:button sizeX="70" sizeY="6" text="@Top Play Time" isTextId="true" action="exp:eXpansion.Statistics:showTopPlayTime"/></frame>
+    <frame posn="0 -66 1"><exp:button sizeX="70" sizeY="6" text="@Top nb Finish" isTextId="true" action="exp:eXpansion.Statistics:showTopFinish"/></frame>
+    <frame posn="0 -72 1"><exp:button sizeX="70" sizeY="6" text="@Top nb Map Played" isTextId="true" action="exp:eXpansion.Statistics:showTopTrackPlay"/></frame>
+    <frame posn="0 -78 1"><exp:button sizeX="70" sizeY="6" text="@Top Karma Voter" isTextId="true" action="exp:eXpansion.Statistics:showTopVoter"/></frame>
+    <frame posn="0 -84 1"><exp:button sizeX="70" sizeY="6" text="@Top Active Players" isTextId="true" action="exp:eXpansion.Statistics:showTopActive"/></frame>
+    <frame posn="0 -90 1"><exp:button sizeX="70" sizeY="6" text="@Country Related" isTextId="true" colorize="2B2"/></frame>
+    <frame posn="0 -96 1"><exp:button sizeX="70" sizeY="6" text="@Top Country by Finish" isTextId="true" action="exp:eXpansion.Statistics:showTopFinishCountry"/></frame>
+    <frame posn="0 -102 1"><exp:button sizeX="70" sizeY="6" text="@Top Country Online" isTextId="true" action="exp:eXpansion.Statistics:showTopOnlineCountry"/></frame>
+    <frame posn="0 -108 1"><exp:button sizeX="70" sizeY="6" text="@Top Winning Country" isTextId="true" action="exp:eXpansion.Statistics:showTopWinnerCountry"/></frame>
+    <frame posn="0 -114 1"><exp:button sizeX="70" sizeY="6" text="@Top Country by nb Player" isTextId="true" action="exp:eXpansion.Statistics:showTopCountry"/></frame>
+</frame>

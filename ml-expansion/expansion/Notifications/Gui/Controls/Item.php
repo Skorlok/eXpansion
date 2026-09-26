@@ -14,7 +14,6 @@ class Item extends \ManiaLivePlugins\eXpansion\Gui\Control
         $this->sizeY = 3.5;
         $this->setAlign("left", "top");
 
-        // $action = \ManiaLive\Gui\ActionHandler::getInstance()->createAction($item->callback);
         $this->label = new \ManiaLib\Gui\Elements\Label(100, 4);
         $this->label->setText($string);
         $this->label->setTextColor("fff");

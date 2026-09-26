@@ -37,6 +37,10 @@ class Gui extends ExpPlugin
     /** @var Script */
     private static $confirmScript = null;
 
+    /** @var MLWindow */
+    private static $playerSelectionWindow = null;
+    private static $playerSelectionCallbacks = array();
+
     public $playersWidgets = array();
 
     /** @var MLWindow */
@@ -60,6 +64,7 @@ class Gui extends ExpPlugin
 
         $this->registerManialinkCallback('showConfirmDialogMl', false, true);
         $this->registerManialinkCallback('configurationOk', true);
+        $this->registerManialinkCallback('selectPlayerClick', false, true);
 
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
@@ -91,13 +96,15 @@ class Gui extends ExpPlugin
         self::$confirmWindow->setTitle("Really do this ?");
         self::$confirmWindow->registerScript(self::$confirmScript);
 
+        self::$playerSelectionWindow = new MLWindow("Gui\\Windows\\PlayerSelection.xml");
+        self::$playerSelectionWindow->setName("Gui Player Selection");
+        self::$playerSelectionWindow->setSize(85, 100);
+        self::$playerSelectionWindow->registerCloseCallback(array($this, 'erasePlayerSelection'));
+
         $this->configWindow = new MLWindow("Gui\\Windows\\Configuration.xml");
         $this->configWindow->setName("HUD Configuration");
         $this->configWindow->setSize(120, 90);
         $this->configWindow->setTitle("Configure HUD");
-        $this->configWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(6, 82));
-        $this->configWindow->setParam("sizeX", 120);
-        $this->configWindow->setParam("sizeY", 90);
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -242,6 +249,7 @@ EOT
     {
         unset($this->configStatuses[$login]);
         unset($this->configGameMode[$login]);
+        unset(self::$playerSelectionCallbacks[$login]);
     }
 
     public function hudCommands($login, $param = "null")
@@ -429,6 +437,56 @@ EOT
         self::$confirmScript->setParam("action", $actionId);
         self::$confirmWindow->setParam("text", self::$confirmWindow->handleSpecialChars($text));
         self::$confirmWindow->show($login);
+    }
+
+    public static function showPlayerSelection($login, $callback, $title, $buttonText = 'Select', $extra = null, $excludedLogin = null)
+    {
+        /** @var \ManiaLive\Data\Storage $storage */
+        $storage = \ManiaLive\Data\Storage::getInstance();
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach (array_merge($storage->players, $storage->spectators) as $player) {
+            if ($excludedLogin && $player->login === $excludedLogin || !$excludedLogin && $player->login === $login) {
+                continue;
+            }
+            $items[$i] = array(self::fixString($player->login), self::fixString($player->nickName));
+            $data[$i] = array(-1, -1, 'exp:eXpansion.Gui:selectPlayerClick:' . $player->login);
+            $i++;
+        }
+
+        self::$playerSelectionCallbacks[$login] = array($callback, $extra);
+
+        self::$playerSelectionWindow->setParam('buttonText', $buttonText);
+        self::$playerSelectionWindow->setParam('playerItems', $items);
+        self::$playerSelectionWindow->setParam('playerData', $data);
+        self::$playerSelectionWindow->setTitle($title);
+        self::$playerSelectionWindow->show($login);
+    }
+
+    public static function erasePlayerSelection($login)
+    {
+        unset(self::$playerSelectionCallbacks[$login]);
+    }
+
+    public function selectPlayerClick($login, $target)
+    {
+        $target = str_replace('–', '-', $target);
+
+        if (!isset(self::$playerSelectionCallbacks[$login])) {
+            return;
+        }
+        $callback = self::$playerSelectionCallbacks[$login][0];
+        $extra    = self::$playerSelectionCallbacks[$login][1];
+        unset(self::$playerSelectionCallbacks[$login]);
+        self::$playerSelectionWindow->erase($login);
+
+        if ($extra) {
+            call_user_func($callback, $login, $target, $extra);
+        } else {
+            call_user_func($callback, $login, $target);
+        }
     }
 
     /**

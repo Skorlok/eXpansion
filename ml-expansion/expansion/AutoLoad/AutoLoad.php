@@ -176,7 +176,6 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->pluginListWindow->setSize(172, 90);
         $this->pluginListWindow->setTitle("Plugin List");
         $this->pluginListWindow->registerCloseCallback(array($this, 'onPluginListWindowClosed'));
-        $this->pluginListWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Pager::getScriptML(8, 86));
     }
 
     /**
@@ -642,7 +641,7 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
                 'otherColorize'  => $otherColorize,
                 'otherTooltip'   => $otherTooltip,
                 'otherSizeY'     => $otherSizeY,
-                'configAvailable'   => !empty($configMgr->getGroupedVariables($pluginId)),
+                'configAvailable' => (bool) $configMgr->getGroupedVariables($pluginId),
                 'startText'      => $startText,
                 'startColorize'  => $startColorize,
             );
@@ -667,6 +666,9 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function pluginListSetGroup($login, $groupIdx, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
         $filterName   = isset($params['name'])   ? $params['name']   : '';
         $filterAuthor = isset($params['author']) ? $params['author'] : '';
         $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
@@ -674,6 +676,9 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function pluginListSearch($login, $params = array())
     {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
         $filterName   = isset($params['name'])   ? $params['name']   : '';
         $filterAuthor = isset($params['author']) ? $params['author'] : '';
         $groupIdx     = isset($params['group'])  ? intval($params['group']) : 0;
@@ -682,6 +687,9 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function pluginListToggle($login, $pluginId)
     {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
         if (isset($this->availablePlugins[$pluginId])) {
             $this->togglePlugin($login, $this->availablePlugins[$pluginId]);
         }

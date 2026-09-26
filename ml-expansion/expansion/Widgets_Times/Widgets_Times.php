@@ -158,12 +158,18 @@ class Widgets_Times extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function getScript($reference, $target, $update = false)
     {
         $playerRecord = \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::getObjbyPropValue($this->localrecords, "login", $target);
-        $drecord = array_search($target, array_column($this->dedirecords, 'Login'));
+        $drecord = false;
+        foreach ($this->dedirecords as $index => $dediRecord) {
+            if ($dediRecord['Login'] == $target) {
+                $drecord = $index;
+                break;
+            }
+        }
 
         $record = false;
 
         // Now check for the PB in dedi and local records
-        if ($drecord) {
+        if ($drecord !== false) {
             if ($playerRecord) {
                 if ($playerRecord->time <= $this->dedirecords[$drecord]['Best']) {
                     $record = $playerRecord;

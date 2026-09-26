@@ -1,6 +1,3 @@
-<?php
-$contentXml = $this->getParam("contentXml");
-?>
 <frame posn="-1 3 0">
-<?php echo \ManiaLivePlugins\eXpansion\Gui\Elements\ScrollableArea::getXML(167, 87, $contentXml); ?>
+<exp:scrollablearea sizeX="167" sizeY="87" contentVarName="contentXml" contentSizeY="{contentSizeY}"/>
 </frame>

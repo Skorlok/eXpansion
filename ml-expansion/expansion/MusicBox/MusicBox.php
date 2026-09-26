@@ -3,13 +3,12 @@
 namespace ManiaLivePlugins\eXpansion\MusicBox;
 
 use Exception;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
-use ManiaLivePlugins\eXpansion\MusicBox\Gui\Windows\MusicListWindow;
 use ManiaLivePlugins\eXpansion\MusicBox\Structures\Song;
 
 class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -24,7 +23,9 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $counter = 0;
     private $dataAccess;
     private $widget;
-    private $action;
+
+    /** @var Window */
+    private $listWindow;
 
     /**
      * onLoad()
@@ -36,23 +37,20 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
         $this->config = Config::getInstance();
-        Gui\Windows\MusicListWindow::$musicPlugin = $this;
 
         $this->registerChatCommand("music", "mbox", 0, true);
         $this->registerChatCommand("music", "mbox", 1, true);
         $this->registerChatCommand("mlist", "mbox", 0, true); // xaseco
         $this->registerChatCommand("mlist", "mbox", 1, true); // xaseco
 
-        /** @var ActionHandler @aH */
-        $aH = ActionHandler::getInstance();
-
-        $this->action = $aH->createAction(array($this, "musicList"));
-
         $this->widget = new Widget("MusicBox\Gui\Widgets\CurrentTrackWidget.xml");
         $this->widget->setName("Music Widget");
         $this->widget->setLayer("scorestable");
         $this->widget->setSize(45, 7);
-        $this->widget->setParam("action", $this->action);
+
+        $this->listWindow = new Window("MusicBox\Gui\Windows\MusicListWindow.xml");
+        $this->listWindow->setName("MusicList");
+        $this->listWindow->setSize(180, 90);
     }
 
     /*
@@ -64,6 +62,8 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnReady()
     {
         $this->dataAccess = DataAccess::getInstance();
+        $this->registerManialinkCallback('musicList');
+        $this->registerManialinkCallback('mbox', false, true);
 
         $this->initMusic();
     }
@@ -93,11 +93,16 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         try {
-            $this->widget->erase();
+            if ($this->widget instanceof Widget) {
+                $this->widget->erase();
+            }
             $this->widget = null;
-            MusicListWindow::EraseAll();
 
-            Gui\Windows\MusicListWindow::$musicPlugin = null;
+            if ($this->listWindow instanceof Window) {
+                $this->listWindow->erase();
+            }
+            $this->listWindow = null;
+
 			$this->connection->setForcedMusic(false, "");
             $this->songs = array();
             $this->wishes = array();
@@ -286,6 +291,8 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
+        $this->listWindow->erase($login);
+
         if (Config::getInstance()->disableJukebox) {
             $this->eXpChatSendServerMessage("#music# Jukeboxing music is disabled.", $login);
             return;
@@ -350,11 +357,19 @@ class MusicBox extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function musicList($login)
     {
         try {
-            $info = Gui\Windows\MusicListWindow::Create($login);
-            $info->setSize(180, 90);
-            $info->setTitle("Music available at server: ", count($this->songs));
-            $info->centerOnScreen();
-            $info->show();
+            $items = array();
+            $data  = array();
+            $i     = 0;
+            foreach ($this->songs as $index => $song) {
+                $items[$i] = array($song->title, $song->artist, $song->genre);
+                $data[$i]  = array(-1, -1, -1, 'exp:eXpansion.MusicBox:mbox:' . ($index + 1));
+                $i++;
+            }
+
+            $this->listWindow->setTitle("Music available at server:  %s", array(count($this->songs)));
+            $this->listWindow->setParam("songItems", $items);
+            $this->listWindow->setParam("songData",  $data);
+            $this->listWindow->show($login);
         } catch (\Exception $e) {
             $this->console(" Error while displaying jukebox window: " . $e->getMessage());
         }

@@ -1,0 +1,126 @@
+<frame posn="0 -3 1" hidden="{hideNotAllPerms}"><exp:inputbox name="group_name" sizeX="115" editable="true" label="@New Group Name :" isTextId="true"/></frame>
+<frame posn="120 -3 1" hidden="{hideNotAllPerms}"><exp:button sizeX="32" sizeY="6" text="@Add" action="exp:eXpansion.AdminGroups:clickAddGroup" colorize="A54B4B" isTextId="true"/></frame>
+<frame posn="0 -13 1">
+    <label sizen="35 4" halign="left" valign="center" style="TextStaticSmall" textid="{@Group Name}"/>
+    <label posn="35 0 1.0E-5" sizen="40 4" halign="left" valign="center" style="TextStaticSmall" textid="{@Nb Players}"/>
+</frame>
+<frame posn="0 -12 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -7 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="155" sizeY="6"/>
+        <label id="column_0_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_0_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_0_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_0_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_0_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -13 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="155" sizeY="6"/>
+        <label id="column_1_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_1_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_1_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_1_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_1_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="155" sizeY="6"/>
+        <label id="column_2_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_2_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_2_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_2_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_2_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -25 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="155" sizeY="6"/>
+        <label id="column_3_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_3_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_3_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_3_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_3_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="155" sizeY="6"/>
+        <label id="column_4_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_4_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_4_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_4_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_4_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -37 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="155" sizeY="6"/>
+        <label id="column_5_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_5_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_5_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_5_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_5_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="155" sizeY="6"/>
+        <label id="column_6_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_6_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_6_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_6_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_6_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -49 0.0001" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="155" sizeY="6"/>
+        <label id="column_7_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_7_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_7_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_7_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_7_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="155" sizeY="6"/>
+        <label id="column_8_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_8_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_8_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_8_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_8_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -61 0.0001" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="155" sizeY="6"/>
+        <label id="column_9_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_9_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_9_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_9_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_9_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="155" sizeY="6"/>
+        <label id="column_10_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_10_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_10_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_10_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_10_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -73 0.0001" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="155" sizeY="6"/>
+        <label id="column_11_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_11_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_11_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_11_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_11_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_12">
+        <exp:listbg indexNumber="12" sizeX="155" sizeY="6"/>
+        <label id="column_12_0" sizen="43.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_1" posn="35 0 1.0E-5" sizen="18.75 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="50 0 1" scale="0.933333333"><exp:button sizeX="30" sizeY="6" text="@Player List" action="eXpOptimizedPagerAction" id="column_12_2" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="72.4 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Change Permissions" action="eXpOptimizedPagerAction" id="column_12_3" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="101.8 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="40" sizeY="6" text="@Delete Group" action="eXpOptimizedPagerAction" id="column_12_4" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        <frame posn="131.2 0 1" scale="0.933333333" hidden="{hideNotAllPerms}"><exp:button sizeX="30" sizeY="6" text="@Inherits" action="eXpOptimizedPagerAction" id="column_12_5" colorize="A54B4B" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <exp:optimizedpager sizeX="160" sizeY="83" itemsVarName="groupItems" dataVarName="groupData" rowsPerPage="13" itemsPerRow="2" varName="groupslist"/>
+</frame>

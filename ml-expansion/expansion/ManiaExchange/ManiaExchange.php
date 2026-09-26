@@ -10,7 +10,7 @@ use ManiaLivePlugins\eXpansion\Helpers\GBXChallMapFetcher;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
-use ManiaLivePlugins\eXpansion\ManiaExchange\Gui\Windows\MxSearch;
+use ManiaLivePlugins\eXpansion\Helpers\Storage as ExpStorage;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 use ManiaLivePlugins\eXpansion\Maps\Maps;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
@@ -43,6 +43,27 @@ class ManiaExchange extends ExpPlugin
     /** @var Window */
     private $mxInfosWindow;
 
+    /** @var Window */
+    private $mxUpdateWindow;
+
+    /** @var Window */
+    private $mxSearchWindow;
+
+    /** Number of maps asked to MX in a single request */
+    const MX_UPDATE_CHUNK_SIZE = 50;
+
+    /** Fields asked to the MX map api for the update window */
+    public static $mxUpdateFields = "fields=MapUid,MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name,UpdatedAt";
+
+    /** Fields asked to the MX map api for the search window */
+    public static $mxSearchFields = "fields=MapId,TitlePack,Environment,VehicleName,GbxMapName,Difficulty,MoodFull,Tags,Length,AwardCount,Uploader.Name";
+
+    /** Entries of the "style" dropdown of the search window, the index is the MX tag id */
+    public static $styleOptions = array("All", "Race", "Fullspeed", "Tech", "RPG", "LOL", "PressForward", "SpeedTech", "Multilap", "Offroad");
+
+    /** Entries of the "length" dropdown of the search window */
+    public static $lengthOptions = array("All", "0-15sec", "15-30sec", "30-45sec", "45-1min", "1min+");
+
     /** @var StdClass $mxInfo */
     public static $mxInfo = null;
     public static $mxReplays = array();
@@ -69,6 +90,11 @@ class ManiaExchange extends ExpPlugin
     public function eXpOnReady()
     {
         $this->registerManialinkCallback('mxSearch');
+        $this->registerManialinkCallback('mxSearchDo', true);
+        $this->registerManialinkCallback('mxSearchAuthor', true, true);
+        $this->registerManialinkCallback('addMap', false, true);
+        $this->registerManialinkCallback('mxVote', false, true);
+        $this->registerManialinkCallback('mxUpdateMap', false, true);
         
         $this->dataAccess = \ManiaLivePlugins\eXpansion\Core\DataAccess::getInstance();
         $this->registerChatCommand("mx", "chatMX", 2, true);
@@ -103,11 +129,6 @@ class ManiaExchange extends ExpPlugin
         $cmd->setMinParam(1);
         $this->cmd_pack = $cmd;
 
-        if ($this->isPluginLoaded('eXpansion\Menu')) {
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('ManiaExchange'), false);
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addItem', __('Search Maps'), null, array($this, 'mxSearch'), false);
-        }
-
         $this->enableDedicatedEvents();
 
         ManiaExchange::$openInfosAction = array($this, 'showMxInfos');
@@ -115,6 +136,15 @@ class ManiaExchange extends ExpPlugin
         $this->mxInfosWindow = new Window("ManiaExchange\Gui\Windows\MxInfos.xml");
         $this->mxInfosWindow->setName("MX Infos");
         $this->mxInfosWindow->setSize(220, 100);
+
+        $this->mxUpdateWindow = new Window("ManiaExchange\Gui\Windows\MxUpdate.xml");
+        $this->mxUpdateWindow->setName("MX Update");
+        $this->mxUpdateWindow->setSize(210, 100);
+
+        $this->mxSearchWindow = new Window("ManiaExchange\Gui\Windows\MxSearch.xml");
+        $this->mxSearchWindow->setName("MX Search");
+        $this->mxSearchWindow->setSize(210, 100);
+        $this->mxSearchWindow->setTitle('ManiaExchange');
 
         $this->onBeginMap(null, null, null);
     }
@@ -217,11 +247,6 @@ class ManiaExchange extends ExpPlugin
         if ($this->expStorage->simpleEnviTitle == "TM" && self::$mxReplays != null && count(self::$mxReplays) > 0 && $this->config->announceMxRecord) {
             $this->eXpChatSendServerMessage($this->msg_worldRec, $login, array(Time::fromTM(self::$mxReplays[0]->ReplayTime), self::$mxReplays[0]->Username));
         }
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        Gui\Windows\MxSearch::Erase($login);
     }
 
     public function showMxInfos($login)
@@ -476,24 +501,324 @@ class ManiaExchange extends ExpPlugin
             $this->eXpChatSendServerMessage("#error#You don't have permission to run this command.", $login);
             return;
         }
-        // clear mx maps cache
+        
         Maps::$dbMapsByUid = array();
 
-        $window = Gui\Windows\MxUpdate::Create($login);
-        $window->setMain($this);
-        $window->setTitle('Update Maps');
-        $window->setSize(210, 100);
-        $window->show();
+        $chunks = array_chunk($this->storage->maps, self::MX_UPDATE_CHUNK_SIZE);
+
+        if (empty($chunks)) {
+            $this->eXpChatSendServerMessage("#error#Not enough maps to check for updates.", $login);
+            return;
+        }
+
+        $this->eXpChatSendServerMessage("#mx#Recieving maps info, please wait...", $login);
+        $this->mxUpdateQuery($login, $chunks, 0, array());
+    }
+
+    private function mxUpdateQuery($login, $chunks, $index, $maps)
+    {
+        $uids = "";
+        foreach ($chunks[$index] as $map) {
+            $uids .= $map->uId . ",";
+        }
+
+        $key = $this->config->key ? "&key=" . $this->config->key : "";
+
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?' . self::$mxUpdateFields . "&uid=" . rtrim($uids, ",") . $key;
+
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
+
+        $this->dataAccess->httpCurl($query, array($this, "xMxUpdate"), array("login" => $login, "chunks" => $chunks, "index" => $index, "maps" => $maps), $options);
+    }
+
+    public function xMxUpdate($job, $jobData)
+    {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
+        $data = $job->getResponse();
+
+        $additionalData = $job->__additionalData;
+
+        $login  = $additionalData['login'];
+        $chunks = $additionalData['chunks'];
+        $index  = $additionalData['index'];
+        $maps   = $additionalData['maps'];
+
+        if ($code !== 200) {
+            $this->eXpChatSendServerMessage("#error#MX returned error code $code", $login);
+            return;
+        }
+
+        $json = json_decode($data, true);
+
+        if (!$json || !isset($json["Results"])) {
+            $this->eXpChatSendServerMessage("#error#Error while processing json data from MX.", $login);
+            return;
+        }
+
+        foreach ($json["Results"] as $map) {
+            $maps[] = MxMap::fromArray($map);
+        }
+
+        $index++;
+
+        if (array_key_exists($index, $chunks)) {
+            $this->eXpChatSendServerMessage("#mx#Processing chunk %s/%s", $login, array($index + 1, count($chunks)));
+            $this->mxUpdateQuery($login, $chunks, $index, $maps);
+            return;
+        }
+
+        $this->showMxUpdateResults($login, $maps);
+    }
+
+    private function showMxUpdateResults($login, $maps)
+    {
+        $mapsByUid = array();
+        foreach ($this->storage->maps as $map) {
+            $mapsByUid[$map->uId] = $map;
+        }
+
+        $mapDir = $this->connection->getMapsDirectory();
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+
+        foreach ($maps as $map) {
+            if (!array_key_exists($map->mapUid, $mapsByUid)) {
+                continue;
+            }
+
+            $fileCreated = filectime($mapDir . DIRECTORY_SEPARATOR . $mapsByUid[$map->mapUid]->fileName);
+            $mapUpdated  = strtotime($map->updatedAt);
+
+            if ($fileCreated > $mapUpdated) {
+                continue;
+            }
+
+            $pack = str_replace("TM", "", $map->titlePack);
+            if (empty($pack) || $pack == "TMAll") {
+                $pack = $map->getEnvironment();
+            }
+
+            $vehicle = "";
+            if ($map->vehicleName) {
+                $vehicle = str_replace("Car", "", $map->vehicleName);
+                $vehicle = ($vehicle == $pack) ? "" : "Car: " . $vehicle;
+            }
+
+            $items[$i] = array($pack, $map->gbxMapName, $map->getDifficulty(), $map->getStyle(), $vehicle, '$fff' . $map->getUploader(), $map->moodFull, $map->getLength(), $map->awardCount);
+            $data[$i] = array(-1, -1, -1, -1, -1, -1, -1, -1, -1, 'exp:eXpansion.ManiaExchange:mxUpdateMap:' . $map->mapId . ':' . $map->mapUid);
+            $i++;
+        }
+
+        if ($i <= 0) {
+            $this->eXpChatSendServerMessage("#mx#All maps up-to-date!", $login);
+            return;
+        }
+
+        $this->mxUpdateWindow->setTitle('Update Maps (%s)', array($i));
+        $this->mxUpdateWindow->setParam("mapItems",    $items);
+        $this->mxUpdateWindow->setParam("mapData",     $data);
+        $this->mxUpdateWindow->show($login);
+    }
+
+    public function mxUpdateMap($login, $target)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::MAP_ADD_MX)) {
+            $this->eXpChatSendServerMessage("#error#You don't have permission to run this command.", $login);
+            return;
+        }
+
+        $target = explode(':', str_replace('–', '-', $target), 2);
+        if (count($target) < 2) {
+            return;
+        }
+
+        $mapId  = (int)$target[0];
+        $mapUid = $target[1];
+
+        $map = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $mapUid);
+        if ($map) {
+            $this->connection->removeMap($map->fileName);
+        }
+
+        $this->addMap($login, $mapId);
     }
 
     public function mxSearch($login, $search = "", $author = "")
     {
-        $window = Gui\Windows\MxSearch::Create($login);
-        $window->setPlugin($this);
-        $window->search($login, $search, $author);
-        $window->setSize(210, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $this->mxSearchRun($login, $search, $author, 0, 0, false);
+    }
+
+    public function mxSearchDo($login, $params = array())
+    {
+        $this->mxSearchRun(
+            $login,
+            isset($params['mapName']) ? $params['mapName'] : "",
+            isset($params['author']) ? $params['author'] : "",
+            isset($params['style']) ? intval($params['style']) : 0,
+            isset($params['length']) ? intval($params['length']) : 0,
+            isset($params['filterAllPacks']) && $params['filterAllPacks'] == '1'
+        );
+    }
+
+    public function mxSearchAuthor($login, $author, $params = array())
+    {
+        $this->mxSearchRun(
+            $login,
+            isset($params['mapName']) ? $params['mapName'] : "",
+            str_replace('–', '-', $author),
+            isset($params['style']) ? intval($params['style']) : 0,
+            isset($params['length']) ? intval($params['length']) : 0,
+            isset($params['filterAllPacks']) && $params['filterAllPacks'] == '1'
+        );
+    }
+
+    private function mxSearchRun($login, $trackname, $author, $styleIdx, $lengthIdx, $filter)
+    {
+        $this->showMxSearch($login, array(), array(), $styleIdx, $lengthIdx, $filter, $trackname, $author, "Searching, please wait");
+
+        $out = "";
+        if ($trackname != "") {
+            $out .= "&name=" . rawurlencode($trackname);
+        }
+        if ($author != "") {
+            $out .= "&author=" . rawurlencode($author);
+        }
+        if ($styleIdx > 0) {
+            $out .= "&tag=" . $styleIdx;
+        }
+
+        if ($this->expStorage->simpleEnviTitle != ExpStorage::TITLE_SIMPLE_SM) {
+            switch ($lengthIdx) {
+                case 1:
+                    $out .= "&lengthmin=0&lengthmax=15000";
+                    break;
+                case 2:
+                    $out .= "&lengthmin=15000&lengthmax=30000";
+                    break;
+                case 3:
+                    $out .= "&lengthmin=30000&lengthmax=45000";
+                    break;
+                case 4:
+                    $out .= "&lengthmin=45000&lengthmax=60000";
+                    break;
+                case 5:
+                    $out .= "&lengthmin=60000";
+                    break;
+            }
+        }
+
+        if (!$filter) {
+            $titlePack = explode("@", $this->expStorage->titleId);
+            $out .= "&titlepack=" . $titlePack[0];
+        }
+
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?' . self::$mxSearchFields . "&" . $out . '&order1=0&count=200' . $this->getKey(true);
+
+        $options = array(CURLOPT_CONNECTTIMEOUT => 20, CURLOPT_TIMEOUT => 30, CURLOPT_HTTPHEADER => array("Content-Type" => "application/json"));
+
+        $this->dataAccess->httpCurl($query, array($this, "xMxSearch"), array("login" => $login, "styleIdx" => $styleIdx, "lengthIdx" => $lengthIdx, "filter" => $filter, "searchMapName" => $trackname, "searchAuthor" => $author), $options);
+    }
+
+    /**
+     * Answer of a search request.
+     *
+     * @param Curl $job
+     * @param      $jobData
+     */
+    public function xMxSearch($job, $jobData)
+    {
+        $info = $job->getCurlInfo();
+        $code = $info['http_code'];
+        $data = $job->getResponse();
+
+        $additionalData = $job->__additionalData;
+
+        $login     = $additionalData['login'];
+        $styleIdx  = $additionalData['styleIdx'];
+        $lengthIdx = $additionalData['lengthIdx'];
+        $filter    = $additionalData['filter'];
+        $searchMapName = $additionalData['searchMapName'];
+        $searchAuthor  = $additionalData['searchAuthor'];
+
+        if ($code !== 200) {
+            $this->showMxSearch($login, array(), array(), $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor, "search returned a http error " . $code);
+            return;
+        }
+
+        if (!$data) {
+            $this->showMxSearch($login, array(), array(), $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor, "search returned no data");
+            return;
+        }
+
+        $json = json_decode($data, true);
+
+        if (isset($json[0]) && !isset($json['Results'])) {
+            $json = array('Results' => $json);
+        }
+
+        if (!$json || !array_key_exists("Results", $json)) {
+            $this->showMxSearch($login, array(), array(), $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor, "Error while processing json data from MX.");
+            return;
+        }
+
+        $maps = MxMap::fromArrayOfArray($json['Results']);
+
+        if (empty($maps)) {
+            $this->showMxSearch($login, array(), array(), $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor, "No maps found with this search terms.");
+            return;
+        }
+
+        $items = array();
+        $rows  = array();
+        $i     = 0;
+
+        foreach ($maps as $map) {
+            $pack = str_replace("TM", "", $map->titlePack);
+            if (empty($pack) || $pack == "TMAll") {
+                $pack = $map->getEnvironment();
+            }
+
+            $vehicle = "";
+            if ($map->vehicleName) {
+                $vehicle = str_replace("Car", "", $map->vehicleName);
+                $vehicle = ($vehicle == $pack) ? "" : "Car: " . $vehicle;
+            }
+
+            $items[$i] = array($pack, $map->gbxMapName, $map->getDifficulty(), $map->getStyle(), $vehicle, '$fff' . $map->getUploader(), $map->moodFull, $map->getLength(), $map->awardCount);
+            $rows[$i] = array(
+                -1, -1, -1, -1, -1,
+                'exp:eXpansion.ManiaExchange:mxSearchAuthor:' . $map->getUploader(),
+                -1, -1, -1,
+                'exp:eXpansion.ManiaExchange:mxVote:' . $map->mapId,
+                'exp:eXpansion.ManiaExchange:addMap:' . $map->mapId,
+                'exp:eXpansion.MapSuggestion:addMapToWish:' . $map->mapId,
+            );
+            $i++;
+        }
+
+        $this->showMxSearch($login, $items, $rows, $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor);
+    }
+
+    private function showMxSearch($login, $items, $rows, $styleIdx, $lengthIdx, $filter, $searchMapName, $searchAuthor, $notice = null)
+    {
+        $this->mxSearchWindow->setParam("styleOptions",   self::$styleOptions);
+        $this->mxSearchWindow->setParam("lengthOptions",  self::$lengthOptions);
+        $this->mxSearchWindow->setParam("styleSelected",  $styleIdx);
+        $this->mxSearchWindow->setParam("lengthSelected", $lengthIdx);
+        $this->mxSearchWindow->setParam("filterAllPacks", $filter);
+        $this->mxSearchWindow->setParam("hideInstall",    !AdminGroups::hasPermission($login, Permission::MAP_ADD_MX));
+        $this->mxSearchWindow->setParam("hideQueue",      !$this->config->mxVote_enable);
+        $this->mxSearchWindow->setParam("mapItems",       $items);
+        $this->mxSearchWindow->setParam("mapData",        $rows);
+        $this->mxSearchWindow->setParam("searchMapName",  $searchMapName);
+        $this->mxSearchWindow->setParam("searchAuthor",   $searchAuthor);
+        $this->mxSearchWindow->setParam("noticeText",     $notice);
+        $this->mxSearchWindow->setParam("hideNotice",     empty($notice));
+        $this->mxSearchWindow->setParam("hideSuggest",    ($this->isPluginLoaded("\\ManiaLivePlugins\\eXpansion\\MapSuggestion\\MapSuggestion")) ? false : true);
+        $this->mxSearchWindow->show($login);
     }
 
     public function addMap($login, $mxId)
@@ -875,11 +1200,18 @@ class ManiaExchange extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        MxSearch::EraseAll();
+        if ($this->mxSearchWindow instanceof Window) {
+            $this->mxSearchWindow->erase();
+        }
+        $this->mxSearchWindow = null;
         if ($this->mxInfosWindow instanceof Window) {
             $this->mxInfosWindow->erase();
         }
         $this->mxInfosWindow = null;
+        if ($this->mxUpdateWindow instanceof Window) {
+            $this->mxUpdateWindow->erase();
+        }
+        $this->mxUpdateWindow = null;
         AdminGroups::removeAdminCommand($this->cmd_add);
         AdminGroups::removeAdminCommand($this->cmd_update);
         AdminGroups::removeAdminCommand($this->cmd_random);

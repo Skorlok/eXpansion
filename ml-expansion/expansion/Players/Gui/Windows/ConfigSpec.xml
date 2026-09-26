@@ -1,0 +1,27 @@
+<label posn="30 5 1" sizen="82 4" style="TextStaticSmall" halign="center" textsize="1.5" textid="{@Target to watch:}"/>
+<label posn="30 -1 1" sizen="78 4" style="TextStaticSmall" textsize="1.2" halign="center" text="{specTargetName}"/>
+<frame posn="0 -9 1"><exp:button sizeX="35" sizeY="6" text="@Select target" action="exp:eXpansion.Players:configSpecSelectTarget:{playerLogin}" isTextId="true"/></frame>
+<frame posn="32 -9 1"><exp:button sizeX="35" sizeY="6" text="@Automatic target" action="exp:eXpansion.Players:configSpecSelectAutomaticTarget:{playerLogin}" isTextId="true"/></frame>
+
+<label posn="0 -18 1" sizen="82 4" style="TextStaticSmall" textsize="1.2" textid="{@Camera}"/>
+<frame posn="2 -24 1"><exp:ratiobutton group="camtype" index="0" entryName="cam_unchanged" active="{camUnchanged}" textWidth="55" text="@Unchanged" isTextId="true"/></frame>
+<frame posn="2 -28 1"><exp:ratiobutton group="camtype" index="1" entryName="cam_free" active="{camFree}" textWidth="55" text="@Free" isTextId="true"/></frame>
+<frame posn="2 -32 1"><exp:ratiobutton group="camtype" index="2" entryName="cam_replay" active="{camReplay}" textWidth="55" text="@Replay" isTextId="true"/></frame>
+<frame posn="2 -36 1"><exp:ratiobutton group="camtype" index="3" entryName="cam_follow" active="{camFollow}" textWidth="55" text="@Follow" isTextId="true"/></frame>
+
+<label posn="35 -18 1" sizen="82 4" style="TextStaticSmall" textsize="1.2" textid="{@Status}"/>
+<frame posn="34 -24 1"><exp:checkbox name="status_forcespec" active="{statusForceSpec}" textWidth="55" text="@Force spectator" isTextId="true"/></frame>
+
+<frame posn="14 -45 1"><exp:button sizeX="40" sizeY="6" text="@Apply" colorize="0a0" action="exp:eXpansion.Players:applyConfigSpec:{playerLogin}:{specTargetLogin}" isTextId="true"/></frame>
+
+
+<frame posn="0 -65 1">
+    <label posn="30 5 1" sizen="82 4" style="TextStaticSmall" halign="center" textsize="1.5" textid="{@Quick actions}"/>
+
+    <frame posn="1.5 -2 1"><exp:button sizeX="35" sizeY="6" text="@Set Spectator" action="exp:eXpansion.Players:setSpectator:{playerLogin}" isTextId="true"/></frame>
+    <frame posn="30.5 -2 1"><exp:button sizeX="35" sizeY="6" text="@Set Player" action="exp:eXpansion.Players:setPlayer:{playerLogin}" isTextId="true"/></frame>
+    <frame posn="1.5 -8 1"><exp:button sizeX="35" sizeY="6" text="@Force Spectator" action="exp:eXpansion.Players:forceSpectator:{playerLogin}" isTextId="true"/></frame>
+    <frame posn="30.5 -8 1"><exp:button sizeX="35" sizeY="6" text="@Force Player" action="exp:eXpansion.Players:forcePlayer:{playerLogin}" isTextId="true"/></frame>
+    
+    <label posn="30 -13 0" sizen="60 4" style="TextStaticSmall" halign="center" autonewline="1" textemboss="1" textsize="0.5" textid="{@Note: forced players/spectators cannot move themselves to spectator or player mode.}"/>
+</frame>

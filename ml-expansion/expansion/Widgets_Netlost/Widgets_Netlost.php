@@ -21,12 +21,15 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
+        /** @var Config */
         $this->config = Config::getInstance();
         Dispatcher::register(AdminGroupEvent::getClass(), $this);
 
         $this->widget = new Widget("Widgets_Netlost\Gui\Widgets\Netlost.xml");
         $this->widget->setName("Netlost Widget");
         $this->widget->setLayer("normal");
+        $this->widget->setSize(200, 12);
+        $this->widget->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY, 0);
         $this->widget->registerScript(new Script('Widgets_Netlost\Gui\Scripts_Netlost'));
 
         $this->displayWidget();
@@ -133,7 +136,6 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
             }
         }
 
-        $this->widget->setSize(200, 12);
         $this->widget->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY, 0);
         $this->widget->show($recepient);
     }
@@ -144,6 +146,7 @@ class Widgets_Netlost extends ExpPlugin implements \ManiaLivePlugins\eXpansion\A
             if (Config::getInstance()->showOnlyAdmins && !in_array($login, AdminGroups::getInstance()->get())) {
                 return;
             }
+            $this->widget->setPosition($this->config->netlostWidget_PosX, $this->config->netlostWidget_PosY, 0);
             $this->widget->show($login);
         }
     }
