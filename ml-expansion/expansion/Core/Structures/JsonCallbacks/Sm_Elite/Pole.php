@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\Structures\JsonCallbacks;
 
-class Pole extends ManiaLiveDedicatedApiStructuresAbstractStructure
+class Pole extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {
 
     /** @var string */

@@ -74,19 +74,24 @@ final class ActionManager extends \ManiaLib\Utils\Singleton implements ServerLis
 			$callable = $callback[0];
 			$args     = $callback[1];
 			if (is_array($callable) && isset($callable[0]) && is_object($callable[0])) {
-				// Use spl_object_hash for every object arg — serializing large objects (e.g. Map)
+				// Use the object id for every object arg — serializing large objects (e.g. Map)
 				// was costing ~1 KB per key string, totalling ~70 MB for 70k callbacks.
 				$argsKey = '';
 				foreach ($args as $arg) {
-					$argsKey .= is_object($arg) ? spl_object_hash($arg) : serialize($arg);
+					$argsKey .= is_object($arg) ? $this->getObjectId($arg) : serialize($arg);
 					$argsKey .= '|';
 				}
-				return spl_object_hash($callable[0]) . '::' . (string)$callable[1] . '::' . $argsKey;
+				return $this->getObjectId($callable[0]) . '::' . (string)$callable[1] . '::' . $argsKey;
 			}
 			return serialize($callback);
 		} catch (\Exception $e) {
 			return null;
 		}
+	}
+
+	private function getObjectId($object)
+	{
+		return PHP_VERSION_ID >= 70200 ? spl_object_id($object) : spl_object_hash($object);
 	}
 
 	public function onPlayerManialinkPageAnswer($playerUid, $login, $answer, array $entries)

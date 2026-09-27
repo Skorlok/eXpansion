@@ -42,7 +42,7 @@ abstract class Job
      * @return string
      */
     public function getId() {
-        return md5(spl_object_hash($this));
+        return md5(PHP_VERSION_ID >= 70200 ? spl_object_id($this) : spl_object_hash($this));
     }
 
     /**

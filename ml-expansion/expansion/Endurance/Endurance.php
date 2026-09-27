@@ -440,7 +440,7 @@ class Endurance extends ExpPlugin implements EnduroListener
 			$this->console("No read ".$csv_file." access");
 			return;
 		}
-		$header = fgetcsv($handle_read, 1000, ";");
+		$header = fgetcsv($handle_read, 1000, ";", '"', '\\');
 		if ($header[0] != "\xEF\xBB\xBFnickname" || $header[1] != "login" || end($header) != "best_total_points") {
 			$this->eXpChatSendServerMessage('$z$s$FF0> [$F00ERROR$FF0] $f00$i' . 'Invalid CSV format, created new one automatically', $fromLogin);
 			$this->console('Invalid CSV format, created new one automatically');
@@ -458,10 +458,10 @@ class Endurance extends ExpPlugin implements EnduroListener
 		}
 		$number = count($header)-3;
 		array_splice($header, -2, 0, array("#".$number));
-		fputcsv($handle_write, $header, ";");
+		$this->write_csv_line($handle_write, $header);
 		$this->eXpChatSendServerMessage('$z$s$FF0> [$F00INFO$FF0] $zSaving '.$type_points.' (#'.$number.')...', $fromLogin);
 		$csv_points = array();
-		while (($data = fgetcsv($handle_read, 1000, ";")) !== false) {
+		while (($data = fgetcsv($handle_read, 1000, ";", '"', '\\')) !== false) {
 			$csv_points[$data[1]] = array_slice($data, 0, -2);
 		}
 		fclose($handle_read);
@@ -497,13 +497,13 @@ class Endurance extends ExpPlugin implements EnduroListener
 				$i++;
 			}
 			$this->calculate_total_and_best_points($data, $number);
-			fputcsv($handle_write, $data, ";");
+			$this->write_csv_line($handle_write, $data);
 			unset($csv_points[$plogin]);
 		}
 		foreach ($csv_points as $key => &$data) {
 			$data[] = "0";
 			$this->calculate_total_and_best_points($data, $number);
-			fputcsv($handle_write, $data, ";");
+			$this->write_csv_line($handle_write, $data);
 		}
 		fclose($handle_write);
 		if (rename($csv_file.'.temp',$csv_file) === false) {
@@ -526,16 +526,16 @@ class Endurance extends ExpPlugin implements EnduroListener
 
 		if (!file_exists($csv_file)) return;
 		if (($handle_read = fopen($csv_file,'r')) !== false && ($handle_write = fopen($csv_file.'.temp','w')) !== false) {
-			$header = fgetcsv($handle_read, 1000, ";");
+			$header = fgetcsv($handle_read, 1000, ";", '"', '\\');
 			$key = count($header)-3;
 			if ($key < 2) return;
 			unset($header[$key]);
-			fputcsv($handle_write, $header, ";");
-			while (($data = fgetcsv($handle_read, 1000, ";")) !== false){
+			$this->write_csv_line($handle_write, $header);
+			while (($data = fgetcsv($handle_read, 1000, ";", '"', '\\')) !== false){
 				$new_data = array_slice($data, 0, -2);
 				unset($new_data[$key]);
 				$this->calculate_total_and_best_points($new_data, $key-2);
-				fputcsv($handle_write, $new_data, ";");
+				$this->write_csv_line($handle_write, $new_data);
 			}
 			fclose($handle_read);
 			fclose($handle_write);
@@ -624,6 +624,14 @@ class Endurance extends ExpPlugin implements EnduroListener
 			$best_points = $total_points-$worst_two;
 		}
 		$data[] = $best_points;
+	}
+
+	private function write_csv_line($handle, $fields)
+	{
+		if (PHP_VERSION_ID >= 50504) {
+			return fputcsv($handle, $fields, ";", '"', '\\');
+		}
+		return fputcsv($handle, $fields, ";");
 	}
 	
 	public function onEnduranceScoresUpdated($update)

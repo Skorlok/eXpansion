@@ -30,7 +30,7 @@ abstract class Dispatcher
 
     public static function register($eventClass, Listener $listener, $events = Event::ALL, $priority = null)
     {
-        $listenerId = spl_object_hash($listener);
+        $listenerId = self::getListenerId($listener);
 
         if (!isset(self::$eventsByClass[$eventClass])) {
             $rc = new \ReflectionClass($eventClass);
@@ -58,7 +58,7 @@ abstract class Dispatcher
 
     public static function unregister($eventClass, Listener $listener, $events = Event::ALL)
     {
-        $listenerId = spl_object_hash($listener);
+        $listenerId = self::getListenerId($listener);
 
 
         if (isset(self::$eventsByClass[$eventClass]))
@@ -81,7 +81,7 @@ abstract class Dispatcher
                             $vars = $plist->current();
                             $listener = $vars["data"];
                             $priority = $vars["priority"];
-                            if(spl_object_hash($listener) != $listenerId){
+                            if(self::getListenerId($listener) != $listenerId){
                                 $newPriority->insert($listener, $priority);
                             }
                             $plist->next();
@@ -138,6 +138,11 @@ abstract class Dispatcher
                 } catch (\Exception $e) {
                     ErrorHandling::processModuleException($e);
                 }
+    }
+
+    private static function getListenerId($listener)
+    {
+        return PHP_VERSION_ID >= 70200 ? spl_object_id($listener) : spl_object_hash($listener);
     }
 }
 

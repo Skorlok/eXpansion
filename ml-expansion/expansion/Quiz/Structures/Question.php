@@ -44,8 +44,6 @@ class Question
     {
         $this->asker = $player;
         $this->question = $question;
-
-        return $this;
     }
 
     /**

@@ -105,7 +105,9 @@ class Overlay_TeamScores extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
         $output = curl_exec($ch);
-        curl_close($ch);
+        if (PHP_VERSION_ID < 80000) {
+            curl_close($ch);
+        }
         $xml = simplexml_load_string($output);
         $this->teams[$team]->name = $xml->name;
         $this->showWidget();

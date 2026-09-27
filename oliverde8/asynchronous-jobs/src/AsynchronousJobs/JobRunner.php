@@ -71,7 +71,7 @@ class JobRunner
      */
     protected function __construct($id)
     {
-        $this->_id = $id ?: md5(spl_object_hash($this) . microtime(true));
+        $this->_id = $id ?: md5($this->_getObjectId($this) . microtime(true));
 
         // proc_open require shell before 7.4, so if php < 7.4, we check if shell is available, otherwise we fallback to direct execution.
         $this->exec = function_exists('proc_open') && (version_compare(PHP_VERSION, '7.4', '>=') || (file_exists('/bin/sh') && is_executable('/bin/sh')));
@@ -102,6 +102,15 @@ class JobRunner
             return $fp;
         }
         return false;
+    }
+
+    /**
+     * @param object $object
+     * @return int|string
+     */
+    private function _getObjectId($object)
+    {
+        return PHP_VERSION_ID >= 70200 ? spl_object_id($object) : spl_object_hash($object);
     }
 
     /**
@@ -206,7 +215,7 @@ class JobRunner
                 fclose($pipe);
             }
 
-            $jobHash = spl_object_hash($job);
+            $jobHash = $this->_getObjectId($job);
 
             $this->runningJobs[$jobHash] = array(
                 'process' => $process,
@@ -237,7 +246,7 @@ class JobRunner
      */
     protected function _getJobResult(Job $job)
     {
-        $jobHash = spl_object_hash($job);
+        $jobHash = $this->_getObjectId($job);
 
         if (!isset($this->runningJobs[$jobHash])) {
             return true;

@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\Structures\JsonCallbacks;
 
-class Player extends ManiaLiveDedicatedApiStructuresAbstractStructure
+class Player extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {
 
     /** @var string */

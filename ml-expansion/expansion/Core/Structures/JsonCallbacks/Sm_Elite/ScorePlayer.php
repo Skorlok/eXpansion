@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\Structures\JsonCallbacks;
 
-class ScorePlayer extends ManiaLiveDedicatedApiStructuresAbstractStructure
+class ScorePlayer extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {
 
     /** @var string */
