@@ -711,8 +711,11 @@ class AdminGroups extends ExpPlugin
      */
     public static function hasPermission($login, $permissionName)
     {
-
-        self::$permissionList[$permissionName] = true;
+        if (!is_null($permissionName)) {
+            self::$permissionList[$permissionName] = true;
+        } else {
+            return true;
+        }
 
         //Is this player an Admin
         if (isset(self::$admins[$login])) {
