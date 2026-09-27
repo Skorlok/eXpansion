@@ -57,7 +57,6 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $msg_errorImageType = "";
 
     private $cmd_reset;
-    private $cmd_points;
 
     /** @var Window */
     private $questionWindow;
@@ -780,6 +779,5 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->widget = null;
 
         AdminGroups::removeAdminCommand($this->cmd_reset);
-        AdminGroups::removeAdminCommand($this->cmd_points);
     }
 }
