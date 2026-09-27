@@ -28,7 +28,7 @@ abstract class Container extends \ManiaLib\Gui\Component
 	{
 		if($component instanceof Containable)
 			$component->onIsAdded($this);
-		$this->components[spl_object_hash($component)] = $component;
+		$this->components[PHP_VERSION_ID >= 70200 ? spl_object_id($component) : spl_object_hash($component)] = $component;
 	}
 	
 	/**
@@ -62,7 +62,7 @@ abstract class Container extends \ManiaLib\Gui\Component
 	 */
 	function removeComponent(Drawable $component)
 	{
-		$hash = spl_object_hash($component);
+		$hash = PHP_VERSION_ID >= 70200 ? spl_object_id($component) : spl_object_hash($component);
 		
 		if(isset($this->components[$hash]))
 		{

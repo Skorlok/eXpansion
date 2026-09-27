@@ -65,7 +65,7 @@ abstract class Control extends Container implements Drawable, Containable
      */
     function onIsAdded(Container $target)
     {
-        $this->parents[spl_object_hash($target)] = $target;
+        $this->parents[PHP_VERSION_ID >= 70200 ? spl_object_id($target) : spl_object_hash($target)] = $target;
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class Control extends Container implements Drawable, Containable
      */
     function onIsRemoved(Container $target)
     {
-        unset($this->parents[spl_object_hash($target)]);
+        unset($this->parents[PHP_VERSION_ID >= 70200 ? spl_object_id($target) : spl_object_hash($target)]);
     }
 
     /**

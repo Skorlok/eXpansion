@@ -116,7 +116,7 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
         $item->setAlign("left", "top");
         $item->setScriptEvents();
         $item->addComponent($component);
-        $hash = spl_object_hash($item);
+        $hash = PHP_VERSION_ID >= 70200 ? spl_object_id($item) : spl_object_hash($item);
         $this->items[$hash] = $item;
         $this->pager->addComponent($this->items[$hash]);
     }
@@ -131,7 +131,7 @@ class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLiv
 
     public function removeItem(\ManiaLib\Gui\Component $item)
     {
-        $hash = spl_object_hash($item);
+        $hash = PHP_VERSION_ID >= 70200 ? spl_object_id($item) : spl_object_hash($item);
         $this->pager->removeComponent($this->items[$hash]);
         $this->items[$hash]->destroy();
         unset($this->items[$hash]);

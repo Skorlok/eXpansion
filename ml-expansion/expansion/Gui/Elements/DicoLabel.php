@@ -40,7 +40,7 @@ class DicoLabel extends \ManiaLib\Gui\Elements\Label
         if ($text instanceof \ManiaLivePlugins\eXpansion\Core\I18n\Message) {
             $text->setArgs($args);
             $this->messages = $text->getMultiLangArray();
-            $this->setTextid('x' . md5(spl_object_hash($this)));
+            $this->setTextid('x' . md5(PHP_VERSION_ID >= 70200 ? spl_object_id($this) : spl_object_hash($this)));
         } elseif (is_string($text)) {
             parent::setText($text);
         }
