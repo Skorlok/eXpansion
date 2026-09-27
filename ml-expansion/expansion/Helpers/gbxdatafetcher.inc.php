@@ -371,7 +371,10 @@ class GBXBaseFetcher
             );
         }
 
-        xml_parser_free($xml_parser);
+        // breaks on PHP 8.5
+        if (PHP_VERSION_ID < 80000) {
+            xml_parser_free($xml_parser);
+        }
     }
 
     /**
