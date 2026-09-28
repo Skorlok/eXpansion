@@ -34,7 +34,8 @@ class PlainWidget extends \ManiaLive\Gui\Window
     private function detectElements($components)
     {
         foreach ($components as $index => $component) {
-            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel) {
+            // a DicoLabel with a plain string has no textid (null offset is deprecated since PHP 8.5) and no messages
+            if ($component instanceof \ManiaLivePlugins\eXpansion\Gui\Elements\DicoLabel && $component->getTextid() !== null) {
                 $this->dicoMessages[$component->getTextid()] = $component->getMessages();
             }
 

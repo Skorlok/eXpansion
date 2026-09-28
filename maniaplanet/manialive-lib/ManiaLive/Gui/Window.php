@@ -228,7 +228,9 @@ abstract class Window extends Container implements TickListener
     final private function __construct($recipient, $args = array())
     {
         $this->recipient = $recipient;
-        $this->id = PHP_VERSION_ID >= 70200 ? spl_object_id($this) : spl_object_hash($this);
+        // spl_object_hash() is deprecated since PHP 8.6, this is exactly what it returns since PHP 8.1.
+        // The id must stay a string: GuiHandler::prepareWindows() uses is_string() to detect windows to hide.
+        $this->id = PHP_VERSION_ID >= 70200 ? sprintf('%016x0000000000000000', spl_object_id($this)) : spl_object_hash($this);
         if ($this->recipient instanceof Group) {
             foreach ($this->recipient as $login) {
                 $this->visibilities[(string)$login] = false;
