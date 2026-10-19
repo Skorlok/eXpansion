@@ -6,7 +6,6 @@ use DirectoryIterator;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Faq\Gui\Windows\FaqWidget;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
 use ManiaLivePlugins\eXpansion\Menu\Menu;
@@ -53,8 +52,6 @@ class Faq extends ExpPlugin
         $this->registerChatCommand("faq", "showFaq", 0, true);
         $this->registerChatCommand("faq", "showFaq", 1, true);
         $this->registerChatCommand("faq", "showFaq", 2, true);
-
-        FaqWidget::$mainPlugin = $this;
 
         $this->faqWindow = new Window("Faq\\Gui\\Windows\\FaqWindow.xml");
         $this->faqWindow->setName("Faq Help");

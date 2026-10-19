@@ -3,10 +3,10 @@
 namespace ManiaLivePlugins\eXpansion\SM_EventHelper;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\SM_EventHelper\Gui\EventHelper;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 /*
  * Copyright (C) 2014 Reaby
@@ -32,35 +32,52 @@ use ManiaLivePlugins\eXpansion\SM_EventHelper\Gui\EventHelper;
  */
 class SM_EventHelper extends ExpPlugin
 {
-
+    /** @var ManiaLink */
     private $widget;
+
+    /** @var Script */
+    private $script;
 
     public function eXpOnReady()
     {
-        $aHandler = ActionHandler::getInstance();
-
-        EventHelper::$actions['checkpoint'] = $aHandler->createAction(array($this, "invokeCheckpoint"));
-        EventHelper::$actions['finish'] = $aHandler->createAction(array($this, "invokeFinish"));
-
         $this->enableDedicatedEvents();
-        $this->widget = EventHelper::Create(null);
-        $this->widget->show();
+
+        $this->registerManialinkCallback('invokeCheckpoint', true);
+        $this->registerManialinkCallback('invokeFinish', true);
+
+        $this->script = new Script('SM_EventHelper\Gui\Script');
+        $this->script->setParam("cpAction", 'exp:eXpansion.SM_EventHelper:invokeCheckpoint');
+        $this->script->setParam("finishAction", 'exp:eXpansion.SM_EventHelper:invokeFinish');
+
+        $this->widget = new ManiaLink('SM_EventHelper\Gui\EventHelper.xml');
+        $this->widget->setName("EventHelper");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition(0, 900, -60);
+        $this->widget->setScripts($this->script);
+
+        $this->showWidget();
+    }
+
+    private function showWidget()
+    {
+        $this->script->setParam("cpCount", $this->storage->currentMap->nbCheckpoints);
+        $this->widget->show(null, true);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        $this->widget->hide();
+        $this->widget->erase();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        $this->widget->show();
+        $this->showWidget();
     }
 
     public function invokeCheckpoint($login, $entries)
     {
-        $timeOrScore = $entries['timeOrScore'];
-        $cpIndex = $entries['index'];
+        $timeOrScore = isset($entries['timeOrScore']) ? $entries['timeOrScore'] : null;
+        $cpIndex = isset($entries['index']) ? $entries['index'] : null;
 
         Dispatcher::dispatch(
             // login  , #id   , time  ,  index ,  endblock, , laptime, lapCpIndex, lapEnd
@@ -73,9 +90,9 @@ class SM_EventHelper extends ExpPlugin
 
     public function invokeFinish($login, $entries)
     {
+        $timeOrScore = isset($entries['timeOrScore']) ? $entries['timeOrScore'] : null;
+        $cpIndex = isset($entries['index']) ? $entries['index'] : null;
 
-        $timeOrScore = $entries['timeOrScore'];
-        $cpIndex = $entries['index'];
         Dispatcher::dispatch(
             // login  , #id      , time  ,  index ,  endblock, , laptime, lapCpIndex, lapEnd
             new ScriptmodeEvent(
@@ -87,12 +104,15 @@ class SM_EventHelper extends ExpPlugin
 
     public function onBeginMatch()
     {
-        $this->widget->show();
+        $this->showWidget();
     }
 
     public function eXpOnUnload()
     {
+        if ($this->widget instanceof ManiaLink) {
+            $this->widget->erase();
+        }
         $this->widget = null;
-        EventHelper::EraseAll();
+        $this->script = null;
     }
 }

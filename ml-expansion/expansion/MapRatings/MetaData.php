@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\MapRatings;
 
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\BoundedTypeInt;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\ColorCode;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
@@ -96,6 +97,21 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
 
         $var = new TypeFloat("endMapRating_PosY", "Position of EndMapRating Widget Y", $config, false, false);
         $var->setDefaultValue(-42);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new ColorCode("colorUnder30", "Color of gauge for rating under 30%", $config, false, false);
+        $var->setDefaultValue('$0ad');
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new ColorCode("colorAbove30", "Color of gauge for rating above 30%", $config, false, false);
+        $var->setDefaultValue('$2af');
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new ColorCode("colorAbove60", "Color of gauge for rating above 60%", $config, false, false);
+        $var->setDefaultValue('$0cf');
         $var->setGroup("Widgets");
         $this->registerVariable($var);
 

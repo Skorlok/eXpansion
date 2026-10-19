@@ -60,17 +60,19 @@ class ExpSettingsController
 
     private function buildAndShow($login, $confName, $currentGroup, $sizeX = 140)
     {
+        $actionConf = $this->encodeConfName($confName);
         $groupVars  = $this->configManager->getGroupedVariables($confName);
         $groupsData = array();
         foreach ($groupVars as $gName => $vars) {
             $groupsData[] = array(
-                'name'     => $gName,
-                'action'   => 'exp:eXpansion.Core:expSettingsSwitchGroup:' . $confName . ':' . $gName . ':' . $sizeX,
+                'name'     => $this->window->handleSpecialChars($gName),
+                'posY'     => count($groupsData) * 6,
+                'action'   => 'exp:eXpansion.Core:expSettingsSwitchGroup:' . $actionConf . ':' . $gName . ':' . $sizeX,
                 'selected' => ($gName == $currentGroup),
             );
         }
 
-        $saveAction = 'exp:eXpansion.Core:expSettingsSave:' . $confName . ':' . $currentGroup . ':' . $sizeX;
+        $saveAction = 'exp:eXpansion.Core:expSettingsSave:' . $actionConf . ':' . $currentGroup . ':' . $sizeX;
 
         $settingsData = array();
         $i            = 0;
@@ -84,48 +86,72 @@ class ExpSettingsController
             $openAction  = null;
 
             if ($var->getDefaultValue() != null || $type == 'checkbox') {
-                $resetAction = 'exp:eXpansion.Core:expSettingsResetVar:' . $confName . ':' . $currentGroup . ':' . $var->getName() . ':' . $sizeX;
+                $resetAction = 'exp:eXpansion.Core:expSettingsResetVar:' . $actionConf . ':' . $currentGroup . ':' . $var->getName() . ':' . $sizeX;
             }
             if ($type == 'list') {
-                $openAction = 'exp:eXpansion.Core:expSettingsOpenWin:' . $confName . ':' . $currentGroup . ':' . $var->getName();
+                $openAction = 'exp:eXpansion.Core:expSettingsOpenWin:' . $actionConf . ':' . $currentGroup . ':' . $var->getName();
+            }
+
+            $value = ($type == 'list') ? '' : (string)$var->getRawValue();
+            if ($type == 'checkbox') {
+                $value = (bool)$value ? 'true' : 'false';
+            } else {
+                $value = $this->window->handleSpecialChars($value);
             }
 
             $settingsData[] = array(
                 'index'        => $i,
-                'type'         => $type,
-                'label'        => $var->getVisibleName(),
+                'isList'       => ($type == 'list'),
+                'isCheckbox'   => ($type == 'checkbox'),
+                'isColor'      => ($type == 'color'),
+                'label'        => $this->window->handleSpecialChars($var->getVisibleName()),
                 'varName'      => $var->getName(),
-                'value'        => ($type == 'list') ? '' : (string)$var->getRawValue(),
-                'previewValue' => $var->getPreviewValues(),
-                'desc'         => is_array($var->getDescription()) ? implode("\n", $var->getDescription()) : $var->getDescription(),
+                'value'        => $value,
+                'previewValue' => $this->window->handleSpecialChars($var->getPreviewValues()),
+                'desc'         => $this->window->handleSpecialChars(is_array($var->getDescription()) ? implode("\n", $var->getDescription()) : $var->getDescription()),
                 'descLines'    => is_array($var->getDescription()) ? count($var->getDescription()) : 1,
                 'isGlobal'     => $var->getIsGlobal(),
                 'resetAction'  => $resetAction,
                 'openAction'   => $openAction,
                 'colorDigits'  => ($var instanceof ColorCode) ? $var->getUseFullHex() : 3,
-                'colorPrefix'  => ($var instanceof ColorCode) ? $var->getUsePrefix()  : true,
+                'colorPrefix'  => (($var instanceof ColorCode) ? $var->getUsePrefix() : true) ? 'true' : 'false',
             );
             $i++;
         }
 
+        $colWidth   = (float)($sizeX / 4);
+        $pagerSizeX = (float)($sizeX * 3 / 4) - 3;
+
         $this->window->setSize($sizeX, 100);
-        $this->window->setParam("sizeX",      $sizeX);
-        $this->window->setParam("groups",     $groupsData);
-        $this->window->setParam("settings",   $settingsData);
-        $this->window->setParam("saveAction", $saveAction);
+        $this->window->setParam("colWidth",       $colWidth);
+        $this->window->setParam("pagerSizeX",     $pagerSizeX);
+        $this->window->setParam("itemBgWidth",    $pagerSizeX - 8);
+        $this->window->setParam("labelSizeX",     $pagerSizeX - 39);
+        $this->window->setParam("inputSizeX",     $pagerSizeX - 28);
+        $this->window->setParam("listChangePosX", $pagerSizeX - 31);
+        $this->window->setParam("listIconPosX",   $pagerSizeX - 39);
+        $this->window->setParam("listHelpPosX",   $pagerSizeX - 47);
+        $this->window->setParam("resetPosX",      $pagerSizeX - 22);
+        $this->window->setParam("helpPosX",       $pagerSizeX - 14);
+        $this->window->setParam("resetOnlyPosX",  $pagerSizeX - 15);
+        $this->window->setParam("menuBtnW",       $colWidth / 0.8);
+        $this->window->setParam("savePosX",       $sizeX - 34);
+        $this->window->setParam("groups",         $groupsData);
+        $this->window->setParam("settings",       $settingsData);
+        $this->window->setParam("saveAction",     $saveAction);
         $this->window->show($login);
     }
 
     public function switchGroup($login, $compound)
     {
-        list($confName, $groupName, $sizeX) = array_pad(explode(':', $compound, 3), 3, null);
+        list($confName, $groupName, $sizeX) = $this->parseCompound($compound, 3);
 
         $this->buildAndShow($login, $confName, $groupName, (int)$sizeX);
     }
 
     public function save($login, $compound, $params = array())
     {
-        list($confName, $groupName, $sizeX) = array_pad(explode(':', $compound, 3), 3, null);
+        list($confName, $groupName, $sizeX) = $this->parseCompound($compound, 3);
         $sizeX = (int)$sizeX;
 
         $groupVars = $this->configManager->getGroupedVariables($confName);
@@ -152,7 +178,7 @@ class ExpSettingsController
 
     public function resetVar($login, $compound)
     {
-        list($confName, $groupName, $varName, $sizeX) = array_pad(explode(':', $compound, 4), 4, null);
+        list($confName, $groupName, $varName, $sizeX) = $this->parseCompound($compound, 4);
         $sizeX = (int)$sizeX;
 
         $groupVars = $this->configManager->getGroupedVariables($confName);
@@ -166,7 +192,7 @@ class ExpSettingsController
 
     public function openWin($login, $compound)
     {
-        list($confName, $groupName, $varName) = array_pad(explode(':', $compound, 3), 3, null);
+        list($confName, $groupName, $varName) = $this->parseCompound($compound, 3);
 
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var) {
@@ -185,7 +211,7 @@ class ExpSettingsController
 
     public function addListValue($login, $compound, $params = array())
     {
-        list($confName, $groupName, $varName) = array_pad(explode(':', $compound, 3), 3, null);
+        list($confName, $groupName, $varName) = $this->parseCompound($compound, 3);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var) {
             return;
@@ -207,7 +233,7 @@ class ExpSettingsController
 
     public function removeListValue($login, $compound)
     {
-        list($confName, $groupName, $varName, $key) = array_pad(explode(':', $compound, 4), 4, null);
+        list($confName, $groupName, $varName, $key) = $this->parseCompound($compound, 4);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var) {
             return;
@@ -221,7 +247,7 @@ class ExpSettingsController
 
     public function confSwitcherLoad($login, $full)
     {
-        list($confName, $groupName, $varName, $dirToken, $fileName) = array_pad(explode(':', $full, 5), 5, null);
+        list($confName, $groupName, $varName, $dirToken, $fileName) = $this->parseCompound($full, 5);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var instanceof ConfigFile) {
             return;
@@ -235,7 +261,7 @@ class ExpSettingsController
 
     public function confSwitcherSave($login, $full)
     {
-        list($confName, $groupName, $varName, $dirToken, $fileName) = array_pad(explode(':', $full, 5), 5, null);
+        list($confName, $groupName, $varName, $dirToken, $fileName) = $this->parseCompound($full, 5);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var instanceof ConfigFile) {
             return;
@@ -247,7 +273,7 @@ class ExpSettingsController
 
     public function confSwitcherSelect($login, $full)
     {
-        list($confName, $groupName, $varName, $dirToken, $fileName) = array_pad(explode(':', $full, 5), 5, null);
+        list($confName, $groupName, $varName, $dirToken, $fileName) = $this->parseCompound($full, 5);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var instanceof ConfigFile) {
             return;
@@ -265,7 +291,7 @@ class ExpSettingsController
 
     public function confSwitcherSaveAs($login, $compound, $params = array())
     {
-        list($confName, $groupName, $varName) = array_pad(explode(':', $compound, 3), 3, null);
+        list($confName, $groupName, $varName) = $this->parseCompound($compound, 3);
         $var = $this->resolveVar($confName, $groupName, $varName);
         if (!$var instanceof ConfigFile) {
             return;
@@ -282,7 +308,7 @@ class ExpSettingsController
 
     private function showConfSwitcher($login, $confName, $groupName, $varName, ConfigFile $var)
     {
-        $compound = $confName . ':' . $groupName . ':' . $varName;
+        $compound = $this->encodeConfName($confName) . ':' . $groupName . ':' . $varName;
         $current  = $var->getRawValue() . '.user.exp';
         $helper   = Helper::getPaths();
 
@@ -330,10 +356,33 @@ class ExpSettingsController
         return isset($groupVars[$groupName][$varName]) ? $groupVars[$groupName][$varName] : null;
     }
 
+    private function encodeConfName($confName)
+    {
+        if (preg_match('/^\\\\ManiaLivePlugins(\\\\.+\\\\([^\\\\]+))\\\\\\2$/', $confName, $matches) && $this->decodeConfName($matches[1]) === $confName) {
+            return $matches[1];
+        }
+        return $confName;
+    }
+
+    private function decodeConfName($confName)
+    {
+        if ((string)$confName !== '' && $confName[0] === '\\' && strpos($confName, '\\ManiaLivePlugins\\') !== 0) {
+            return '\\ManiaLivePlugins' . $confName . substr($confName, strrpos($confName, '\\'));
+        }
+        return $confName;
+    }
+
+    private function parseCompound($compound, $count)
+    {
+        $parts    = array_pad(explode(':', $compound, $count), $count, null);
+        $parts[0] = $this->decodeConfName($parts[0]);
+        return $parts;
+    }
+
     private function showListWindow($login, $confName, $groupName, $varName, \ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $isHash   = $var instanceof HashList;
-        $compound = $confName . ':' . $groupName . ':' . $varName;
+        $compound = $this->encodeConfName($confName) . ':' . $groupName . ':' . $varName;
 
         $items = array();
         $data  = array();

@@ -4,7 +4,7 @@
     </frame>
     <frame posn="6 0 2.0E-5">
         <frame posn="0 -3 1">
-            <exp:button sizeX="32" sizeY="6" text="<?php echo $this->handleSpecialChars($this->getParam('targetPlayer') ? $this->getParam('targetPlayer') : 'Select...'); ?>" textcolor="fff" action="exp:eXpansion.PersonalMessages:players"/>
+            <exp:button sizeX="32" sizeY="6" text="{targetPlayer}" textcolor="fff" action="exp:eXpansion.PersonalMessages:players"/>
         </frame>
         <entry id="messagebox" posn="27.5 -0.5 1.0E-5" sizen="78 6" scale="0.8" halign="left" valign="top" style="" scriptevents="1" textcolor="fff" name="message"/>
     </frame>

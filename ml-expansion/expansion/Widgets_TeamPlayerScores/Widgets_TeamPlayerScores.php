@@ -2,10 +2,12 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores;
 
+use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Widgets_TeamPlayerScores\Structures\PlayerScore;
 
 /**
@@ -111,10 +113,26 @@ class Widgets_TeamPlayerScores extends ExpPlugin
 
     private function showWidget()
     {
+        $rows = array();
+        foreach ($this->playerScores as $playerScore) {
+            $rows[] = array(
+                'posY'     => -4 * count($rows),
+                'score'    => $playerScore->score,
+                'nickname' => Formatting::stripCodes($this->widget->handleSpecialChars($playerScore->nickName), 'hlpwoistn'),
+                'bestTime' => $this->widget->handleSpecialChars(Time::fromTM($playerScore->bestTime)),
+                'first'    => $playerScore->winScore[0],
+                'second'   => $playerScore->winScore[1],
+                'third'    => $playerScore->winScore[2],
+            );
+            if (count($rows) >= $this->config->teamPlayerScorePanel_nbFields) {
+                break;
+            }
+        }
+
         $this->widget->setSize(42, (($this->config->teamPlayerScorePanel_nbFields) * 4 + 4.75));
         $this->widget->setPosition($this->config->teamPlayerScorePanel_PosX, $this->config->teamPlayerScorePanel_PosY, 0);
-        $this->widget->setParam("nbFields", $this->config->teamPlayerScorePanel_nbFields);
-        $this->widget->setParam("playerScores", $this->playerScores);
+        $this->widget->setParam("bgSizeY",      5 + $this->config->teamPlayerScorePanel_nbFields * 4);
+        $this->widget->setParam("playerScores", $rows);
         $this->widget->show(null, true);
     }
 

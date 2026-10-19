@@ -257,21 +257,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
     }
 
-    public function EndMatch()
-    {
-        $this->endMapTriggered = false;
-    }
-
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
         $this->endMapTriggered = true;
-    }
-
-    public function onBeginRound()
-    {
-        if (!$this->running) {
-            return;
-        }
     }
 
     /**
@@ -741,9 +729,12 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     public function showDediReport($login, $reportLogin)
     {
-        $this->dediReportWindow->setParam("reportLogin",    str_replace('–', '-', $reportLogin));
-        $this->dediReportWindow->setParam("mapUid",         $this->storage->currentMap->uId);
-        $this->dediReportWindow->setParam("recipientLogin", $login);
+        $reportText  = "Login to check: " . str_replace('–', '-', $reportLogin) . "&#10;";
+        $reportText .= "Map: " . $this->storage->currentMap->uId . "&#10;";
+        $reportText .= "Reason: *edit your reason here*&#10;";
+        $reportText .= "Reportee: " . $login . "&#10;";
+        
+        $this->dediReportWindow->setParam("reportText", $reportText);
         $this->dediReportWindow->show($login);
     }
 
@@ -757,9 +748,8 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $gamemode = self::eXpGetCurrentCompatibilityGameMode();
 
         if ($gamemode == GameInfos::GAMEMODE_TEAM) {
-            $this->dedimania->forceDediSend = true;
             $this->sendScores();
-            $this->EndMatch();
+            $this->endMapTriggered = false;
             $this->records = array();
             $this->dedimania->getChallengeRecords();
 
@@ -807,10 +797,10 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $gReplaySaved = $this->gReplay;
         $vReplaySaved = $this->vReplay;
 
-        $this->dedimania->forceDediSend = true;
         $this->sendScores();
-        $this->EndMatch();
+        $this->endMapTriggered = false;
         $this->records = array();
+        $this->dedimania->getChallengeRecords();
 
         // rankings are reset in sensScores()
         $this->rankings = $rankings;
@@ -862,9 +852,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             return;
         }
 
-        $this->dedimania->forceDediSend = true;
         $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $vReplay, $gReplay, $allCps);
         $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $login);
+        $this->dedimania->getChallengeRecords();
     }
 
     public function isRunning()

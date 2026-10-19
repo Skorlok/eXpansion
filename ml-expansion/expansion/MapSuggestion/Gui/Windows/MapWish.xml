@@ -1,8 +1,5 @@
-<?php
-$from     = $this->getParam("from");
-?>
 <frame posn="2 -6 0">
-	<?php echo '<exp:inputbox name="from" sizeX="60" editable="false" label="@From" text="' . $this->handleSpecialChars($from) . '" isTextId="true"/>'; ?>
+	<exp:inputbox name="from" sizeX="60" editable="false" label="@From" text="{from}" isTextId="true"/>
 	<frame posn="0 -12 1">
 		<exp:inputbox name="mxid" sizeX="60" label="@Mania-Exchange ID-number for map wish" isTextId="true"/>
 	</frame>

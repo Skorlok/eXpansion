@@ -3,46 +3,51 @@
 namespace ManiaLivePlugins\eXpansion\Minigame1;
 
 use Exception;
-use ManiaLive\Gui\ActionHandler;
+use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
 use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
-use ManiaLivePlugins\eXpansion\Minigame1\Gui\Widgets\MinigameWidget;
 
 class Minigame1 extends ExpPlugin
 {
-
     /** @var Config */
     private $config;
 
     private $timerGap = 30;
 
-    private $active = true;
-
     private $tick = 0;
+
+    /** @var StaticWidget */
+    private $widget;
 
     public function eXpOnReady()
     {
-
         $this->enableTickerEvent();
+        $this->enableDedicatedEvents(Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
 
         $this->config = Config::getInstance();
         $this->timerGap = $this->getTimerGap();
-        $ah = ActionHandler::getInstance();
-        MinigameWidget::$action = $ah->createAction(array($this, "onClick"));
+
+        $this->registerManialinkCallback('onClick');
 
         Gui::preloadImage($this->config->mg1_imageUrl);
         Gui::preloadImage($this->config->mg1_imageFocusUrl);
         Gui::preloadUpdate();
 
-        $this->colorParser->registerCode("game1", $this->config, "mg1_messageColor");
+        $this->widget = new StaticWidget('Minigame1\Gui\Widgets\Minigame.xml');
+        $this->widget->setName("Minigame1");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition(0, 0, 50);
 
+        $this->colorParser->registerCode("game1", $this->config, "mg1_messageColor");
     }
 
     public function onClick($login)
     {
+        $this->widget->erase();
         try {
             $player = $this->storage->getPlayerObject($login);
             $amount = intval(rand($this->config->mg1_giftMin, $this->config->mg1_giftMax));
@@ -77,14 +82,23 @@ class Minigame1 extends ExpPlugin
                 );
                 $this->eXpChatSendServerMessage($msg);
             } else {
-                MinigameWidget::EraseAll();
-                $widget = MinigameWidget::Create(null);
-                $widget->setDisplayDuration($this->getDuration());
-                $widget->show();
+                $this->showWidget();
                 $this->timerGap = $this->getTimerGap();
             }
             $this->tick = 0;
         }
+    }
+
+    private function showWidget()
+    {
+        $size = $this->config->mg1_imageSize;
+
+        $this->widget->setParam("posX", rand(-160 + intval($size / 2), 160 - intval($size / 2)));
+        $this->widget->setParam("posY", rand(-90 + intval($size / 2), 90 - intval($size / 2)));
+        $this->widget->setParam("size", $size);
+        $this->widget->setParam("imageUrl", $this->config->mg1_imageUrl);
+        $this->widget->setParam("imageFocusUrl", $this->config->mg1_imageFocusUrl);
+        $this->widget->show(null, true, $this->getDuration());
     }
 
     private function getTimerGap()
@@ -100,14 +114,17 @@ class Minigame1 extends ExpPlugin
         $min = $this->config->mg1_displayDurationMin;
         $max = $this->config->mg1_displayDurationMax;
 
-        return intval(rand($min, $max));
+        // 0 means "no timeout", so never let it through
+        return max(1, intval(rand($min, $max)));
     }
 
     public function eXpOnUnload()
     {
-        $ah = ActionHandler::getInstance();
-        $ah->deleteAction(MinigameWidget::$action);
-        MinigameWidget::$action = -1;
+        if ($this->widget instanceof StaticWidget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
+
         Gui::preloadRemove($this->config->mg1_imageUrl);
         Gui::preloadRemove($this->config->mg1_imageFocusUrl);
         Gui::preloadUpdate();

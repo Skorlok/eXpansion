@@ -1,6 +1,0 @@
-declare CMlQuad quad <=> (Page.GetFirstChild("quad") as CMlQuad);
-declare Window <=> Page.GetFirstChild("{{ widgetId }}");
-declare Integer Duration = {{ duration }};
-declare Text action = "{{ action }}";
-declare Boolean canClick = True;
-declare Integer StartTime = Now;

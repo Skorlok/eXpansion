@@ -1,0 +1,30 @@
+<frame posn="-160 0 0">
+    <exp:widgetbg sizeX="320" sizeY="9"/>
+</frame>
+
+<frame posn="0 0 1.0E-5">
+    <label posn="0 -6.25 0" sizen="106.66666666667 -1" halign="center" valign="center" style="TextStaticSmall" textsize="1" textid="{ladderLimits}"/>
+    <label id="serverName" posn="0 -2.25 1.0E-5" sizen="106.66666666667 4.5" halign="center" valign="center" style="TextRaceMessageBig" textsize="3"/>
+</frame>
+
+<frame posn="-159 0 3.0E-5">
+    <label posn="0 -2.25 0" sizen="53.333333333333 4.5" halign="left" valign="center" style="TextStaticSmall" textsize="1" textid="{@Time}"/>
+    <label id="clock" posn="0 -6.25 1.0E-5" sizen="53.333333333333 4.5" halign="left" valign="center" style="TextValueSmallSm"/>
+
+    <frame posn="54.333333333333 0 2.0E-5">
+        <quad posn="0 -2.25 0" sizen="35.555555555556 4.3" halign="left" valign="center" bgcolor="FFFA"/>
+        <quad id="playerQ" posn="0 -2.25 1.0E-5" sizen="35.555555555556 4.3" halign="left" valign="center" bgcolor="FFFA"/>
+        <quad posn="0 -6.5 2.0E-5" sizen="35.555555555556 4.3" halign="left" valign="center" bgcolor="FFFA"/>
+        <quad id="specQ" posn="0 -6.5 3.0E-5" sizen="35.555555555556 4.3" halign="left" valign="center" bgcolor="FFFA"/>
+        <label posn="17.777777777778 -2.25 4.0E-5" sizen="35.555555555556 4.3" halign="center" valign="center" style="TextStaticSmall" textsize="1" textcolor="000" textid="{@Players}"/>
+        <label posn="17.777777777778 -6.45 5.0E-5" sizen="35.555555555556 4.3" halign="center" valign="center" style="TextStaticSmall" textsize="1" textcolor="000" textid="{@Spectators}"/>
+        <label id="specs" posn="44.444444444444 -6.45 6.0E-5" sizen="35.555555555556 4.5" halign="center" valign="center" style="TextRaceChrono" textsize="1" textcolor="fff" text="0/16"/>
+        <label id="players" posn="44.444444444444 -2.25 7.0E-5" sizen="35.555555555556 4.5" halign="center" valign="center" style="TextRaceChrono" textsize="1" textcolor="fff" text="1/16"/>
+    </frame>
+</frame>
+
+<frame posn="106.66666666667 0 0.00013">
+    <quad id="mapIcon" posn="53.333333333333 0 0" sizen="9 9" halign="right" valign="top" style="Bgs1" substyle="BgWindow2"/>
+    <label id="mapName" posn="43.333333333333 -2.25 1.0E-5" sizen="43.333333333333 4.5" halign="right" valign="center" style="TextStaticSmall" textsize="2" text="{mapName}"/>
+    <label id="mapAuthor" posn="43.333333333333 -6.25 2.0E-5" sizen="43.333333333333 4.5" halign="right" valign="center" style="TextStaticSmall" textsize="1" text="{mapAuthor}"/>
+</frame>

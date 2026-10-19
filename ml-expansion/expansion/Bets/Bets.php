@@ -264,8 +264,7 @@ class Bets extends ExpPlugin
         if (self::$state == self::ACCEPT) {
             $this->widgetAccept->setPosition($this->config->betWidget_PosX, $this->config->betWidget_PosY, 0);
             $this->widget->erase();
-            $this->widgetAccept->setParam("text", 'Accept bet for %1$s planets ?');
-            $this->widgetAccept->setParam("textParam", array("" . self::$betAmount));
+            $this->widgetAccept->setParam("text", $this->widgetAccept->addLang('Accept bet for %1$s planets ?', array("" . self::$betAmount)));
             $this->widgetAccept->show(null, true);
         }
     }

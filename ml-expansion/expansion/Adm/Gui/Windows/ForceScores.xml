@@ -1,25 +1,18 @@
-<?php
-$players = $this->getParam("players");
-
-$itemsXml = "";
-$i = 0;
-foreach ((array)$players as $player) {
-    $itemsXml .= '<frame>';
-    $itemsXml .= '<exp:listbg indexNumber="' . $i . '" sizeX="152" sizeY="6"/>';
-    $itemsXml .= '<frame posn="4 0 1.0E-5">';
-    $itemsXml .= '<quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>';
-    $itemsXml .= '<label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($player->nickName) . '"/>';
-    $itemsXml .= '<frame posn="104 0 1">';
-    $itemsXml .= '<exp:inputbox name="' . $player->login . '" sizeX="20"/>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '</frame>';
-    $i++;
-}
-
-$this->setParam("itemsXml", $itemsXml);
-?>
-<exp:pager sizeX="160" sizeY="72" itemsVarName="itemsXml" itemSizeY="6"/>
+<frame id="Pager" scriptevents="1">
+    <exp:foreach items="players" as="player" index="i">
+    <frame>
+        <exp:listbg indexNumber="{i}" sizeX="152" sizeY="6"/>
+        <frame posn="4 0 1.0E-5">
+            <quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>
+            <label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="{player.nickName}"/>
+            <frame posn="104 0 1">
+                <exp:inputbox name="{player.login}" sizeX="20"/>
+            </frame>
+        </frame>
+    </frame>
+    </exp:foreach>
+</frame>
+<exp:pager sizeX="160" sizeY="72" itemSizeY="6"/>
 <frame posn="40 2 0">
 	<exp:button sizeX="32" sizeY="6" text="@Reset scores" action="exp:eXpansion.Adm:forceScoresClear" isTextId="true"/>
 	<frame posn="27.5 0 1">

@@ -94,7 +94,12 @@ class ScoreDisplay extends ExpPlugin
             return;
         }
 
-        $this->widget->setParam("data", $this->widgetData);
+        $this->widget->setParam("teamName0", $this->widget->handleSpecialChars($this->widgetData["teamName0"]));
+        $this->widget->setParam("teamName1", $this->widget->handleSpecialChars($this->widgetData["teamName1"]));
+        $this->widget->setParam("flag0", $this->widgetData["flag0"]);
+        $this->widget->setParam("flag1", $this->widgetData["flag1"]);
+        $this->widget->setParam("score0", $this->widgetData["score0"]);
+        $this->widget->setParam("score1", $this->widgetData["score1"]);
         $this->widget->setPosition($this->config->scoreWidget_PosX, $this->config->scoreWidget_PosY, 0);
         $this->widget->show(null, true);
     }

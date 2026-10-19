@@ -2,6 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\I18n;
 
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
+
 /**
  * Description of Message
  *
@@ -67,9 +69,7 @@ class Message
         $out = array();
 
         foreach ($temp as $lang => $msg) {
-            $arrgs = $this->args;
-            array_unshift($arrgs, $msg);
-            $text = call_user_func_array('sprintf', $arrgs);
+            $text = self::format($msg, $this->args);
             $out[$lang] = array(
                 "Lang" => lcfirst($lang),
                 "Text" => \ManiaLivePlugins\eXpansion\Core\ColorParser::getInstance()->parseColors($text),
@@ -93,11 +93,43 @@ class Message
      */
     public function getParsedMessage($lang = null)
     {
-        $arrgs = $this->args;
-        array_unshift($arrgs, $this->getMessage($lang));
-        $text = call_user_func_array('sprintf', $arrgs);
+        $text = self::format($this->getMessage($lang), $this->args);
 
         return \ManiaLivePlugins\eXpansion\Core\ColorParser::getInstance()->parseColors($text);
+    }
+
+    /**
+     * format()
+     * sprintf() that doesn't crash on an invalid format (a stray % in the message),
+     * the error is logged and the message is returned unformatted.
+     *
+     * @param string $message
+     * @param array $args
+     *
+     * @return string
+     */
+    public static function format($message, array $args)
+    {
+        array_unshift($args, $message);
+        $error = 'sprintf() failed';
+        try {
+            $text = call_user_func_array('sprintf', $args);
+        } catch (\Exception $e) {
+            $text = false;
+            $error = $e->getMessage();
+        } catch (\Throwable $e) {
+            $text = false;
+            $error = $e->getMessage();
+        }
+
+        if ($text === false) {
+            Helper::logError('[I18n]Error with translations strings : ' . $message);
+            Helper::logError('[I18n]' . $error);
+
+            return $message;
+        }
+
+        return $text;
     }
 
     /**

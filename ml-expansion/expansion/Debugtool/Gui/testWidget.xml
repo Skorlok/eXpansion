@@ -1,0 +1,12 @@
+<frame posn="0 -3 0">
+    <exp:foreach items="rows" as="r">
+    <frame posn="0 {r.posY} 0">
+        <label sizen="16 6" style="TextStaticSmall" text="{r.login}"/>
+        <label posn="16 0 1.0E-5" sizen="35 6" style="TextStaticSmall" text="{r.nickname}"/>
+        <label posn="51 0 2.0E-5" sizen="16 6" style="TextStaticSmall" text="{r.slot}"/>
+    </frame>
+    </exp:foreach>
+</frame>
+
+<label posn="0 0 1" sizen="60 7" halign="left" valign="top" style="TextStaticSmall" text="$fffPlayer login and nick"/>
+<label posn="42 0 1" sizen="60 7" halign="left" valign="top" style="TextStaticSmall" text="$fffPlayersSlot Status"/>

@@ -27,3 +27,6 @@ Retirer
 
 Waiting Queue
 File d'attente
+
+Remove player from queue
+Retirer le joueur de la file d'attente

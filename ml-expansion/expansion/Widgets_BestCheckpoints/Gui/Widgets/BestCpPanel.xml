@@ -1,22 +1,12 @@
 <frame posn="0 -2 0">
     <frame>
-        <?php
-        for ($x = 0; $x < $this->getParam('cpLimit') && $x < count($this->getParam('checkpoints')); $x++) {
-            if (isset($this->getParam('checkpoints')[$x])) {
-                
-                $time = \ManiaLive\Utilities\Time::fromTM($this->getParam('checkpoints')[$x]->time);
-                if (strpos($time, ":") == 1) {
-                    $time = "0" . $time;
-                }
-
-                echo '<frame posn="' . (35 * ($x % 6)) . ' -' . (5*(floor($x/6))) . ' 0">';
-                echo '<quad id="Bg_' . $x . '" posn="-2 0 0" sizen="35 5" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" colorize="' . $this->getParam('guiConfig')->style_widget_bgColorize . '"/>';
-                echo '<label id="CpPos_' . $x . '" posn="2 0 1.0E-5" sizen="3 4" halign="right" valign="center" style="TextStaticSmall" textsize="1" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#rank#")) . '" text="' . ($x + 1) . '."/>';
-                echo '<label id="CpTime_' . $x . '" posn="2.5 0 2.0E-5" sizen="9 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#time#")) . '" text="' . $time . '"/>';
-                echo '<label id="CpNick_' . $x . '" posn="12 0 3.0E-5" sizen="21 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="' . $this->handleSpecialChars($this->getParam('checkpoints')[$x]->nickname) . '"/>';
-                echo '</frame>';
-            }
-        }
-        ?>
+        <exp:foreach items="checkpoints" as="cp">
+        <frame posn="{cp.posX} {cp.posY} 0">
+            <quad id="Bg_{cp.index}" posn="-2 0 0" sizen="35 5" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" colorize="{bgColorize}"/>
+            <label id="CpPos_{cp.index}" posn="2 0 1.0E-5" sizen="3 4" halign="right" valign="center" style="TextStaticSmall" textsize="1" textcolor="{rankColor}" text="{cp.rank}."/>
+            <label id="CpTime_{cp.index}" posn="2.5 0 2.0E-5" sizen="9 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" textcolor="{timeColor}" text="{cp.time}"/>
+            <label id="CpNick_{cp.index}" posn="12 0 3.0E-5" sizen="21 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="{cp.nickname}"/>
+        </frame>
+        </exp:foreach>
     </frame>
 </frame>

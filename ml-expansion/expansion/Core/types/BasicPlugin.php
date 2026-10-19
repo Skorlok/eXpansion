@@ -1076,16 +1076,7 @@ namespace {
                 $lang = \ManiaLivePlugins\eXpansion\Core\I18n::getInstance()->getString($message, $language);
             }
 
-            array_unshift($args, $lang);
-
-            try {
-                return call_user_func_array('sprintf', $args);
-            } catch (\Exception $e) {
-                Helper::logError('[basicPlugin/Chat]Error with translations strings : ' . $lang);
-                Helper::logError('[basicPlugin/Chat]' . $e->getMessage());
-
-                return $lang;
-            }
+            return \ManiaLivePlugins\eXpansion\Core\I18n\Message::format($lang, $args);
         }
     } else {
         exit("function '__()' is already defined, can't continue.");

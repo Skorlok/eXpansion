@@ -66,8 +66,8 @@ class NotificationPluginlist extends \ManiaLivePlugins\eXpansion\Core\types\conf
         foreach (AutoLoad::getAvailablePlugins() as $pluginId => $meta) {
             $plugins[] = array(
                 'name'   => 'cb_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $pluginId),
-                'text'   => $meta->getName(),
-                'active' => in_array($pluginId, $list),
+                'text'   => $this->confPluginListWindow->handleSpecialChars($meta->getName()),
+                'active' => in_array($pluginId, $list) ? 'true' : 'false',
             );
         }
 

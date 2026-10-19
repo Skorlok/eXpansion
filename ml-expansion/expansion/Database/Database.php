@@ -22,6 +22,7 @@ use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
 class Database extends ExpPlugin
 {
     private $config;
+    private $updateServerChallengesPending = false;
 
     /** @var Window */
     private $maintainanceWindow;
@@ -91,6 +92,9 @@ class Database extends ExpPlugin
 
     public function onTick()
     {
+        if ($this->updateServerChallengesPending) {
+            $this->updateServerChallenges();
+        }
         if ($this->config->enableBackup) {
             if (time() % (60 * 15) == 0) { // check every 15 minutes
                 $var = MetaData::getInstance()->getVariable('autoBackupFiles');
@@ -194,7 +198,7 @@ class Database extends ExpPlugin
 
     public function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
     {
-        $this->updateServerChallenges();
+        $this->updateServerChallengesPending = true;
     }
 
     public function updatePlayTime($player)
@@ -213,6 +217,7 @@ class Database extends ExpPlugin
 
     public function updateServerChallenges()
     {
+        $this->updateServerChallengesPending = false;
         if ($this->expStorage->isRelay) {
             return;
         }
@@ -500,7 +505,10 @@ class Database extends ExpPlugin
         $rows     = $this->db->execute("SHOW TABLES in `" . $dbConfig->database . "`;")->fetchArrayOfRow();
         $tables   = array();
         foreach ($rows as $row) {
-            $tables[] = $row[0];
+            $tables[] = array(
+                'name' => $row[0],
+                'text' => $this->maintainanceWindow->handleSpecialChars($row[0]),
+            );
         }
         $this->maintainanceWindow->setParam("tables", $tables);
         $this->maintainanceWindow->show($login);

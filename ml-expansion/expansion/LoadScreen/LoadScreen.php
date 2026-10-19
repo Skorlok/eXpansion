@@ -2,15 +2,14 @@
 
 namespace ManiaLivePlugins\eXpansion\LoadScreen;
 
-use Exception;
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Helpers\Helper;
-use ManiaLivePlugins\eXpansion\LoadScreen\Gui\Windows\LScreen;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\ManiaExchange\Structures\MxMap;
 
 /*
@@ -44,12 +43,21 @@ class LoadScreen extends ExpPlugin
     /** @var DataAccess */
     private $dataAccess;
 
+    /** @var ManiaLink */
+    private $screen;
+
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
         $this->disableDedicatedEvents(Event::ON_END_MATCH);
         Dispatcher::register(Event::getClass(), $this, Event::ON_END_MATCH, 10);
+
+        $this->screen = new ManiaLink('LoadScreen\Gui\Windows\LScreen.xml');
+        $this->screen->setName("loading Screen");
+        $this->screen->setLayer("normal");
+        $this->screen->setPosition(-160, 90, -60);
+        $this->screen->setScripts(new Script('LoadScreen\Gui\Script'));
 
         $this->dataAccess = DataAccess::getInstance();
         $config = Config::getInstance();
@@ -97,10 +105,8 @@ class LoadScreen extends ExpPlugin
                 }
             }
 
-            $widget = LScreen::Create(null);
-            $widget->setName("loading Screen");
-            $widget->setImage($url);
-            $widget->show();
+            $this->screen->setParam("image", $url);
+            $this->screen->show(null, true);
         }
     }
 
@@ -111,23 +117,18 @@ class LoadScreen extends ExpPlugin
         }
         $this->startTime = time();
         $this->isActive = true;
-
-        /*$xml = '<manialink id="ls" version="2" layer="LoadingScreen">
-        <quad posn="-160 90 100" sizen="320 180" image="https://cdn.skorlok.com/image/fonde52.jpg"/>
-        </manialink>';
-        $this->connection->sendDisplayManialinkPage(null, $xml);*/
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         $this->isActive = false;
-        LScreen::EraseAll();
+        $this->screen->erase();
     }
 
     public function onBeginMatch()
     {
         $this->isActive = false;
-        LScreen::EraseAll();
+        $this->screen->erase();
         Gui::preloadRemove($this->mxImage);
         Gui::preloadUpdate();
 
@@ -184,6 +185,11 @@ class LoadScreen extends ExpPlugin
 
     public function eXpOnUnload()
     {
+        if ($this->screen instanceof ManiaLink) {
+            $this->screen->erase();
+        }
+        $this->screen = null;
+
         Dispatcher::unregister(Event::getClass(), $this, Event::ON_END_MATCH);
     }
 }

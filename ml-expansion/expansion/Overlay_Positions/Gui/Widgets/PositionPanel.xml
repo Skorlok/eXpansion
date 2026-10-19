@@ -1,0 +1,17 @@
+<frame scale="1.1">
+    <label posn="0 6 0" sizen="40 6" style="TextStaticSmall" text="{teamScore}"/>
+    <quad posn="-3 0 1.0E-5" sizen="40 6" halign="left" valign="center" style="Bgs1InRace" substyle="BgCardList"/>
+
+    <frame posn="0 0 2.0E-5">
+        <exp:foreach items="rows" as="r">
+        <frame posn="0 {r.posY} 0">
+            <quad posn="-3 0 0" sizen="80 4.5" halign="left" valign="center" style="Bgs1InRace" substyle="BgCardList"/>
+            <label posn="0 0 1.0E-5" sizen="8 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textcolor="{r.color}" text="{r.index}"/>
+            <label posn="6.4 0 2.0E-5" sizen="36 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textcolor="{r.color}" text="{r.nick}"/>
+            <label posn="39.2 0 3.0E-5" sizen="16 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textcolor="{r.color}" text="{r.time}"/>
+            <label posn="56 0 4.0E-5" sizen="16 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textcolor="{r.color}" text="{r.diff}"/>
+            <label posn="68.8 0 5.0E-5" sizen="16 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textcolor="{r.color}" text="{r.points}"/>
+        </frame>
+        </exp:foreach>
+    </frame>
+</frame>

@@ -25,25 +25,20 @@ class Widgets_EndRankings extends ExpPlugin
         $this->enableDatabase();
         $this->config = Config::getInstance();
 
-        $formatter = LongDate::getInstance();
-
         $this->widget1 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
         $this->widget1->setName("Server Ranks");
         $this->widget1->setLayer("normal");
         $this->widget1->setParam("title", "Server Ranks");
-        $this->widget1->setParam("formatter", $formatter);
 
         $this->widget2 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
         $this->widget2->setName("Top Playtime");
         $this->widget2->setLayer("normal");
         $this->widget2->setParam("title", "Top Playtime");
-        $this->widget2->setParam("formatter", $formatter);
 
         $this->widget3 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
         $this->widget3->setName("Top Donators");
         $this->widget3->setLayer("normal");
         $this->widget3->setParam("title", "Top Donators");
-        $this->widget3->setParam("formatter", $formatter);
     }
 
     /**
@@ -53,28 +48,63 @@ class Widgets_EndRankings extends ExpPlugin
      */
     public function displayWidgets()
     {
-        /** @var Config $config */
+        /** @var Config */
         $this->config = Config::getInstance();
 
         $this->widget1->setSize(40, (3 * $this->config->rankPanel_nbFields) + 4.5);
         $this->widget1->setPosition($this->config->rankPanel_PosX, $this->config->rankPanel_PosY, 0);
-        $this->widget1->setParam("items", $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks"));
-        $this->widget1->setParam("nbFields", $this->config->rankPanel_nbFields);
+        $this->setPanelParams($this->widget1, $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks"), $this->config->rankPanel_nbFields);
         $this->widget1->show(null, true);
 
-        
+
         $this->widget2->setSize(40, (3 * $this->config->playtimePanel_nbFields) + 4.5);
         $this->widget2->setPosition($this->config->playtimePanel_PosX, $this->config->playtimePanel_PosY, 0);
-        $this->widget2->setParam("items", $this->getTopPlaytime());
-        $this->widget2->setParam("nbFields", $this->config->playtimePanel_nbFields);
+        $this->setPanelParams($this->widget2, $this->getTopPlaytime(), $this->config->playtimePanel_nbFields);
         $this->widget2->show(null, true);
 
-        
+
         $this->widget3->setSize(40, (3 * $this->config->donatorPanel_nbFields) + 4.5);
         $this->widget3->setPosition($this->config->donatorPanel_PosX, $this->config->donatorPanel_PosY, 0);
-        $this->widget3->setParam("items", $this->getTopDonators());
-        $this->widget3->setParam("nbFields", $this->config->donatorPanel_nbFields);
+        $this->setPanelParams($this->widget3, $this->getTopDonators(), $this->config->donatorPanel_nbFields);
         $this->widget3->show(null, true);
+    }
+
+    /**
+     * Fill the params of the Gui\Widgets\Panel.xml template.
+     * The items are either server ranks (tscore), playtimes (longDate) or donations (data).
+     */
+    private function setPanelParams(Widget $widget, $items, $nbFields)
+    {
+        /** @var LongDate $formatter */
+        $formatter = LongDate::getInstance();
+
+        $rows = array();
+        foreach ($items as $item) {
+            $row = array(
+                'posY'       => -3 * count($rows),
+                'rank'       => count($rows) + 1,
+                'isPlaytime' => property_exists($item, 'longDate'),
+                'isRank'     => property_exists($item, 'tscore'),
+            );
+            if ($row['isPlaytime']) {
+                $row['nickname'] = $widget->handleSpecialChars($item->nickname);
+                $row['value']    = $widget->handleSpecialChars($formatter->format($item->longDate));
+            } elseif ($row['isRank']) {
+                $row['nickname'] = $widget->handleSpecialChars($item->player_nickname);
+                $row['value']    = $widget->handleSpecialChars(number_format($item->tscore + 1, 2));
+            } else {
+                $row['nickname'] = $widget->handleSpecialChars($item->nickname);
+                $row['value']    = $widget->handleSpecialChars(strval($item->data));
+            }
+            $rows[] = $row;
+
+            if (count($rows) == $nbFields) {
+                break;
+            }
+        }
+
+        $widget->setParam("bgSizeY", (3 * $nbFields) + 4.5);
+        $widget->setParam("rows",    $rows);
     }
 
     public function getTopDonators()

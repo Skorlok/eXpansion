@@ -21,6 +21,9 @@
 namespace ManiaLivePlugins\eXpansion\Debugtool;
 
 use ManiaLive\Event\Dispatcher;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
 /**
  * Description of Debugtool
@@ -31,36 +34,48 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     private $ticker = 0;
     private $testActive = false;
-    private $fakelogin = "";
+    private $fakeLogin = "";
+
+    /** @var Widget */
+    private $memWidget;
+
+    /** @var Window */
+    private $testWindow;
+
+    /** @var ManiaLink */
+    private $testWidget;
+
+    private $lastMemUsage = 0;
+
+    private $nextLoop = 0;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->enableDedicatedEvents();
-        $this->registerChatCommand(
-            "connect",
-            "connect",
-            1,
-            true,
-            \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get()
-        );
-        $this->registerChatCommand(
-            "disconnect",
-            "disconnect",
-            1,
-            true,
-            \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get()
-        );
-        $this->registerChatCommand(
-            "faketest",
-            "test",
-            0,
-            true,
-            \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get()
-        );
+        $this->enableApplicationEvents();
+        $this->enableTickerEvent();
+        $this->registerChatCommand("connect", "connect", 1, true, \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get());
+        $this->registerChatCommand("disconnect", "disconnect", 1, true, \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get());
+        $this->registerChatCommand("faketest", "test", 0, true, \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::get());
+        
+        $this->memWidget = new Widget('Debugtool\Gui\debugWidget.xml');
+        $this->memWidget->setName("Debug widget");
+        $this->memWidget->setLayer("normal");
+        $this->memWidget->setSize(60, 7);
+        $this->memWidget->setPosition(155, -45, -60);
+
+        $this->testWindow = new Window('Debugtool\Gui\testWindow.xml');
+        $this->testWindow->setName("Test window");
+        $this->testWindow->setSize(120, 60);
+        $this->testWindow->setTitle("testwindow");
+
+        $this->testWidget = new ManiaLink('Debugtool\Gui\testWidget.xml');
+        $this->testWidget->setName("Test widget");
+        $this->testWidget->setLayer("normal");
+        $this->testWidget->setPosition(0, 0, -60);
+
         $this->mem(null);
         $this->registerChatCommand("te", "team", 0, false);
-
     }
 
     public function team()
@@ -75,6 +90,22 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         $this->disableTickerEvent();
+
+        if ($this->memWidget instanceof Widget) {
+            $this->memWidget->erase();
+        }
+        $this->memWidget = null;
+
+        if ($this->testWindow instanceof Window) {
+            $this->testWindow->erase();
+        }
+        $this->testWindow = null;
+
+        if ($this->testWidget instanceof ManiaLink) {
+            $this->testWidget->erase();
+        }
+        $this->testWidget = null;
+
         parent::eXpOnUnload();
     }
 
@@ -82,7 +113,6 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         if ($this->testActive) {
             if ($this->ticker == 1) {
-
                 $this->connection->disconnectFakePlayer($this->fakeLogin);
                 $this->ticker = 0;
             } else {
@@ -92,15 +122,25 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
-    {
-    }
-
     public function testWin($login)
     {
-        $win = Gui\testWindow::create($login);
-        $win->setSize(120, 60);
-        $win->show($login);
+        $this->testWindow->show($login);
+    }
+
+    public function testWidget($login)
+    {
+        $rows = array();
+        foreach ($this->storage->players + $this->storage->spectators as $player) {
+            $rows[] = array(
+                'posY'     => -5 * count($rows),
+                'login'    => $this->testWidget->handleSpecialChars($player->login),
+                'nickname' => $this->testWidget->handleSpecialChars($player->nickName),
+                'slot'     => $player->hasPlayerSlot ? '$0d0true' : '$d00false',
+            );
+        }
+
+        $this->testWidget->setParam("rows", $rows);
+        $this->testWidget->show($login);
     }
 
     public function connect($login, $playercount)
@@ -142,10 +182,6 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         Dispatcher::setApplicationListener(new Profiler());
     }
 
-    public function LibXmlRpc_OnWayPoint($login, $blockId, $time, $cpIndex, $isEndBlock, $lapTime, $lapNb, $isLapEnd)
-    {
-    }
-
     public function test($login)
     {
         $this->testActive = !$this->testActive;
@@ -160,10 +196,30 @@ class Debugtool extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function mem($login)
     {
-        Gui\debugWidget::EraseAll();
-        $widget = Gui\debugWidget::Create(null);
-        $widget->setPosition(155, -45);
-        $widget->show();
+        $usage = memory_get_usage();
+
+        if ($usage == $this->lastMemUsage) {
+            $color = "fff";
+        } else {
+            $color = ($usage > $this->lastMemUsage) ? "d22" : "2d2";
+        }
+        $this->lastMemUsage = $usage;
+
+        $this->memWidget->setParam("color", $color);
+        $this->memWidget->setParam("text", "mem usage: " . round($usage / 1024 / 1024, 3) . " Mb");
+        $this->memWidget->show(null, true);
+    }
+
+    public function onPostLoop()
+    {
+        $startTime = microtime(true);
+        if ($startTime < $this->nextLoop) {
+            return;
+        }
+
+        $this->mem(null);
+
+        $this->nextLoop = microtime(true) + 0.95;
     }
 
     public function crash()

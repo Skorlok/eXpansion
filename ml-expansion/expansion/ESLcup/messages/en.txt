@@ -1,0 +1,8 @@
+Score Rankings
+Score Rankings
+
+$sGame Mode: ESL cup
+$sGame Mode: ESL cup
+
+$sPoints Limit: %s
+$sPoints Limit: %s

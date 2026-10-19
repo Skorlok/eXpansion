@@ -260,7 +260,7 @@ class AdminGroups extends ExpPlugin
         $this->permissionsWindow = new Window("AdminGroups\Gui\Windows\Permissions.xml");
         $this->permissionsWindow->setName("Permissions");
         $this->permissionsWindow->setSize(130, 100);
-        $this->permissionsWindow->registerScript(\ManiaLivePlugins\eXpansion\Gui\Elements\Checkbox::getScriptML());
+        $this->permissionsWindow->registerScript(new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("AdminGroups/Gui/Scripts/PermissionsInherit"));
 
         $this->groupPlayersWindow = new Window("AdminGroups\Gui\Windows\Players.xml");
         $this->groupPlayersWindow->setName("AdminGroupPlayers");
@@ -1406,8 +1406,9 @@ class AdminGroups extends ExpPlugin
             $nh = $g->getInherits();
             if ($group !== $g && !isset($nh[$group->getGroupName()])) {
                 $groups[] = array(
-                    'name'    => $g->getGroupName(),
-                    'checked' => isset($inherits[$g->getGroupName()]),
+                    'name'   => $g->getGroupName(),
+                    'text'   => $this->inheritsWindow->handleSpecialChars($g->getGroupName()),
+                    'active' => isset($inherits[$g->getGroupName()]) ? 'true' : 'false',
                 );
             }
         }
@@ -1473,18 +1474,21 @@ class AdminGroups extends ExpPlugin
         $hasInherits = !empty($inherits);
         $permissions = array();
         foreach (self::$permissionList as $key => $val) {
+            $inherited     = ($group->getPermission($key) == self::UNKNOWN_PERMISSION);
             $permissions[] = array(
-                'name'           => $key,
-                'label'          => __(self::getPermissionTitleMessage($key), $login),
-                'checked_have'   => $group->hasPermission($key),
-                'checked_inherit' => ($group->getPermission($key) == self::UNKNOWN_PERMISSION),
+                'name'          => $key,
+                'label'         => $this->permissionsWindow->handleSpecialChars(__(self::getPermissionTitleMessage($key), $login)),
+                'haveActive'    => $group->hasPermission($key) ? 'true' : 'false',
+                'haveEnabled'   => ($hasInherits && $inherited) ? 'false' : 'true',
+                'inheritActive' => $inherited ? 'true' : 'false',
             );
         }
         $this->permissionsWindow->setTitle(__(self::$txt_permissionsTitle, $login, $group->getGroupName()));
         $this->permissionsWindow->setParam("groupName", $group->getGroupName());
         $this->permissionsWindow->setParam("permissions", $permissions);
         $this->permissionsWindow->setParam("hasInherits", $hasInherits);
-        $this->permissionsWindow->setParam("inheritLabel", __(self::$txt_inherits, $login) . "?");
+        $this->permissionsWindow->setParam("cbHaveWidth", $hasInherits ? 55 : 80);
+        $this->permissionsWindow->setParam("inheritLabel", $this->permissionsWindow->handleSpecialChars(__(self::$txt_inherits, $login) . "?"));
         $this->permissionsWindow->show($login);
     }
 
@@ -1857,7 +1861,16 @@ class AdminGroups extends ExpPlugin
      */
     public function showCmdMore($login, AdminCmd $cmd)
     {
-        $this->cmdMoreWindow->setParam("cmd",   $cmd);
+        $aliases = "";
+        $i = 1;
+        foreach ($cmd->getAliases() as $alias) {
+            $aliases .= '$w' . $i . ')$z ' . $alias . "\n";
+            $i++;
+        }
+        $this->cmdMoreWindow->setParam("contentCmd", $this->cmdMoreWindow->handleSpecialChars('//' . $cmd->getCmd()));
+        $this->cmdMoreWindow->setParam("contentDesc", $this->cmdMoreWindow->handleSpecialChars($cmd->getHelp()));
+        $this->cmdMoreWindow->setParam("contentDescm", $this->cmdMoreWindow->handleSpecialChars($cmd->getHelpMore()));
+        $this->cmdMoreWindow->setParam("aliases", $this->cmdMoreWindow->handleSpecialChars($aliases));
         $this->cmdMoreWindow->show($login);
     }
 

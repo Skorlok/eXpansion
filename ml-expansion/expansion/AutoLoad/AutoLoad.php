@@ -558,6 +558,7 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $pHandler  = PluginHandler::getInstance();
         $configMgr = ConfigManager::getInstance();
+        $window    = $this->pluginListWindow;
 
         $selectedGroupName = isset($this->pluginListGroups[$selectedGroupIdx])
             ? $this->pluginListGroups[$selectedGroupIdx]
@@ -630,16 +631,16 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $pluginsData[] = array(
                 'id'             => $pluginId,
                 'index'          => $i++,
-                'name'           => ($metaData->getName() == "" ? $pluginId : $metaData->getName()),
-                'desc'           => $metaData->getDescription(),
+                'name'           => $window->handleSpecialChars($metaData->getName() == "" ? $pluginId : $metaData->getName()),
+                'desc'           => $window->handleSpecialChars($metaData->getDescription()),
                 'toggleColorize' => $toggleColorize,
-                'toggleTooltip'  => $toggleTooltip,
+                'toggleTooltip'  => $window->handleSpecialChars($toggleTooltip),
                 'titleColorize'  => $titleColorize,
-                'titleTooltip'   => $titleTooltip,
+                'titleTooltip'   => $window->handleSpecialChars($titleTooltip),
                 'gameColorize'   => $gameColorize,
-                'gameTooltip'    => $gameTooltip,
+                'gameTooltip'    => $window->handleSpecialChars($gameTooltip),
                 'otherColorize'  => $otherColorize,
-                'otherTooltip'   => $otherTooltip,
+                'otherTooltip'   => $window->handleSpecialChars($otherTooltip),
                 'otherSizeY'     => $otherSizeY,
                 'configAvailable' => (bool) $configMgr->getGroupedVariables($pluginId),
                 'startText'      => $startText,
@@ -650,18 +651,19 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $groupsData = array();
         foreach ($this->pluginListGroups as $idx => $groupName) {
             $groupsData[] = array(
-                'name'     => $groupName,
+                'name'     => $window->handleSpecialChars($groupName),
+                'posY'     => $idx * 6.5,
                 'selected' => ($idx == $selectedGroupIdx),
             );
         }
 
-        $this->pluginListWindow->setParam("plugins",         $pluginsData);
-        $this->pluginListWindow->setParam("groups",          $groupsData);
-        $this->pluginListWindow->setParam("groupNames",      $this->pluginListGroups);
-        $this->pluginListWindow->setParam("currentGroupIdx", $selectedGroupIdx);
-        $this->pluginListWindow->setParam("currentName",     $filterName);
-        $this->pluginListWindow->setParam("currentAuthor",   $filterAuthor);
-        $this->pluginListWindow->show($login);
+        $window->setParam("plugins",         $pluginsData);
+        $window->setParam("groups",          $groupsData);
+        $window->setParam("groupNames",      $this->pluginListGroups);
+        $window->setParam("currentGroupIdx", $selectedGroupIdx);
+        $window->setParam("currentName",     $window->handleSpecialChars($filterName));
+        $window->setParam("currentAuthor",   $window->handleSpecialChars($filterAuthor));
+        $window->show($login);
     }
 
     public function pluginListSetGroup($login, $groupIdx, $params = array())

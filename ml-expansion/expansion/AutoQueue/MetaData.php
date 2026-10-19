@@ -27,23 +27,13 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(2);
         $this->registerVariable($var);
 
-        $var = new TypeFloat("enterQueueList_PosX", "Position of EnterQueueList Widget X", $config, false, false);
-        $var->setDefaultValue(-30);
+        $var = new TypeFloat("autoQueue_PosX", "Position of AutoQueue Widget X", $config, false, false);
+        $var->setDefaultValue(84);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
 
-        $var = new TypeFloat("enterQueueList_PosY", "Position of EnterQueueList Widget Y", $config, false, false);
-        $var->setDefaultValue(60);
-        $var->setGroup("Widgets");
-        $this->registerVariable($var);
-
-        $var = new TypeFloat("queueList_PosX", "Position of QueueList Widget X", $config, false, false);
-        $var->setDefaultValue(80);
-        $var->setGroup("Widgets");
-        $this->registerVariable($var);
-
-        $var = new TypeFloat("queueList_PosY", "Position of QueueList Widget Y", $config, false, false);
-        $var->setDefaultValue(-30);
+        $var = new TypeFloat("autoQueue_PosY", "Position of AutoQueue Widget Y", $config, false, false);
+        $var->setDefaultValue(-18);
         $var->setGroup("Widgets");
         $this->registerVariable($var);
     }

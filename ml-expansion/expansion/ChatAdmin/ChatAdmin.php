@@ -1681,6 +1681,7 @@ class ChatAdmin extends ExpPlugin
             $this->paramDialogWindow->setTitle("blacklist %s", array($nickname));
             $this->paramDialogWindow->setParam("adminAction", "black");
             $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->setParam("hideDrop", false);
             $this->paramDialogWindow->show($fromLogin);
 
             return;
@@ -1831,6 +1832,7 @@ class ChatAdmin extends ExpPlugin
             $this->paramDialogWindow->setTitle("ban %s", array($nickname));
             $this->paramDialogWindow->setParam("adminAction", "ban");
             $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->setParam("hideDrop", false);
             $this->paramDialogWindow->show($fromLogin);
             return;
         }
@@ -1898,6 +1900,7 @@ class ChatAdmin extends ExpPlugin
             $this->paramDialogWindow->setTitle("warn %s", array($player->cleanNickName));
             $this->paramDialogWindow->setParam("adminAction", "warn");
             $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->setParam("hideDrop", true);
             $this->paramDialogWindow->show($fromLogin);
 
             return;
@@ -2027,6 +2030,7 @@ class ChatAdmin extends ExpPlugin
             $this->paramDialogWindow->setTitle("kick %s", array($player->cleanNickName));
             $this->paramDialogWindow->setParam("adminAction", "kick");
             $this->paramDialogWindow->setParam("adminTarget", $target);
+            $this->paramDialogWindow->setParam("hideDrop", true);
             $this->paramDialogWindow->show($fromLogin);
 
             return;

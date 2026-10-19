@@ -237,7 +237,9 @@ class PersonalMessages extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         if ($login && isset($this->targetPlayer[$login])) {
             $targetPlayer = $this->storage->getPlayerObject($this->targetPlayer[$login]);
-            $this->widget->setParam("targetPlayer", $targetPlayer->nickName);
+            $this->widget->setParam("targetPlayer", $this->widget->handleSpecialChars($targetPlayer->nickName));
+        } else {
+            $this->widget->setParam("targetPlayer", 'Select...');
         }
         $this->widget->setPosition($this->pConfig->messagingWidget_PosX, $this->pConfig->messagingWidget_PosY, 25);
         $this->widget->show($login, is_null($login));

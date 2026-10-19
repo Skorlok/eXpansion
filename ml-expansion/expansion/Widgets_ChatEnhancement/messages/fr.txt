@@ -1,0 +1,5 @@
+Display Chat History
+Afficher l'historique du chat
+
+Is public chat active
+Le chat public est-il actif

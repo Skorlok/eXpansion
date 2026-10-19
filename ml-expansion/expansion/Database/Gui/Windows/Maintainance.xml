@@ -1,25 +1,18 @@
-<?php
-
-$tables = $this->getParam("tables");
-
-$itemsXml = "";
-$n        = 0;
-
-foreach ((array)$tables as $table) {
-    $itemsXml .= '<frame>';
-    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="152" sizeY="6"/>';
-    $itemsXml .= '<frame posn="0 0 1">';
-    $itemsXml .= '<exp:checkbox name="cb_' . $table . '" textWidth="1"/>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '<label posn="6 0 2" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($table) . '"/>';
-    $itemsXml .= '</frame>';
-    $n++;
-}
-
-$this->setParam("itemsXml", $itemsXml);
-?>
 <frame posn="0 7 0">
-    <exp:pager sizeX="156" sizeY="90" itemsVarName="itemsXml" posX="3" posY="0" itemSizeY="6"/>
+    <frame posn="3 0 0">
+        <frame id="Pager" scriptevents="1">
+            <exp:foreach items="tables" as="table" index="n">
+            <frame>
+                <exp:listbg indexNumber="{n}" sizeX="152" sizeY="6"/>
+                <frame posn="0 0 1">
+                    <exp:checkbox name="cb_{table.name}" textWidth="1"/>
+                </frame>
+                <label posn="6 0 2" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="{table.text}"/>
+            </frame>
+            </exp:foreach>
+        </frame>
+        <exp:pager sizeX="156" sizeY="90" itemSizeY="6"/>
+    </frame>
     <frame posn="30 -97 1">
         <frame posn="25.5 0 1"><exp:button sizeX="32" sizeY="6" text="Clear Table" colorize="d00" action="exp:eXpansion.Database:maintainanceTruncate"/></frame>
         <frame posn="51 0 1"><exp:button sizeX="32" sizeY="6" text="Repair" action="exp:eXpansion.Database:maintainanceRepair"/></frame>

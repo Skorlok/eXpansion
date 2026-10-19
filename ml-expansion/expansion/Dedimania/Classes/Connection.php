@@ -60,7 +60,15 @@ class Connection extends Singleton implements AppListener, TickListener
     private $dediUid = null;
     private $lastUpdate = 0;
 
-    public $forceDediSend = false;
+    /** @var array|null */
+    private $currentRequest = null;
+    private $requestQueue = array();
+    private $isSending = false;
+    private $sendingSince = 0;
+    private $requestId = 0;
+    private $nextSendTime = 0;
+    private $retryCount = 0;
+    private $isProcessingQueue = false;
 
     /**
      * Connection constructor.
@@ -93,6 +101,8 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function onTick()
     {
+        $this->processRequestQueue();
+
         try {
             if ($this->sessionId !== null && (time() - $this->lastUpdate) > 240) {
                 $this->debug("Dedimania connection keepalive!");
@@ -242,17 +252,68 @@ class Connection extends Singleton implements AppListener, TickListener
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $request->getXml());
         }
 
-        $this->dataAccess->httpCurl($this->url, array($this, "handleRequestResponse"), array("callback" => $callback), $options);
+        $this->requestQueue[] = array("options" => $options, "callback" => $callback);
+
+        $this->processRequestQueue();
+    }
+
+    public function processRequestQueue()
+    {
+        if ($this->isProcessingQueue) {
+            return;
+        }
+        $this->isProcessingQueue = true;
+
+        if ($this->isSending && time() - $this->sendingSince > 360) {
+            $this->console("[Dedimania Error] Request got no answer, sending it again");
+            $this->isSending = false;
+        }
+
+        if (!$this->isSending && microtime(true) >= $this->nextSendTime) {
+            if ($this->currentRequest === null && !empty($this->requestQueue)) {
+                $this->currentRequest = array_shift($this->requestQueue);
+                $this->retryCount = 0;
+            }
+            if ($this->currentRequest !== null) {
+                $this->isSending = true;
+                $this->sendingSince = time();
+                $this->requestId++;
+                $this->dataAccess->httpCurl($this->url, array($this, "handleRequestResponse"), array("requestId" => $this->requestId), $this->currentRequest['options']);
+            }
+        }
+
+        $this->isProcessingQueue = false;
     }
 
     public function handleRequestResponse($job, $jobData)
     {
-        $info = $job->getCurlInfo();
-        $code = $info['http_code'];
-        $data = $job->getResponse();
         $additionalData = $job->__additionalData;
+        if (!isset($additionalData['requestId']) || $additionalData['requestId'] !== $this->requestId) {
+            return;
+        }
+        $this->isSending = false;
 
-        $callback = $additionalData['callback'];
+        $info = $job->getCurlInfo();
+        $code = is_null($info) ? 0 : (int)$info['http_code'];
+        $data = $job->getResponse();
+
+        if ($code == 0) {
+            $this->retryCount++;
+            if ($this->retryCount <= 3) {
+                $retryDelay = 5 * $this->retryCount;
+                $this->nextSendTime = microtime(true) + $retryDelay;
+                $this->console("[Dedimania Error] No answer from dedimania (" . $job->getCurlError() . "), retrying again in " . $retryDelay . " seconds");
+                return;
+            }
+            $this->console("[Dedimania Error] No answer from dedimania (" . $job->getCurlError() . "), request dropped after 3 retries");
+            $this->currentRequest = null;
+            $this->processRequestQueue();
+            return;
+        }
+
+        $callback = $this->currentRequest['callback'];
+        $this->currentRequest = null;
+        $this->processRequestQueue();
 
         if ($code != 200) {
             $this->console("[Dedimania Error] Dedimania returned error code: " . $code);
@@ -567,8 +628,11 @@ class Connection extends Singleton implements AppListener, TickListener
                 if (count($errors) > 0 && array_key_exists('methods', $errors[0])) {
                     foreach ($errors[0]['methods'] as $error) {
                         if (!empty($error['errors'])) {
-                            $this->console('[Dedimania service return error] Method:'.$error['methodName']);
-                            $this->console('Error string:'.$error['errors']);
+                            if ($error['errors'] == "Warning in method_handler.php(470): Stadium is limited to maxrank 15 in TA for not upgraded servers! For premium accounts, see Dedimania forum and tm2stats page.") {
+                                continue;
+                            }
+                            $this->console('[Dedimania service return error] Method: '.$error['methodName']);
+                            $this->console('Error string: '.$error['errors']);
                         }
                     }
                 }
@@ -698,10 +762,6 @@ class Connection extends Singleton implements AppListener, TickListener
     public function xSetChallengeTimes($data)
     {
         $this->console("Sending times new times: \$0f0Success");
-        if ($this->forceDediSend) {
-            $this->getChallengeRecords();
-            $this->forceDediSend = false;
-        }
     }
 
     /**

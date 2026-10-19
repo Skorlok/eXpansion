@@ -1,0 +1,65 @@
+declare Window <=> Page.GetFirstChild("{{ name }}");
+
+declare Boolean exp_needToCheckPersistentVars for UI = False;
+declare Integer exp_multipleCheckCount = 0;
+
+declare persistent Vec3[Text][Text] EXP_widgetLastPosRel =  Vec3[Text][Text];
+declare persistent Boolean[Text][Text] EXP_widgetVisible = Boolean[Text][Text];
+declare persistent Boolean exp_isWidgetsHidden = False;
+declare Boolean exp_widgetVisibleBuffered;
+
+declare persistent Text[Text][Text] EXP_widgetLayers = Text[Text][Text];  // layer can be "normal" or "scorestable" or some other for future usage
+declare Text exp_widgetLayersBuffered;  
+
+declare Text id = "{{ name }}";
+declare Text[] exp_windowStack for UI = Text[];
+declare Text gameMode = "{{ gameMode }}";
+declare Boolean forceReset = {{ forceReset }};
+declare Text activeLayer = "{{ activeLayer }}";
+declare Text visibleLayerInit = "{{ visibleLayerInit }}";
+declare Boolean disablePersonalHud = {{ disablePersonalHud }};
+
+declare Boolean exp_widgetCurrentVisible = False;
+declare Boolean eXp_firstPersistentCheckDone = False;
+
+if (!EXP_widgetVisible.existskey(id) || forceReset) {
+	EXP_widgetVisible[id] = Boolean[Text];
+}
+
+if (!EXP_widgetVisible[id].existskey(gameMode) ) {
+	EXP_widgetVisible[id][gameMode] = True;
+}
+
+if (!EXP_widgetLayers.existskey(id) || forceReset) { 
+	EXP_widgetLayers[id] = Text[Text];
+}
+
+if (!EXP_widgetLayers[id].existskey(gameMode)) { 
+	EXP_widgetLayers[id][gameMode] = activeLayer; 
+}
+
+if (!EXP_widgetLastPosRel.existskey(id)) {
+    EXP_widgetLastPosRel[id] = Vec3[Text];
+}
+EXP_widgetLastPosRel[id][gameMode] = < {{ posX }}, {{ posY }}, -3.0>;
+
+if (!disablePersonalHud) {
+    exp_widgetCurrentVisible = EXP_widgetVisible[id][gameMode];
+    exp_widgetVisibleBuffered = EXP_widgetVisible[id][gameMode];
+    exp_widgetLayersBuffered = EXP_widgetLayers[id][gameMode];
+    
+    // reduce flickering on normal layer, when widget update.
+    if (!EXP_widgetVisible[id][gameMode] || EXP_widgetLayers[id][gameMode] != activeLayer || exp_isWidgetsHidden == True) {
+	    Window.Hide();
+	    exp_widgetCurrentVisible = False;
+    }
+} else {
+    exp_widgetLayersBuffered = visibleLayerInit;
+    exp_widgetCurrentVisible = True;
+    exp_widgetVisibleBuffered = True;
+    if (visibleLayerInit != activeLayer || exp_isWidgetsHidden == True) {
+        Window.Hide();
+        exp_widgetCurrentVisible = False;
+        exp_widgetVisibleBuffered = False;
+    }
+}

@@ -15,9 +15,6 @@ class Window extends ManiaLink
     /** @var Script[] */
     private $userScript = array();
 
-    /** @var Script[] keyed by class name — re-registering replaces */
-    private $overrideScripts = array();
-
     /** @var string[] raw ManiaScript strings */
     private $moreScripts = array();
 
@@ -104,11 +101,6 @@ class Window extends ManiaLink
     public function addScriptToWhile($script)
     {
         $this->extraWLoop .= $script;
-    }
-
-    public function registerOrOverrideScript(Script $script)
-    {
-        $this->overrideScripts[get_class($script)] = $script;
     }
 
     public function addScriptToLib($script)

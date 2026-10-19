@@ -71,6 +71,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDescription(
             array(
                 'Pattern to define where the map will be saved. Available variables : ',
+                '(relative to /UserData/Maps/Downloaded)',
                 '{map_author}, {map_name}, {map_environment}, {map_vehicle}, {map_type}',
                 '{map_style}, {mx_id}, {server_title}, {server_login}',
                 'You can use / to create sub directories.'

@@ -127,10 +127,50 @@ class Widgets_TeamRoundScores extends ExpPlugin
 
     private function showWidget()
     {
+        $var = \ManiaLivePlugins\eXpansion\Gui\MetaData::getInstance()->getVariable('teamParams')->getRawValue();
+        $hasTeamParams = isset($var["team1Name"], $var["team2Name"], $var["team1ColorHSL"], $var["team2ColorHSL"], $var["team1Color"], $var["team2Color"]);
+
+        $team1Color = $hasTeamParams ? $var["team1Color"] : "3af";
+        $team2Color = $hasTeamParams ? $var["team2Color"] : "d00";
+
+        $rows = array();
+        foreach ($this->roundScores as $score) {
+            switch ($score->winningTeamId) {
+                case 0:
+                    $winner      = $hasTeamParams ? '$' . $var["team1Color"] . $var["team1Name"] : '$3afBlue';
+                    $winnerColor = "fff";
+                    break;
+                case 1:
+                    $winner      = $hasTeamParams ? '$' . $var["team2Color"] . $var["team2Name"] : '$d00Red';
+                    $winnerColor = "fff";
+                    break;
+                default:
+                    $winner      = "Draw";
+                    $winnerColor = "aaa";
+                    break;
+            }
+
+            $rows[] = array(
+                'posY'        => -4 * count($rows),
+                'round'       => $score->roundNumber + 1,
+                'total1'      => $score->totalScore[0],
+                'total2'      => $score->totalScore[1],
+                'winner'      => $this->widget->handleSpecialChars($winner),
+                'winnerColor' => $winnerColor,
+                'score1'      => $score->score[0],
+                'score2'      => $score->score[1],
+            );
+            if (count($rows) >= $this->config->teamRoundScorePanel_nbFields) {
+                break;
+            }
+        }
+
         $this->widget->setSize(42, (($this->config->teamRoundScorePanel_nbFields) * 4 + 4.75));
         $this->widget->setPosition($this->config->teamRoundScorePanel_PosX, $this->config->teamRoundScorePanel_PosY, 0);
-        $this->widget->setParam("nbFields", $this->config->teamRoundScorePanel_nbFields);
-        $this->widget->setParam("roundScores", $this->roundScores);
+        $this->widget->setParam("bgSizeY",     5 + $this->config->teamRoundScorePanel_nbFields * 4);
+        $this->widget->setParam("team1Color",  $this->widget->handleSpecialChars($team1Color));
+        $this->widget->setParam("team2Color",  $this->widget->handleSpecialChars($team2Color));
+        $this->widget->setParam("roundScores", $rows);
         $this->widget->show(null, true);
     }
 

@@ -5,12 +5,9 @@ namespace ManiaLivePlugins\eXpansion\Gui;
 use Exception;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink as MLPage;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window as MLWindow;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\GetPlayerWidgets;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
-use ManiaLivePlugins\eXpansion\Gui\Windows\HudMove;
-use ManiaLivePlugins\eXpansion\Gui\Windows\ResetHud;
 
 class Gui extends ExpPlugin
 {
@@ -18,7 +15,11 @@ class Gui extends ExpPlugin
     private $msg_params;
     private $msg_disabled;
     private $counter = 0;
-    private $preloader;
+
+    /** @var MLPage */
+    private static $preloader = null;
+    /** @var string[] url hash => url */
+    private static $preloadCache = array();
     // next 2 is used by contextMenu
     public static $items = array();
     public static $callbacks = array();
@@ -48,6 +49,11 @@ class Gui extends ExpPlugin
     private $configStatuses = array();
     private $configGameMode = array();
 
+    /** @var MLPage */
+    private $getPlayerWidgets;
+    /** @var Script */
+    private $getPlayerWidgetsScript;
+
     public function eXpOnInit()
     {
         $this->setVersion("0.1");
@@ -65,19 +71,21 @@ class Gui extends ExpPlugin
         $this->registerManialinkCallback('showConfirmDialogMl', false, true);
         $this->registerManialinkCallback('configurationOk', true);
         $this->registerManialinkCallback('selectPlayerClick', false, true);
+        $this->registerManialinkCallback('showHudConfig', true);
 
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
         
         $this->setPublicMethod("hudCommands");
 
-        GetPlayerWidgets::$parentPlugin = $this;
-
         $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset, config");
         $this->msg_disabled = eXpGetMessage("#error#Server Admin has disabled personal huds. Sorry!");
 
-        $this->preloader = Preloader::Create(null);
-        $this->preloader->show();
+        self::$preloader = new MLPage("Gui\\Widgets\\Preloader.xml");
+        self::$preloader->setName("Preloader");
+        self::$preloader->setLayer("normal");
+        self::$preloader->setPosition(-400, 240, -60);
+        self::preloadUpdate();
 
         self::$errorWindow = new MLWindow("Gui\\Windows\\Error.xml");
         self::$errorWindow->setName("Gui Error");
@@ -88,6 +96,7 @@ class Gui extends ExpPlugin
         self::$noticeWindow->setName("Gui Notice");
         self::$noticeWindow->setSize(90, 60);
         self::$noticeWindow->setTitle("Notice");
+        self::$noticeWindow->setParam("closeAction", self::$noticeWindow->getCloseAction());
 
         self::$confirmScript = new Script("Gui/Scripts/ConfirmDialog");
         self::$confirmWindow = new MLWindow("Gui\\Windows\\ConfirmDialog.xml");
@@ -105,6 +114,13 @@ class Gui extends ExpPlugin
         $this->configWindow->setName("HUD Configuration");
         $this->configWindow->setSize(120, 90);
         $this->configWindow->setTitle("Configure HUD");
+
+        $this->getPlayerWidgetsScript = new Script("Gui\Scripts\GetPlayerWidgets");
+        $this->getPlayerWidgets = new MLPage("Gui\\Widgets\\GetPlayerWidgets.xml");
+        $this->getPlayerWidgets->setName("GetPlayerWidgets");
+        $this->getPlayerWidgets->setLayer("normal");
+        $this->getPlayerWidgets->setPosition(0, 0, -60);
+        $this->getPlayerWidgets->setScripts($this->getPlayerWidgetsScript);
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -278,9 +294,20 @@ EOT
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = HudMove::Create($login, false);
-            $window->enable();
-            $window->show();
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_enableHudMove for UI = False;
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        exp_enableHudMove = True;
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
         }
     }
 
@@ -289,17 +316,27 @@ EOT
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = HudMove::Create($login, false);
-            $window->disable();
-            $window->show();
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_enableHudMove for UI = False;
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        exp_enableHudMove = False;
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
         }
     }
 
     public function getPlayersWidgets($login)
     {
-        GetPlayerWidgets::Erase($login);
-        $widget = GetPlayerWidgets::Create($login, false);
-        $widget->show();
+        $this->getPlayerWidgetsScript->setParam("gameMode", $this->storage->getCleanGamemodeName());
+        $this->getPlayerWidgets->show($login);
     }
 
     public function showHudConfig($login, $entries = array())
@@ -313,7 +350,7 @@ EOT
             } else {
                 $this->showConfigWindow($login, array('widgetStatus' => $this->playersWidgets[$login]));
                 unset($this->playersWidgets[$login]);
-                GetPlayerWidgets::Erase($login);
+                $this->getPlayerWidgets->erase($login);
             }
         }
     }
@@ -343,7 +380,15 @@ EOT
         $this->configStatuses[$login] = $statuses;
         $this->configGameMode[$login] = $gameMode;
 
-        $this->configWindow->setParam("items", $statuses);
+        $items = array();
+        foreach ($statuses as $status) {
+            $items[] = array(
+                'text'   => $this->configWindow->handleSpecialChars($status['id']),
+                'active' => $status['value'] ? 'true' : 'false',
+            );
+        }
+
+        $this->configWindow->setParam("items", $items);
         $this->configWindow->show($login);
     }
 
@@ -352,15 +397,25 @@ EOT
         if (!isset($this->configStatuses[$login])) {
             return;
         }
-        $outValues = array();
+
+        $xml = '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+                        declare persistent Boolean[Text][Text] EXP_widgetVisible;';
+
         foreach ($this->configStatuses[$login] as $x => $status) {
-            $isChecked = isset($params['cb_' . $x]) && $params['cb_' . $x] == '1';
-            $outValues[] = new Structures\ConfigItem($status['id'], $this->configGameMode[$login], $isChecked ? '1' : '0');
+            $xml .=     'EXP_widgetVisible["' . $status['id'] . '"]["' . $this->configGameMode[$login] . '"] = ' . ((isset($params['cb_' . $x]) && $params['cb_' . $x] == '1') ? "True" : "False") . ';';
         }
-        $apply = Windows\HudSetVisibility::Create($login);
-        $apply->setData($outValues);
-        $apply->setTimeout(5);
-        $apply->show();
+
+        $xml .= '        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>';
+
+        $this->connection->sendDisplayManialinkPage($login, $xml);
         $this->configWindow->erase($login);
         unset($this->configStatuses[$login]);
         unset($this->configGameMode[$login]);
@@ -371,11 +426,38 @@ EOT
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = ResetHud::Create($login);
-            $window->setTimeout(1);
-            $window->show();
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare persistent Vec3[Text] EXP_windowLastPos;
+                        declare persistent Vec3[Text] EXP_windowLastPosRel;
+
+                        declare persistent Vec3[Text][Text] EXP_widgetLastPos;
+                        declare persistent Vec3[Text][Text] EXP_widgetLastPosRel;
+                        declare persistent Boolean[Text][Text] EXP_widgetVisible;
+                        declare persistent Text[Text][Text] EXP_widgetLayers;
+
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        declare persistent Boolean exp_chatVisible = True;
+                        exp_chatVisible = True;
+
+                        EXP_windowLastPos.clear();
+                        EXP_windowLastPosRel.clear();
+                        EXP_widgetLastPos.clear();
+                        EXP_widgetLastPosRel.clear();
+                        EXP_widgetVisible.clear();
+                        EXP_widgetLayers.clear();
+
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
+
             $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
-            //ResetHud::Erase($login);
         }
     }
 
@@ -514,7 +596,7 @@ EOT
                 $out .= trim($line) . "\n";
             }
         }
-        self::$errorWindow->setParam("message", $out);
+        self::$errorWindow->setParam("message", self::$errorWindow->handleSpecialChars($out));
         self::$errorWindow->show($login);
     }
 
@@ -525,23 +607,38 @@ EOT
      */
     public static function preloadImage($url)
     {
-        Preloader::add($url);
+        if ($url == "") {
+            return;
+        }
+        self::$preloadCache[md5($url)] = $url;
     }
 
     /**
      * Preload image
      *
-     * @param type $url
+     * @param string $url
      */
     public static function preloadRemove($url)
     {
-        Preloader::remove($url);
+        $md5 = md5($url);
+        if (array_key_exists($md5, self::$preloadCache)) {
+            unset(self::$preloadCache[$md5]);
+        }
     }
 
     public static function preloadUpdate()
     {
-        $preloader = Preloader::Create(null);
-        $preloader->show();
+        if (!self::$preloader instanceof MLPage) {
+            return;
+        }
+
+        $quads = "";
+        foreach (self::$preloadCache as $url) {
+            $quads .= '<quad sizen="6 6" image="' . self::$preloader->handleSpecialChars($url) . '"/>';
+        }
+
+        self::$preloader->setParam("quads", $quads);
+        self::$preloader->show(null, true);
     }
 
     /**

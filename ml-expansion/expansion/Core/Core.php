@@ -26,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.2.2.8";
+    const EXP_VERSION = "1.2.2.9";
 
     const EXP_REQUIRE_MANIALIVE = "4.0.0";
 
@@ -141,6 +141,8 @@ class Core extends types\ExpPlugin
     public static $optimizeEnabled = false;
 
     public $updateServerTags = false;
+
+    private $saveMatchSettingsNeeded = false;
 
     /**
      * Declares what is necessary for expansion ro run.
@@ -486,7 +488,7 @@ EOT;
 
         $this->netStatWindow = new Window("Core\Gui\Windows\NetStat.xml");
         $this->netStatWindow->setName("NetStat");
-        $this->netStatWindow->setSize(140, 100);
+        $this->netStatWindow->setSize(60, 100);
         $this->netStatWindow->setTitle('Network Status');
         $this->netStatWindow->registerCloseCallback(array($this, 'onNetStatWindowCloseCallback'));
 
@@ -792,19 +794,23 @@ EOT;
 
     public function updateQuitDialog()
     {
+        /** @var Config $config */
         $config = Config::getInstance();
-        if (empty($config->quitDialogManialink)) {
-            $window = new Gui\Windows\QuitWindow();
-            $this->quitDialogXml = $window->getXml();
+        /** @var \ManiaLivePlugins\eXpansion\Gui\Config $guiConfig */
+        $guiConfig = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+
+        if (!empty($config->quitDialogManialink) && file_exists($config->quitDialogManialink) && is_readable($config->quitDialogManialink)) {
+            $this->quitDialogXml = file_get_contents($config->quitDialogManialink);
         } else {
-            try {
-                $this->quitDialogXml = file_get_contents($config->quitDialogManialink);
-            } catch (\Exception $e) {
-                $this->console("error while fetching quitDialog xml: " . $e->getMessage());
-                $window = new Gui\Windows\QuitWindow();
-                $this->quitDialogXml = $window->getXml();
-            }
+            $xml  = '<manialink version="1" background="1" navigable3d="0">';
+            $xml .= '<timeout>0</timeout>';
+            $xml .= '<quad posn="0 50 -50" sizen="120 30" halign="center" valign="top" url="http://ml-expansion.com" image="' . $guiConfig->logo . '"/>';
+            $xml .= '<quad posn="0 0 1.0E-5" sizen="160 50" halign="center" valign="top" style="Bgs1InRace" substyle="BgCard"/>';
+            $xml .= '<label posn="0 20 2.0E-5" sizen="160 7" scale="1.5" halign="center" valign="top" style="TextRaceMessageBig" text="' . $this->storage->server->name . '"/>';
+            $xml .= '</manialink>';
+            $this->quitDialogXml = $xml;
         }
+
         $this->connection->customizeQuitDialog($this->quitDialogXml, "", true, 0);
     }
 
@@ -1031,7 +1037,7 @@ EOT;
      */
     public function onGameSettingsChange(\Maniaplanet\DedicatedServer\Structures\GameInfos $oldSettings, \Maniaplanet\DedicatedServer\Structures\GameInfos $newSettings, $changes)
     {
-        $this->saveMatchSettings();
+        $this->saveMatchSettingsNeeded = true;
     }
 
     /**
@@ -1121,7 +1127,7 @@ EOT;
     public function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
     {
         if ($isListModified) {
-            $this->saveMatchSettings();
+            $this->saveMatchSettingsNeeded = true;
         }
     }
 
@@ -1130,6 +1136,7 @@ EOT;
      */
     public function saveMatchSettings()
     {
+        $this->saveMatchSettingsNeeded = false;
         //If the admin has declared a file name to save settings in
         if (!empty($this->config->defaultMatchSettingsFile)) {
             try {
@@ -1149,7 +1156,7 @@ EOT;
      */
     public function onGameModeChange($oldGameMode, $newGameMode)
     {
-        $this->saveMatchSettings();
+        $this->saveMatchSettingsNeeded = true;
         $this->showNotice("GameMode Changed");
         //enable custom points in team mode
         if ($this->eXpGetCurrentCompatibilityGameMode()== GameInfos::GAMEMODE_TEAM) {
@@ -1291,11 +1298,28 @@ EOT;
      */
     public function showInfo($login)
     {
-        $statsAction = -1;
-        if ($this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics')) {
-            $statsAction = "exp:eXpansion.ServerStatistics:showStats";
+        $version = $this->connection->getVersion();
+
+        $admContact = $this->config->contact;
+        if (strpos($admContact, '@') !== false) {
+            $admContact = '$lmailto://' . $admContact;
+        } else {
+            $admContact = '$l' . $admContact;
         }
-        $this->infoWindow->setParam("statsAction", $statsAction);
+
+        $this->infoWindow->setParam("hideServerStats", !$this->isPluginLoaded('\ManiaLivePlugins\eXpansion\ServerStatistics\ServerStatistics'));
+        $this->infoWindow->setParam("serverLogin", $this->infoWindow->handleSpecialChars($this->storage->serverLogin));
+        $this->infoWindow->setParam("titleId", $this->infoWindow->handleSpecialChars($version->titleId));
+        $this->infoWindow->setParam("vVersion", $this->infoWindow->handleSpecialChars($version->version));
+        $this->infoWindow->setParam("vBuild", $this->infoWindow->handleSpecialChars($version->build));
+        $this->infoWindow->setParam("vApi", $this->infoWindow->handleSpecialChars($version->apiVersion));
+        $this->infoWindow->setParam("mlVersion", $this->infoWindow->handleSpecialChars(\ManiaLive\Application\VERSION));
+        $this->infoWindow->setParam("expVer", $this->infoWindow->handleSpecialChars(\ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . " - " . date("Y-m-d h:i:s A", \ManiaLivePlugins\eXpansion\Helpers\Helper::getBuildDate())));
+        $this->infoWindow->setParam("phpVer", $this->infoWindow->handleSpecialChars(phpversion()));
+        $this->infoWindow->setParam("admContact", $this->infoWindow->handleSpecialChars($admContact));
+        $this->infoWindow->setParam("joinLink", $this->infoWindow->handleSpecialChars("maniaplanet://#join=" . $this->storage->serverLogin . "@" . $version->titleId));
+        $this->infoWindow->setParam("favLink", $this->infoWindow->handleSpecialChars("maniaplanet://#addfavourite=" . $this->storage->serverLogin . "@" . $version->titleId));
+        $this->infoWindow->setParam("favUrl", $this->infoWindow->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php?login=" . rawurldecode($this->storage->serverLogin)));
         $this->infoWindow->show($login);
     }
 
@@ -1303,6 +1327,10 @@ EOT;
     {
         if ($this->storage->serverStatus->code < 3 || $this->storage->serverStatus->code > 4) {
             return;
+        }
+
+        if ($this->saveMatchSettingsNeeded) {
+            $this->saveMatchSettings();
         }
 
         if ($this->config->useWhitelist) {
@@ -1344,11 +1372,38 @@ EOT;
             $this->netLostBuffer = $outPlayers;
 
             if (!empty($this->netStatViewers)) {
+                $this->buildNetStatWindow();
                 $this->netStatWindow->show(array_values($this->netStatViewers));
             }
 
             $this->debug("Memory usage: " . $this->echo_memory_usage());
         }
+    }
+
+    public function buildNetStatWindow()
+    {
+        \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::asortAsc(self::$netStat, "login");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach (self::$netStat as $login => $stat) {
+            if (isset($this->storage->players[$login])) {
+                $nick = ($i + 1) . ". " . $this->storage->players[$login]->nickName;
+            } elseif (isset($this->storage->spectators[$login])) {
+                $nick = ($i + 1) . ". " . $this->storage->spectators[$login]->nickName;
+            } else {
+                $nick = ($i + 1) . ". " . $login;
+            }
+            $color = ($stat->updateLatency < 300) ? '$0f0' : '$f00';
+
+            $items[$i] = array($nick, $color . $stat->updateLatency . "ms", $stat->latestNetworkActivity);
+            $data[$i] = array(-1, -1, -1);
+            $i++;
+        }
+
+        $this->netStatWindow->setParam("statsItems", $items);
+        $this->netStatWindow->setParam("statsData",  $data);
     }
 
     /**
@@ -1359,6 +1414,7 @@ EOT;
     public function showNetStats($login)
     {
         if (AdminGroups::hasPermission($login, Permission::CHAT_ADMINCHAT)) {
+            $this->buildNetStatWindow();
             $this->netStatViewers[$login] = $login;
             $this->netStatWindow->show($login);
         }

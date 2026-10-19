@@ -1,26 +1,19 @@
 <frame>
-    <?php echo '<exp:widgetbg sizeX="42" sizeY="' . (5 + $this->getParam('nbFields') * 4) . '"/>'; ?>
+    <exp:widgetbg sizeX="42" sizeY="{bgSizeY}"/>
 </frame>
 <quad posn="0 0 1.0E-5" sizen="42 4.2" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" colorize="3af"/>
 <label posn="21 -2 2.0E-5" sizen="30 5" halign="center" valign="center" style="TextCardScores2" textsize="1" textcolor="fff" textid="{@{title}}"/>
 <frame posn="2 -6.5 3.0E-5">
     <frame>
-        <?php
-            $x = 1;
-            foreach ($this->getParam('playerScores') as $playerScore) {
-                echo '<frame posn="0 '. (- $x*4.0 + 4.0) . ' 0">';
-                    echo '<label posn="3 0 0" sizen="7 5" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="' . $playerScore->score . '"/>';
-                    echo '<label posn="4 0 1.0E-5" sizen="13 4" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . \ManiaLivePlugins\eXpansion\Helpers\Formatting::stripCodes($this->handleSpecialChars($playerScore->nickName), 'hlpwoistn') . '"/>';
-                    echo '<label posn="23 0 2.0E-5" sizen="16 4" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="' . \ManiaLive\Utilities\Time::fromTM($playerScore->bestTime) . '"/>';
-                    echo '<label posn="30 0 3.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="' . $playerScore->winScore[0] . '"/>';
-                    echo '<label posn="34 0 4.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="aaa" text="' . $playerScore->winScore[1] . '"/>';
-                    echo '<label posn="38 0 5.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="f80" text="' . $playerScore->winScore[2] . '"/>';
-                echo '</frame>';
-
-                $x++;
-                if ($x > $this->getParam('nbFields')) {
-                    break;
-                }
-            }?>
+        <exp:foreach items="playerScores" as="p">
+        <frame posn="0 {p.posY} 0">
+            <label posn="3 0 0" sizen="7 5" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="{p.score}"/>
+            <label posn="4 0 1.0E-5" sizen="13 4" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="{p.nickname}"/>
+            <label posn="23 0 2.0E-5" sizen="16 4" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="{p.bestTime}"/>
+            <label posn="30 0 3.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="{p.first}"/>
+            <label posn="34 0 4.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="aaa" text="{p.second}"/>
+            <label posn="38 0 5.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="f80" text="{p.third}"/>
+        </frame>
+        </exp:foreach>
     </frame>
 </frame>

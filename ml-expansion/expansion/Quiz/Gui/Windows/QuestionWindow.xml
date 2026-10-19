@@ -1,20 +1,30 @@
-<?php
-$questionText = $this->getParam("questionText");
-$imageUrl     = $this->getParam("imageUrl");
-?>
 <frame posn="0 -6 0">
 	<frame posn="0 0 1">
-		<?php echo '<exp:inputbox name="question" sizeX="80" label="@Question" text="' . $this->handleSpecialChars($questionText) . '" isTextId="true"/>'; ?>
+		<exp:inputbox name="question" sizeX="80" label="@Question" text="{questionText}" isTextId="true"/>
 	</frame>
-<?php for ($x = 0; $x < 7; $x++):
-	$ansText = $this->getParam("answer" . $x);
-?>
-	<frame posn="0 -<?php echo 12 * ($x + 1); ?> 1">
-		<?php echo '<exp:inputbox name="answer.' . $x . '" sizeX="80" label="' . $this->addLang("Answer " . ($x + 1)) . '" text="' . $this->handleSpecialChars($ansText) . '" isTextId="true"/>'; ?>
+	<frame posn="0 -12 1">
+		<exp:inputbox name="answer.0" sizeX="80" label="@Answer 1" text="{answer0}" isTextId="true"/>
 	</frame>
-<?php endfor; ?>
+	<frame posn="0 -24 1">
+		<exp:inputbox name="answer.1" sizeX="80" label="@Answer 2" text="{answer1}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -36 1">
+		<exp:inputbox name="answer.2" sizeX="80" label="@Answer 3" text="{answer2}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -48 1">
+		<exp:inputbox name="answer.3" sizeX="80" label="@Answer 4" text="{answer3}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -60 1">
+		<exp:inputbox name="answer.4" sizeX="80" label="@Answer 5" text="{answer4}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -72 1">
+		<exp:inputbox name="answer.5" sizeX="80" label="@Answer 6" text="{answer5}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -84 1">
+		<exp:inputbox name="answer.6" sizeX="80" label="@Answer 7" text="{answer6}" isTextId="true"/>
+	</frame>
 	<frame posn="0 -96 1">
-		<?php echo '<exp:inputbox name="imageUrl" sizeX="80" label="@Url for image" text="' . $this->handleSpecialChars($imageUrl) . '" isTextId="true"/>'; ?>
+		<exp:inputbox name="imageUrl" sizeX="80" label="@Url for image" text="{imageUrl}" isTextId="true"/>
 	</frame>
 	<frame posn="0 -108 1">
 		<exp:button sizeX="32" sizeY="6" text="@Ask hidden" action="exp:eXpansion.Quiz:questionHidden" isTextId="true"/>

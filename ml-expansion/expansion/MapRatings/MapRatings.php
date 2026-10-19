@@ -243,7 +243,21 @@ class MapRatings extends ExpPlugin
                 }
             }
         }
-        $this->widget->setParam("rating", $votes);
+
+        $color = "fff";
+        if ($votes < 30) {
+            $color = str_replace("$", "", $this->config->colorUnder30);
+        }
+        if ($votes >= 30) {
+            $color = str_replace("$", "", $this->config->colorAbove30);
+        }
+        if ($votes > 60) {
+            $color = str_replace("$", "", $this->config->colorAbove60);
+        }
+
+        $this->widget->setParam("ratingRatio", ($votes/100));
+        $this->widget->setParam("rating", round($votes));
+        $this->widget->setParam("color", $color);
         $this->widget->setParam("nbVotes", $nbVotes);
         
         $this->widget->show(null, true);
@@ -252,7 +266,7 @@ class MapRatings extends ExpPlugin
     public function showEndMapWidget($logins)
     {
         $this->widgetEndMap->setPosition($this->config->endMapRating_PosX, $this->config->endMapRating_PosY, 0);
-        $this->widgetEndMap->setParam("mapName", Formatting::stripCodes($this->storage->currentMap->name, "wosn"));
+        $this->widgetEndMap->setParam("mapName", $this->widgetEndMap->handleSpecialChars(Formatting::stripCodes($this->storage->currentMap->name, "wosn")));
         $this->widgetEndMap->show($logins);
     }
 

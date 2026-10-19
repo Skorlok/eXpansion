@@ -189,7 +189,7 @@ if  ((Now - lastUpdateTime) >= 500) {
     needUpdate{{ varName }} = True;
 }
 
-if (needUpdate{{ varName }} && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate{{ varName }} && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer))) {
     lastUpdateTime = Now;
 
     needUpdate{{ varName }} = False;

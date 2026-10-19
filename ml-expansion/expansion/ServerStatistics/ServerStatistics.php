@@ -152,6 +152,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function showStats($login, $params = null)
     {
+        /** @var \ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate $formatter */
         $formatter = \ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate::getInstance();
 
         $avgPlayer = 'unknown';
@@ -173,18 +174,17 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         $this->statsWindow->setTitle('Welcome to : ' . \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->name));
-        $this->statsWindow->setParam("comment",           \ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->comment, true));
-        $this->statsWindow->setParam("upTimeDedi",        $formatter->format($this->expStorage->getDediUpTime()));
-        $this->statsWindow->setParam("upTime",            $formatter->format($this->expStorage->getExpansionUpTime()));
-        $this->statsWindow->setParam("mapCount",          sizeof($this->storage->maps));
-        $this->statsWindow->setParam("maxPlayers",        strval($this->storage->server->currentMaxPlayers));
-        $this->statsWindow->setParam("avgPlayer",         $avgPlayer);
-        $this->statsWindow->setParam("maxSpectators",     strval($this->storage->server->currentMaxSpectators));
-        $this->statsWindow->setParam("avgSpec",           $avgSpec);
-        $this->statsWindow->setParam("ladderLimit",       $this->storage->server->ladderServerLimitMin . ' - ' . $this->storage->server->ladderServerLimitMax);
-        $this->statsWindow->setParam("nbPlayer",          $nbPlayer);
-        $this->statsWindow->setParam("nbNation",          $nbNation);
-        $this->statsWindow->setParam("totalPlayersTimes", $totalPlayersTimes);
+        $this->statsWindow->setParam("comment",        $this->statsWindow->handleSpecialChars(\ManiaLivePlugins\eXpansion\Gui\Gui::fixString($this->storage->server->comment, true)));
+        $this->statsWindow->setParam("upTimeDedi",     $this->statsWindow->handleSpecialChars($formatter->format($this->expStorage->getDediUpTime())));
+        $this->statsWindow->setParam("upTime",         $this->statsWindow->handleSpecialChars($formatter->format($this->expStorage->getExpansionUpTime())));
+        $this->statsWindow->setParam("mapCount",       $this->statsWindow->handleSpecialChars(sizeof($this->storage->maps)));
+        $this->statsWindow->setParam("maxPlayers",     $this->statsWindow->handleSpecialChars(strval($this->storage->server->currentMaxPlayers)));
+        $this->statsWindow->setParam("avgPlayer",      $this->statsWindow->handleSpecialChars($avgPlayer));
+        $this->statsWindow->setParam("maxSpectators",  $this->statsWindow->handleSpecialChars(strval($this->storage->server->currentMaxSpectators)));
+        $this->statsWindow->setParam("avgSpec",        $this->statsWindow->handleSpecialChars($avgSpec));
+        $this->statsWindow->setParam("ladderLimit",    $this->statsWindow->handleSpecialChars($this->storage->server->ladderServerLimitMin . ' - ' . $this->storage->server->ladderServerLimitMax));
+        $this->statsWindow->setParam("visitedBy",      $this->statsWindow->handleSpecialChars($this->statsWindow->addLang('Visited by %s players from %s zones', array($nbPlayer, $nbNation))));
+        $this->statsWindow->setParam("playedTogether", $this->statsWindow->handleSpecialChars($this->statsWindow->addLang('Who together played %s', array($totalPlayersTimes))));
         $this->statsWindow->show($login);
     }
 
@@ -222,14 +222,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
         }
 
-        $this->plotterWindow->setTitle("Players");
-        $this->plotterWindow->setParam("datas", $out);
-        $this->plotterWindow->setParam("limitY", (((int)($max / 5)) + 1) * 5);
-        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
-        $this->plotterWindow->setParam("labelsY", null);
-        $this->plotterWindow->setParam("color0", "00f");
-        $this->plotterWindow->setParam("color1", "f00");
-        $this->plotterWindow->show($login);
+        $this->showPlotter($login, "Players", $out, (((int)($max / 5)) + 1) * 5, $this->getXDateLabels($startTime), null, "00f", "f00");
     }
 
     public function showMemory($login)
@@ -279,14 +272,7 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $labels[] = ((int)(($memory_limit - ($i * ($memory_limit / 5))) / (1024 * 1024))) . "M";
         }
 
-        $this->plotterWindow->setTitle("Memory usage");
-        $this->plotterWindow->setParam("datas", $out);
-        $this->plotterWindow->setParam("limitY", $memory_limit);
-        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
-        $this->plotterWindow->setParam("labelsY", $labels);
-        $this->plotterWindow->setParam("color0", "f90");
-        $this->plotterWindow->setParam("color1", "f00");
-        $this->plotterWindow->show($login);
+        $this->showPlotter($login, "Memory usage", $out, $memory_limit, $this->getXDateLabels($startTime), $labels, "f90", "f00");
     }
 
     public function showCpu($login)
@@ -313,13 +299,65 @@ class ServerStatistics extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $out[0][] = $data->cpuload;
         }
 
-        $this->plotterWindow->setTitle("Cpu usage");
-        $this->plotterWindow->setParam("datas", $out);
-        $this->plotterWindow->setParam("limitY", 100);
-        $this->plotterWindow->setParam("labelsX", $this->getXDateLabels($startTime));
-        $this->plotterWindow->setParam("labelsY", null);
-        $this->plotterWindow->setParam("color0", "f00");
-        $this->plotterWindow->setParam("color1", null);
+        $this->showPlotter($login, "Cpu usage", $out, 100, $this->getXDateLabels($startTime), null, "f00", null);
+    }
+
+    private function showPlotter($login, $title, $datas, $limitY, $labelsX, $labelsY, $color0, $color1)
+    {
+        $limitY  = (float)$limitY;
+        $labelsX = is_array($labelsX) ? $labelsX : array();
+        $nbX     = count($labelsX);
+
+        $xLabels = array();
+        foreach ($labelsX as $i => $label) {
+            $xLabels[] = array(
+                'posX' => ($i * 195 / $nbX) + 5,
+                'text' => $this->plotterWindow->handleSpecialChars($label),
+            );
+        }
+
+        $yLabels = array();
+        if (is_array($labelsY) && count($labelsY) > 0) {
+            $nbY = count($labelsY);
+            foreach ($labelsY as $i => $label) {
+                $yLabels[] = array(
+                    'posY' => (-$i * 95 / $nbY) - 1,
+                    'text' => $this->plotterWindow->handleSpecialChars($label),
+                );
+            }
+        } else {
+            for ($i = 0; $i < 5; $i++) {
+                $yLabels[] = array(
+                    'posY' => (-$i * 95 / 5) - 1,
+                    'text' => (int)((5 - $i) * ($limitY / 5)),
+                );
+            }
+        }
+
+        $curves = array();
+        foreach ((is_array($datas) ? $datas : array()) as $series) {
+            $points = array();
+            foreach ($series as $x => $val) {
+                $points[] = array('x' => $x, 'y' => $val);
+            }
+            if (!empty($points)) {
+                $curves[] = array('color' => empty($curves) ? $color0 : $color1, 'points' => $points);
+            }
+        }
+
+        $gridLines = array();
+        $step      = ($limitY > 0) ? (pow(10, round(log($limitY) / 2.303)) / 5) : 1;
+        for ($index = 0; $index < $limitY; $index += $step) {
+            $gridLines[] = $index;
+        }
+
+        $this->plotterWindow->setTitle($title);
+        $this->plotterWindow->setParam("labelsX", $xLabels);
+        $this->plotterWindow->setParam("labelsY", $yLabels);
+        $this->plotterWindow->setParam("limitY", $limitY);
+        $this->plotterWindow->setParam("curves", $curves);
+        $this->plotterWindow->setParam("gridLines", $gridLines);
+        $this->plotterWindow->setParam("useStyle", substr($this->expStorage->version->build, 0, 4) >= 2017);
         $this->plotterWindow->show($login);
     }
 

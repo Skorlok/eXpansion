@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_BestRuns;
 
+use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
@@ -84,11 +85,42 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function displayWidget()
     {
+        /** @var guiConfig $guiConfig */
+        $guiConfig   = guiConfig::getInstance();
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->getColor("#rank#");
+        $timeColor   = $colorParser->getColor("#time#");
+
+        $runs = array();
+        foreach ($this->bestRuns as $run) {
+            $checkpoints = array();
+            foreach ($run->checkpoints as $cp) {
+                $index = count($checkpoints);
+                $checkpoints[] = array(
+                    'posX' => 15 * $index,
+                    'text' => $this->widget->handleSpecialChars($rankColor . ($index + 1) . ' ' . $timeColor . Time::fromTM($cp)),
+                );
+                if (count($checkpoints) > 10) {
+                    break; // Putting more than 1 line of checkpoints takes too much space and hell to compute next player
+                }
+            }
+
+            $runs[] = array(
+                'posY'        => -5 * count($runs),
+                'nickname'    => $this->widget->handleSpecialChars($run->nickname),
+                'time'        => $this->widget->handleSpecialChars(Time::fromTM($run->totalTime)),
+                'checkpoints' => $checkpoints,
+            );
+            if (count($runs) >= $this->config->bestRunsWidget_nbDisplay) {
+                break;
+            }
+        }
+
         $this->widget->setPosition($this->config->bestRunsWidget_PosX, $this->config->bestRunsWidget_PosY, 0);
-        $this->widget->setParam("bestRuns", $this->bestRuns);
-        $this->widget->setParam("nbFields", $this->config->bestRunsWidget_nbDisplay);
-        $this->widget->setParam("guiConfig", guiConfig::getInstance());
-        $this->widget->setParam("colorParser", ColorParser::getInstance());
+        $this->widget->setParam("runs",       $runs);
+        $this->widget->setParam("bgColorize", $this->widget->handleSpecialChars($guiConfig->style_widget_bgColorize));
+        $this->widget->setParam("timeColor",  $this->widget->handleSpecialChars(str_replace('$', "", $timeColor)));
         $this->widget->show(null, true);
     }
 

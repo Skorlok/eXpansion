@@ -237,7 +237,7 @@ foreach (Login => Useless in playerTimes) {
     }
 }
 
-if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate && ((exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer))) {
     needUpdate = False;
 
     declare Text[] playerRank = getSortedRank(playerTimes, playerCPs, totalCps);

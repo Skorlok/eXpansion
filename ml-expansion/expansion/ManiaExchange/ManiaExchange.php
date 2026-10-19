@@ -136,6 +136,7 @@ class ManiaExchange extends ExpPlugin
         $this->mxInfosWindow = new Window("ManiaExchange\Gui\Windows\MxInfos.xml");
         $this->mxInfosWindow->setName("MX Infos");
         $this->mxInfosWindow->setSize(220, 100);
+        $this->mxInfosWindow->setTitle('ManiaExchange Map Infos');
 
         $this->mxUpdateWindow = new Window("ManiaExchange\Gui\Windows\MxUpdate.xml");
         $this->mxUpdateWindow->setName("MX Update");
@@ -207,7 +208,7 @@ class ManiaExchange extends ExpPlugin
         self::$mxInfo = MxMap::fromArray($json['Results'][0]);
 
         if ($this->expStorage->simpleEnviTitle == "TM" && self::$mxInfo->replayCount > 0) {
-            $query = "https://tm.mania.exchange/api/replays/?count=25&best=1&mapId=" . self::$mxInfo->mapId;
+            $query = "https://tm.mania.exchange/api/replays/?count=250&best=1&mapId=" . self::$mxInfo->mapId;
 
             $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
             $this->dataAccess->httpCurl($query, array($this, "xGetReplaysInfo"), null, $options);
@@ -256,18 +257,6 @@ class ManiaExchange extends ExpPlugin
             return;
         }
 
-        $replays = array();
-        foreach (self::$mxReplays as $rec_nb => $rec) {
-            $pass = $this->storage->server->password ? ":" . $this->storage->server->password : "";
-            $link = '$h[https://skorlok.com/r.php?login=' . $this->storage->serverLogin . $pass
-                . '&tp=' . $this->expStorage->titleId . '&mx=t&replay=' . $rec->ReplayId . ']';
-            $replays[] = array(
-                'name' => $rec->Username,
-                'time' => Time::fromTM($rec->ReplayTime),
-                'link' => $link,
-            );
-        }
-
         $baseUrl = "https://" . strtolower($this->expStorage->simpleEnviTitle) . ".mania.exchange/";
         if (self::$mxInfo->images && isset(self::$mxInfo->images[0])
             && self::$mxInfo->images[0]['Width'] > 0 && self::$mxInfo->images[0]['Height'] > 0) {
@@ -277,19 +266,19 @@ class ManiaExchange extends ExpPlugin
         }
         $mxPageUrl = $baseUrl . "mapshow/" . self::$mxInfo->mapId;
 
-        $mxRows = array(
-            array('key' => 'Name:',       'value' => strval(self::$mxInfo->name)),
-            array('key' => 'Author:',     'value' => strval(self::$mxInfo->getUploader())),
-            array('key' => 'Uploaded:',   'value' => substr(str_replace('T', " ", self::$mxInfo->uploadedAt), 0, 16)),
-            array('key' => 'Updated:',    'value' => substr(str_replace('T', " ", self::$mxInfo->updatedAt), 0, 16)),
-            array('key' => 'Awards:',     'value' => strval(self::$mxInfo->awardCount)),
-            array('key' => 'Difficulty:', 'value' => strval(self::$mxInfo->getDifficulty())),
-            array('key' => 'Length:',     'value' => strval(self::$mxInfo->getLength())),
-            array('key' => 'Mood:',       'value' => strval(self::$mxInfo->moodFull)),
-            array('key' => 'Style:',      'value' => strval(self::$mxInfo->getStyle())),
-            array('key' => 'TitlePack:',  'value' => strval(self::$mxInfo->titlePack)),
-            array('key' => 'Routes:',     'value' => strval(self::$mxInfo->getRouteType())),
-            array('key' => 'MapType:',    'value' => strval(self::$mxInfo->mapType)),
+        $mxParams = array(
+            'mxName'       => strval(self::$mxInfo->name),
+            'mxAuthor'     => strval(self::$mxInfo->getUploader()),
+            'mxUploaded'   => substr(str_replace('T', " ", self::$mxInfo->uploadedAt), 0, 16),
+            'mxUpdated'    => substr(str_replace('T', " ", self::$mxInfo->updatedAt), 0, 16),
+            'mxAwards'     => strval(self::$mxInfo->awardCount),
+            'mxDifficulty' => strval(self::$mxInfo->getDifficulty()),
+            'mxLength'     => strval(self::$mxInfo->getLength()),
+            'mxMood'       => strval(self::$mxInfo->moodFull),
+            'mxStyle'      => strval(self::$mxInfo->getStyle()),
+            'mxTitlePack'  => strval(self::$mxInfo->titlePack),
+            'mxRoutes'     => strval(self::$mxInfo->getRouteType()),
+            'mxMapType'    => strval(self::$mxInfo->mapType),
         );
 
         $rawText = self::$mxInfo->authorComments !== null ? self::$mxInfo->authorComments : '';
@@ -302,12 +291,12 @@ class ManiaExchange extends ExpPlugin
         $description = preg_replace('#</.*>#Ui', '', $description);
 
         $hasLocalMap = false;
-        $uid         = '';
-        $fileName    = '';
-        $localRows   = array();
-        $rightRows   = array();
-        $modUrl      = null;
-        $songUrl     = null;
+        $modUrl      = '';
+        $songUrl     = '';
+        $localParams = array_fill_keys(array(
+            'uid', 'fileName', 'localName', 'localAuthor', 'localAuthorNick', 'localMood', 'localMapStyle', 'localMapType', 'localEnvironment', 'localCarType',
+            'addDate', 'authorTime', 'goldTime', 'silverTime', 'bronzeTime', 'checkpoints', 'laps', 'displayCost', 'songName', 'modName',
+        ), '');
 
         $map     = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $this->storage->currentMap->uId);
         $mapPath = $this->connection->getMapsDirectory();
@@ -330,56 +319,64 @@ class ManiaExchange extends ExpPlugin
                 $map->songFile     = $gbxInfo->songFile;
                 $map->modName      = $gbxInfo->modName;
                 $map->{"nick"}     = $gbxInfo->authorNick;
-                $modUrl            = $gbxInfo->modUrl ? $gbxInfo->modUrl : null;
-                $songUrl           = $gbxInfo->songUrl ? $gbxInfo->songUrl : null;
+                $modUrl            = $gbxInfo->modUrl ? $gbxInfo->modUrl : '';
+                $songUrl           = $gbxInfo->songUrl ? $gbxInfo->songUrl : '';
             } catch (\Exception $ex) {
                 \ManiaLive\Utilities\Console::println("Info: Map not found or error while reading gbx info for map.");
             }
 
-            $uid      = $map->uId;
-            $fileName = $map->fileName;
-
             $date = new \DateTime();
             $date->setTimestamp((int)$map->addTime);
 
-            $localRows = array(
-                array('key' => 'Name:',        'value' => strval($map->name)),
-                array('key' => 'Author:',      'value' => strval($map->author)),
-                array('key' => 'Author Nick:', 'value' => strval($map->nick)),
-                array('key' => 'Mood:',        'value' => strval($map->mood)),
-                array('key' => 'Map Style:',   'value' => strval($map->mapStyle)),
-                array('key' => 'Map Type:',    'value' => strval($map->mapType)),
-                array('key' => 'Environment:', 'value' => strval($map->environnement)),
-                array('key' => 'Car type:',    'value' => $gbxInfo ? strval($gbxInfo->vehicle) : ''),
-            );
-
-            $rightRows = array(
-                array('key' => 'Add Date:',     'value' => $date->format("d.m.Y")),
-                array('key' => 'Author Time:',  'value' => Time::fromTM($map->authorTime)),
-                array('key' => 'Gold Time:',    'value' => Time::fromTM($map->goldTime)),
-                array('key' => 'Silver Time:',  'value' => Time::fromTM($map->silverTime)),
-                array('key' => 'Bronze Time:',  'value' => Time::fromTM($map->bronzeTime)),
-                array('key' => 'Checkpoints:',  'value' => strval($map->nbCheckpoint)),
-                array('key' => 'Laps:',         'value' => strval($map->nbLap)),
-                array('key' => 'Display Cost:', 'value' => strval($map->copperPrice)),
-                array('key' => 'Song Name:',    'value' => strval($map->songFile)),
-                array('key' => 'Mod Name:',     'value' => strval($map->modName)),
+            $localParams = array(
+                'uid'              => strval($map->uId),
+                'fileName'         => strval($map->fileName),
+                'localName'        => strval($map->name),
+                'localAuthor'      => strval($map->author),
+                'localAuthorNick'  => strval($map->nick),
+                'localMood'        => strval($map->mood),
+                'localMapStyle'    => strval($map->mapStyle),
+                'localMapType'     => strval($map->mapType),
+                'localEnvironment' => strval($map->environnement),
+                'localCarType'     => $gbxInfo ? strval($gbxInfo->vehicle) : '',
+                'addDate'          => $date->format("d.m.Y"),
+                'authorTime'       => Time::fromTM($map->authorTime),
+                'goldTime'         => Time::fromTM($map->goldTime),
+                'silverTime'       => Time::fromTM($map->silverTime),
+                'bronzeTime'       => Time::fromTM($map->bronzeTime),
+                'checkpoints'      => strval($map->nbCheckpoint),
+                'laps'             => strval($map->nbLap),
+                'displayCost'      => strval($map->copperPrice),
+                'songName'         => strval($map->songFile),
+                'modName'          => strval($map->modName),
             );
         }
 
-        $this->mxInfosWindow->setTitle('ManiaExchange Map Infos');
-        $this->mxInfosWindow->setParam("replays",     $replays);
-        $this->mxInfosWindow->setParam("imageUrl",    $imageUrl);
-        $this->mxInfosWindow->setParam("mxPageUrl",   $mxPageUrl);
-        $this->mxInfosWindow->setParam("description", $description);
-        $this->mxInfosWindow->setParam("mxRows",      $mxRows);
-        $this->mxInfosWindow->setParam("hasLocalMap", $hasLocalMap);
-        $this->mxInfosWindow->setParam("uid",         $uid);
-        $this->mxInfosWindow->setParam("fileName",    $fileName);
-        $this->mxInfosWindow->setParam("localRows",   $localRows);
-        $this->mxInfosWindow->setParam("rightRows",   $rightRows);
-        $this->mxInfosWindow->setParam("modUrl",      $modUrl);
-        $this->mxInfosWindow->setParam("songUrl",     $songUrl);
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach (self::$mxReplays as $rec) {
+            $pass = $this->storage->server->password ? ":" . $this->storage->server->password : "";
+            $link = '$h[watch_replay?login=' . $this->storage->serverLogin . $pass . '&tp=' . $this->expStorage->titleId . '&mx=t&replay=' . $rec->ReplayId . ']';
+
+            $items[$i] = array(($i + 1) . '.', $rec->Username, $link . Time::fromTM($rec->ReplayTime));
+            $data[$i] = array(-1, -1, -1, -1);
+            $i++;
+        }
+
+        foreach (array_merge($mxParams, $localParams) as $key => $value) {
+            $this->mxInfosWindow->setParam($key, $this->mxInfosWindow->handleSpecialChars($value));
+        }
+        $this->mxInfosWindow->setParam("replayItems",    $items);
+        $this->mxInfosWindow->setParam("replayData",     $data);
+        $this->mxInfosWindow->setParam("imageUrl",       $this->mxInfosWindow->handleSpecialChars($imageUrl));
+        $this->mxInfosWindow->setParam("mxPageUrl",      $this->mxInfosWindow->handleSpecialChars($mxPageUrl));
+        $this->mxInfosWindow->setParam("description",    $description);
+        $this->mxInfosWindow->setParam("modUrl",         $this->mxInfosWindow->handleSpecialChars($modUrl));
+        $this->mxInfosWindow->setParam("songUrl",        $this->mxInfosWindow->handleSpecialChars($songUrl));
+        $this->mxInfosWindow->setParam("hideLocalMap",   !$hasLocalMap);
+        $this->mxInfosWindow->setParam("hideModButton",  !$modUrl);
+        $this->mxInfosWindow->setParam("hideSongButton", !$songUrl);
         $this->mxInfosWindow->show($login);
     }
 
@@ -405,7 +402,7 @@ class ManiaExchange extends ExpPlugin
 
     public function mxDownloadPack($login, $packId, $startAfter = null)
     {
-        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId&mappackid=' . $packId . '&count=50' . ($startAfter ? '&after=' . $startAfter : '');
+        $query = 'https://' . strtolower($this->expStorage->simpleEnviTitle) . '.mania.exchange/api/maps?fields=MapId,MapUid&mappackid=' . $packId . '&count=50' . ($startAfter ? '&after=' . $startAfter : '');
 
         $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_HTTPHEADER => array("X-ManiaPlanet-ServerLogin" => $this->storage->serverLogin));
         $this->dataAccess->httpCurl($query, array($this, "xAddMxPackAdmin"), array("login" => $login, "packId" => $packId, "firstLoop" => $startAfter == null), $options);
@@ -445,8 +442,21 @@ class ManiaExchange extends ExpPlugin
             return;
         }
 
+        $mapsByUid = array();
+        foreach ($this->storage->maps as $map) {
+            $mapsByUid[$map->uId] = $map;
+        }
+        $alreadyAddedCount = 0;
+
         foreach ($json->Results as $map) {
-            $this->addMap($login, $map->MapId);
+            if (isset($mapsByUid[$map->MapUid])) {
+                $alreadyAddedCount++;
+            } else {
+                $this->addMap($login, $map->MapId);
+            }
+        }
+        if ($alreadyAddedCount > 0) {
+            $this->eXpChatSendServerMessage("%s maps were already added on the server.", $login, array($alreadyAddedCount));
         }
 
         if (count($json->Results) == 50) {
@@ -900,6 +910,11 @@ class ManiaExchange extends ExpPlugin
             $gbxReader = new GBXChallMapFetcher(true, false, false);
             $gbxReader->processData($data);
 
+            if (!$gbxReader->validated) {
+                $this->eXpChatSendServerMessage("Map is not validated: " . $gbxReader->name . '$z$fff$s (validate the map and compute shadows before adding)', $login);
+                return;
+            }
+
             $mapFileName = ArrayOfObj::getObjbyPropValue($this->storage->maps, "uId", $gbxReader->uid);
             if ($mapFileName){
                 $this->eXpChatSendServerMessage("#mx#Map already in playlist! Update? remove it first or use //mxupdate", $login);
@@ -912,9 +927,6 @@ class ManiaExchange extends ExpPlugin
             if ($this->expStorage->isRemoteControlled) {
                 $this->saveMapRemotelly($file, $dir, $data, $login);
             } else {
-                if (!is_dir($dir)) {
-                    mkdir($dir, 0775, true);
-                }
                 $this->saveMapLocally($file, $dir, $data, $login);
             }
         } catch (\Exception $ex) {
@@ -967,42 +979,9 @@ class ManiaExchange extends ExpPlugin
             if ($this->connection->writeFile($file, $data)) {
 
                 try {
-                    if (!$this->connection->checkMapForCurrentServerParams($file)) {
-                        $msg = eXpGetMessage("#admin_error#The Map is not compatible with current server settings, map not added.");
-                        $this->eXpChatSendServerMessage($msg, $login);
-                        return;
-                    }
-
-                    $this->connection->addMap($file);
-
-                    $map = $this->connection->getMapInfo($file);
-                    $this->eXpChatSendServerMessage($this->msg_add, null, array($map->name));
-                    if ($this->config->juke_newmaps) {
-                        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
-                    }
-                } catch (\Exception $e) {
-                    $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
-                    $this->storage->resetMapInfos();
-                }
-            } else {
-                $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file at remote host: " . $file, $login);
-            }
-        } catch (Exception $ex) {
-            $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file at remote host :" . $e->getMessage(), $login);
-        }
-    }
-
-    public function saveMapLocally($file, $dir, $data, $login)
-    {
-        try {
-            if (!is_dir($dir)) {
-                mkdir($dir, 0775);
-            }
-
-            if (is_dir($dir) && $this->dataAccess->save($file, $data)) {
-
-                try {
-                    if (!$this->connection->checkMapForCurrentServerParams($file)) {
+                    try {
+                        $this->connection->checkMapForCurrentServerParams($file);
+                    } catch (\Exception $e) {
                         $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
                         $this->eXpChatSendServerMessage($msg, $login);
                         return;
@@ -1012,7 +991,46 @@ class ManiaExchange extends ExpPlugin
 
                     $map = $this->connection->getMapInfo($file);
                     $this->eXpChatSendServerMessage($this->msg_add, null, array($map->name));
-                    if ($this->config->juke_newmaps) {
+                    if ($this->config->juke_newmaps && $this->storage->getPlayerObject($login) != null) {
+                        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
+                    }
+                } catch (\Exception $e) {
+                    $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
+                    $this->storage->resetMapInfos();
+                }
+            } else {
+                $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file at remote host: " . $file, $login);
+            }
+        } catch (\Exception $ex) {
+            $this->eXpChatSendServerMessage("#admin_error#Error while saving a map file at remote host :" . $ex->getMessage(), $login);
+        }
+    }
+
+    public function saveMapLocally($file, $dir, $data, $login)
+    {
+        try {
+            if (!is_dir($dir)) {
+                if (!mkdir($dir, 0775, true)) {
+                    $this->eXpChatSendServerMessage("Error while creating directory for map: " . $dir, $login);
+                    return;
+                }
+            }
+
+            if ($this->dataAccess->save($file, $data)) {
+                try {
+                    try {
+                        $this->connection->checkMapForCurrentServerParams($file);
+                    } catch (\Exception $e) {
+                        $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
+                        $this->eXpChatSendServerMessage($msg, $login);
+                        return;
+                    }
+
+                    $this->connection->addMap($file);
+
+                    $map = $this->connection->getMapInfo($file);
+                    $this->eXpChatSendServerMessage($this->msg_add, null, array($map->name));
+                    if ($this->config->juke_newmaps && $this->storage->getPlayerObject($login) != null) {
                         $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Maps\Maps', "queueMap", $login, $map, false);
                     }
                 } catch (\Exception $e) {
@@ -1060,12 +1078,10 @@ class ManiaExchange extends ExpPlugin
 
         if ($this->dataAccess->save($file, $data)) {
             try {
-                if (!$this->connection->checkMapForCurrentServerParams($file)) {
-                    $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
-                    $this->eXpChatSendServerMessage($msg, $login);
-                    return;
-                }
+                $this->connection->checkMapForCurrentServerParams($file);
             } catch (\Exception $e) {
+                $msg = eXpGetMessage("#admin_error#Map is not compatible with current server settings, map not added.");
+                $this->eXpChatSendServerMessage($msg, $login);
                 $this->connection->chatSendServerMessage(__("Error: %s", $login, $e->getMessage()), $login);
                 return;
             }

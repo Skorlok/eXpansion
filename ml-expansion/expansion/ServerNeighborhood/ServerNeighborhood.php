@@ -99,7 +99,6 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->widget = new Widget("ServerNeighborhood\Gui\Widgets\ServerNeighborhood.xml");
         $this->widget->setName("Server Neighborhood Panel");
         $this->widget->setLayer("normal");
-        $this->widget->setParam('ownLogin', $this->storage->serverLogin);
         $this->widget->setParam('title', 'Server Neighborhood');
         $this->widget->registerScript($this->script);
         if ($this->expStorage->simpleEnviTitle == "TM") {
@@ -297,14 +296,54 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $sizeY = 3.4;
         }
 
+        $gamemodes = array(
+            'rounds'     => 'RT_Rounds',
+            'timeattack' => 'RT_TimeAttack',
+            'team'       => 'RT_Team',
+            'laps'       => 'RT_Laps',
+            'cup'        => 'RT_Cup',
+        );
+
+        $rows = array();
+        foreach ($servers as $srv) {
+            $server = $srv->getServer_data()->server;
+
+            $iconStyle = 'empty';
+            $iconSubstyle = 'empty';
+            if ($server->login == $this->storage->serverLogin) {
+                $iconStyle = 'Icons128x128_1';
+                $iconSubstyle = 'Back';
+            } elseif ($server->private == 'true') {
+                $iconStyle = 'Icons128x128_1';
+                $iconSubstyle = 'Padlock';
+            }
+
+            $playersColor = ((int)$server->players->current >= (int)$server->players->maximum) ? '$F00' : '$FFF';
+            $specsColor   = ((int)$server->spectators->current >= (int)$server->spectators->maximum) ? '$F00' : '$FFF';
+            $gamemode     = strval($server->gamemode);
+
+            $rows[] = array(
+                'posY'         => -$sizeY * count($rows),
+                'action'       => $this->widget->handleSpecialChars($srv->mlAction),
+                'iconStyle'    => $iconStyle,
+                'iconSubstyle' => $iconSubstyle,
+                'modeSubstyle' => isset($gamemodes[$gamemode]) ? $gamemodes[$gamemode] : 'RT_Script',
+                'players'      => $this->widget->handleSpecialChars($playersColor . $server->players->current . '/' . $server->players->maximum),
+                'specs'        => $this->widget->handleSpecialChars($specsColor . $server->spectators->current . '/' . $server->spectators->maximum),
+                'ladder'       => $this->widget->handleSpecialChars('$FFF' . $server->ladder->minimum . '/' . $server->ladder->maximum),
+                'name'         => '$AAA' . $this->widget->handleSpecialChars((string)$server->name),
+            );
+        }
+
         $this->script->setParam('refresh_interval', $this->config->refresh_interval * 1000);
 
         $this->widget->setPosition($this->config->serverPanel_PosX, $this->config->serverPanel_PosY, 25);
         $this->widget->setSize(33, $sizeY * $this->config->nbElement + 9);
         $this->widget->setParam('refresh_interval', $this->config->refresh_interval);
-        $this->widget->setParam('style', $this->config->style);
-        $this->widget->setParam('nbFields', $this->config->nbElement);
-        $this->widget->setParam('items', $servers);
+        $this->widget->setParam('isUndefStyle', $this->config->style == 'UndefStyle');
+        $this->widget->setParam('servers', $rows);
+        // without any server, the background only covers the title
+        $this->widget->setParam('bgSizeY', empty($rows) ? 8.75 : $sizeY * $this->config->nbElement + 8.75);
         $this->widget->show(null, true);
     }
 
@@ -357,28 +396,35 @@ class ServerNeighborhood extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function showServerList($login)
     {
-        $serversData = array();
+        $serverItems = array();
+        $serverData  = array();
+        $i = 0;
+
         foreach ($this->servers as $serverId => $server) {
             if (!$server->isOnline()) {
                 continue;
             }
             $sd = $server->getServer_data();
-            $serversData[] = array(
-                'env'           => $sd->current->map->environment,
-                'sname'         => $sd->server->name,
-                'playersCurrent'=> $sd->server->players->current,
-                'playersMax'    => $sd->server->players->maximum,
-                'specsCurrent'  => $sd->server->spectators->current,
-                'specsMax'      => $sd->server->spectators->maximum,
-                'ladderMin'     => $sd->server->ladder->minimum,
-                'ladderMax'     => $sd->server->ladder->maximum,
-                'mapName'       => $sd->current->map->name,
-                'mapAuthor'     => $sd->current->map->author,
-                'mapAuthorTime' => $sd->current->map->authortime,
-                'action'        => 'exp:eXpansion.ServerNeighborhood:showServerPlayers:' . $serverId,
+
+            $playersFull = ((int)$sd->server->players->current >= (int)$sd->server->players->maximum);
+            $specsFull   = ((int)$sd->server->spectators->current >= (int)$sd->server->spectators->maximum);
+
+            $serverItems[$i] = array(
+                '$111$i' . (string)$sd->current->map->environment,
+                (string)$sd->server->name,
+                ($playersFull ? '$F00' : '$111') . (string)$sd->server->players->current . '/' . (string)$sd->server->players->maximum,
+                ($specsFull ? '$F00' : '$111') . (string)$sd->server->spectators->current . '/' . (string)$sd->server->spectators->maximum,
+                '$111' . (string)$sd->server->ladder->minimum . ' - ' . (string)$sd->server->ladder->maximum . 'k',
+                '$111' . (string)$sd->current->map->name,
+                '$111' . (string)$sd->current->map->author,
+                '$111' . (string)$sd->current->map->authortime,
             );
+            $serverData[$i] = array('exp:eXpansion.ServerNeighborhood:showServerPlayers:' . $serverId);
+            $i++;
         }
-        $this->serverListWindow->setParam("servers", $serversData);
+
+        $this->serverListWindow->setParam("serverItems", $serverItems);
+        $this->serverListWindow->setParam("serverData", $serverData);
         $this->serverListWindow->show($login);
     }
 

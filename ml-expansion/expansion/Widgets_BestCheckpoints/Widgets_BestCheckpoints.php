@@ -2,6 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_BestCheckpoints;
 
+use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
@@ -31,16 +32,40 @@ class Widgets_BestCheckpoints extends ExpPlugin
 
     /**
      * displayWidget(string $login)
-     *
-     * @param string $login
      */
     public function displayWidget($checkpoints)
     {
+        $rows = array();
+        for ($x = 0; $x < $this->config->CPNumber && $x < count($checkpoints); $x++) {
+            if (!isset($checkpoints[$x])) {
+                continue;
+            }
+
+            $time = Time::fromTM($checkpoints[$x]->time);
+            if (strpos($time, ":") == 1) {
+                $time = "0" . $time;
+            }
+
+            $rows[] = array(
+                'index'    => $x,
+                'rank'     => $x + 1,
+                'posX'     => 35 * ($x % 6),
+                'posY'     => -5 * floor($x / 6),
+                'time'     => $time,
+                'nickname' => $this->widget->handleSpecialChars($checkpoints[$x]->nickname),
+            );
+        }
+
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        /** @var guiConfig $guiConfig */
+        $guiConfig = guiConfig::getInstance();
+
         $this->widget->setPosition($this->config->bestCpWidget_PosX, $this->config->bestCpWidget_PosY, 0);
-        $this->widget->setParam("checkpoints", $checkpoints);
-        $this->widget->setParam("cpLimit", Config::getInstance()->CPNumber);
-        $this->widget->setParam("guiConfig", guiConfig::getInstance());
-        $this->widget->setParam("colorParser", ColorParser::getInstance());
+        $this->widget->setParam("checkpoints", $rows);
+        $this->widget->setParam("bgColorize",  $this->widget->handleSpecialChars($guiConfig->style_widget_bgColorize));
+        $this->widget->setParam("rankColor",   $this->widget->handleSpecialChars(str_replace('$', "", $colorParser->getColor("#rank#"))));
+        $this->widget->setParam("timeColor",   $this->widget->handleSpecialChars(str_replace('$', "", $colorParser->getColor("#time#"))));
         $this->widget->show(null, true);
     }
 

@@ -23,11 +23,6 @@ class Checkbox
         return self::$script;
     }
 
-    public static function getLastId()
-    {
-        return (self::$counter > 0) ? self::$counter - 1 : 100000;
-    }
-
     public static function getXML($name, $active = false, $textWidth = 25, $enabled = true, $text = "", $isTextId = false)
     {
         $id = self::$counter++;

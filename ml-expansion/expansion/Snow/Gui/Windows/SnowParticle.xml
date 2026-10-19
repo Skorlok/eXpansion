@@ -1,0 +1,3 @@
+<exp:foreach items="particles" as="p">
+<quad id="p{p.index}" posn="{p.posX} 99 0" sizen="4 4" halign="center" valign="center" image="{texture}" scriptevents="1" class="particle"/>
+</exp:foreach>

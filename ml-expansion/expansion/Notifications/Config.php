@@ -6,6 +6,6 @@ class Config extends \ManiaLib\Utils\Singleton
 {
     public $redirectedPlugins = array();
 
-    public $posX = -160;
-    public $posY = 80.5;
+    public $posX = 28;
+    public $posY = -67;
 }

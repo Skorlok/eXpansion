@@ -19,13 +19,12 @@ namespace ManiaLivePlugins\eXpansion\AutoQueue;
 
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\AutoQueue\Classes\Queue;
-use ManiaLivePlugins\eXpansion\AutoQueue\Gui\Widgets\EnterQueueWidget;
-use ManiaLivePlugins\eXpansion\AutoQueue\Gui\Widgets\QueueList;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
@@ -43,10 +42,10 @@ class AutoQueue extends ExpPlugin
     private $config;
     private $canUnqueue = true;
     private $checkQueue = true;
-    public static $enterAction;
-    public static $leaveAction;
-    public static $showEnterQueueAction;
     protected $fullMatchPlayers = array();
+
+    /** @var Widget */
+    private $queueWidget;
 
     public function eXpOnReady()
     {
@@ -60,15 +59,18 @@ class AutoQueue extends ExpPlugin
 
         $this->queue = new Queue();
 
-        /** @var ActionHandler $ah */
-        $ah = ActionHandler::getInstance();
-        self::$enterAction = $ah->createAction(array($this, "enterQueue"));
-        self::$leaveAction = $ah->createAction(array($this, "leaveQueue"));
-        self::$showEnterQueueAction = $ah->createAction(array($this, "showEnterQueue"));
+        $this->registerManialinkCallback('enterQueue');
+        $this->registerManialinkCallback('leaveQueue');
+        $this->registerManialinkCallback('admRemoveQueue', false, true);
+
+        $this->queueWidget = new Widget("AutoQueue\Gui\Widgets\AutoQueueWidget.xml");
+        $this->queueWidget->setName("AutoQueue");
+        $this->queueWidget->setLayer("normal");
+        $this->queueWidget->setSize(35, 44.5);
+        $this->queueWidget->setPosition($this->config->autoQueue_PosX, $this->config->autoQueue_PosY, 0);
 
         foreach ($this->storage->spectators as $login => $player) {
             $this->connection->forceSpectator($login, 1);
-            $this->showEnterQueue($login);
         }
         foreach ($this->storage->players as $login => $player) {
             $this->fullMatchPlayers[$login] = $player;
@@ -108,7 +110,7 @@ class AutoQueue extends ExpPlugin
     {
         switch ($callback) {
             case "Maniaplanet.StartRound_Start":
-                $this->onBeginRound(0);
+                $this->onBeginRound();
                 break;
         }
     }
@@ -117,7 +119,6 @@ class AutoQueue extends ExpPlugin
     {
         if ($isSpectator) {
             $this->connection->forceSpectator($login, 1);
-            $this->showEnterQueue($login);
             $this->widgetSyncList();
         }
     }
@@ -126,8 +127,8 @@ class AutoQueue extends ExpPlugin
     {
         if (in_array($login, $this->queue->getLogins())) {
             $this->queue->remove($login);
+            $this->widgetSyncList();
         }
-        $this->widgetSyncList();
         $this->checkQueue = true;
     }
 
@@ -138,26 +139,21 @@ class AutoQueue extends ExpPlugin
         }
 
         if ($player->spectator) {
-            $this->showEnterQueue($player->login);
             $this->widgetSyncList();
 
             try {
                 $this->connection->forceSpectator($player->login, 1);
-            } catch (\Exception $ex) {
+            } catch (\Exception $ex) {}
 
-            }
             if ($player->hasPlayerSlot) {
                 try {
                     $this->connection->spectatorReleasePlayerSlot($player->login);
-                } catch (\Exception $e) {
-
-                }
+                } catch (\Exception $e) {}
             }
 
             $this->checkQueue = true;
         } else {
             $this->widgetSyncList();
-            EnterQueueWidget::Erase($player->login);
         }
     }
 
@@ -183,15 +179,16 @@ class AutoQueue extends ExpPlugin
 
     public function admRemoveQueue($login, $target)
     {
+        $target = str_replace('–', '-', $target);
+
         if (AdminGroups::hasPermission($login, Permission::SERVER_ADMIN)) {
             if (in_array($target, $this->queue->getLogins())) {
                 $this->queue->remove($target);
-                $this->eXpChatSendServerMessage(eXpGetMessage("Admin has removed you from queue!", $target));
+                $this->eXpChatSendServerMessage(eXpGetMessage("Admin has removed you from queue!"), $target);
                 $this->eXpChatSendServerMessage(eXpGetMessage('Removed player %s $z$ffffrom queue'), $login,  array($this->storage->getPlayerObject($target)->cleanNickName));
+                $this->widgetSyncList();
             }
         }
-        EnterQueueWidget::Erase($login);
-        $this->widgetSyncList();
     }
 
     public function enterQueue($login)
@@ -206,14 +203,15 @@ class AutoQueue extends ExpPlugin
 
         $this->checkQueue = true;
 
-        EnterQueueWidget::Erase($login);
         $this->widgetSyncList();
     }
 
     public function leaveQueue($login)
     {
+        if (!in_array($login, $this->queue->getLogins())) {
+            return;
+        }
         $this->queue->remove($login);
-        $this->showEnterQueue($login);
         $this->widgetSyncList();
     }
 
@@ -274,40 +272,47 @@ class AutoQueue extends ExpPlugin
     {
         $this->queue->syncPlayers(array_keys($this->storage->players));
 
-        QueueList::EraseAll();
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $queued = $this->queue->getQueuedPlayers();
+        $logins = array_keys($queued);
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($queued as $player) {
+            $items[$i] = array($rankColor . $i + 1 . '.', $player->nickName);
+            $data[$i]  = array(-1, -1, 'exp:eXpansion.AutoQueue:admRemoveQueue:' . $player->login);
+            $i++;
+        }
+        $this->queueWidget->setParam("queueItems", $items);
+        $this->queueWidget->setParam("queueData", $data);
+
+        // failsafe, players should not be able to see the widget
+        $players = array_keys($this->storage->players);
+        if (!empty($players)) {
+            $this->queueWidget->erase($players);
+        }
 
         foreach ($this->storage->spectators as $login => $player) {
-            /** @var QueueList $widget */
-            $widget = QueueList::Create($login);
-            $widget->setPosition($this->config->queueList_PosX, $this->config->queueList_PosY);
-            $widget->setPlayers($this->queue->getQueuedPlayers(), $this);
-            $widget->show();
-        }
-    }
+            $inQueue = in_array($login, $logins);
 
-    public function showEnterQueue($login)
-    {
-        $player = $this->storage->getPlayerObject($login);
-        if ($player && $player->ladderScore < $this->storage->server->ladderServerLimitMin) {
-            return;
+            $this->queueWidget->setParam("hideJoin",   $inQueue);
+            $this->queueWidget->setParam("hideLeave",  !$inQueue);
+            $this->queueWidget->setParam("hideRemove", !AdminGroups::hasPermission($login, Permission::SERVER_ADMIN));
+            $this->queueWidget->show($login);
         }
-        $widget = EnterQueueWidget::Create($login);
-        $widget->setPosition($this->config->enterQueueList_PosX, $this->config->enterQueueList_PosY);
-        $widget->show($login);
     }
 
     public function eXpOnUnload()
     {
-        /** @var ActionHandler $ah */
-        $ah = ActionHandler::getInstance();
-        $ah->deleteAction(self::$enterAction);
-        $ah->deleteAction(self::$leaveAction);
-        $ah->deleteAction(self::$showEnterQueueAction);
+        if ($this->queueWidget instanceof Widget) {
+            $this->queueWidget->erase();
+        }
+        $this->queueWidget = null;
 
-        self::$enterAction = null;
-        self::$leaveAction = null;
-        EnterQueueWidget::EraseAll();
-        QueueList::EraseAll();
         $this->queue = null;
         $this->fullMatchPlayers = array();
     }

@@ -31,7 +31,7 @@ class MapSuggestion extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $player = $this->storage->getPlayerObject($login);
         $from = $player->nickName . '$z$s$fff (' . $login . ')';
-        $this->mapWishWindow->setParam("from", $from);
+        $this->mapWishWindow->setParam("from", $this->mapWishWindow->handleSpecialChars($from));
         $this->mapWishWindow->show($login);
     }
 

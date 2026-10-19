@@ -1,26 +1,10 @@
-<?php
-
-if (is_numeric($this->getParam('resAmount'))) {
-    $resText = array($this->addLang('$s$fffBuy'), $this->addLang('$s$fffRestart'), $this->addLang('$s$fff' . $this->getParam('resAmount') . 'p'));
-} else {
-    $resText = array($this->addLang('$s$fffMax'), $this->addLang('$s$fffrestarts'), $this->addLang('$s$fffreached'));
-}
-
-if (is_numeric($this->getParam('skipAmount'))) {
-    $skipText = array($this->addLang('$s$fffBuy'), $this->addLang('$s$fffSkip'), $this->addLang('$s$fff' . $this->getParam('skipAmount') . 'p'));
-} else {
-    $skipText = array($this->addLang('$s$fffMax'), $this->addLang('$s$fffskips'), $this->addLang('$s$fffreached'));
-}
-
-?>
-
 <frame posn="6 0 0">
     <frame>
         <frame posn="0 0 -1">
-            <?php echo '<exp:widgetbutton sizeX="10" sizeY="10" action="exp:eXpansion.Widgets_ResSkip:skipMap" row0="' . $skipText[0] . '" row1="' . $skipText[1] . '" row2="' . $skipText[2] . '"/>'; ?>
+            <exp:widgetbutton sizeX="10" sizeY="10" action="exp:eXpansion.Widgets_ResSkip:skipMap" row0="{skipText0}" row1="{skipText1}" row2="{skipText2}"/>
         </frame>
         <frame posn="10 0 -1">
-            <?php echo '<exp:widgetbutton sizeX="10" sizeY="10" action="exp:eXpansion.Widgets_ResSkip:restartMap" row0="' . $resText[0] . '" row1="' . $resText[1] . '" row2="' . $resText[2] . '"/>'; ?>
+            <exp:widgetbutton sizeX="10" sizeY="10" action="exp:eXpansion.Widgets_ResSkip:restartMap" row0="{resText0}" row1="{resText1}" row2="{resText2}"/>
         </frame>
     </frame>
 </frame>

@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         parent::onBeginLoad();
         $this->setName("Chat: Chat Webhook Exporter");
         $this->setDescription("Provides a way to export chat messages to a webhook.");
-        $this->setGroups(array("Chat", "Tools"));
+        $this->setGroups(array("Chat", "Connectivity"));
 
         $this->setRelaySupport(false);
 

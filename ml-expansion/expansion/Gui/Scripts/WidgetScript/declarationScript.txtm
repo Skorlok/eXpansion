@@ -33,7 +33,6 @@ declare Vec3 LastDelta = <Window.RelativePosition.X, Window.RelativePosition.Y, 
 declare Vec3 DeltaPos = <0.0, 0.0, -3.0>;
 declare Real lastMouseX = 0.0;
 declare Real lastMouseY = 0.0;
-declare CMlControl element;
 
 declare Boolean exp_needToCheckPersistentVars for UI = False;
 declare Integer exp_multipleCheckCount = 0;
@@ -57,8 +56,6 @@ declare Text visibleLayerInit = "{{ visibleLayerInit }}";
 declare Boolean disablePersonalHud = {{ disablePersonalHud }};
 
 declare Boolean exp_widgetCurrentVisible = False;
-declare Boolean exp_widgetVisibilityChanged = False;
-declare Integer eXp_lastWidgetCheck = 0;
 declare Boolean eXp_firstPersistentCheckDone = False;
 
 if (!EXP_widgetVisible.existskey(id) || forceReset) {

@@ -22,4 +22,8 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $endMapRating_PosX = -45;
     public $endMapRating_PosY = -42;
+
+    public $colorUnder30 = '$0ad';
+    public $colorAbove30 = '$2af';
+    public $colorAbove60 = '$0cf';
 }

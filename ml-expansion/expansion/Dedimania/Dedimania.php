@@ -290,7 +290,7 @@ class Dedimania extends DedimaniaAbstract
     public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
         $this->sendScores();
-        $this->EndMatch();
+        $this->endMapTriggered = false;
     }
 
     public function sendScores()

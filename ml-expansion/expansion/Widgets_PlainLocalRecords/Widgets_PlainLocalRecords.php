@@ -3,6 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_PlainLocalRecords;
 
 use ManiaLive\Event\Dispatcher;
+use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
@@ -30,7 +31,6 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
         $this->widget->setName("Local Scores Panel");
         $this->widget->setLayer("normal");
         $this->widget->setParam("title", "Best Scores");
-        $this->widget->setParam("isTime", true);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -50,9 +50,33 @@ class Widgets_PlainLocalRecords extends ExpPlugin implements Listener
     {
         $this->widget->setSize(46, ($this->config->localRecordsPanel_nbFields * 4) + 3.25);
         $this->widget->setPosition($this->config->localRecordsPanel_PosX, $this->config->localRecordsPanel_PosY, 0);
-        $this->widget->setParam("nbFields", $this->config->localRecordsPanel_nbFields);
-        $this->widget->setParam("records", self::$localrecords);
+        self::setPanelParams($this->widget, self::$localrecords, $this->config->localRecordsPanel_nbFields, true);
         $this->widget->show(null, true);
+    }
+
+    /**
+     * Fill the params of the Gui\Widgets\RecordsPanel.xml template, also used by Widgets_LocalScores.
+     *
+     * @param bool $isTime true to display the record times as a race time, false to display the raw scores
+     */
+    public static function setPanelParams(Widget $widget, $records, $nbFields, $isTime)
+    {
+        $rows = array();
+        foreach ($records as $record) {
+            $index = count($rows) + 1;
+            $rows[] = array(
+                'index'    => $index,
+                'posY'     => -4 * ($index - 1),
+                'time'     => $widget->handleSpecialChars(strval($isTime ? Time::fromTM($record->time) : $record->time)),
+                'nickname' => $widget->handleSpecialChars($record->nickName),
+            );
+            if (count($rows) >= $nbFields) {
+                break;
+            }
+        }
+
+        $widget->setParam("bgSizeY", 3.25 + $nbFields * 4);
+        $widget->setParam("records", $rows);
     }
 
     public function onBeginMatch()

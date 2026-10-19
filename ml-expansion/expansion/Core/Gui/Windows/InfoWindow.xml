@@ -1,29 +1,3 @@
-<?php
-$connection  = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
-$storage     = \ManiaLive\Data\Storage::getInstance();
-$version     = $connection->getVersion();
-$statsAction = $this->getParam("statsAction");
-
-$serverLogin = $this->handleSpecialChars($storage->serverLogin);
-$titleId     = $this->handleSpecialChars($version->titleId);
-$vVersion    = $this->handleSpecialChars($version->version);
-$vBuild      = $this->handleSpecialChars($version->build);
-$vApi        = $this->handleSpecialChars($version->apiVersion);
-$expVer      = $this->handleSpecialChars(\ManiaLivePlugins\eXpansion\Core\Core::EXP_VERSION . " - " . date("Y-m-d h:i:s A", \ManiaLivePlugins\eXpansion\Helpers\Helper::getBuildDate()));
-$phpVer      = $this->handleSpecialChars(phpversion());
-
-$admContact = \ManiaLivePlugins\eXpansion\Core\Config::getInstance()->contact;
-if (strpos($admContact, '@') !== false) {
-	$admContact = '$lmailto://' . $admContact;
-} else {
-	$admContact = '$l' . $admContact;
-}
-$admContact = $this->handleSpecialChars($admContact);
-
-$joinLink = $this->handleSpecialChars("maniaplanet://#join=" . $storage->serverLogin . "@" . $version->titleId);
-$favLink  = $this->handleSpecialChars("maniaplanet://#addfavourite=" . $storage->serverLogin . "@" . $version->titleId);
-$favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php?login=" . rawurldecode($storage->serverLogin));
-?>
 <frame posn="0 2 0" scale="0.8">
 	<frame>
 		<frame>
@@ -31,7 +5,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $serverLogin ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{serverLogin}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -41,7 +15,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vVersion ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vVersion}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -51,7 +25,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vBuild ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vBuild}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -61,7 +35,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $vApi ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vApi}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -71,7 +45,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $titleId ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{titleId}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -81,7 +55,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars(\ManiaLive\Application\VERSION) ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{mlVersion}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -91,7 +65,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $expVer ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{expVer}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -101,7 +75,7 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $phpVer ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{phpVer}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
@@ -111,25 +85,23 @@ $favUrl   = $this->handleSpecialChars("http://reaby.kapsi.fi/ml/addfavourite.php
 			<frame posn="0 -2 1.0E-5">
 				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
 			</frame>
-			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="<?php echo $admContact ?>" autonewline="1"/>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{admContact}" autonewline="1"/>
 			<frame posn="33 -2 3.0E-5">
 				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
 			</frame>
 		</frame>
 		<label posn="0 -54 0.00036" sizen="10 7" style="TextStaticSmall"/>
 		<frame posn="0 -61 1" scale="1.2">
-			<?php echo '<exp:inputbox name="join" sizeX="77" label="@Join link:" text="' . $joinLink . '" isTextId="true"/>'; ?>
+			<exp:inputbox name="join" sizeX="77" label="@Join link:" text="{joinLink}" isTextId="true"/>
 		</frame>
 		<frame posn="0 -75.4 1" scale="1.2">
-			<?php echo '<exp:inputbox name="fav" sizeX="77" label="@Favourite link:" text="' . $favLink . '" isTextId="true"/>'; ?>
+			<exp:inputbox name="fav" sizeX="77" label="@Favourite link:" text="{favLink}" isTextId="true"/>
 		</frame>
 	</frame>
 </frame>
-<?php if ($statsAction != -1): ?>
-<frame posn="78 -69 1">
-	<exp:button sizeX="30" sizeY="6" text="@Server Stats" action="<?php echo $statsAction; ?>" isTextId="true"/>
+<frame posn="78 -69 1" hidden="{hideServerStats}">
+	<exp:button sizeX="30" sizeY="6" text="@Server Stats" action="exp:eXpansion.ServerStatistics:showStats" isTextId="true"/>
 </frame>
-<?php endif; ?>
 <frame posn="80 -60.5 1">
-	<exp:button sizeX="20" sizeY="6" text="@Add to Fav's" manialink="<?php echo $favUrl; ?>" isTextId="true"/>
+	<exp:button sizeX="20" sizeY="6" text="@Add to Fav's" manialink="{favUrl}" isTextId="true"/>
 </frame>

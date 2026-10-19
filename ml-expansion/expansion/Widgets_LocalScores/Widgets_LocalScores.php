@@ -8,6 +8,7 @@ use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Listener;
+use ManiaLivePlugins\eXpansion\Widgets_PlainLocalRecords\Widgets_PlainLocalRecords;
 
 class Widgets_LocalScores extends ExpPlugin implements Listener
 {
@@ -30,7 +31,6 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
         $this->widget->setName("Local Scores Panel");
         $this->widget->setLayer("normal");
         $this->widget->setParam("title", "Best Scores");
-        $this->widget->setParam("isTime", false);
         if ($this->expStorage->simpleEnviTitle == "TM") {
             $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
         }
@@ -50,8 +50,7 @@ class Widgets_LocalScores extends ExpPlugin implements Listener
     {
         $this->widget->setSize(46, ($this->config->localScoresPanel_nbFields * 4) + 3.25);
         $this->widget->setPosition($this->config->localScoresPanel_PosX, $this->config->localScoresPanel_PosY, 0);
-        $this->widget->setParam("nbFields", $this->config->localScoresPanel_nbFields);
-        $this->widget->setParam("records", self::$localrecords);
+        Widgets_PlainLocalRecords::setPanelParams($this->widget, self::$localrecords, $this->config->localScoresPanel_nbFields, false);
         $this->widget->show(null, true);
     }
 

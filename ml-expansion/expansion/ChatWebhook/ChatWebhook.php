@@ -4,16 +4,37 @@ namespace ManiaLivePlugins\eXpansion\ChatWebhook;
 
 use DateTime;
 use Exception;
+use ManiaLivePlugins\eXpansion\Helpers\Countries;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use ManiaLivePlugins\eXpansion\ChatWebhook\Classes\Connection as ChatWebhookConnection;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
-use ManiaLivePlugins\eXpansion\Core\DataAccess;
 
 class ChatWebhook extends ExpPlugin
 {
 
-    private $dataAccess;
+    /** @var ChatWebhookConnection */
+    private $webConnection;
+
+    /** @var Config */
     private $config;
+
+    /** @var array country => flag image, only where Countries::mapCountry() doesn't give an existing image */
+    private static $flags = array(
+        'Cameroon' => 'CMR',
+        'Chinese Taipei' => 'ROC',
+        'Congo' => 'COG',
+        'Germany' => 'GER',
+        'Niger' => 'NER',
+        'Romania' => 'ROU',
+        'Serbia' => 'SRB',
+        'Taiwan' => 'ROC',
+        'Trinidad and Tobago' => 'TTO',
+        'Aruba' => 'WOR',
+        'Bermuda' => 'WOR',
+        'Guam' => 'WOR',
+        'Puerto Rico' => 'WOR',
+    );
 
     public function eXpOnLoad()
     {
@@ -23,7 +44,7 @@ class ChatWebhook extends ExpPlugin
     public function eXpOnReady()
     {
         $this->config = Config::getInstance();
-        $this->dataAccess = DataAccess::getInstance();
+        $this->webConnection = new ChatWebhookConnection($this->config->webhookUrl);
 
         foreach ($this->storage->players as $login => $player) {
             $this->onPlayerConnect($login, null);
@@ -37,6 +58,7 @@ class ChatWebhook extends ExpPlugin
     public function onSettingsChanged(Variable $var)
     {
         $this->config = Config::getInstance();
+        $this->webConnection->url = $this->config->webhookUrl;
     }
 
     public function eXpOnUnload()
@@ -47,38 +69,6 @@ class ChatWebhook extends ExpPlugin
 
         foreach ($this->storage->spectators as $login => $player) {
             $this->onPlayerDisconnect($login);
-        }
-    }
-
-    public function sendWebhookMessage($content = "", $embeds = array())
-    {
-        if ($this->config->webhookUrl == "") {
-            return;
-        }
-        $postData = array("username" => Formatting::stripStyles($this->storage->server->name), "content" => $content, "allowed_mentions" => array("parse" => array()));
-        if (sizeof($embeds) > 0) {
-            $postData["embeds"] = array($embeds);
-        }
-
-        $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($postData), CURLOPT_HTTPHEADER => array("Content-Type: application/json; charset=utf-8"));
-        $this->dataAccess->httpCurl($this->config->webhookUrl, array($this, "requestCallback"), null, $options);
-    }
-
-    public function requestCallback($job, $jobData)
-    {
-        $info = $job->getCurlInfo();
-        $code = $info['http_code'];
-        $data = $job->getResponse();
-
-        if (substr($code, 0, 1) != 2) {
-            $this->console("Error while sending webhook message : " . $code);
-        }
-        if ($data) {
-            $json = json_decode($data, true);
-			if ($json) {
-				$this->console(print_r($json, true));
-				return;
-			}
         }
     }
 
@@ -138,7 +128,7 @@ class ChatWebhook extends ExpPlugin
             }
             $this->setJoinTime($login);
 
-            $this->sendWebhookMessage("", array(
+            $this->webConnection->sendWebhookMessage("", null, array(
                 "description" => Formatting::stripStyles($player->nickName) . ' (' . $login . ') Connected from ' . $this->getCountry($player, false),
                 "color" => hexdec("00cc00"),
                 "timestamp" => date("c", strtotime("now"))
@@ -161,7 +151,7 @@ class ChatWebhook extends ExpPlugin
                 return;
             }
             
-            $this->sendWebhookMessage("", array(
+            $this->webConnection->sendWebhookMessage("", null, array(
                 "description" => Formatting::stripStyles($player->nickName) . ' (' . $login . ') from ' . $this->getCountry($player, true) . ' has left the game after ' . $this->getSessionTime($login),
                 "color" => hexdec("cc0000"),
                 "timestamp" => date("c", strtotime("now"))
@@ -186,14 +176,12 @@ class ChatWebhook extends ExpPlugin
             return;
         }
 
-        $message = '**' . Formatting::stripStyles($player->nickName) .' :** ' . $text;
-
-        if (strlen($message) < 2000) {
-            $this->sendWebhookMessage($message);
+        if (strlen($text) < 2000) {
+            $this->webConnection->sendWebhookMessage($text, array("name" => Formatting::stripStyles($player->nickName), "flag" => $this->getFlag($player)));
         } else {
-            $messages = str_split($message, 1500);
+            $messages = str_split($text, 1500);
             foreach ($messages as $message) {
-                $this->sendWebhookMessage($message);
+                $this->webConnection->sendWebhookMessage($message, array("name" => Formatting::stripStyles($player->nickName), "flag" => $this->getFlag($player)));
             }
         }
     }
@@ -215,5 +203,16 @@ class ChatWebhook extends ExpPlugin
         }
 
         return $country;
+    }
+
+    private function getFlag($player)
+    {
+        $country = $this->getCountry($player, true);
+        if (isset(self::$flags[$country])) {
+            return self::$flags[$country];
+        }
+
+        $code = Countries::mapCountry($country);
+        return $code == 'OTH' ? 'WOR' : $code;
     }
 }

@@ -1,23 +1,23 @@
 <frame posn="0 0 2.0E-5" id="Frame">
     <frame>
-        <?php echo '<exp:widgetbg sizeX="{sizeX}" sizeY="' . ((3 + $this->getParam('nbFields') * 4) + 1.5) . '" action="{action}"/>'; ?>
+        <exp:widgetbg sizeX="{sizeX}" sizeY="{bgSizeY}" action="{action}"/>
     </frame>
 
     <frame posn="0 0 1.0E-5">
-        <?php echo '<exp:widgettitle sizeX="{sizeX}" sizeY="' . (3 + $this->getParam('nbFields') * 4) . '" text="{@{title}}" id="minimizeButton"/>'; ?>
+        <exp:widgettitle sizeX="{sizeX}" sizeY="{titleSizeY}" text="{@{title}}" id="minimizeButton"/>
     </frame>
 
-    <frame posn="<?php echo ($this->getParam('sizeX') / 2) + 1 ?> -5.5 4.0E-5">
+    <frame posn="{centerX} -5.5 4.0E-5">
         <frame>
-            <?php for ($index = 1; $index <= $this->getParam('nbFields'); $index++) {
-                echo '<frame posn="-20.5 -' . (($index - 1) * 4) . ' 0">';
-                    echo '<quad id="RecBgBlink_' . $index . '" posn="-1.5 1.5 0" sizen="42 3.5" halign="left" valign="top" bgcolor="0f0" opacity="0.25" hidden="1"/>';
-                    echo '<quad id="RecBg_' . $index . '" posn="-1.5 1.5 1.0E-5" sizen="42 3.5" halign="left" valign="top" bgcolor="000" opacity="0.55" hidden="1"/>';
-                    echo '<label id="RecRank_' . $index . '" posn="3.25 0 2.0E-5" sizen="4 4" halign="right" valign="center" style="TextRaceChat" textsize="1.5" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#rank#")) . '" textemboss="1"/>';
-                    echo '<label id="RecTime_' . $index . '" posn="3.5 0 3.0E-5" sizen="11 5" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="' . str_replace('$', "", $this->getParam('colorParser')->getColor("#time#")) . '"/>';
-                    echo '<label id="RecNick_' . $index . '" posn="15.5 0 4.0E-5" sizen="24 4" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="fff" textemboss=""/>';
-                echo '</frame>';
-            }?>
+            <exp:foreach items="fields" as="f">
+            <frame posn="-20.5 {f.posY} 0">
+                <quad id="RecBgBlink_{f.index}" posn="-1.5 1.5 0" sizen="42 3.5" halign="left" valign="top" bgcolor="0f0" opacity="0.25" hidden="1"/>
+                <quad id="RecBg_{f.index}" posn="-1.5 1.5 1.0E-5" sizen="42 3.5" halign="left" valign="top" bgcolor="000" opacity="0.55" hidden="1"/>
+                <label id="RecRank_{f.index}" posn="3.25 0 2.0E-5" sizen="4 4" halign="right" valign="center" style="TextRaceChat" textsize="1.5" textcolor="{rankColor}" textemboss="1"/>
+                <label id="RecTime_{f.index}" posn="3.5 0 3.0E-5" sizen="11 5" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="{timeColor}"/>
+                <label id="RecNick_{f.index}" posn="15.5 0 4.0E-5" sizen="24 4" halign="left" valign="center" style="TextRaceChat" scriptevents="1" class="nickLabel" textsize="1" textcolor="fff" textemboss=""/>
+            </frame>
+            </exp:foreach>
         </frame>
     </frame>
 </frame>
@@ -28,11 +28,11 @@
 
 <frame id="MicroMenu">
     <frame scriptevents="1">
-        <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="<?php echo $this->getParam('guiConfig')->style_widget_bgColorize ?>" bgcolorfocus="<?php echo $this->getParam('guiConfig')->style_widget_title_bgColorize ?>" scriptevents="1"/>
+        <quad id="mQuad_2" sizen="30 5" halign="left" valign="center" bgcolor="{bgColor}" bgcolorfocus="{bgColorFocus}" scriptevents="1"/>
         <label id="item_2" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Rectract Widget"/>
     </frame>
     <frame posn="0 -5 2.0E-5" scriptevents="1">
-        <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="<?php echo $this->getParam('guiConfig')->style_widget_bgColorize ?>" bgcolorfocus="<?php echo $this->getParam('guiConfig')->style_widget_title_bgColorize ?>" scriptevents="1"/>
+        <quad id="mQuad_1" sizen="30 5" halign="left" valign="center" bgcolor="{bgColor}" bgcolorfocus="{bgColorFocus}" scriptevents="1"/>
         <label id="item_1" posn="2 0 1.0E-5" sizen="30 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff" text="Put On TAB View"/>
     </frame>
 </frame>

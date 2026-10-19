@@ -1,0 +1,5 @@
+<frame scale="{scale}">
+    <exp:foreach items="lights" as="l">
+    <quad id="q{l.index}" posn="{l.posX} {posY} {posZ}" sizen="{width} {height}" halign="left" valign="top" image="{texture}" scriptevents="1" class="lineElement"/>
+    </exp:foreach>
+</frame>

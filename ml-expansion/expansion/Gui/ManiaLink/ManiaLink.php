@@ -28,7 +28,7 @@ class ManiaLink extends Singletons
             'class'  => 'ManiaLivePlugins\eXpansion\Gui\Elements\Pager',
             'method' => 'getXML',
             'ml'     => true,
-            'params' => array('sizeX', 'sizeY', 'itemsVarName', 'posX', 'posY', 'itemSizeY'),
+            'params' => array('sizeX', 'sizeY', 'itemSizeY'),
         ),
         // ml = true : $this (ManiaLink instance) is prepended as first argument
         'dropdown' => array(
@@ -121,6 +121,9 @@ class ManiaLink extends Singletons
     protected $elementsScript;
     protected $dicoMessages;
 
+    /** @var Script[] keyed by class name — re-registering replaces */
+    protected $overrideScripts;
+
     /** @var \ManiaLive\Data\Storage\Storage $storage */
     protected $storage;
     protected $eXpStorage;
@@ -146,6 +149,7 @@ class ManiaLink extends Singletons
 
         $this->parameters = array();
         $this->elementsScript = array();
+        $this->overrideScripts = array();
     }
 
     // Getters
@@ -177,7 +181,7 @@ class ManiaLink extends Singletons
 
     public function getLayer()
     {
-        if (strtolower($this->layer == "scorestable")) {
+        if (strtolower($this->layer) == "scorestable") {
             return "scorestable";
         } else {
             return "normal";
@@ -204,6 +208,15 @@ class ManiaLink extends Singletons
     public function setScripts($scripts)
     {
         $this->scripts = $scripts;
+    }
+
+    /**
+     * Register a script, replacing any previously registered script of the same class.
+     * Used by the elements that emit their own ManiaScript once per ManiaLink (pagers, scrollable areas).
+     */
+    public function registerOrOverrideScript(Script $script)
+    {
+        $this->overrideScripts[get_class($script)] = $script;
     }
 
     public function registerElementScript(Script $script, $param = null)
@@ -271,9 +284,6 @@ class ManiaLink extends Singletons
         return str_replace(array('&', '"', "'", '>', '<', "\n", "\t", "\r"), array('&amp;', '&quot;', '&apos;', '&gt;', '&lt;', '&#10;', '&#9;', '&#13;'), $string);
     }
 
-    /**
-     * Read a template file (cached), optionally execute its PHP, then apply {key} substitution.
-     */
     private function renderFile($path, array $params, $login)
     {
         $path = str_replace("\\", DIRECTORY_SEPARATOR, $path);
@@ -292,23 +302,181 @@ class ManiaLink extends Singletons
             $output = $raw;
         }
 
-        $search  = array();
-        $replace = array();
-        foreach ($params as $key => $value) {
-            if (!is_scalar($value) && $value !== null) continue;
-            $search[]  = '{' . $key . '}';
-            $replace[] = $value !== null ? (string)$value : '';
-        }
-        $output = !empty($search) ? str_replace($search, $replace, $output) : $output;
-
-        if (strpos($output, '{@') !== false) {
-            $self = $this;
-            $output = preg_replace_callback('/\{@([^}]+)\}/', function($m) use ($self) {
-                return $self->addLang($m[1]);
-            }, $output);
-        }
+        $output = $this->renderNodes($this->parseBlocks($output), $params, array());
 
         return $this->expandComponents($output, $login);
+    }
+
+    private function parseBlocks($template)
+    {
+        $parts = preg_split(
+            '/(<exp:(?:foreach|if)(?:\s+[a-zA-Z_][a-zA-Z0-9_]*="[^"]*")*\s*>|<\/exp:(?:foreach|if)\s*>|<exp:else\s*\/>)/',
+            $template,
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE
+        );
+        if ($parts === false) {
+            return array($template);
+        }
+
+        $root  = (object)array('type' => 'root', 'attrs' => array(), 'children' => array(), 'else' => array(), 'inElse' => false);
+        $stack = array($root);
+
+        foreach ($parts as $i => $part) {
+            $current = end($stack);
+            $list    = $current->inElse ? 'else' : 'children';
+
+            // even parts are text, odd parts are the captured block tags
+            if ($i % 2 === 0) {
+                if ($part !== '') $current->{$list}[] = $part;
+                continue;
+            }
+
+            if (preg_match('/^<\/exp:(\w+)/', $part, $m)) {
+                if (count($stack) === 1) {
+                    Helper::logError('ManiaLink: unexpected ' . $part . ' in ' . $this->relPath, array("Gui", "ManiaLink"));
+                    continue;
+                }
+                if ($current->type !== $m[1]) {
+                    Helper::logError('ManiaLink: ' . $part . ' closes a <exp:' . $current->type . '> in ' . $this->relPath, array("Gui", "ManiaLink"));
+                }
+                array_pop($stack);
+            } elseif (strpos($part, '<exp:else') === 0) {
+                if ($current->type !== 'if' || $current->inElse) {
+                    Helper::logError('ManiaLink: unexpected <exp:else/> in ' . $this->relPath, array("Gui", "ManiaLink"));
+                    continue;
+                }
+                $current->inElse = true;
+            } else {
+                preg_match('/^<exp:(\w+)/', $part, $m);
+                $attrs = array();
+                preg_match_all('/([a-zA-Z_][a-zA-Z0-9_]*)="([^"]*)"/', $part, $pairs, PREG_SET_ORDER);
+                foreach ($pairs as $p) $attrs[$p[1]] = $p[2];
+
+                $node = (object)array('type' => $m[1], 'attrs' => $attrs, 'children' => array(), 'else' => array(), 'inElse' => false);
+                $current->{$list}[] = $node;
+                $stack[] = $node;
+            }
+        }
+
+        if (count($stack) > 1) {
+            Helper::logError('ManiaLink: unclosed <exp:' . end($stack)->type . '> in ' . $this->relPath, array("Gui", "ManiaLink"));
+        }
+
+        return $root->children;
+    }
+
+    private function renderNodes(array $nodes, array $params, array $scope)
+    {
+        $output = '';
+        foreach ($nodes as $node) {
+            if (is_string($node)) {
+                $output .= $this->replacePlaceholders($node, $params, $scope);
+            } elseif ($node->type === 'if') {
+                $test = isset($node->attrs['test']) ? $node->attrs['test'] : '';
+                $output .= $this->renderNodes($this->isTrue($test, $params, $scope) ? $node->children : $node->else, $params, $scope);
+            } else {
+                $output .= $this->renderLoop($node, $params, $scope);
+            }
+        }
+        return $output;
+    }
+
+    private function renderLoop($node, array $params, array $scope)
+    {
+        if (!isset($node->attrs['items'], $node->attrs['as'])) {
+            Helper::logError('ManiaLink: <exp:foreach> needs "items" and "as" attributes in ' . $this->relPath, array("Gui", "ManiaLink"));
+            return '';
+        }
+
+        $found = false;
+        $items = $this->resolveValue($node->attrs['items'], $params, $scope, $found);
+        if (!is_array($items) && !($items instanceof \Traversable)) {
+            return '';
+        }
+
+        $output = '';
+        $index  = 0;
+        foreach ($items as $item) {
+            $loopScope = $scope;
+            $loopScope[$node->attrs['as']] = $item;
+            if (isset($node->attrs['index'])) {
+                $loopScope[$node->attrs['index']] = $index;
+            }
+            $output .= $this->renderNodes($node->children, $params, $loopScope);
+            $index++;
+        }
+        return $output;
+    }
+
+    private function isTrue($test, array $params, array $scope)
+    {
+        $test   = trim($test);
+        $negate = ($test !== '' && $test[0] === '!');
+        if ($negate) {
+            $test = ltrim(substr($test, 1));
+        }
+
+        $found = false;
+        $value = $this->resolveValue($test, $params, $scope, $found);
+        $result = $found && (bool)$value;
+
+        return $negate ? !$result : $result;
+    }
+
+    private function replacePlaceholders($text, array $params, array $scope)
+    {
+        if (strpos($text, '{') === false) return $text;
+
+        $self = $this;
+        return preg_replace_callback('/\{(?:@((?:[^{}]|\{[^{}]*\})+)|([^{}@"<>\s][^{}"<>]*))\}/', function($m) use ($self, $params, $scope) {
+            if ($m[1] !== '') {
+                $lang = strpos($m[1], '{') !== false ? $self->replacePlaceholders($m[1], $params, $scope) : $m[1];
+                return $self->addLang($lang);
+            }
+
+            $found = false;
+            $value = $self->resolveValue($m[2], $params, $scope, $found);
+            if (!$found || (!is_scalar($value) && $value !== null)) {
+                return $m[0];
+            }
+            return $value !== null ? (string)$value : '';
+        }, $text);
+    }
+
+    private function resolveValue($path, array $params, array $scope, &$found)
+    {
+        $found = true;
+        if (array_key_exists($path, $scope))  return $scope[$path];
+        if (array_key_exists($path, $params)) return $params[$path];
+
+        $parts = explode('.', $path);
+        $first = array_shift($parts);
+        if (empty($parts)) {
+            $found = false;
+            return null;
+        }
+
+        if (array_key_exists($first, $scope)) {
+            $value = $scope[$first];
+        } elseif (array_key_exists($first, $params)) {
+            $value = $params[$first];
+        } else {
+            $found = false;
+            return null;
+        }
+
+        foreach ($parts as $part) {
+            if (is_array($value) && array_key_exists($part, $value)) {
+                $value = $value[$part];
+            } elseif (is_object($value) && (isset($value->$part) || array_key_exists($part, get_object_vars($value)))) {
+                $value = $value->$part;
+            } else {
+                $found = false;
+                return null;
+            }
+        }
+        return $value;
     }
 
     private function expandComponents($output, $login, $depth = 0)
@@ -408,9 +576,15 @@ class ManiaLink extends Singletons
     }
 
     protected function getMlScripts() {
-        $this->widgetScript->setParam("dDeclares", $this->scripts->getDeclarationScript() . $this->scripts->getEndScript());
-        $this->widgetScript->setParam("scriptLib", $this->scripts->getlibScript());
-        $this->widgetScript->setParam("wLoop", $this->scripts->getWhileLoopScript());
+        if ($this->scripts instanceof Script) {
+            $this->widgetScript->setParam("dDeclares", $this->scripts->getDeclarationScript() . $this->scripts->getEndScript());
+            $this->widgetScript->setParam("scriptLib", $this->scripts->getlibScript());
+            $this->widgetScript->setParam("wLoop", $this->scripts->getWhileLoopScript());
+        } else {
+            $this->widgetScript->setParam("dDeclares", "");
+            $this->widgetScript->setParam("scriptLib", "");
+            $this->widgetScript->setParam("wLoop", "");
+        }
 
         return $this->widgetScript->getDeclarationScript();
     }
@@ -438,7 +612,7 @@ class ManiaLink extends Singletons
         }
     }
 
-    public function show($login = null, $persistant = false)
+    public function show($login = null, $persistant = false, $timeout = 0)
     {
         $xml = $this->getWidget($login);
         if ($this->name == "XXX") {
@@ -456,24 +630,24 @@ class ManiaLink extends Singletons
                 $login = $connected;
             }
             try {
-                $this->connection->sendDisplayManialinkPage($login, $xml, 0, false, false); // fix the bug where player leave so method return `login unknown`
+                $this->connection->sendDisplayManialinkPage($login, $xml, $timeout, false, false); // fix the bug where player leave so method return `login unknown`
             } catch (\Exception $e) {
                 if (is_array($login)) {
-                    Helper::log('Cannot send widget: "' . $this->name . '" to players, retrying each login individually, server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+                    Helper::log('Cannot send manialink: "' . $this->name . '" to players, retrying each login individually, server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
 
                     foreach ($login as $l) {
                         try {
-                            $this->connection->sendDisplayManialinkPage($l, $xml, 0, false, false);
+                            $this->connection->sendDisplayManialinkPage($l, $xml, $timeout, false, false);
                         } catch (\Exception $e2) {
-                            Helper::log('Cannot send widget: "' . $this->name . '" to player: "' . $l . '" , server said: ' . $e2->getMessage(), array("Gui", "ManiaLink"));
+                            Helper::log('Cannot send manialink: "' . $this->name . '" to player: "' . $l . '" , server said: ' . $e2->getMessage(), array("Gui", "ManiaLink"));
                         }
                     }
                 } else {
-                    Helper::log('Cannot send widget: "' . $this->name . '" to player: "' . $login . '" , server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+                    Helper::log('Cannot send manialink: "' . $this->name . '" to player: "' . $login . '" , server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
                 }
             }
         } else {
-            $this->connection->sendDisplayManialinkPage(null, $xml, 0, false, true);
+            $this->connection->sendDisplayManialinkPage(null, $xml, $timeout, false, true);
         }
 
         if ($persistant && $login == null) {
@@ -484,10 +658,32 @@ class ManiaLink extends Singletons
     public function erase($login = null)
     {
         if ($login !== null) {
+            if (is_array($login)) {
+                // check if login exists in $this->storage->players and $this->storage->spectators
+                $connected = array();
+                foreach ($login as $l) {
+                    if (isset($this->storage->players[$l]) || isset($this->storage->spectators[$l])) {
+                        $connected[] = $l;
+                    }
+                }
+                $login = $connected;
+            }
             try {
                 $this->connection->sendDisplayManialinkPage($login, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, false); // fix the bug where player leave so method return `login unknown`
             } catch (\Exception $e) {
-                Helper::log("Cannot erase player widget, server said: " . $e->getMessage(), array("Gui", "ManiaLink"));
+                if (is_array($login)) {
+                    Helper::log('Cannot erase player manialink: "' . $this->name . '" to players, retrying each login individually, server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+
+                    foreach ($login as $l) {
+                        try {
+                            $this->connection->sendDisplayManialinkPage($l, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, false);
+                        } catch (\Exception $e2) {
+                            Helper::log('Cannot erase player manialink: "' . $this->name . '" to player: "' . $l . '" , server said: ' . $e2->getMessage(), array("Gui", "ManiaLink"));
+                        }
+                    }
+                } else {
+                    Helper::log('Cannot erase player manialink: "' . $this->name . '" to player: "' . $login . '" , server said: ' . $e->getMessage(), array("Gui", "ManiaLink"));
+                }
             }
         } else {
             $this->connection->sendDisplayManialinkPage(null, '<manialink id="' . $this->getWidgetHashName() . '"></manialink>', 0, false, true);

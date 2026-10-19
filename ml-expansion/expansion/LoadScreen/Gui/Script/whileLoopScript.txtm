@@ -1,0 +1,13 @@
+if (Window.Visible) {
+    if (Now > (startTime + 8000)) {
+        Window.Hide(); // autohide after 8 seconds
+    }
+
+    foreach (Event in PendingEvents) {
+        if (Event.Type == CMlEvent::Type::MouseClick || Event.Type == CMlEvent::Type::KeyPress) {
+            if (Now > (startTime + 3000)) {
+                Window.Hide(); // enable hide after 3 seconds, if user press key or clicks mouse
+            }
+        }
+    }
+}

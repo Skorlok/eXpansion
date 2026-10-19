@@ -1,44 +1,32 @@
-<?php
-
-$limits      = $this->getParam("limits");
-$votes       = $this->getParam("votes");
-
-$itemsXml = "";
-$n        = 0;
-
-foreach ((array)$limits as $limit) {
-    $itemsXml .= '<frame>';
-    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="109" sizeY="10"/>';
-    $itemsXml .= '<label posn="0 0 0" sizen="50 10" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($limit['label']) . '"/>';
-    $itemsXml .= '<frame posn="50 -1 1">';
-    $itemsXml .= '<exp:inputbox name="' . $limit['name'] . '" sizeX="14" label="@Limit" text="' . (string)$limit['value'] . '" isTextId="true"/>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '</frame>';
-    $n++;
-}
-
-foreach ((array)$votes as $vote) {
-    $votersHtml = '<exp:dropdown name="' . $vote['votersName'] . '" itemsVarName="voterOptions" selectedIndex="' . $vote['votersSelected'] . '" sizeX="20"/>';
-
-    $itemsXml .= '<frame>';
-    $itemsXml .= '<exp:listbg indexNumber="' . $n . '" sizeX="109" sizeY="10"/>';
-    $itemsXml .= '<label posn="0 0 0" sizen="50 10" halign="left" valign="center" style="TextStaticSmall" text="' . $this->handleSpecialChars($vote['label']) . '"/>';
-    $itemsXml .= '<frame posn="50 -1 1">';
-    $itemsXml .= '<exp:inputbox name="' . $vote['timeoutName'] . '" sizeX="14" label="@Timeout" text="' . (string)$vote['timeoutValue'] . '" isTextId="true"/>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '<frame posn="68 -1 1">';
-    $itemsXml .= '<exp:inputbox name="' . $vote['ratioName'] . '" sizeX="14" label="@Ratio" text="' . (string)$vote['ratioValue'] . '" isTextId="true"/>';
-    $itemsXml .= '</frame>';
-    $itemsXml .= '<frame posn="86 -1 1">';
-    $itemsXml .= $votersHtml;
-    $itemsXml .= '</frame>';
-    $itemsXml .= '</frame>';
-    $n++;
-}
-
-$this->setParam("itemsXml", $itemsXml);
-?>
-<exp:pager sizeX="115" sizeY="84" itemsVarName="itemsXml" posX="5" posY="7" itemSizeY="10"/>
+<frame posn="5 7 0">
+    <frame id="Pager" scriptevents="1">
+        <exp:foreach items="limits" as="limit">
+        <frame>
+            <exp:listbg indexNumber="{limit.index}" sizeX="109" sizeY="10"/>
+            <label sizen="50 10" halign="left" valign="center" style="TextStaticSmall" text="{limit.label}"/>
+            <frame posn="50 -1 1">
+                <exp:inputbox name="{limit.name}" sizeX="14" label="@Limit" text="{limit.value}" isTextId="true"/>
+            </frame>
+        </frame>
+        </exp:foreach>
+        <exp:foreach items="votes" as="vote">
+        <frame>
+            <exp:listbg indexNumber="{vote.index}" sizeX="109" sizeY="10"/>
+            <label sizen="50 10" halign="left" valign="center" style="TextStaticSmall" text="{vote.label}"/>
+            <frame posn="50 -1 1">
+                <exp:inputbox name="{vote.timeoutName}" sizeX="14" label="@Timeout" text="{vote.timeoutValue}" isTextId="true"/>
+            </frame>
+            <frame posn="68 -1 1">
+                <exp:inputbox name="{vote.ratioName}" sizeX="14" label="@Ratio" text="{vote.ratioValue}" isTextId="true"/>
+            </frame>
+            <frame posn="86 -1 1">
+                <exp:dropdown name="{vote.votersName}" itemsVarName="voterOptions" selectedIndex="{vote.votersSelected}" sizeX="20"/>
+            </frame>
+        </frame>
+        </exp:foreach>
+    </frame>
+    <exp:pager sizeX="115" sizeY="84" itemSizeY="10"/>
+</frame>
 <frame posn="96 -86 1">
     <exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Votes:applyVoteSettings" isTextId="true"/>
 </frame>

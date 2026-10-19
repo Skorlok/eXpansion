@@ -34,8 +34,6 @@ class Widgets_ResSkip extends ExpPlugin
 
     private $skipActive;
 
-    private $actions = array();
-
     private $widget;
 
     public function eXpOnLoad()
@@ -61,6 +59,14 @@ class Widgets_ResSkip extends ExpPlugin
         $this->config = Config::getInstance();
         $this->donateConfig = DonateConfig::getInstance();
 
+        $this->widget = new Widget("Widgets_ResSkip\Gui\Widgets\ResSkipButtons.xml");
+        $this->widget->setName("Skip and Res Buttons");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(20, 10);
+        if ($this->expStorage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+
         $this->showResSkip();
     }
 
@@ -80,31 +86,30 @@ class Widgets_ResSkip extends ExpPlugin
             return;
         }
 
-        $skipAmount = null;
-        $resAmount = null;
         if (isset($this->config->publicSkipAmount[$this->skipCount]) && $this->config->publicSkipAmount[$this->skipCount] > 0) {
-            $skipAmount = $this->config->publicSkipAmount[$this->skipCount];
+            $skipText = array($this->widget->addLang('$s$fffBuy'), $this->widget->addLang('$s$fffSkip'), $this->widget->addLang('$s$fff' . $this->config->publicSkipAmount[$this->skipCount] . 'p'));
+        } else {
+            $skipText = array($this->widget->addLang('$s$fffMax'), $this->widget->addLang('$s$fffskips'), $this->widget->addLang('$s$fffreached'));
         }
 
         if (isset($this->config->publicResAmount[$this->resCount]) && $this->config->publicResAmount[$this->resCount] > 0) {
-            $resAmount = $this->config->publicResAmount[$this->resCount];
+            $resText = array($this->widget->addLang('$s$fffBuy'), $this->widget->addLang('$s$fffRestart'), $this->widget->addLang('$s$fff' . $this->config->publicResAmount[$this->resCount] . 'p'));
+        } else {
+            $resText = array($this->widget->addLang('$s$fffMax'), $this->widget->addLang('$s$fffrestarts'), $this->widget->addLang('$s$fffreached'));
         }
 
 
-        $this->widget = new Widget("Widgets_ResSkip\Gui\Widgets\ResSkipButtons.xml");
-        $this->widget->setName("Skip and Res Buttons");
-        $this->widget->setLayer("normal");
         if ($this->expStorage->simpleEnviTitle == "SM") {
             $this->widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania, 0);
         } else {
             $this->widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY, 0);
         }
-        $this->widget->setSize(20, 10);
-        $this->widget->setParam("resAmount", $resAmount);
-        $this->widget->setParam("skipAmount", $skipAmount);
-        if ($this->expStorage->simpleEnviTitle == "TM") {
-            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
-        }
+        $this->widget->setParam("resText0", $resText[0]);
+        $this->widget->setParam("resText1", $resText[1]);
+        $this->widget->setParam("resText2", $resText[2]);
+        $this->widget->setParam("skipText0", $skipText[0]);
+        $this->widget->setParam("skipText1", $skipText[1]);
+        $this->widget->setParam("skipText2", $skipText[2]);
         $this->widget->show(null, true);
     }
 
@@ -216,7 +221,9 @@ class Widgets_ResSkip extends ExpPlugin
 
     public function eXpOnUnload()
     {
-        $this->widget->erase();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
         $this->widget = null;
     }
 }

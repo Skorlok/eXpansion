@@ -1,83 +1,55 @@
-<?php
-$uid         = $this->getParam("uid");
-$fileName    = $this->getParam("fileName");
-$mapName     = $this->getParam("mapName");
-$author      = $this->getParam("author");
-$authorNick  = $this->getParam("authorNick");
-$mood        = $this->getParam("mood");
-$mapStyle    = $this->getParam("mapStyle");
-$mapType     = $this->getParam("mapType");
-$environment = $this->getParam("environment");
-$carType     = $this->getParam("carType");
-$addDate     = $this->getParam("addDate");
-$authorTime  = $this->getParam("authorTime");
-$goldTime    = $this->getParam("goldTime");
-$silverTime  = $this->getParam("silverTime");
-$bronzeTime  = $this->getParam("bronzeTime");
-$checkpoints = $this->getParam("checkpoints");
-$laps        = $this->getParam("laps");
-$displayCost = $this->getParam("displayCost");
-$songName    = $this->getParam("songName");
-$modName     = $this->getParam("modName");
-$modUrl      = $this->getParam("modUrl");
-$songUrl     = $this->getParam("songUrl");
-?>
 <frame posn="-35 1 7.0E-5">
 	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="{@Unique id}"/>
 	<frame posn="70 0 1">
-		<?php echo '<exp:inputbox name="" sizeX="35" text="' . $this->handleSpecialChars($uid) . '"/>'; ?>
+		<exp:inputbox name="" sizeX="35" text="{uid}"/>
 	</frame>
 	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@File Name}"/>
 	<frame posn="70 -6 1">
-		<?php echo '<exp:inputbox name="" sizeX="35" text="' . $this->handleSpecialChars($fileName) . '"/>'; ?>
+		<exp:inputbox name="" sizeX="35" text="{fileName}"/>
 	</frame>
 	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Name}"/>
-	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapName) ?>"/>
+	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="{mapName}"/>
 	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author}"/>
-	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($author) ?>"/>
+	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="{author}"/>
 	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author Nick}"/>
-	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($authorNick) ?>"/>
+	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="{authorNick}"/>
 	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="{@Mood}"/>
-	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mood) ?>"/>
+	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="{mood}"/>
 	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="{@Map Style}"/>
-	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapStyle) ?>"/>
+	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="{mapStyle}"/>
 	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="{@Map Type}"/>
-	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($mapType) ?>"/>
+	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="{mapType}"/>
 	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="{@Environment}"/>
-	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($environment) ?>"/>
+	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="{environment}"/>
 	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="{@Car type}"/>
-	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($carType) ?>"/>
+	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="{carType}"/>
 	<label posn="35 -45 0.0002" sizen="35 6" style="TextStaticSmall"/>
-	<?php if ($modUrl): ?>
-	<frame posn="80 -85 1">
-		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Mod" url="<?php echo $this->handleSpecialChars($modUrl); ?>" isTextId="true"/>
+	<frame posn="80 -85 1" hidden="{hideModButton}">
+		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Mod" url="{modUrl}" isTextId="true"/>
 	</frame>
-	<?php endif; ?>
-	<?php if ($songUrl): ?>
-	<frame posn="110 -85 1">
-		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Song" url="<?php echo $this->handleSpecialChars($songUrl); ?>" isTextId="true"/>
+	<frame posn="110 -85 1" hidden="{hideSongButton}">
+		<exp:button sizeX="37.5" sizeY="6.25" text="@Download Song" url="{songUrl}" isTextId="true"/>
 	</frame>
-	<?php endif; ?>
 </frame>
 <frame posn="40 1 0.00028">
 	<label posn="35 0 0" sizen="35 6" style="TextStaticSmall" textid="{@Add Date}"/>
-	<label posn="70 0 1.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($addDate) ?>"/>
+	<label posn="70 0 1.0E-5" sizen="35 6" style="TextStaticSmall" text="{addDate}"/>
 	<label posn="35 -5 2.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Author Time}"/>
-	<label posn="70 -5 3.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($authorTime) ?>"/>
+	<label posn="70 -5 3.0E-5" sizen="35 6" style="TextStaticSmall" text="{authorTime}"/>
 	<label posn="35 -10 4.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Gold Time}"/>
-	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($goldTime) ?>"/>
+	<label posn="70 -10 5.0E-5" sizen="35 6" style="TextStaticSmall" text="{goldTime}"/>
 	<label posn="35 -15 6.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Silver Time}"/>
-	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($silverTime) ?>"/>
+	<label posn="70 -15 7.0E-5" sizen="35 6" style="TextStaticSmall" text="{silverTime}"/>
 	<label posn="35 -20 8.0E-5" sizen="35 6" style="TextStaticSmall" textid="{@Bronze Time}"/>
-	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($bronzeTime) ?>"/>
+	<label posn="70 -20 9.0E-5" sizen="35 6" style="TextStaticSmall" text="{bronzeTime}"/>
 	<label posn="35 -25 0.0001" sizen="35 6" style="TextStaticSmall" textid="{@Checkpoints}"/>
-	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($checkpoints) ?>"/>
+	<label posn="70 -25 0.00011" sizen="35 6" style="TextStaticSmall" text="{checkpoints}"/>
 	<label posn="35 -30 0.00012" sizen="35 6" style="TextStaticSmall" textid="{@Laps}"/>
-	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($laps) ?>"/>
+	<label posn="70 -30 0.00013" sizen="35 6" style="TextStaticSmall" text="{laps}"/>
 	<label posn="35 -35 0.00014" sizen="35 6" style="TextStaticSmall" textid="{@Display Cost}"/>
-	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($displayCost) ?>"/>
+	<label posn="70 -35 0.00015" sizen="35 6" style="TextStaticSmall" text="{displayCost}"/>
 	<label posn="35 -40 0.00016" sizen="35 6" style="TextStaticSmall" textid="{@Song Name}"/>
-	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($songName) ?>"/>
+	<label posn="70 -40 0.00017" sizen="35 6" style="TextStaticSmall" text="{songName}"/>
 	<label posn="35 -45 0.00018" sizen="35 6" style="TextStaticSmall" textid="{@Mod Name}"/>
-	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="<?php echo $this->handleSpecialChars($modName) ?>"/>
+	<label posn="70 -45 0.00019" sizen="35 6" style="TextStaticSmall" text="{modName}"/>
 </frame>

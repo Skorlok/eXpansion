@@ -101,12 +101,7 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $this->widget->setLayer("normal");
             $this->widget->setPosition($posX, $posY, 0);
             $this->widget->setSize($sizeX, $sizeY);
-            $this->widget->setParam("sizeX", $sizeX);
-            $this->widget->setParam("nbFields", $nbF);
-            $this->widget->setParam("title", "Local Records");
-            $this->widget->setParam("action", LocalBase::$openRecordsAction);
-            $this->widget->setParam("guiConfig", guiConfig::getInstance());
-            $this->widget->setParam("colorParser", ColorParser::getInstance());
+            self::setPanelParams($this->widget, $sizeX, $nbF, "Local Records", LocalBase::$openRecordsAction);
             $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
             $this->widget->registerScript($widgetScript);
             $this->widget->registerScript($trayScript);
@@ -119,18 +114,45 @@ class Widgets_LocalRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $this->widget2->setLayer("scorestable");
                 $this->widget2->setPosition($posX, $posY, 0);
                 $this->widget2->setSize($sizeX, $sizeY);
-                $this->widget2->setParam("sizeX", $sizeX);
-                $this->widget2->setParam("nbFields", $nbF);
-                $this->widget2->setParam("title", "Local Records");
-                $this->widget2->setParam("action", LocalBase::$openRecordsAction);
-                $this->widget2->setParam("guiConfig", guiConfig::getInstance());
-                $this->widget2->setParam("colorParser", ColorParser::getInstance());
+                self::setPanelParams($this->widget2, $sizeX, $nbF, "Local Records", LocalBase::$openRecordsAction);
                 $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                 $this->widget2->registerScript($widgetScript);
                 $this->widget2->registerScript($trayScript);
                 $this->widget2->show($login);
             }
         }
+    }
+
+    /**
+     * Fill the params of the templates sharing the records panel layout:
+     * - Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml (also used by Widgets_DedimaniaRecords and Widgets_LiveRankings)
+     * - Widgets_LocalRecordsHidden\Gui\Widgets\LocalRecords.xml
+     * - Widgets_LiveRankings\Gui\Widgets\LiveRanking.xml (which adds its team params)
+     * - Widgets_Livecp\Gui\Widgets\LiveCP.xml
+     */
+    public static function setPanelParams(Widget $widget, $sizeX, $nbFields, $title, $action)
+    {
+        /** @var guiConfig $guiConfig */
+        $guiConfig   = guiConfig::getInstance();
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+
+        $fields = array();
+        for ($index = 1; $index <= $nbFields; $index++) {
+            $fields[] = array('index' => $index, 'posY' => -4 * ($index - 1));
+        }
+
+        $widget->setParam("sizeX",        $sizeX);
+        $widget->setParam("bgSizeY",      (3 + $nbFields * 4) + 1.5);
+        $widget->setParam("titleSizeY",   3 + $nbFields * 4);
+        $widget->setParam("centerX",      ($sizeX / 2) + 1);
+        $widget->setParam("title",        $title);
+        $widget->setParam("action",       $action);
+        $widget->setParam("fields",       $fields);
+        $widget->setParam("rankColor",    $widget->handleSpecialChars(str_replace('$', "", $colorParser->getColor("#rank#"))));
+        $widget->setParam("timeColor",    $widget->handleSpecialChars(str_replace('$', "", $colorParser->getColor("#time#"))));
+        $widget->setParam("bgColor",      $widget->handleSpecialChars($guiConfig->style_widget_bgColorize));
+        $widget->setParam("bgColorFocus", $widget->handleSpecialChars($guiConfig->style_widget_title_bgColorize));
     }
 
     public function getWidgetScript($nbField, $nbFirstField, $update = false)

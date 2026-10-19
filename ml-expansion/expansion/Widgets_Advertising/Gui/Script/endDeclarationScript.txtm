@@ -1,6 +1,5 @@
 
 declare Text[] playersToHide = {{ hide }};
-declare Window <=> Page.GetFirstChild("{{ widgetId }}");
 
 foreach (player in playersToHide) {
     if (player == InputPlayer.Login) {

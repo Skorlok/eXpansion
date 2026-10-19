@@ -5,12 +5,11 @@ namespace ManiaLivePlugins\eXpansion\Widgets_LiveRankings;
 use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Event\Dispatcher;
 use ManiaLivePlugins\eXpansion\Core\Core;
-use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Endurance\Endurance;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -121,6 +120,11 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             }
         }
 
+        $action = null;
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
+            $action = Endurance::$openScoresAction;
+        }
+
         $team1Name = '$wBlue Team : ';
         $team1Color = '00f';
         $team2Name = '$wRed Team : ';
@@ -137,6 +141,7 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
                 $team2Color = $var["team2Color"];
             }
         }
+        $showTeams = $gamemode == GameInfos::GAMEMODE_TEAM;
 
         
         if (($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_LAPS) && $this->storage->getCleanGamemodeName() != "endurocup") {
@@ -148,20 +153,14 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
         $this->widget->setLayer("normal");
         $this->widget->setPosition($posX, $posY, 0);
         $this->widget->setSize($sizeX, $sizeY);
-        $this->widget->setParam("sizeX", $sizeX);
-        $this->widget->setParam("nbFields", $nbF);
-        $this->widget->setParam("title", "Live Rankings");
-        $this->widget->setParam("action", null);
-        if ($this->storage->getCleanGamemodeName() == "endurocup") {
-            $this->widget->setParam("action", Endurance::$openScoresAction);
-        }
-        $this->widget->setParam("guiConfig", guiConfig::getInstance());
-        $this->widget->setParam("colorParser", ColorParser::getInstance());
-        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
-            $this->widget->setParam("team1Name", $team1Name);
-            $this->widget->setParam("team1Color", $team1Color);
-            $this->widget->setParam("team2Name", $team2Name);
-            $this->widget->setParam("team2Color", $team2Color);
+        Widgets_LocalRecords::setPanelParams($this->widget, $sizeX, $nbF, "Live Rankings", $action);
+        $this->widget->setParam("showTeams", $showTeams);
+        if ($showTeams) {
+            $this->widget->setParam("teamsPosY",  -4 * $nbF);
+            $this->widget->setParam("team1Name",  $this->widget->handleSpecialChars($team1Name));
+            $this->widget->setParam("team1Color", $this->widget->handleSpecialChars($team1Color));
+            $this->widget->setParam("team2Name",  $this->widget->handleSpecialChars($team2Name));
+            $this->widget->setParam("team2Color", $this->widget->handleSpecialChars($team2Color));
         }
         $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
         $this->widget->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
@@ -184,20 +183,14 @@ class Widgets_LiveRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlu
             $this->widget2->setLayer("scorestable");
             $this->widget2->setPosition($posX, $posY, 0);
             $this->widget2->setSize($sizeX, $sizeY);
-            $this->widget2->setParam("sizeX", $sizeX);
-            $this->widget2->setParam("nbFields", $nbF);
-            $this->widget2->setParam("title", "Live Rankings");
-            $this->widget2->setParam("action", null);
-            if ($this->storage->getCleanGamemodeName() == "endurocup") {
-                $this->widget2->setParam("action", Endurance::$openScoresAction);
-            }
-            $this->widget2->setParam("guiConfig", guiConfig::getInstance());
-            $this->widget2->setParam("colorParser", ColorParser::getInstance());
-            if ($gamemode == GameInfos::GAMEMODE_TEAM) {
-                $this->widget2->setParam("team1Name", $team1Name);
-                $this->widget2->setParam("team1Color", $team1Color);
-                $this->widget2->setParam("team2Name", $team2Name);
-                $this->widget2->setParam("team2Color", $team2Color);
+            Widgets_LocalRecords::setPanelParams($this->widget2, $sizeX, $nbF, "Live Rankings", $action);
+            $this->widget2->setParam("showTeams", $showTeams);
+            if ($showTeams) {
+                $this->widget2->setParam("teamsPosY",  -4 * $nbF);
+                $this->widget2->setParam("team1Name",  $this->widget2->handleSpecialChars($team1Name));
+                $this->widget2->setParam("team1Color", $this->widget2->handleSpecialChars($team1Color));
+                $this->widget2->setParam("team2Name",  $this->widget2->handleSpecialChars($team2Name));
+                $this->widget2->setParam("team2Color", $this->widget2->handleSpecialChars($team2Color));
             }
             $this->widget2->registerScript(new Script('Gui/Script_libraries/mQuery/TextExt'));
             $this->widget2->registerScript($trayScript);

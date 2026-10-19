@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
 use ManiaLivePlugins\eXpansion\Gui\Config;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
@@ -14,7 +15,7 @@ class OptimizedPager
     /**
      * Generate the OptimizedPager XML structure.
      *
-     * @param \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window $mlClass   ManiaLink class name (e.g. "ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window")
+     * @param ManiaLink $mlClass   ManiaLink instance (Window or Widget)
      * @param string $login     Player login or null for all players
      * @param float  $sizeX    Total width (including scrollbar)
      * @param float  $sizeY    Total height
@@ -31,8 +32,8 @@ class OptimizedPager
             Helper::logError('OptimizedPager: Invalid $mlClass parameter', array("Gui", "OptimizedPager"));
             return "";
         }
-        if (!$mlClass instanceof \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window) {
-            Helper::logError('OptimizedPager: $mlClass parameter must be an instance of ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window', array("Gui", "OptimizedPager"));
+        if (!$mlClass instanceof ManiaLink) {
+            Helper::logError('OptimizedPager: $mlClass parameter must be an instance of ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink', array("Gui", "OptimizedPager"));
             return "";
         }
         $items = $mlClass->getParam($itemsVarName);

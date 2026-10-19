@@ -719,14 +719,15 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (!AdminGroups::hasPermission($login, Permission::SERVER_VOTES)) {
             return;
         }
-        
+
+        /** @var Config $config */
         $config   = Config::getInstance();
         /** @var \ManiaLivePlugins\eXpansion\ManiaExchange\Config $mxConfig */
         $mxConfig = \ManiaLivePlugins\eXpansion\ManiaExchange\Config::getInstance();
 
         $limitsData = array(
-            array('label' => "Max votes per map (0 = disabled)",     'name' => '!_voteLimit',    'value' => $config->limit_votes),
-            array('label' => "Max restarts of a map (0 = disabled)", 'name' => '!_restartLimit', 'value' => $config->restartLimit),
+            array('index' => 0, 'label' => "Max votes per map (0 = disabled)",     'name' => '!_voteLimit',    'value' => $config->limit_votes),
+            array('index' => 1, 'label' => "Max restarts of a map (0 = disabled)", 'name' => '!_restartLimit', 'value' => $config->restartLimit),
         );
 
         $votesData    = array();
@@ -734,7 +735,8 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         foreach ($managedVotes as $cmd => $vote) {
             $selectedIdx = min(3, max(0, $vote->voters + 1));
             $votesData[] = array(
-                'label'          => $vote->command,
+                'index'          => count($limitsData) + count($votesData),
+                'label'          => $this->voteSettingsWindow->handleSpecialChars($vote->command),
                 'timeoutName'    => $vote->command . '_timeouts',
                 'timeoutValue'   => $vote->timeout,
                 'ratioName'      => $vote->command . '_ratios',
@@ -746,6 +748,7 @@ class Votes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         $mxSelectedIdx = min(3, max(0, $mxConfig->mxVote_voters + 1));
         $votesData[] = array(
+            'index'          => count($limitsData) + count($votesData),
             'label'          => "mxVote",
             'timeoutName'    => "mxVote_timeouts",
             'timeoutValue'   => $mxConfig->mxVote_timeouts,

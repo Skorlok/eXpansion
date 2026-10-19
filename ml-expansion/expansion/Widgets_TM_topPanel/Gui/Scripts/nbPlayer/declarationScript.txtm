@@ -5,6 +5,6 @@ declare specQ = (Page.GetFirstChild("specQ") as CMlLabel);
 
 declare Integer maxPlayers = {{ maxPlayers }};
 declare Integer maxSpecs= {{ maxSpecs }};
-declare Real div = {{ div }};
+declare Real div = 35.5555555556;
 
 declare eXp_lastNbPlayerUpdate = 0;

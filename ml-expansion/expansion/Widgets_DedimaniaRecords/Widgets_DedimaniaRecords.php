@@ -3,12 +3,11 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -94,12 +93,7 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                 $this->widget->setLayer("normal");
                 $this->widget->setPosition($posX, $posY, 0);
                 $this->widget->setSize($sizeX, $sizeY);
-                $this->widget->setParam("sizeX", $sizeX);
-                $this->widget->setParam("nbFields", $nbF);
-                $this->widget->setParam("title", "Dedimania Records");
-                $this->widget->setParam("action", DedimaniaAbstract::$actionOpenRecs);
-                $this->widget->setParam("guiConfig", guiConfig::getInstance());
-                $this->widget->setParam("colorParser", ColorParser::getInstance());
+                Widgets_LocalRecords::setPanelParams($this->widget, $sizeX, $nbF, "Dedimania Records", DedimaniaAbstract::$actionOpenRecs);
                 $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                 $this->widget->registerScript($widgetScript);
                 $this->widget->registerScript($trayScript);
@@ -112,12 +106,7 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
                     $this->widget2->setLayer("scorestable");
                     $this->widget2->setPosition($posX, $posY, 0);
                     $this->widget2->setSize($sizeX, $sizeY);
-                    $this->widget2->setParam("sizeX", $sizeX);
-                    $this->widget2->setParam("nbFields", $nbF);
-                    $this->widget2->setParam("title", "Dedimania Records");
-                    $this->widget2->setParam("action", DedimaniaAbstract::$actionOpenRecs);
-                    $this->widget2->setParam("guiConfig", guiConfig::getInstance());
-                    $this->widget2->setParam("colorParser", ColorParser::getInstance());
+                    Widgets_LocalRecords::setPanelParams($this->widget2, $sizeX, $nbF, "Dedimania Records", DedimaniaAbstract::$actionOpenRecs);
                     $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                     $this->widget2->registerScript($widgetScript);
                     $this->widget2->registerScript($trayScript);

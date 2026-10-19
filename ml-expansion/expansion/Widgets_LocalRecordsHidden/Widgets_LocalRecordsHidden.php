@@ -4,14 +4,13 @@ namespace ManiaLivePlugins\eXpansion\Widgets_LocalRecordsHidden;
 
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\PluginHandler\Dependency;
-use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
-use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use ManiaLivePlugins\eXpansion\LocalRecords\LocalBase;
 use ManiaLivePlugins\eXpansion\LocalRecords\Config as LocalRecordsConfig;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event as LocalEvent;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
@@ -101,12 +100,7 @@ class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\
             $this->widget->setLayer("normal");
             $this->widget->setPosition($posX, $posY, 0);
             $this->widget->setSize($sizeX, $sizeY);
-            $this->widget->setParam("sizeX", $sizeX);
-            $this->widget->setParam("nbFields", $nbF);
-            $this->widget->setParam("title", "Local Records");
-            $this->widget->setParam("action", LocalBase::$openRecordsAction);
-            $this->widget->setParam("guiConfig", guiConfig::getInstance());
-            $this->widget->setParam("colorParser", ColorParser::getInstance());
+            Widgets_LocalRecords::setPanelParams($this->widget, $sizeX, $nbF, "Local Records", LocalBase::$openRecordsAction);
             $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
             $this->widget->registerScript($widgetScript);
             $this->widget->registerScript($trayScript);
@@ -119,12 +113,7 @@ class Widgets_LocalRecordsHidden extends \ManiaLivePlugins\eXpansion\Core\types\
                 $this->widget2->setLayer("scorestable");
                 $this->widget2->setPosition($posX, $posY, 0);
                 $this->widget2->setSize($sizeX, $sizeY);
-                $this->widget2->setParam("sizeX", $sizeX);
-                $this->widget2->setParam("nbFields", $nbF);
-                $this->widget2->setParam("title", "Local Records");
-                $this->widget2->setParam("action", LocalBase::$openRecordsAction);
-                $this->widget2->setParam("guiConfig", guiConfig::getInstance());
-                $this->widget2->setParam("colorParser", ColorParser::getInstance());
+                Widgets_LocalRecords::setPanelParams($this->widget2, $sizeX, $nbF, "Local Records", LocalBase::$openRecordsAction);
                 $this->widget2->registerScript(new Script('Gui/Script_libraries/TimeToText'));
                 $this->widget2->registerScript($widgetScript);
                 $this->widget2->registerScript($trayScript);

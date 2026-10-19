@@ -530,11 +530,18 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $this->script->setParam("reveal", "False");
             $this->script->setParam("isHidden", Maniascript::getBoolean($this->currentQuestion->isHidden));
             
+            $cellX = $newWidth / 3;
+            $cellY = $newHeight / 3;
+
             $this->widget->setPosition($this->config->quizImage_PosX, $this->config->quizImage_PosY, 5);
-            $this->widget->setParam("imageUrl", $this->currentQuestion->getImage());
-            $this->widget->setParam("width", $newWidth);
-            $this->widget->setParam("height", $newHeight);
-            $this->widget->setParam("hiddenQuestion", $this->currentQuestion->isHidden);
+            $this->widget->setParam("imageUrl", $this->widget->handleSpecialChars($this->currentQuestion->getImage()));
+            $this->widget->setParam("imageSize", $newWidth . " " . $newHeight);
+            $this->widget->setParam("cellSize", $cellX . " " . $cellY);
+            for ($i = 0; $i < 3; $i++) {
+                $this->widget->setParam("colX" . $i, $i * $cellX);
+                $this->widget->setParam("rowY" . $i, -$i * $cellY);
+            }
+            $this->widget->setParam("quadOpacity", $this->currentQuestion->isHidden ? "1" : "0");
             $this->widget->show(null, true);
         } else {
             $this->eXpChatSendServerMessage($this->msg_errorImageType);
@@ -576,10 +583,21 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $login = $question->asker->login;
             $question->setImageSize($newWidth, $newHeight);
             $this->hiddenQuestions[$login] = $question;
+            $sizeX = (float)$question->sizeX;
+            $sizeY = (float)$question->sizeY;
+            $cellX = $sizeX / 3;
+            $cellY = $sizeY / 3;
+
             $this->hiddenQuestionWindow->erase($login);
-            $this->hiddenQuestionWindow->setParam("imageUrl", $question->getImage());
-            $this->hiddenQuestionWindow->setParam("sizeX", $question->sizeX);
-            $this->hiddenQuestionWindow->setParam("sizeY", $question->sizeY);
+            $this->hiddenQuestionWindow->setParam("imageUrl", $this->hiddenQuestionWindow->handleSpecialChars($question->getImage()));
+            $this->hiddenQuestionWindow->setParam("imageSize", $sizeX . " " . $sizeY);
+            $this->hiddenQuestionWindow->setParam("cellSize", $cellX . " " . $cellY);
+            for ($i = 0; $i < 3; $i++) {
+                $this->hiddenQuestionWindow->setParam("colX" . $i, $i * $cellX);
+                $this->hiddenQuestionWindow->setParam("rowY" . $i, -$i * $cellY);
+                $this->hiddenQuestionWindow->setParam("centerX" . $i, $i * $cellX + $cellX / 2);
+                $this->hiddenQuestionWindow->setParam("centerY" . $i, -$i * $cellY - $cellY / 2);
+            }
             $this->hiddenQuestionWindow->show($login);
         } else {
             $this->eXpChatSendServerMessage($this->msg_errorImageType);
@@ -621,11 +639,11 @@ class Quiz extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         }
 
         $this->questionWindow->erase($login);
-        $this->questionWindow->setParam("questionText", $questionText);
+        $this->questionWindow->setParam("questionText", $this->questionWindow->handleSpecialChars($questionText));
         for ($x = 0; $x < 7; $x++) {
-            $this->questionWindow->setParam("answer" . $x, $answerTexts[$x]);
+            $this->questionWindow->setParam("answer" . $x, $this->questionWindow->handleSpecialChars($answerTexts[$x]));
         }
-        $this->questionWindow->setParam("imageUrl", $imageUrl);
+        $this->questionWindow->setParam("imageUrl", $this->questionWindow->handleSpecialChars($imageUrl));
         $this->questionWindow->show($login);
     }
 

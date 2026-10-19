@@ -1,0 +1,7 @@
+if (exp_needToCheckPersistentVars) {
+	if (exp_isWidgetsHidden == False) {
+		Window.Show();
+	} else {
+		Window.Hide();
+	}
+}

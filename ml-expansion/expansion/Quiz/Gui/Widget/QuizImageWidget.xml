@@ -1,28 +1,14 @@
-<frame>
-    <quad sizen="24 21.75" bgcolor="222" opacity=" 0.6"/>
-    <exp:widgetbg sizeX="24" sizeY="21.75"/>
-</frame>
-<frame posn="0 0 1">
-    <quad posn="12 -1.5 0" sizen="24 4" halign="center" valign="center" style="Bgs1InRace" substyle="BgWindow4" opacity="0.6" colorize="53BE55"/>
-    <label id="widgetTitle" posn="12 -1.5 1.0E-5" sizen="22 4" halign="center" valign="center" style="TextCardScores2" textsize="1" textcolor="fff" text="Question"/>
-    <exp:widgettitle sizeX="24" sizeY="4" text="@Question"/>
-</frame>
+<exp:widgetbg sizeX="24" sizeY="21.75"/>
+<exp:widgettitle sizeX="24" sizeY="4" text="@Question"/>
 <frame posn="2 -4 3">
-    <quad id="image" sizen="{width} {height}" image="{imageUrl}" scriptevents="1" class="quad"/>
-    <?php
-        $y = $this->getParam('height') / 3;
-        $x = $this->getParam('width') / 3;
-
-        $c = 0;
-        $opacity = 0.;
-        if ($this->getParam('hiddenQuestion')) {
-            $opacity = 1.;
-        }
-        for ($i = 0; $i < 3; $i++) {
-            for ($j = 0; $j < 3; $j++) {
-                echo '<quad id="quad_' . $c . '" posn="' . $i * $x . ' ' . -$j * $y . ' 1" sizen="' . $x . ' ' . $y . '" bgcolor="000" opacity="' . $opacity . '" scriptevents="1" class="quad"/>';
-                $c++;
-            }
-        }
-    ?>
+    <quad id="image" sizen="{imageSize}" image="{imageUrl}" scriptevents="1" class="quad"/>
+    <quad id="quad_0" posn="{colX0} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_1" posn="{colX0} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_2" posn="{colX0} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_3" posn="{colX1} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_4" posn="{colX1} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_5" posn="{colX1} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_6" posn="{colX2} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_7" posn="{colX2} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_8" posn="{colX2} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
 </frame>

@@ -1,92 +1,80 @@
 ========================================
-OBSOLÈTE - ne pas convertir
+Windows using OptimizedPager
 ========================================
 
-  AutoUpdate/Gui/Windows/UpdateProgress.php
-  Emotes/Gui/Windows/EmotePanel.php
-  Faq/Gui/Windows/FaqWidget.php
+  Adm/Gui/Windows/MatchSettings.xml
+  AdminGroups/Gui/Windows/Groups.xml
+  AdminGroups/Gui/Windows/Help.xml
+  AdminGroups/Gui/Windows/Players.xml
+  ChatAdmin/Gui/Windows/GenericPlayerList.xml
+  Chatlog/Gui/Windows/ChatlogWindow.xml
+  Core/Gui/Windows/ConfSwitcher.xml
+  Core/Gui/Windows/ExpListSetting.xml
+  Core/Gui/Windows/NetStat.xml
+  Database/Gui/Windows/BackupRestore.xml
+  Dedimania/Gui/Windows/Records.xml
+  Endurance/Gui/Windows/EnduroScores.xml
+  Gui/Windows/PlayerSelection.xml
+  LocalRecords/Gui/Windows/CpDiff.xml
+  LocalRecords/Gui/Windows/Cps.xml
+  LocalRecords/Gui/Windows/Ranks.xml
+  LocalRecords/Gui/Windows/Records.xml
+  LocalRecords/Gui/Windows/Sector.xml
+  LocalRecords/Gui/Windows/TopSums.xml
+  ManiaExchange/Gui/Windows/MxSearch.xml
+  ManiaExchange/Gui/Windows/MxUpdate.xml
+  MapRatings/Gui/Windows/MapRatingsManager.xml
+  Maps/Gui/Windows/AddMaps.xml
+  Maps/Gui/Windows/Jukelist.xml
+  Maps/Gui/Windows/Maplist.xml
+  MusicBox/Gui/Windows/MusicListWindow.xml
+  NetStat/Gui/Windows/NetStatWindow.xml
+  Players/Gui/Windows/Playerlist.xml
+  Quiz/Gui/Windows/Playerlist.xml
+  ServerNeighborhood/Gui/Windows/PlayerList.xml
+  ServerNeighborhood/Gui/Windows/ServerList.xml
+  Statistics/Gui/Windows/StatsWindow.xml
 
 ========================================
-DÉJÀ CONVERTIS EN XML avec OptimizedPager
+Windows using Pager
 ========================================
 
-  Adm/Gui/Windows/MatchSettings.php
-  AdminGroups/Gui/Windows/Groups.php
-  AdminGroups/Gui/Windows/Help.php
-  AdminGroups/Gui/Windows/Players.php
-  ChatAdmin/Gui/Windows/GenericPlayerList.php
-  Chatlog/Gui/Windows/ChatlogWindow.php
-  Core/Gui/Windows/ConfSwitcher.php
-  Core/Gui/Windows/ExpListSetting.php
-  Database/Gui/Windows/BackupRestore.php
-  Dedimania/Gui/Windows/CpDiff.php "utilise" LocalRecords/Gui/Windows/CpDiff.xml
-  Dedimania/Gui/Windows/RecordCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
-  Dedimania/Gui/Windows/RecordSecCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
-  Dedimania/Gui/Windows/Records.php
-  Endurance/Gui/Windows/EnduroScores.php
-  Gui/Windows/PlayerSelection.php
-  LocalRecords/Gui/Windows/CpDiff.php
-  LocalRecords/Gui/Windows/Cps.php
-  LocalRecords/Gui/Windows/Ranks.php
-  LocalRecords/Gui/Windows/Records.php
-  LocalRecords/Gui/Windows/SecCps.php "utilise" LocalRecords/Gui/Windows/Cps.xml
-  LocalRecords/Gui/Windows/Sector.php
-  LocalRecords/Gui/Windows/TopSumsWindow.php
-  ManiaExchange/Gui/Windows/MxSearch.php
-  ManiaExchange/Gui/Windows/MxUpdate.php
-  MapRatings/Gui/Windows/MapRatingsManager.php
-  Maps/Gui/Windows/AddMaps.php
-  Maps/Gui/Windows/Jukelist.php
-  Maps/Gui/Windows/Maplist.php
-  MusicBox/Gui/Windows/MusicListWindow.php
-  Players/Gui/Windows/Playerlist.php
-  Quiz/Gui/Windows/AddPoint.php "fusionné avec" Quiz/Gui/Windows/Playerlist.php
-  ServerNeighborhood/Gui/Windows/PlayerList.php
-  Statistics/Gui/Windows/StatsWindow.php
+  Adm/Gui/Windows/ForceScores.xml
+  Adm/Gui/Windows/RoundPoints.xml
+  Adm/Gui/Windows/ScriptSettings.xml
+  AdminGroups/Gui/Windows/Inherits.xml
+  AdminGroups/Gui/Windows/Permissions.xml
+  AutoLoad/Gui/Windows/PluginList.xml
+  Core/Gui/Windows/ExpSettings.xml
+  Database/Gui/Windows/Maintainance.xml
+  Gui/Windows/Configuration.xml
+  Notifications/Gui/Windows/ConfPluginList.xml
+  Votes/Gui/Windows/VoteSettingsWindow.xml
 
 ========================================
-DÉJÀ CONVERTIS EN XML avec Pager
+Windows not using any Pager
 ========================================
 
-  Adm/Gui/Windows/ForceScores.php
-  Adm/Gui/Windows/RoundPoints.php
-  Adm/Gui/Windows/ScriptSettings.php
-  AdminGroups/Gui/Windows/Inherits.php
-  AdminGroups/Gui/Windows/Permissions.php
-  AutoLoad/Gui/Windows/PluginList.php
-  Core/Gui/Windows/ExpSettings.php
-  Database/Gui/Windows/Maintainance.php
-  Gui/Windows/Configuration.php
-  Notifications/Gui/Windows/ConfPluginList.php
-  ServerNeighborhood/Gui/Windows/ServerList.php
-  Votes/Gui/Windows/VoteSettingsWindow.php
-
-========================================
-DÉJÀ CONVERTIS EN XML sans pager
-========================================
-
-  Adm/Gui/Windows/GameOptions.php
-  Adm/Gui/Windows/ServerControlMain.php
-  Adm/Gui/Windows/ServerManagement.php
-  Adm/Gui/Windows/ServerOptions.php
-  AdminGroups/Gui/Windows/CmdMore.php
-  ChatAdmin/Gui/Windows/ClubLinksSetup.php
-  ChatAdmin/Gui/Windows/ParameterDialog.php
-  ChatAdmin/Gui/Windows/TeamSetup.php
-  Core/Gui/Windows/InfoWindow.php
-  Core/Gui/Windows/NetStat.php
-  Dedimania/Gui/Windows/DediReport.php
-  Faq/Gui/Windows/FaqWindow.php
-  Gui/Windows/ConfirmDialog.php
-  Gui/Windows/Error.php
-  Gui/Windows/Notice.php
-  ManiaExchange/Gui/Windows/MxInfos.php
-  Maps/Gui/Windows/MapInfo.php
-  MapSuggestion/Gui/Windows/MapWish.php
-  NetStat/Gui/Windows/NetStatWindow.php
-  Quiz/Gui/Windows/HiddenQuestionWindow.php
-  Quiz/Gui/Windows/QuestionWindow.php
-  ScoreDisplay/Gui/Windows/ScoreSetup.php
-  ServerStatistics/Gui/Windows/PlotterWindow.php
-  ServerStatistics/Gui/Windows/StatsWindow.php
-  Tutorial/Gui/Windows/TutorialWindow.php
+  Adm/Gui/Windows/GameOptions.xml
+  Adm/Gui/Windows/ServerControlMain.xml
+  Adm/Gui/Windows/ServerManagement.xml
+  Adm/Gui/Windows/ServerOptions.xml
+  AdminGroups/Gui/Windows/CmdMore.xml
+  ChatAdmin/Gui/Windows/ClubLinksSetup.xml
+  ChatAdmin/Gui/Windows/ParameterDialog.xml
+  ChatAdmin/Gui/Windows/TeamSetup.xml
+  Core/Gui/Windows/InfoWindow.xml
+  Dedimania/Gui/Windows/DediReport.xml
+  Faq/Gui/Windows/FaqWindow.xml
+  Gui/Windows/ConfirmDialog.xml
+  Gui/Windows/Error.xml
+  Gui/Windows/Notice.xml
+  ManiaExchange/Gui/Windows/MxInfos.xml
+  Maps/Gui/Windows/MapInfo.xml
+  MapSuggestion/Gui/Windows/MapWish.xml
+  Quiz/Gui/Windows/HiddenQuestionWindow.xml
+  Quiz/Gui/Windows/QuestionWindow.xml
+  ScoreDisplay/Gui/Windows/ScoreSetup.xml
+  ServerStatistics/Gui/Windows/PlotterWindow.xml
+  ServerStatistics/Gui/Windows/StatsWindow.xml
+  Tutorial/Gui/Windows/TutorialWindow.xml

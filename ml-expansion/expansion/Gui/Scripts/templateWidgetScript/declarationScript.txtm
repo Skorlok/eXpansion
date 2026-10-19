@@ -33,7 +33,6 @@ declare Vec3 LastDelta = <Window.RelativePosition.X, Window.RelativePosition.Y, 
 declare Vec3 DeltaPos = <0.0, 0.0, -3.0>;
 declare Real lastMouseX = 0.0;
 declare Real lastMouseY = 0.0;
-declare CMlControl element;
 
 declare Boolean exp_needToCheckPersistentVars for UI = False;
 declare Integer exp_multipleCheckCount = 0;
@@ -50,6 +49,7 @@ declare persistent Text[Text][Text] EXP_widgetLayers = Text[Text][Text];  // lay
 declare Text exp_widgetLayersBuffered;  
 
 declare Text id = "{{ name }}";
+declare Text[] exp_windowStack for UI = Text[];
 declare Text gameMode = "{{ gameMode }}";
 declare Boolean forceReset = {{ forceReset }};
 declare Text activeLayer = "{{ activeLayer }}";
@@ -57,8 +57,6 @@ declare Text visibleLayerInit = "{{ visibleLayerInit }}";
 declare Boolean disablePersonalHud = {{ disablePersonalHud }};
 
 declare Boolean exp_widgetCurrentVisible = False;
-declare Boolean exp_widgetVisibilityChanged = False;
-declare Integer eXp_lastWidgetCheck = 0;
 declare Boolean eXp_firstPersistentCheckDone = False;
 
 if (!EXP_widgetVisible.existskey(id) || forceReset) {

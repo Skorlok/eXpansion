@@ -1,0 +1,77 @@
+<frame>
+    <exp:widgetbg sizeX="35" sizeY="44.5"/>
+</frame>
+
+<frame posn="0 0 1">
+    <exp:widgettitle sizeX="35" sizeY="4" text="@Waiting Queue"/>
+</frame>
+
+<frame posn="4 -7 1">
+    <frame hidden="{hideJoin}">
+        <exp:button sizeX="26.6" sizeY="5" text="@Join" colorize="0f0" action="exp:eXpansion.AutoQueue:enterQueue" isTextId="true"/>
+    </frame>
+    <frame hidden="{hideLeave}">
+        <exp:button sizeX="26.6" sizeY="5" text="@Leave" colorize="f00" action="exp:eXpansion.AutoQueue:leaveQueue" isTextId="true"/>
+    </frame>
+</frame>
+
+<frame posn="0 -9 1" id="Pager" scriptevents="1">
+        <frame posn="0 -3 0" id="row_0">
+            <label id="column_0_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_0_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_0_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -7 0" id="row_1">
+            <label id="column_1_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_1_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_1_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -11 0" id="row_2">
+            <label id="column_2_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_2_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_2_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -15 0" id="row_3">
+            <label id="column_3_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_3_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_3_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -19 0" id="row_4">
+            <label id="column_4_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_4_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_4_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -23 0" id="row_5">
+            <label id="column_5_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_5_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_5_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -27 0" id="row_6">
+            <label id="column_6_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_6_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_6_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+        <frame posn="0 -31 0" id="row_7">
+            <label id="column_7_0" posn="4 0 1" sizen="6 5" halign="right" valign="center" style="TextRaceChat" textsize="0.8"/>
+            <label id="column_7_1" posn="4 0 1" sizen="22 5" halign="left" valign="center" style="TextRaceChat" textsize="1" textcolor="fff"/>
+            <frame posn="26 0 2" hidden="{hideRemove}">
+                <exp:icon sizeX="5" sizeY="5" description="@Remove player from queue" descSizeX="60" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_7_2" class="eXpOptimizedPagerAction" isTextId="true"/>
+            </frame>
+        </frame>
+
+        <exp:optimizedpager sizeX="35.8" sizeY="34" itemsVarName="queueItems" dataVarName="queueData" rowsPerPage="8" itemsPerRow="2" varName="autoqueue"/>
+</frame>

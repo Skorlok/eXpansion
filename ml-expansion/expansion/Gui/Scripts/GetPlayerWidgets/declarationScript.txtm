@@ -1,8 +1,10 @@
+declare persistent Boolean[Text][Text] EXP_widgetVisible = Boolean[Text][Text];
+declare Text gameMode = "{{ gameMode }}";
 
 declare Text outText = "";
 declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntry);
 
-declare Text action = "{{ action }}";
+declare Text action = "exp:eXpansion.Gui:showHudConfig";
 
 
 outText = "";

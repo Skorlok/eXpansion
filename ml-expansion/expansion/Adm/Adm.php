@@ -12,6 +12,7 @@ use ManiaLivePlugins\eXpansion\Gui\Gui;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Storage;
+use ManiaLivePlugins\eXpansion\Helpers\TimeConversion;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\ServerOptions as DedicatedServerOptions;
 
@@ -164,13 +165,36 @@ class Adm extends ExpPlugin
     {
         if (AdminGroups::getAdmin($login) != null) {
             $server = $this->connection->getServerOptions();
-            $this->serverOptionsWindow->setParam("login",             $login);
-            $this->serverOptionsWindow->setParam("server",            $server);
-            $this->serverOptionsWindow->setParam("serverName",        $this->connection->getServerName());
-            $this->serverOptionsWindow->setParam("serverComment",     $this->connection->getServerComment());
-            $this->serverOptionsWindow->setParam("serverPassword",    $this->connection->getServerPassword());
-            $this->serverOptionsWindow->setParam("serverSpecPassword", $this->connection->getServerPasswordForSpectator());
-            $this->serverOptionsWindow->setParam("refereePassword",   $this->connection->getRefereePassword());
+
+            $this->serverOptionsWindow->setParam("canName", AdminGroups::hasPermission($login, Permission::SERVER_NAME));
+            $this->serverOptionsWindow->setParam("canComment", !AdminGroups::hasPermission($login, Permission::SERVER_COMMENT));
+            $this->serverOptionsWindow->setParam("canMaxPlayer", AdminGroups::hasPermission($login, Permission::SERVER_MAXPLAYER));
+            $this->serverOptionsWindow->setParam("canMaxSpec", AdminGroups::hasPermission($login, Permission::SERVER_MAXSPEC));
+            $this->serverOptionsWindow->setParam("canPassword", AdminGroups::hasPermission($login, Permission::SERVER_PASSWORD));
+            $this->serverOptionsWindow->setParam("canSpecPwd", AdminGroups::hasPermission($login, Permission::SERVER_SPECPWD));
+            $this->serverOptionsWindow->setParam("canRefPwd", AdminGroups::hasPermission($login, Permission::SERVER_REFPWD));
+            $this->serverOptionsWindow->setParam("canGenericOpts", AdminGroups::hasPermission($login, Permission::SERVER_GENERIC_OPTIONS));
+            $this->serverOptionsWindow->setParam("serverName", $this->serverOptionsWindow->handleSpecialChars($this->connection->getServerName()));
+            $this->serverOptionsWindow->setParam("serverComment", $this->serverOptionsWindow->handleSpecialChars($this->connection->getServerComment()));
+            $this->serverOptionsWindow->setParam("nextMaxPlayers", $server->nextMaxPlayers);
+            $this->serverOptionsWindow->setParam("nextMaxSpectators", $server->nextMaxSpectators);
+            $this->serverOptionsWindow->setParam("ladderServerLimitMin", $server->ladderServerLimitMin);
+            $this->serverOptionsWindow->setParam("ladderServerLimitMax", $server->ladderServerLimitMax);
+            $this->serverOptionsWindow->setParam("serverPassword", $this->serverOptionsWindow->handleSpecialChars($this->connection->getServerPassword()));
+            $this->serverOptionsWindow->setParam("serverSpecPass", $this->serverOptionsWindow->handleSpecialChars($this->connection->getServerPasswordForSpectator()));
+            $this->serverOptionsWindow->setParam("refereePassword", $this->serverOptionsWindow->handleSpecialChars($this->connection->getRefereePassword()));
+            $this->serverOptionsWindow->setParam("hideServer", ($server->hideServer == 0) ? true : false);
+            $this->serverOptionsWindow->setParam("currentLadderMode", $server->currentLadderMode);
+            $this->serverOptionsWindow->setParam("allowMapDownload", $server->allowMapDownload);
+            $this->serverOptionsWindow->setParam("isP2PDownload", $server->isP2PDownload);
+            $this->serverOptionsWindow->setParam("isP2PUpload", $server->isP2PUpload);
+            $this->serverOptionsWindow->setParam("refereeMode", $server->refereeMode);
+            $this->serverOptionsWindow->setParam("disableHorns", $server->disableHorns);
+            $this->serverOptionsWindow->setParam("disableServiceAnnounces", $server->disableServiceAnnounces);
+            $this->serverOptionsWindow->setParam("autoSaveReplays", $server->autoSaveReplays);
+            $this->serverOptionsWindow->setParam("autoSaveValidationReplays", $server->autoSaveValidationReplays);
+            $this->serverOptionsWindow->setParam("keepPlayerSlots", $server->keepPlayerSlots);
+
             $this->serverOptionsWindow->show($login);
         }
     }
@@ -244,8 +268,7 @@ class Adm extends ExpPlugin
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
             $gamemode = $this->storage->gameInfos->gameMode;
             if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_TEAM || GameInfos::GAMEMODE_CUP) {
-                $this->forceScoresWindow->setParam("players", Core::$rankings);
-                $this->forceScoresWindow->show($login);
+                $this->showForceScoresWindow($login);
             } else {
                 $this->eXpChatSendServerMessage($this->msgForceScoreError, $login);
             }
@@ -292,8 +315,21 @@ class Adm extends ExpPlugin
         $this->connection->triggerModeScriptEventArray('Shootmania.GetScores', array());
         $this->forceScoresOk();
 
-        $this->forceScoresWindow->setParam("players", Core::$rankings);
-        $this->forceScoresWindow->show($fromLogin);
+        $this->showForceScoresWindow($fromLogin);
+    }
+
+    private function showForceScoresWindow($login)
+    {
+        $players = array();
+        foreach ((array)Core::$rankings as $player) {
+            $players[] = array(
+                'login'    => $player->login,
+                'nickName' => $this->forceScoresWindow->handleSpecialChars($player->nickName),
+            );
+        }
+
+        $this->forceScoresWindow->setParam("players", $players);
+        $this->forceScoresWindow->show($login);
     }
 
     public function forceScoresSkip($login)
@@ -336,7 +372,40 @@ class Adm extends ExpPlugin
     public function gameOptions($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            $this->gameOptionsWindow->setParam("nextGameInfo", $this->connection->getNextGameInfo());
+            $nextGameInfo = $this->connection->getNextGameInfo();
+            $this->gameOptionsWindow->setParam("isTaMode", $nextGameInfo->gameMode == GameInfos::GAMEMODE_TIMEATTACK);
+            $this->gameOptionsWindow->setParam("isRoundsMode", $nextGameInfo->gameMode == GameInfos::GAMEMODE_ROUNDS);
+            $this->gameOptionsWindow->setParam("isCupMode", $nextGameInfo->gameMode == GameInfos::GAMEMODE_CUP);
+            $this->gameOptionsWindow->setParam("isLapsMode", $nextGameInfo->gameMode == GameInfos::GAMEMODE_LAPS);
+            $this->gameOptionsWindow->setParam("isTeamMode", $nextGameInfo->gameMode == GameInfos::GAMEMODE_TEAM);
+
+            $this->gameOptionsWindow->setParam("roundsUseNewRules", $nextGameInfo->roundsUseNewRules);
+            $this->gameOptionsWindow->setParam("teamUseNewRules", $nextGameInfo->teamUseNewRules);
+            $this->gameOptionsWindow->setParam("disableRespawn", $nextGameInfo->disableRespawn);
+            $this->gameOptionsWindow->setParam("forceShowAllOpponents", $nextGameInfo->forceShowAllOpponents);
+
+            $this->gameOptionsWindow->setParam("chatTime", TimeConversion::TMtoMS($nextGameInfo->chatTime));
+            $this->gameOptionsWindow->setParam("allWarmUpDuration", $nextGameInfo->allWarmUpDuration);
+            $this->gameOptionsWindow->setParam("finishTimeout", TimeConversion::TMtoMS($nextGameInfo->finishTimeout));
+
+            $this->gameOptionsWindow->setParam("timeAttackLimit", TimeConversion::TMtoMS($nextGameInfo->timeAttackLimit));
+            $this->gameOptionsWindow->setParam("timeAttackSynchStartPeriod", $nextGameInfo->timeAttackSynchStartPeriod);
+
+            $this->gameOptionsWindow->setParam("roundsPointsLimit", $nextGameInfo->roundsPointsLimit);
+            $this->gameOptionsWindow->setParam("roundsForcedLaps", $nextGameInfo->roundsForcedLaps);
+            $this->gameOptionsWindow->setParam("roundsPointsLimitNewRules", $nextGameInfo->roundsPointsLimitNewRules);
+
+            $this->gameOptionsWindow->setParam("teamPointsLimit", $nextGameInfo->teamPointsLimit);
+            $this->gameOptionsWindow->setParam("teamMaxPoints", $nextGameInfo->teamMaxPoints);
+            $this->gameOptionsWindow->setParam("teamPointsLimitNewRules", $nextGameInfo->teamPointsLimitNewRules);
+
+            $this->gameOptionsWindow->setParam("cupPointsLimit", $nextGameInfo->cupPointsLimit);
+            $this->gameOptionsWindow->setParam("cupNbWinners", $nextGameInfo->cupNbWinners);
+            $this->gameOptionsWindow->setParam("cupRoundsPerMap", $nextGameInfo->cupRoundsPerMap);
+
+            $this->gameOptionsWindow->setParam("lapsNbLaps", $nextGameInfo->lapsNbLaps);
+            $this->gameOptionsWindow->setParam("lapsTimeLimit", TimeConversion::TMtoMS($nextGameInfo->lapsTimeLimit));
+
             $this->gameOptionsWindow->show($login);
         }
     }
@@ -502,8 +571,9 @@ class Adm extends ExpPlugin
         foreach ($p as $preset) {
             $points = implode(",", $preset['points']);
             $presetsForTemplate[] = array(
-                'name'   => $preset['name'],
-                'points' => $points,
+                'index'  => count($presetsForTemplate) + 1,
+                'name'   => $this->roundPointsWindow->handleSpecialChars($preset['name']),
+                'points' => $this->roundPointsWindow->handleSpecialChars($points),
                 'action' => 'exp:eXpansion.Adm:roundPointsSetPreset:' . $points,
             );
         }
@@ -703,7 +773,18 @@ class Adm extends ExpPlugin
     public function scriptSettings($login)
     {
         if (AdminGroups::hasPermission($login, Permission::GAME_SETTINGS)) {
-            $this->scriptSettingsWindow->setParam("settings", $this->connection->getModeScriptSettings());
+            $settings = array();
+            foreach ((array)$this->connection->getModeScriptSettings() as $name => $value) {
+                $isBool     = is_bool($value);
+                $settings[] = array(
+                    'name'   => $name,
+                    'label'  => $this->scriptSettingsWindow->handleSpecialChars($name),
+                    'isBool' => $isBool,
+                    'value'  => $isBool ? ($value ? 'true' : 'false') : $this->scriptSettingsWindow->handleSpecialChars(strval($value)),
+                );
+            }
+
+            $this->scriptSettingsWindow->setParam("settings", $settings);
             $this->scriptSettingsWindow->show($login);
         }
     }
