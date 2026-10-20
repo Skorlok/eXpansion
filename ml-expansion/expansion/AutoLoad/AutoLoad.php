@@ -90,7 +90,10 @@ class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while loading Core plugins!" . $ex->getMessage());
-            AdminGroups::getInstance()->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting expansion core. See console for more info.');
+            $adminGroups = AdminGroups::getInstance();
+            if ($adminGroups !== null) {
+                $adminGroups->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting expansion core. See console for more info.');
+            }
         }
 
         // do event to inform autoload is complete;

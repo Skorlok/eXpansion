@@ -283,7 +283,7 @@ class AutoQueue extends ExpPlugin
         $data  = array();
         $i     = 0;
         foreach ($queued as $player) {
-            $items[$i] = array($rankColor . $i + 1 . '.', $player->nickName);
+            $items[$i] = array($rankColor . ($i + 1) . '.', $player->nickName);
             $data[$i]  = array(-1, -1, 'exp:eXpansion.AutoQueue:admRemoveQueue:' . $player->login);
             $i++;
         }
