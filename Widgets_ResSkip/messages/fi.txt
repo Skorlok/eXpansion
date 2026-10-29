@@ -1,32 +1,23 @@
-AddToFav:$s$fffAdd
-AddToFav:$s$fffLisää
+$s$fffBuy
+$s$fffOsta
 
-AddToFav:$s$fffto
-AddToFav:$s$fff
+$s$fffRestart
+$s$fffAloitus
 
-AddToFav:$s$fffFav's
-AddToFav:$s$fffSuosik.
+$s$fffMax
+$s$fffMax
 
-AddToFav:$ff0Buy
-AddToFav:$ff0Osta
+$s$fffrestarts
+$s$fffaloitusta
 
-AddToFav:$fffRestart
-AddToFav:$fffAloitus
+$s$fffreached
+$s$fffsaavutettu
 
-AddToFav:$ff0Max
-AddToFav:$ff0Max
+$s$fffSkip
+$s$fffSkip
 
-AddToFav:$fffrestarts
-AddToFav:$fffaloitusta
-
-AddToFav:$ff0reached
-AddToFav:$ff0saavutettu
-
-AddToFav:$fffSkip
-AddToFav:$fffSkip
-
-AddToFav:$fffskips
-AddToFav:$fffskips
+$s$fffskips
+$s$fffskips
 
 Are you sure you want to restart this map
 Oletko varma, että haluat pelata kartan uudelleen

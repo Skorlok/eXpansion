@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Chat;
 
-use ManiaLib\Utils\Singleton;
+use ManiaLive\Utilities\Singleton;
 
 class Config extends Singleton
 {
@@ -18,4 +18,7 @@ class Config extends Singleton
     public $useProfanityFilter = false;
     public $useChannels = false;
     public $channels = array("English", "German", "French");
+
+    public $chatSelector_PosX = -153;
+    public $chatSelector_PosY = 77;
 }

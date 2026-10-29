@@ -1,0 +1,11 @@
+Time
+Heure
+
+Players
+Joueurs
+
+Spectators
+Spectateurs
+
+Ladder limits %1$s - %2$sk
+Limites ladder %1$s - %2$sk

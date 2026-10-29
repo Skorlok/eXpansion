@@ -1,133 +1,129 @@
 <?php
 
-/* [19] => Array
-  (
-  [TrackID] => 63857
-  [UserID] => 5237
-  [Username] => cricri56
-  [UploadedAt] => 2014-05-06T17:53:10.38
-  [UpdatedAt] => 2014-05-06T17:53:10.38
-  [Name] => Cliffs of Sanity (mix valley)
-  [TypeName] => Race
-  [MapType] => Race
-  [TitlePack] => Trackmania_2
-  [StyleName] => Race
-  [Mood] => Day
-  [DisplayCost] => 5682
-  [ModName] =>
-  [Lightmap] => 6
-  [ExeVersion] => 3.3.0
-  [ExeBuild] => 2014-05-02_17_3
-  [EnvironmentName] => Canyon
-  [VehicleName] => ValleyCar
-  [UnlimiterRequired] =>
-  [RouteName] => Single
-  [LengthName] => 1 min
-  [Laps] => 1
-  [DifficultyName] => Intermediate
-  [ReplayTypeName] =>
-  [ReplayWRID] =>
-  [ReplayCount] => 0
-  [TrackValue] => 0
-  [Comments] =>
-  [AwardCount] => 0
-  [CommentCount] => 0
-  [ReplayWRTime] =>
-  [ReplayWRUserID] =>
-  [ReplayWRUsername] =>
-  [Unreleased] =>
-  [GbxMapName] => $ccc$oCliffs of Sanity (mix valley)
-  [RatingVoteCount] => 0
-  [RatingVoteAverage] => 0
-  [HasScreenshot] =>
-  [HasThumbnail] => 1
-  )
- */
-
 namespace ManiaLivePlugins\eXpansion\ManiaExchange\Structures;
 
 class MxMap extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 {
+    public $mapUid;
 
-    public $trackID;
+    public $mapId;
 
-    public $trackUID;
+    public $titlePack;
 
-    public $userID;
+    public $environment;
 
-    public $username;
+    public $vehicleName;
 
-    public $uploadedAt;
+    public $gbxMapName;
+
+    public $uploader;
+
+    public $difficulty;
+
+    public $moodFull;
+
+    public $tags;
+
+    public $length;
+
+    public $awardCount;
 
     public $updatedAt;
 
     public $name;
 
-    /** @var string contains mapname with color codes */
-    public $gbxMapName;
+    public $uploadedAt;
 
-    public $typeName;
+    public $images;
 
     public $mapType;
 
-    public $titlePack;
-
-    public $styleName;
-
-    public $mood;
-
-    public $displayCost;
-
-    public $modName;
-
-    /** @var Lightmap version, currently 6 */
-    public $lightmap;
-
-    public $exeVersion;
-
-    public $exeBuild;
-
-    /** Canyon / Valley / Stadium */
-    public $environmentName;
-
-    /** CanyonCar / ValleyCar / StadiumCar */
-    public $vehicleName;
-
-    public $unlimiterRequired;
-
-    public $routeName;
-
-    public $lengthName;
-
-    public $laps;
-
-    public $difficultyName;
-
-    public $replayTypeName;
-
-    public $replayWRID;
+    public $routes;
 
     public $replayCount;
 
-    public $trackValue;
+    public $authorComments;
 
-    public $comments;
+    public function getEnvironment()
+    {
+        switch ($this->environment) {
+            case 1:
+                return "Canyon";
+            case 3:
+                return "Valley";
+            case 4:
+                return "Lagoon";
+            case 2:
+                return "Stadium";
+            case "Storm":
+                return "Storm";
+            default:
+                return "Unknown";
+        }
+    }
 
-    public $commentCount;
+    public function getUploader()
+    {
+        return $this->uploader["Name"];
+    }
 
-    public $awardCount;
+    public function getDifficulty()
+    {
+        switch ($this->difficulty) {
+            case 0:
+                return "Beginner";
+            case 1:
+                return "Intermediate";
+            case 2:
+                return "Advanced";
+            case 3:
+                return "Expert";
+            case 4:
+                return "Lunatic";
+            case 5:
+                return "Impossible";
+            default:
+                return "Unknown";
+        }
+    }
 
-    public $replayWRTime;
+    public function getStyle()
+    {
+        if (isset($this->tags[0]["Name"])) {
+            return $this->tags[0]["Name"];
+        }
+        return "";
+    }
 
-    public $replayWRUserID;
+    public function getLength()
+    {
+        return $this->timeString($this->length);
+    }
 
-    public $replayWRUsername;
+    public function getRouteType()
+    {
+        switch ($this->difficulty) {
+            case 0:
+                return "Single";
+            case 1:
+                return "Multiple";
+            case 2:
+                return "Symmetrical";
+            default:
+                return "Unknown";
+        }
+    }
 
-    public $ratingVoteCount;
-
-    public $ratingVoteAverage;
-
-    public $hasScreenshot;
-
-    public $hasThumbnail;
+    // function to convert time in milliseconds to a string
+    public function timeString($time)
+    {
+        $time = $time / 1000;
+        $minutes = floor($time / 60);
+        $seconds = intval($time) % 60;
+        $seconds = round($seconds, 2);
+        if ($minutes) {
+            return $minutes . "min " . $seconds . "s";
+        }
+        return $seconds . "s";
+    }
 }

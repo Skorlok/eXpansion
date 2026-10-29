@@ -9,6 +9,7 @@ class GlobalEvent extends \ManiaLive\Event\Event
     const ON_VOTE_RESTART = 4;
     const ON_VOTE_SKIP = 8;
     const ON_AUTOLOAD_COMPLETE = 16;
+    const ON_SCORES_CALCULATED = 32;
 
     protected $params;
 
@@ -34,6 +35,9 @@ class GlobalEvent extends \ManiaLive\Event\Event
                 break;
             case self::ON_AUTOLOAD_COMPLETE:
                 $listener->eXpAutoloadComplete();
+                break;
+            case self::ON_SCORES_CALCULATED:
+                $listener->onScoresCalculated($p[0]);
                 break;
         }
     }

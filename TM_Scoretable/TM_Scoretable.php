@@ -20,7 +20,6 @@
 namespace ManiaLivePlugins\eXpansion\TM_Scoretable;
 
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\TM_Scoretable\Gui\Scoretable\Scoretable;
 
 /**
  * Description of TM_Scoretable

@@ -1,0 +1,256 @@
+<frame posn="2 0 0">
+    <frame posn="0 0 1"><exp:inputbox name="searchbox" sizeX="35" editable="true" label="@Search maps" text="{searchTerm}" isTextId="true"/></frame>
+    <frame posn="38 0 1"><exp:button sizeX="40" sizeY="6" text="@Search Map" colorize="0a0" action="exp:eXpansion.Maps:doSearchMap" isTextId="true"/></frame>
+    <frame posn="69.5 0 1"><exp:button sizeX="40" sizeY="6" text="@Search Author" colorize="0a0" action="exp:eXpansion.Maps:doSearchAuthor" isTextId="true"/></frame>
+    <frame posn="101 0 1"><exp:button sizeX="40" sizeY="6" text="@Open Filter Window" action="exp:eXpansion.Maps:openFilterWindow" isTextId="true"/></frame>
+    <frame posn="132.5 0 1"><exp:button sizeX="40" sizeY="6" text="@Clear Filters" action="exp:eXpansion.Maps:clearPlayerFilter" isTextId="true"/></frame>
+</frame>
+<frame posn="3 -9.5 0">
+    <quad posn="-2 0 0" sizen="210 6.5" halign="left" valign="center" style="Bgs1" substyle="BgCard"/>
+</frame>
+<frame posn="3 -8.25 1.0E-5">
+    <frame>
+        <label sizen="23.75 7" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:author" textsize="1.5" textcolor="000" textid="{@Author}"/>
+        <label posn="23.75 0 1.0E-5" sizen="71.25 7" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:name" textsize="1.5" textcolor="000" textid="{@Map name}"/>
+        <label posn="95 0 2.0E-5" sizen="19 7" style="TextCardRaceRank" textsize="1.5" textcolor="000" textid="{@Title}"/>
+        <label posn="114 0 3.0E-5" sizen="19 7" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:goldTime" textsize="1.5" textcolor="000" textid="{@Length}"/>
+        <label posn="133 0 4.0E-5" hidden="{hideRecs}" sizen="14.25 7" halign="center" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:localrecord" textsize="1.5" textcolor="000" textid="{@Record}"/>
+        <label posn="147.25 0 5.0E-5" hidden="{hideRating}" sizen="14.25 7" halign="center" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:rating" textsize="1.5" textcolor="000" textid="{@Rating}"/>
+        <label posn="161.5 0 6.0E-5" hidden="{hideRating}" sizen="12 7" halign="center" style="TextCardRaceRank" action="exp:eXpansion.Maps:doSort:playervote" textsize="1.5" textcolor="000" textid="{@My rating}"/>
+        <label posn="173.5 0 6.0E-5" sizen="14.25 7" style="TextCardRaceRank" textsize="1.5" textcolor="000" textid="{@Actions}"/>
+    </frame>
+</frame>
+<frame posn="3 -17 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 0 0.0001" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_0_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_0_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_0_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_0_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_0_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_0_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_0_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -6.5 0.0001" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_1_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_1_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_1_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_1_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_1_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_1_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_1_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -13 0.0001" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_2_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_2_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_2_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_2_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_2_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_2_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_2_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -19.5 0.0001" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_3_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_3_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_3_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_3_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_3_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_3_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_3_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -26 0.0001" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_4_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_4_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_4_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_4_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_4_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_4_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_4_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -32.5 0.0001" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_5_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_5_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_5_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_5_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_5_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_5_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_5_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -39 0.0001" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_6_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_6_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_6_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_6_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_6_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_6_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_6_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -45.5 0.0001" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_7_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_7_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_7_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_7_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_7_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_7_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_7_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -52 0.0001" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_8_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_8_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_8_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_8_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_8_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_8_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_8_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -58.5 0.0001" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_9_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_9_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_9_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_9_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_9_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_9_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_9_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -65 0.0001" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_10_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_10_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_10_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_10_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_10_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_10_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_10_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <frame posn="0 -71.5 0.0001" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="204" sizeY="6.5"/>
+
+        <label id="column_11_0" sizen="23.75 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="23.75 0 1.0E-5" sizen="71.25 4" halign="left" valign="center" bgcolor="000" focusareacolor1="0000" focusareacolor2="{bgColorize}" textprefix="$s" style="TextValueSmall" textsize="1" action="eXpOptimizedPagerAction" scriptevents="1" class="eXpOptimizedPagerAction"/>
+        <label id="column_11_2" posn="95 0 2.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_3" posn="114 0 3.0E-5" sizen="19 4" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_4" hidden="{hideRecs}" posn="133 0 4.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_5" hidden="{hideRating}" posn="147.25 0 5.0E-5" sizen="14.25 4" halign="center" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_6" hidden="{hideRating}" posn="161.5 0 6.0E-5" sizen="12 4" halign="center" valign="center" style="TextStaticSmall"/>
+
+        <frame posn="173.5 0 0.01">
+            <frame posn="0 0 1"><exp:icon sizeX="5" sizeY="5" description="@Map Info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="TrackInfo" id="column_11_7" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="5.25 0 1" hidden="{hideRecs}"><exp:icon sizeX="5" sizeY="5" description="@Show Records" descSizeX="40" action="eXpOptimizedPagerAction" icon="BgRaceScore2" iconSub="ScoreLink" id="column_11_8" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="10.5 0 1" hidden="{hideJump}"><exp:icon sizeX="5" sizeY="5" description="@Skip to this map" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="ClipPlay" id="column_11_9" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="15.75 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Remove this map from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons128x32_1" iconSub="Close" id="column_11_10" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+            <frame posn="21 0 1" hidden="{hideRemove}"><exp:icon sizeX="5" sizeY="5" description="@$F22Erase this map and the file from server" descSizeX="70" action="eXpOptimizedPagerAction" icon="Icons64x64_1" iconSub="Close" id="column_11_11" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+        </frame>
+    </frame>
+    <exp:optimizedpager sizeX="208" sizeY="80" itemsVarName="maplistItems" dataVarName="maplistData" rowsPerPage="12" itemsPerRow="7" varName="maplist"/>
+</frame>
+<frame posn="189 2 1" scale="0.666666667" hidden="{hideRemove}">
+    <exp:button sizeX="35" sizeY="6" text="@$d00Clear Maplist" action="{removeAllAction}" isTextId="true"/>
+</frame>

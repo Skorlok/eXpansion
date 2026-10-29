@@ -1,0 +1,27 @@
+<frame id="Pager" scriptevents="1">
+    <exp:foreach items="players" as="player" index="i">
+    <frame>
+        <exp:listbg indexNumber="{i}" sizeX="152" sizeY="6"/>
+        <frame posn="4 0 1.0E-5">
+            <quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>
+            <label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="{player.nickName}"/>
+            <frame posn="104 0 1">
+                <exp:inputbox name="{player.login}" sizeX="20"/>
+            </frame>
+        </frame>
+    </frame>
+    </exp:foreach>
+</frame>
+<exp:pager sizeX="160" sizeY="72" itemSizeY="6"/>
+<frame posn="40 2 0">
+	<exp:button sizeX="32" sizeY="6" text="@Reset scores" action="exp:eXpansion.Adm:forceScoresClear" isTextId="true"/>
+	<frame posn="27.5 0 1">
+		<exp:button sizeX="32" sizeY="6" text="@Skip & reset" action="exp:eXpansion.Adm:forceScoresSkip" isTextId="true"/>
+	</frame>
+	<frame posn="55 0 0">
+		<exp:button sizeX="32" sizeY="6" text="@Restart & reset" action="exp:eXpansion.Adm:forceScoresRestart" isTextId="true"/>
+	</frame>
+</frame>
+<frame posn="129 -74 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Adm:forceScoresApply" isTextId="true"/>
+</frame>

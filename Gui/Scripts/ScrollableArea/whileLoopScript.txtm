@@ -15,45 +15,50 @@ if(pager_moveScroll){
         ScrollBar.RelativePosition.Y = pager_scrollYOriginPosition + pager_deltaMouseYPosition;
     }
 
-    declare maxDelta = pagerStartPos - pagerStopPosition;
-
-    percent = 1 - (MathLib::Abs(maxDelta) - MathLib::Abs(ScrollBar.RelativePosition.Y)) / MathLib::Abs(maxDelta);
-
-    if (percent != oldPercent) {
-    declare y =(contentSizeY - ScrollableArea.ClipWindowSize.Y )* percent;
-    Content.RelativePosition.Y = y;
-    oldPercent = percent;
+    if (maxDelta != 0.) {
+        percent = 1 - (MathLib::Abs(maxDelta) - MathLib::Abs(ScrollBar.RelativePosition.Y)) / MathLib::Abs(maxDelta);
     }
-
-
 }
 
-if(pager_moveScroll2) {
+if (isScrollDown) {
+    isScrollDown = False;
 
-    if(pager_firstClick2){
-	    pager_scrollXOriginPosition = ScrollHBar.RelativePosition.X;
-    }
-    pager_firstClick2 = False;
-
-    declare xpos = pager_scrollXOriginPosition + pager_deltaMouseXPosition;
-
-    if ( xpos <= pagerStartPos2) {
-	    ScrollHBar.RelativePosition.X = pagerStartPos2;
-    } else if (xpos > pagerStopPosition2) {
-    	ScrollHBar.RelativePosition.X = pagerStopPosition2;
+    declare Real newPerc = percent + scrollStep;
+    if (newPerc >= 1.) {
+        percent = 1.;
+        ScrollBar.RelativePosition.Y = pagerStopPosition;
     } else {
-        ScrollHBar.RelativePosition.X = pager_scrollXOriginPosition + pager_deltaMouseXPosition;
+        percent = newPerc;
+        ScrollBar.RelativePosition.Y -= maxDelta * scrollStep;
+    }
+}
+
+if (isScrollUp) {
+    isScrollUp = False;
+
+    declare Real newPerc = percent - scrollStep;
+    if (newPerc <= 0.) {
+        percent = 0.;
+        ScrollBar.RelativePosition.Y = pagerStartPos;
+    } else {
+        percent = newPerc;
+        ScrollBar.RelativePosition.Y += maxDelta * scrollStep;
+    }
+}
+
+if (percent != oldPercent) {
+    oldPercent = percent;
+    Content.RelativePosition.Y = (contentSizeY - ScrollableArea.ClipWindowSize.Y) * percent;
+
+    ScrollUp.Opacity = 1.0;
+    ScrollDown.Opacity = 1.0;
+
+    if (percent <= 0.) {
+        ScrollUp.Opacity = disabledOpacity;
     }
 
-    declare maxDelta2 = pagerStartPos2 - pagerStopPosition2;
-
-    percent2 = 1 - (MathLib::Abs(maxDelta2) - MathLib::Abs(ScrollHBar.RelativePosition.X)) / MathLib::Abs(maxDelta2);
-
-    if (percent2 != oldPercent2) {
-        declare x = (contentSizeX - ScrollableArea.ClipWindowSize.X ) * percent2;
-        Content.RelativePosition.X = -x;
-
-        oldPercent2 = percent2;
+    if (percent >= 1.) {
+        ScrollDown.Opacity = disabledOpacity;
     }
 }
 
@@ -71,17 +76,6 @@ foreach (Event in PendingEvents) {
 	    if (Event.ControlId == "scrollVUp")  {
             isScrollUp = True;
 	    }
-	    if (Event.ControlId == "scrollHBar")  {
-            pager_startMouseXPosition = MouseX;
-            pager_firstClick2 = True;
-            pager_moveScroll2 = True;
-        }
-        if (Event.ControlId == "scrollHLeft")  {
-            isScrollLeft = True;
-        }
-        if (Event.ControlId == "scrollHRight")  {
-            isScrollRight = True;
-        }
     }
 
 // pagedown = 78
@@ -107,9 +101,6 @@ foreach (Event in PendingEvents) {
 if (MouseLeftButton == False) {
     pager_firstClick = False;
     pager_moveScroll = False;
-    pager_moveScroll2 = False;
 } else if(pager_moveScroll) {
     pager_deltaMouseYPosition = MouseY - pager_startMouseYPosition;
-} else if (pager_moveScroll2) {
-    pager_deltaMouseXPosition = MouseX - pager_startMouseXPosition;
 }

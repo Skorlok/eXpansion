@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $refresh_interval = 20;
@@ -13,7 +13,10 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $storing_path = "../";
 
-    public $servers = array('../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml', '../oliverde8-server2_serverinfo.xml');
+    public $servers = array();
 
     public $snwidget_isDockable = true;
+
+    public $serverPanel_PosX = -160;
+    public $serverPanel_PosY = 80;
 }

@@ -1,6 +1,8 @@
 <?php
 namespace ManiaLivePlugins\eXpansion\Helpers;
 
+use Exception;
+
     /* vim: set noexpandtab tabstop=2 softtabstop=2 shiftwidth=2: */
 
     /**
@@ -130,7 +132,7 @@ class GBXBaseFetcher
     // read in raw GBX data
     protected function loadGBXdata($filename)
     {
-        $gbxdata = @file_get_contents($filename, false, null, 0, self::LOAD_LIMIT * 1024);
+        $gbxdata = file_get_contents($filename, false, null, 0, self::LOAD_LIMIT * 1024);
         if ($gbxdata !== false) {
             $this->storeGBXdata($gbxdata);
         } else {
@@ -320,7 +322,8 @@ class GBXBaseFetcher
     private function startTag($parser, $name, $attribs)
     {
         foreach ($attribs as $key => &$val) {
-            $val = utf8_decode($val);
+            //$val = utf8_decode($val);
+            $val = mb_convert_encoding($val, 'ISO-8859-1', 'UTF-8');
         }
         array_push($this->_parsestack, $name);
         if ($name == 'DEP') {
@@ -350,14 +353,14 @@ class GBXBaseFetcher
     {
         // define a dedicated parser to handle the attributes
         $xml_parser = xml_parser_create();
-        xml_set_object($xml_parser, $this);
-        xml_set_element_handler($xml_parser, 'startTag', 'endTag');
-        xml_set_character_data_handler($xml_parser, 'charData');
+        xml_set_element_handler($xml_parser, array($this, 'startTag'), array($this, 'endTag'));
+        xml_set_character_data_handler($xml_parser, array($this, 'charData'));
 
         // escape '&' characters unless already a known entity
         $xml = preg_replace('/&(?!(?:amp|quot|apos|lt|gt);)/', '&amp;', $this->xml);
 
-        if (!xml_parse($xml_parser, utf8_encode($xml), true)) {
+        // if (!xml_parse($xml_parser, utf8_encode($xml), true)) {
+        if (!xml_parse($xml_parser, mb_convert_encoding($xml, 'UTF-8', mb_list_encodings()), true)) {
             $this->errorOut(
                 sprintf(
                     'XML chunk parse error: %s at line %d',
@@ -368,7 +371,10 @@ class GBXBaseFetcher
             );
         }
 
-        xml_parser_free($xml_parser);
+        // breaks on PHP 8.5
+        if (PHP_VERSION_ID < 80000) {
+            xml_parser_free($xml_parser);
+        }
     }
 
     /**
@@ -973,7 +979,7 @@ class GBXChallMapFetcher extends GBXBaseFetcher
             // extract optional song & mod filenames
             if (!empty($this->xmlParsed['DEPS'])) {
                 for ($i = 0; $i < count($this->xmlParsed['DEPS']); $i++) {
-                    if (preg_match('/ChallengeMusics\\\\(.+)/', $this->xmlParsed['DEPS'][$i]['FILE'], $path)) {
+                    if (preg_match('/Musics\\\\(.+)/', $this->xmlParsed['DEPS'][$i]['FILE'], $path)) {
                         $this->songFile = $path[1];
                         if (isset($this->xmlParsed['DEPS'][$i]['URL'])) {
                             $this->songUrl = $this->xmlParsed['DEPS'][$i]['URL'];
@@ -1269,11 +1275,11 @@ class GBXChallMapFetcher extends GBXBaseFetcher
                 ) {
                     // flip thumbnail via temporary file
                     $tmp = tempnam(sys_get_temp_dir(), 'gbxflip');
-                    if (@file_put_contents($tmp, $this->thumbnail) !== false) {
-                        if ($tn = @imagecreatefromjpeg($tmp)) {
+                    if (file_put_contents($tmp, $this->thumbnail) !== false) {
+                        if ($tn = imagecreatefromjpeg($tmp)) {
                             $tn = $this->imageFlip($tn, self::IMAGE_FLIP_HORIZONTAL);
-                            if (@imagejpeg($tn, $tmp)) {
-                                if (($tn = @file_get_contents($tmp)) !== false) {
+                            if (imagejpeg($tn, $tmp)) {
+                                if (($tn = file_get_contents($tmp)) !== false) {
                                     $this->thumbnail = $tn;
                                 }
                             }

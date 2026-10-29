@@ -41,7 +41,7 @@ class FunnyTimes extends ExpPlugin
         $this->eXpChatSendServerMessage(
             $message,
             null,
-            array($this->storage->getPlayerObject($login)->nickName, Time::fromTM($timeOrScore))
+            array($this->storage->getPlayerObject($login)->cleanNickName, Time::fromTM($timeOrScore))
         );
     }
 }

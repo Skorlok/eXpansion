@@ -2,7 +2,9 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_LocalScores;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
-
+    public $localScoresPanel_PosX = 114;
+    public $localScoresPanel_PosY = 64;
+    public $localScoresPanel_nbFields = 23;
 }

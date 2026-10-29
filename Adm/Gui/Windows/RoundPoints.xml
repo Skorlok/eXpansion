@@ -1,0 +1,29 @@
+<frame id="Pager" scriptevents="1">
+    <frame>
+        <exp:listbg indexNumber="0" sizeX="152" sizeY="6"/>
+        <frame posn="2 0 1.0E-5">
+            <quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>
+            <label posn="4 0 1.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" textid="{@Custom point}"/>
+            <frame posn="40 0 1">
+                <exp:inputbox name="customPoints" sizeX="90" text="{customPoints}"/>
+            </frame>
+            <frame posn="130 0 5.0E-5" scale="0.8">
+                <exp:button sizeX="32" sizeY="6" text="@Set" action="exp:eXpansion.Adm:roundPointsSetCustom" isTextId="true"/>
+            </frame>
+        </frame>
+    </frame>
+    <exp:foreach items="presets" as="preset">
+    <frame>
+        <exp:listbg indexNumber="{preset.index}" sizeX="152" sizeY="6"/>
+        <frame posn="2 0 1.0E-5">
+            <quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>
+            <label posn="4 0 1.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="{preset.name}"/>
+            <label posn="40 0 3.0E-5" sizen="90 3" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="{preset.points}"/>
+            <frame posn="130 0 5.0E-5" scale="0.8">
+                <exp:button sizeX="32" sizeY="6" text="@Set" action="{preset.action}" isTextId="true"/>
+            </frame>
+        </frame>
+    </frame>
+    </exp:foreach>
+</frame>
+<exp:pager sizeX="160" sizeY="82" itemSizeY="6"/>

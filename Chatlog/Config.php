@@ -1,14 +1,13 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\Chatlog;
 
-use ManiaLib\Utils\Singleton;
+namespace ManiaLivePlugins\eXpansion\Chatlog;
 
 /**
  * Description of Config
  *
  * @author Petri
  */
-class Config extends Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
     public $historyLenght = 100;
 }

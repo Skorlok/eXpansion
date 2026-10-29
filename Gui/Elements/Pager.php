@@ -2,155 +2,45 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLivePlugins\eXpansion\Gui\Config;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
-/**
- * Description of Pager
- *
- * @author Petri
- */
-class Pager extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
+class Pager
 {
 
-    protected $pager;
-    protected $items = array();
-    protected $scroll;
-    protected $scrollBg;
-    protected $scrollUp;
-    protected $scrollDown;
-    protected $barFrame;
-    protected $itemSizeY = 6;
-    protected $myScript;
-
-    public function __construct()
+    /**
+     * Generate the Pager XML structure (scrollable container + scrollbar chrome).
+     *
+     * @param Window $mlClass   ManiaLink class name (e.g. "ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window")
+     * @param float  $sizeX  Total width
+     * @param float  $sizeY  Total height
+     * @param float  $itemSizeY  Height of one item row
+     * @return string
+     */
+    public static function getXML($mlClass, $sizeX = 100, $sizeY = 50, $itemSizeY = 6)
     {
-        $config = Config::getInstance();
-
-        $this->pager = new \ManiaLive\Gui\Controls\Frame();
-        $this->pager->setId("Pager");
-        $this->pager->setScriptEvents();
-        $this->addComponent($this->pager);
-
-        $this->barFrame = new \ManiaLive\Gui\Controls\Frame(0, -5);
-        $this->addComponent($this->barFrame);
-
-        $this->scroll = new \ManiaLib\Gui\Elements\Quad(3, 15);
-        $this->scroll->setAlign("center", "top");
-        $this->scroll->setBgcolor("fff");
-        $this->scroll->setId("ScrollBar");
-        $this->scroll->setScriptEvents();
-        $this->barFrame->addComponent($this->scroll);
-
-        $this->scrollBg = new \ManiaLib\Gui\Elements\Quad(4, 40);
-        $this->scrollBg->setAlign("center", "top");
-        $this->scrollBg->setId("ScrollBg");
-        $this->scrollBg->setBgcolor("fff");
-        $this->scrollBg->setOpacity(0.3);
-        $this->barFrame->addComponent($this->scrollBg);
-
-        $this->scrollDown = new \ManiaLib\Gui\Elements\Label(6.5, 6.5);
-        $this->scrollDown->setAlign("center", "top");
-        $this->scrollDown->setText('▼');
-        $this->scrollDown->setId("ScrollDown");
-        $this->scrollDown->setScriptEvents();
-        $this->barFrame->addComponent($this->scrollDown);
-
-        $this->scrollUp = new \ManiaLib\Gui\Elements\Label(6.5, 6.5);
-        $this->scrollUp->setAlign("center", "bottom");
-        $this->scrollUp->setText('▲');
-        $this->scrollUp->setId("ScrollUp");
-        $this->scrollUp->setScriptEvents();
-        $this->barFrame->addComponent($this->scrollUp);
-
-        $this->myScript = new \ManiaLivePlugins\eXpansion\Gui\Structures\Script("Gui\Scripts\Pager");
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-        parent::onResize($oldX, $oldY);
-
-        $this->pager->setSize($this->sizeX - 6, $this->sizeY);
-
-        $this->myScript->setParam("pagerSizeY", $this->sizeY);
-
-        $this->scroll->setPosition($this->sizeX - 3, 0,2);
-        $this->scrollBg->setPosition($this->sizeX - 3, 0,1);
-        $this->scrollBg->setSizeY($this->sizeY - 9);
-
-        $this->scrollDown->setPosition($this->sizeX - 3, -($this->sizeY - 9));
-        $this->scrollUp->setPosition($this->sizeX - 3, 0);
-
-        foreach ($this->items as $item) {
-            $scale = $item->getScale();
-            if ($scale == "") {
-                $scale = 1;
-            }
-
-            $item->setSizeX($this->sizeX / $scale - 4);
+        if (!is_object($mlClass)) {
+            Helper::logError('Pager: Invalid $mlClass parameter', array("Gui", "Pager"));
+            return "";
         }
-    }
-
-    public function setStretchContentX($value)
-    {
-        // do nothing xD
-    }
-
-    public function addItem(\ManiaLib\Gui\Component $component)
-    {
-        $scale = $component->getScale();
-        if ($scale == "") {
-            $scale = 1;
+        if (!$mlClass instanceof Window) {
+            Helper::logError('Pager: $mlClass parameter must be an instance of ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window', array("Gui", "Pager"));
+            return "";
         }
-        $component->setSizeX($this->sizeX / $scale - 8);
-        $component->setAlign("left", "top");
-        if ($component->getSizeY() > 0) {
-            $this->itemSizeY = $component->getSizeY();
-        }
-        $item = new \ManiaLive\Gui\Controls\Frame();
-        $item->setAlign("left", "top");
-        $item->setScriptEvents();
-        $item->addComponent($component);
-        $hash = spl_object_hash($item);
-        $this->items[$hash] = $item;
-        $this->pager->addComponent($this->items[$hash]);
-    }
 
-    public function clearItems()
-    {
-        if (isset($this->pager) && $this->pager != null) {
-            $this->pager->destroyComponents();
-            $this->items = array();
-        }
-    }
+        $xml  = '<frame posn="' . ($sizeX - 3) . ' -5 0">';
+        $xml .= '<quad id="ScrollBg" posn="0 0 0" sizen="4 ' . ($sizeY - 9) . '" halign="center" valign="top" style="Bgs1InRace" substyle="BgPlayerCard" opacity="0.9"/>';
+        $xml .= '<quad id="ScrollBar" posn="0 0 1" sizen="3 15" halign="center" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerName" scriptevents="1"/>';
+        $xml .= '<quad id="ScrollDown" posn="0 -' . ($sizeY - 10) . ' 0" sizen="6.5 6.5" halign="center" valign="top" style="Icons64x64_1" substyle="ArrowDown" scriptevents="1"/>';
+        $xml .= '<quad id="ScrollUp" posn="0 -1 0" sizen="6.5 6.5" halign="center" valign="bottom" style="Icons64x64_1" substyle="ArrowUp" scriptevents="1"/>';
+        $xml .= '</frame>';
 
-    public function removeItem(\ManiaLib\Gui\Component $item)
-    {
-        $hash = spl_object_hash($item);
-        $this->pager->removeComponent($this->items[$hash]);
-        $this->items[$hash]->destroy();
-        unset($this->items[$hash]);
-    }
+        $script = new Script("Gui\Scripts\Pager");
+        $script->setParam("sizeY",      $script->getNumber($itemSizeY));
+        $script->setParam("pagerSizeY", $script->getNumber($sizeY));
+        $mlClass->registerOrOverrideScript($script);
 
-    public function destroy()
-    {
-        if (isset($this->pager) && $this->pager != null) {
-            $this->pager->destroyComponents();
-            $this->pager->destroy();
-            $this->items = array();
-        }
-        parent::destroy();
-    }
-
-    public function onIsRemoved(\ManiaLive\Gui\Container $target)
-    {
-        parent::onIsRemoved($target);
-        $this->destroy();
-    }
-
-    public function getScript()
-    {
-        $this->myScript->setParam("sizeY", $this->itemSizeY);
-
-        return $this->myScript;
+        return $xml;
     }
 }

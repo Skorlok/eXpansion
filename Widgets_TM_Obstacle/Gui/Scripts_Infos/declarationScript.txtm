@@ -1,6 +1,6 @@
-declare Integer totalCheckpoints = <?php echo $this->totalCp; ?>;
-declare Integer playerCount = <?php echo $this->playerCount; ?>;
-declare Text serverLogin = "<?php echo $this->serverLogin; ?>";
+declare Integer totalCheckpoints = {{ totalCp }};
+declare Integer playerCount = {{ playerCount }};
+declare Text serverLogin = "{{ serverLogin }}";
 declare Real divGrad = 1.0;
 declare Integer curCp = 0;
 declare Boolean Started = False;

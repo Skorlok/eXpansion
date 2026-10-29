@@ -1,6 +1,4 @@
 <?php
-namespace ManiaLivePlugins\eXpansion\AutoQueue\Classes;
-
 /*
  * Copyright (C) 2014 Reaby
  *
@@ -18,8 +16,9 @@ namespace ManiaLivePlugins\eXpansion\AutoQueue\Classes;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use ManiaLive\Data\Storage;
-use ManiaLivePlugins\eXpansion\AutoQueue\Structures\QueuePlayer;
+namespace ManiaLivePlugins\eXpansion\AutoQueue\Classes;
+
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 
 /**
  * Description of Queue
@@ -70,24 +69,13 @@ class Queue
         }
     }
 
-    /**
-     * gets first player out of the array :)
-     *
-     * @return null|QueuePlayer
-     */
     public function getNextPlayer()
     {
         if ($this->queue->count() > 0) {
             return $this->queue->dequeue();
         }
-        return null;
     }
 
-    /**
-     * gets list of queueplayer
-     *
-     * @return QueuePlayer[]
-     */
     public function getQueuedPlayers()
     {
         $out = array();
@@ -106,5 +94,10 @@ class Queue
     public function getLogins()
     {
         return array_keys($this->getQueuedPlayers());
+    }
+
+    public function getNbPlayers()
+    {
+        return $this->queue->count();
     }
 }

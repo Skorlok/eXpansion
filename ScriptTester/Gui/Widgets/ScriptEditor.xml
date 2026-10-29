@@ -1,0 +1,22 @@
+<frame scale="0.75">
+    <frame>
+        <exp:widgetbg sizeX="395" sizeY="75"/>
+    </frame>
+
+    <frame posn="12 0 1.0E-5">
+        <exp:widgettitle sizeX="180" sizeY="4" text="@Manialink editor"/>
+    </frame>
+    <textedit id="input_manialink" posn="12 -5 3.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="{manialink}" textformat="script" name="manialink" showlinenumbers="1" autonewline="1"/>
+
+    <frame posn="210 0 4.0E-5">
+        <exp:widgettitle sizeX="180" sizeY="4" text="@Maniascript editor"/>
+    </frame>
+    <textedit id="input_maniascript" posn="210 -5 6.0E-5" sizen="180 60" halign="left" valign="top" scriptevents="1" default="{maniascript}" textformat="script" name="script" showlinenumbers="1" autonewline="1"/>
+
+    <frame posn="190 -70 1">
+        <exp:button sizeX="40" sizeY="6" text="@Save &amp; Test" colorize="0d0" action="exp:eXpansion.ScriptTester:apply" id="apply" isTextId="true"/>
+    </frame>
+    <frame posn="365 -70 1">
+        <exp:button sizeX="32" sizeY="6" text="@Close" colorize="d00" action="exp:eXpansion.ScriptTester:closeEditor" isTextId="true"/>
+    </frame>
+</frame>

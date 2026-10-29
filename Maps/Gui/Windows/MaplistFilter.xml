@@ -1,0 +1,78 @@
+<frame posn="1 0 0">
+    <label posn="0 0 1" sizen="44 5" textsize="1.5" halign="left" valign="center" style="TextStaticSmall" textid="{@Filters}"/>
+    <label posn="49 0 1" sizen="44 5" textsize="1.5" halign="left" valign="center" style="TextStaticSmall" textid="{@Sort By}"/>
+    <label posn="90 0 1" sizen="30 5" textsize="1.5" halign="left" valign="center" style="TextStaticSmall" textid="{@Direction}"/>
+    <quad posn="46.5 1 0" sizen="0.5 99" style="BgsPlayerCard" substyle="BgCard" opacity="0.5"/>
+    <quad posn="86 1 0" sizen="0.5 99" style="BgsPlayerCard" substyle="BgCard" opacity="0.5"/>
+
+    <!-- Section: Environnement -->
+    <label posn="0 -6 1" sizen="44 4" textsize="1.2" halign="left" valign="center" style="TextStaticSmall" textid="{@Environment}"/>
+    <frame posn="0 -11 1"><exp:button sizeX="21" sizeY="5" text="Canyon" action="exp:eXpansion.Maps:applyFilter:canyon"/></frame>
+    <frame posn="23 -11 1"><exp:button sizeX="21" sizeY="5" text="Stadium" action="exp:eXpansion.Maps:applyFilter:stadium"/></frame>
+    <frame posn="0 -17 1"><exp:button sizeX="21" sizeY="5" text="Valley" action="exp:eXpansion.Maps:applyFilter:valley"/></frame>
+    <frame posn="23 -17 1"><exp:button sizeX="21" sizeY="5" text="Lagoon" action="exp:eXpansion.Maps:applyFilter:lagoon"/></frame>
+
+    <quad posn="0 -23 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <!-- Section: Mood -->
+    <label posn="0 -25 1" sizen="44 4" textsize="1.2" halign="left" valign="center" style="TextStaticSmall" textid="{@Mood}"/>
+    <frame posn="0 -30 1"><exp:button sizeX="21" sizeY="5" text="@Sunrise" action="exp:eXpansion.Maps:applyFilter:sunrise" isTextId="true"/></frame>
+    <frame posn="23 -30 1"><exp:button sizeX="21" sizeY="5" text="@Day" action="exp:eXpansion.Maps:applyFilter:day" isTextId="true"/></frame>
+    <frame posn="0 -36 1"><exp:button sizeX="21" sizeY="5" text="@Sunset" action="exp:eXpansion.Maps:applyFilter:sunset" isTextId="true"/></frame>
+    <frame posn="23 -36 1"><exp:button sizeX="21" sizeY="5" text="@Night" action="exp:eXpansion.Maps:applyFilter:night" isTextId="true"/></frame>
+
+    <quad posn="0 -42 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <!-- Section: Médailles -->
+    <label hidden="{hideLocalRecords}" posn="0 -44 1" sizen="44 4" textsize="1.2" halign="left" valign="center" style="TextStaticSmall" textid="{@Medals}"/>
+    <frame hidden="{hideLocalRecords}" posn="0 -49 1"><exp:button sizeX="21" sizeY="5" text="@No Author time" action="exp:eXpansion.Maps:applyFilter:noauthor" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="23 -49 1"><exp:button sizeX="21" sizeY="5" text="@No Gold time" action="exp:eXpansion.Maps:applyFilter:nogold" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="0 -55 1"><exp:button sizeX="21" sizeY="5" text="@No Silver time" action="exp:eXpansion.Maps:applyFilter:nosilver" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="23 -55 1"><exp:button sizeX="21" sizeY="5" text="@No Bronze time" action="exp:eXpansion.Maps:applyFilter:nobronze" isTextId="true"/></frame>
+
+    <quad posn="0 -61 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <!-- Paires simples -->
+    <frame hidden="{hideLocalRecords}" posn="0 -63 1"><exp:button sizeX="21" sizeY="5" text="@Not Finished" action="exp:eXpansion.Maps:applyFilter:nofinish" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="23 -63 1"><exp:button sizeX="21" sizeY="5" text="@Finished" action="exp:eXpansion.Maps:applyFilter:finished" isTextId="true"/></frame>
+
+    <quad posn="0 -69 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <frame hidden="{hideMapRatings}" posn="0 -71 1"><exp:button sizeX="21" sizeY="5" text="@Not Rated" action="exp:eXpansion.Maps:applyFilter:novote" isTextId="true"/></frame>
+    <frame hidden="{hideMapRatings}" posn="23 -71 1"><exp:button sizeX="21" sizeY="5" text="@Rated" action="exp:eXpansion.Maps:applyFilter:voted" isTextId="true"/></frame>
+
+    <quad posn="0 -77 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <frame posn="0 -79 1"><exp:button sizeX="21" sizeY="5" text="@Not Recently Played" action="exp:eXpansion.Maps:applyFilter:norecent" isTextId="true"/></frame>
+    <frame posn="23 -79 1"><exp:button sizeX="21" sizeY="5" text="@Recently Played" action="exp:eXpansion.Maps:applyFilter:recent" isTextId="true"/></frame>
+
+    <quad posn="0 -85 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <frame posn="0 -87 1"><exp:button sizeX="21" sizeY="5" text="@No Multilap" action="exp:eXpansion.Maps:applyFilter:nomultilap" isTextId="true"/></frame>
+    <frame posn="23 -87 1"><exp:button sizeX="21" sizeY="5" text="@Only Multilap" action="exp:eXpansion.Maps:applyFilter:multilap" isTextId="true"/></frame>
+
+    <quad posn="0 -93 0.5" sizen="44 0.3" style="BgsPlayerCard" substyle="BgCard" opacity="0.4"/>
+
+    <!-- Behind player filter -->
+    <label hidden="{hideLocalRecords}" posn="0 -95 1" sizen="44 4" textsize="1.2" halign="left" valign="center" style="TextStaticSmall" textid="{@Behind player}"/>
+    <frame hidden="{hideLocalRecords}" posn="-1 -103 1"><exp:inputbox name="behindLogin" sizeX="30" editable="true" label="@Login" text="{targetLogin}" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="32 -103 1"><exp:button sizeX="12" sizeY="5" text="OK" action="exp:eXpansion.Maps:applyFilter:behindlogin"/></frame>
+
+    <!-- Sort By -->
+    <frame posn="49 -7 1"><exp:button sizeX="44" sizeY="5" text="@Map Name" action="exp:eXpansion.Maps:applySortFilter:name" isTextId="true"/></frame>
+    <frame posn="49 -13 1"><exp:button sizeX="44" sizeY="5" text="@Map Author" action="exp:eXpansion.Maps:applySortFilter:author" isTextId="true"/></frame>
+    <frame posn="49 -19 1"><exp:button sizeX="44" sizeY="5" text="@Gold Time" action="exp:eXpansion.Maps:applySortFilter:goldTime" isTextId="true"/></frame>
+    <frame hidden="{hideLocalRecords}" posn="49 -25 1"><exp:button sizeX="44" sizeY="5" text="@Local Record" action="exp:eXpansion.Maps:applySortFilter:localrecord" isTextId="true"/></frame>
+    <frame hidden="{hideMapRatings}" posn="49 -31 1"><exp:button sizeX="44" sizeY="5" text="@Map Rating" action="exp:eXpansion.Maps:applySortFilter:rating" isTextId="true"/></frame>
+    <frame posn="49 -37 1"><exp:button sizeX="44" sizeY="5" text="@Add Time" action="exp:eXpansion.Maps:applySortFilter:addTime" isTextId="true"/></frame>
+    <frame hidden="{hideMapRatings}" posn="49 -43 1"><exp:button sizeX="44" sizeY="5" text="@My rating" action="exp:eXpansion.Maps:applySortFilter:playervote" isTextId="true"/></frame>
+    <frame posn="49 -49 1"><exp:button sizeX="44" sizeY="5" text="@Display Cost" action="exp:eXpansion.Maps:applySortFilter:copperPrice" isTextId="true"/></frame>
+
+    <!-- Sort direction -->
+    <frame posn="92 -7 1">
+        <exp:ratiobutton group="sortDir" index="0" entryName="sortDir_asc" active="{isAsc}" textWidth="50" text="@Ascending" isTextId="true"/>
+    </frame>
+    <frame posn="92 -14 1">
+        <exp:ratiobutton group="sortDir" index="1" entryName="sortDir_desc" active="{isDesc}" textWidth="50" text="@Descending" isTextId="true"/>
+    </frame>
+</frame>

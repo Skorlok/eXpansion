@@ -1,9 +1,8 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Structures;
 
-use ManiaLive\Data\Player;
-
-class ExpPlayer extends Player
+class ExpPlayer extends \ManiaLivePlugins\eXpansion\Helpers\PlayerStorage
 {
 
     const Player_rank_position_change = 1;

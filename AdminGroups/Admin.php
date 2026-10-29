@@ -1,7 +1,7 @@
 <?php
 namespace ManiaLivePlugins\eXpansion\AdminGroups;
 
-use ManiaLive\Data\Storage;
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 
 /**
  * Description of Admin
@@ -51,7 +51,9 @@ class Admin
     public function hasPermission($name)
     {
         if (is_array($this->ipAllowed)) {
-            $ip = Storage::getInstance()->getPlayerObject($this->login)->iPAddress;
+            /** @var Storage $storage */
+            $storage = Storage::getInstance();
+            $ip = $storage->getPlayerObject($this->login)->iPAddress;
             $address = explode(":", $ip, 2);
 
             if (sizeof($address) > 0) {

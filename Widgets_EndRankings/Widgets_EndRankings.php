@@ -3,11 +3,17 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_EndRankings;
 
 use ManiaLive\PluginHandler\Dependency;
+use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\Formaters\LongDate;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 
-class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
+class Widgets_EndRankings extends ExpPlugin
 {
-    private $wasWarmup = false;
-
+    private $config;
+    private $widget1;
+    private $widget2;
+    private $widget3;
+    
     public function eXpOnInit()
     {
         $this->addDependency(new Dependency('\ManiaLivePlugins\eXpansion\\LocalRecords\\LocalRecords'));
@@ -17,6 +23,22 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
     {
         $this->enableDedicatedEvents();
         $this->enableDatabase();
+        $this->config = Config::getInstance();
+
+        $this->widget1 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
+        $this->widget1->setName("Server Ranks");
+        $this->widget1->setLayer("normal");
+        $this->widget1->setParam("title", "Server Ranks");
+
+        $this->widget2 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
+        $this->widget2->setName("Top Playtime");
+        $this->widget2->setLayer("normal");
+        $this->widget2->setParam("title", "Top Playtime");
+
+        $this->widget3 = new Widget("Widgets_EndRankings\Gui\Widgets\Panel.xml");
+        $this->widget3->setName("Top Donators");
+        $this->widget3->setLayer("normal");
+        $this->widget3->setParam("title", "Top Donators");
     }
 
     /**
@@ -24,30 +46,65 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
      *
      * @param string $login
      */
-    public function displayWidget($login = null)
+    public function displayWidgets()
     {
-        $info = Gui\Widgets\RanksPanel::Create(null);
-        $info->setSize(38, 95);
-        $info->setData(
-            $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks")
-        );
-        $info->setPosition(-160, 60);
-        $info->show();
+        /** @var Config */
+        $this->config = Config::getInstance();
 
-        $play = Gui\Widgets\TopPlayTime::Create(null);
-        $play->setTitle(eXpGetMessage("Top Playtime"));
-        $play->setLines(15);
-        $play->setData($this->getTopPlaytime());
-        $play->setPosition(120, 60);
-        $play->show();
+        $this->widget1->setSize(40, (3 * $this->config->rankPanel_nbFields) + 4.5);
+        $this->widget1->setPosition($this->config->rankPanel_PosX, $this->config->rankPanel_PosY, 0);
+        $this->setPanelParams($this->widget1, $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRanks"), $this->config->rankPanel_nbFields);
+        $this->widget1->show(null, true);
 
 
-        $don = Gui\Widgets\Donators::Create(null);
-        $don->setTitle(eXpGetMessage("Top Donators"));
-        $don->setLines(15);
-        $don->setData($this->getTopDonators());
-        $don->setPosition(120, 0);
-        $don->show();
+        $this->widget2->setSize(40, (3 * $this->config->playtimePanel_nbFields) + 4.5);
+        $this->widget2->setPosition($this->config->playtimePanel_PosX, $this->config->playtimePanel_PosY, 0);
+        $this->setPanelParams($this->widget2, $this->getTopPlaytime(), $this->config->playtimePanel_nbFields);
+        $this->widget2->show(null, true);
+
+
+        $this->widget3->setSize(40, (3 * $this->config->donatorPanel_nbFields) + 4.5);
+        $this->widget3->setPosition($this->config->donatorPanel_PosX, $this->config->donatorPanel_PosY, 0);
+        $this->setPanelParams($this->widget3, $this->getTopDonators(), $this->config->donatorPanel_nbFields);
+        $this->widget3->show(null, true);
+    }
+
+    /**
+     * Fill the params of the Gui\Widgets\Panel.xml template.
+     * The items are either server ranks (tscore), playtimes (longDate) or donations (data).
+     */
+    private function setPanelParams(Widget $widget, $items, $nbFields)
+    {
+        /** @var LongDate $formatter */
+        $formatter = LongDate::getInstance();
+
+        $rows = array();
+        foreach ($items as $item) {
+            $row = array(
+                'posY'       => -3 * count($rows),
+                'rank'       => count($rows) + 1,
+                'isPlaytime' => property_exists($item, 'longDate'),
+                'isRank'     => property_exists($item, 'tscore'),
+            );
+            if ($row['isPlaytime']) {
+                $row['nickname'] = $widget->handleSpecialChars($item->nickname);
+                $row['value']    = $widget->handleSpecialChars($formatter->format($item->longDate));
+            } elseif ($row['isRank']) {
+                $row['nickname'] = $widget->handleSpecialChars($item->player_nickname);
+                $row['value']    = $widget->handleSpecialChars(number_format($item->tscore + 1, 2));
+            } else {
+                $row['nickname'] = $widget->handleSpecialChars($item->nickname);
+                $row['value']    = $widget->handleSpecialChars(strval($item->data));
+            }
+            $rows[] = $row;
+
+            if (count($rows) == $nbFields) {
+                break;
+            }
+        }
+
+        $widget->setParam("bgSizeY", (3 * $nbFields) + 4.5);
+        $widget->setParam("rows",    $rows);
     }
 
     public function getTopDonators()
@@ -89,28 +146,34 @@ class Widgets_EndRankings extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlug
         $this->hide();
     }
 
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
-    }
-
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        $this->displayWidget();
+        $this->displayWidgets();
     }
 
     public function hide()
     {
-        Gui\Widgets\RanksPanel::EraseAll();
-        Gui\Widgets\TopPlayTime::EraseAll();
-        Gui\Widgets\Donators::EraseAll();
+        if ($this->widget1 instanceof Widget) {
+            $this->widget1->erase();
+        }
+        if ($this->widget2 instanceof Widget) {
+            $this->widget2->erase();
+        }
+        if ($this->widget3 instanceof Widget) {
+            $this->widget3->erase();
+        }
     }
 
     public function eXpOnUnload()
     {
         $this->hide();
+        $this->widget1 = null;
+        $this->widget2 = null;
+        $this->widget3 = null;
+        $this->config = null;
+        parent::eXpOnUnload();
     }
 }

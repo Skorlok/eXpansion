@@ -1,0 +1,23 @@
+Wish a map
+Souhaiter une carte
+
+From
+De
+
+Mania-Exchange ID-number for map wish
+Mania-Exchange ID-number for map wish
+
+Why you would like this map to be added ?
+Pourquoi souhaitez-vous que cette carte soit ajoutée ?
+
+Apply
+Appliquer
+
+Cancel
+Annuler
+
+Looks like you have not entered any description.
+Il semble que vous n'ayez pas saisi de description.
+
+Looks like mx id is missing or is invalid.
+Il semble que l'identifiant mx soit manquant ou invalide.

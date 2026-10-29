@@ -1,0 +1,15 @@
+<quad sizen="165 18" halign="center" valign="top" image="{imageUrl}"/>
+
+<label id="team1" posn="-25 -7 1.0E-5" sizen="60 8" halign="right" valign="center" style="{teamStyle}" action="exp:eXpansion.Overlay_TeamScores:setData1" scriptevents="1" textsize="3" textprefix="$s" text="{team1Name}"/>
+<label id="team2" posn="25 -7 2.0E-5" sizen="60 8" halign="left" valign="center" style="{teamStyle}" action="exp:eXpansion.Overlay_TeamScores:setData0" scriptevents="1" textsize="3" textprefix="$s" text="{team2Name}"/>
+
+<label posn="-7 -5 3.0E-5" sizen="20 7" halign="right" valign="top" style="TextRaceChrono" text="{team1Score}"/>
+<label posn="7 -5 4.0E-5" sizen="20 7" halign="left" valign="top" style="TextRaceChrono" text="{team2Score}"/>
+
+<frame posn="-22.75 -15 1" hidden="{hideAdmin}">
+    <exp:button sizeX="32" sizeY="6" text="@$ddd{toggleText}" colorize="0000" action="exp:eXpansion.Overlay_TeamScores:toggle" isTextId="true"/>
+</frame>
+
+<frame posn="-2.75 -15 1" hidden="{hideAdmin}">
+    <exp:button sizeX="32" sizeY="6" text="@$dddReset" colorize="0000" action="exp:eXpansion.Overlay_TeamScores:reset" isTextId="true"/>
+</frame>

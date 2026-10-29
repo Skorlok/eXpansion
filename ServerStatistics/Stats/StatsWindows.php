@@ -52,7 +52,7 @@ class StatsWindows implements AbstractStat
         $boot = "";
         $ostime = "";
         foreach ($this->wmi->ExecQuery("SELECT LastBootUpTime FROM Win32_OperatingSystem") as $os) {
-            $boot = floor($os->LastBootUpTime);
+            $boot = intval($os->LastBootUpTime);
             break;
         }
 

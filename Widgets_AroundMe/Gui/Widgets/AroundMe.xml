@@ -1,0 +1,5 @@
+<frame id="Frame">
+    <quad posn="0 8 0" sizen="30 25" style="UIConstructionSimple_Buttons" substyle="Drive"/>
+    <label id="behindLabel" posn="-20 0 1.0E-5" sizen="20 7" style="TextRaceChronoError" text="$FFF"/>
+    <label id="frontLabel" posn="28 0 2.0E-5" sizen="20 7" style="TextRaceChronoError" text="$FFF"/>
+</frame>

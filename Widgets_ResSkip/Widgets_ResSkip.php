@@ -2,11 +2,11 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_ResSkip;
 
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\Core\types\Bill;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\DonatePanel\Config as DonateConfig;
-use ManiaLivePlugins\eXpansion\Widgets_ResSkip\Gui\Widgets\ResSkipButtons;
+use ManiaLivePlugins\eXpansion\Donate\Config as DonateConfig;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_ResSkip extends ExpPlugin
@@ -34,7 +34,7 @@ class Widgets_ResSkip extends ExpPlugin
 
     private $skipActive;
 
-    private $actions = array();
+    private $widget;
 
     public function eXpOnLoad()
     {
@@ -53,14 +53,21 @@ class Widgets_ResSkip extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->registerManialinkCallback('skipMap');
+        $this->registerManialinkCallback('restartMap');
 
         $this->config = Config::getInstance();
         $this->donateConfig = DonateConfig::getInstance();
 
-        $this->actions['skip'] = ActionHandler::getInstance()->createAction(array($this, "skipMap"));
-        $this->actions['res'] = ActionHandler::getInstance()->createAction(array($this, "restartMap"));
+        $this->widget = new Widget("Widgets_ResSkip\Gui\Widgets\ResSkipButtons.xml");
+        $this->widget->setName("Skip and Res Buttons");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(20, 10);
+        if ($this->storage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
 
-        $this->showResSkip(null);
+        $this->showResSkip();
     }
 
     public function isPublicResIsActive()
@@ -73,44 +80,37 @@ class Widgets_ResSkip extends ExpPlugin
         return !(empty($this->config->publicSkipAmount) || $this->config->publicSkipAmount[0] == -1);
     }
 
-    public function showResSkip($login)
+    public function showResSkip()
     {
-        if ($this->expStorage->isRelay) {
+        if ($this->storage->isRelay) {
             return;
         }
 
-
-        $widget = ResSkipButtons::Create(null, true);
-        $widget->setActions($this->actions['res'], $this->actions['skip']);
-        $widget->setServerInfo($this->storage->serverLogin);
-        $widget->setSize(42.0, 10.0);
-
-
-        $nbSkips = isset($this->skipCount[$login]) ? $this->skipCount[$login] : 0;
-
-        if (isset($this->config->publicSkipAmount[$nbSkips]) && $this->config->publicSkipAmount[$nbSkips] > 0) {
-            $widget->setSkipAmount($this->config->publicSkipAmount[$nbSkips]);
+        if (isset($this->config->publicSkipAmount[$this->skipCount]) && $this->config->publicSkipAmount[$this->skipCount] > 0) {
+            $skipText = array($this->widget->addLang('$s$fffBuy'), $this->widget->addLang('$s$fffSkip'), $this->widget->addLang('$s$fff' . $this->config->publicSkipAmount[$this->skipCount] . 'p'));
         } else {
-            $widget->setSkipAmount("max");
+            $skipText = array($this->widget->addLang('$s$fffMax'), $this->widget->addLang('$s$fffskips'), $this->widget->addLang('$s$fffreached'));
         }
 
-        if (isset($this->config->publicResAmount[$this->resCount])
-            && $this->config->publicResAmount[$this->resCount] > 0
-        ) {
-            $widget->setResAmount($this->config->publicResAmount[$this->resCount]);
+        if (isset($this->config->publicResAmount[$this->resCount]) && $this->config->publicResAmount[$this->resCount] > 0) {
+            $resText = array($this->widget->addLang('$s$fffBuy'), $this->widget->addLang('$s$fffRestart'), $this->widget->addLang('$s$fff' . $this->config->publicResAmount[$this->resCount] . 'p'));
         } else {
-            $widget->setResAmount("max");
+            $resText = array($this->widget->addLang('$s$fffMax'), $this->widget->addLang('$s$fffrestarts'), $this->widget->addLang('$s$fffreached'));
         }
 
-        $widget->show();
-    }
 
-    public function onPlayerDisconnect($login, $disconnectionReason = null)
-    {
-        if (isset($this->skipCount[$login])) {
-            unset($this->skipCount[$login]);
+        if ($this->storage->simpleEnviTitle == "SM") {
+            $this->widget->setPosition($this->config->resSkipButtons_PosX_Shootmania, $this->config->resSkipButtons_PosY_Shootmania, 0);
+        } else {
+            $this->widget->setPosition($this->config->resSkipButtons_PosX, $this->config->resSkipButtons_PosY, 0);
         }
-        ResSkipButtons::Erase($login);
+        $this->widget->setParam("resText0", $resText[0]);
+        $this->widget->setParam("resText1", $resText[1]);
+        $this->widget->setParam("resText2", $resText[2]);
+        $this->widget->setParam("skipText0", $skipText[0]);
+        $this->widget->setParam("skipText1", $skipText[1]);
+        $this->widget->setParam("skipText2", $skipText[2]);
+        $this->widget->show(null, true);
     }
 
     public function restartMap($login)
@@ -119,10 +119,7 @@ class Widgets_ResSkip extends ExpPlugin
         if ($this->resActive) {
             //Already restarted no need to do
             $this->eXpChatSendServerMessage($this->msg_resOnProgress, $login);
-        } elseif (isset($this->config->publicResAmount[$this->resCount])
-            && $this->config->publicResAmount[$this->resCount] != -1
-            && $this->resCount < count($this->config->publicResAmount)
-        ) {
+        } elseif (isset($this->config->publicResAmount[$this->resCount]) && $this->config->publicResAmount[$this->resCount] != -1 && $this->resCount < count($this->config->publicResAmount)) {
             $amount = $this->config->publicResAmount[$this->resCount];
             $this->resActive = true;
 
@@ -132,13 +129,7 @@ class Widgets_ResSkip extends ExpPlugin
                 $toLogin = $this->storage->serverLogin;
             }
 
-            $bill = $this->eXpStartBill(
-                $login,
-                $toLogin,
-                $amount,
-                __("Are you sure you want to restart this map", $login),
-                array($this, 'publicRestartMap')
-            );
+            $bill = $this->eXpStartBill($login, $toLogin, $amount, __("Are you sure you want to restart this map", $login), array($this, 'publicRestartMap'));
             $bill->setSubject('map_restart');
             $bill->setErrorCallback(5, array($this, 'failRestartMap'));
             $bill->setErrorCallback(6, array($this, 'failRestartMap'));
@@ -154,7 +145,7 @@ class Widgets_ResSkip extends ExpPlugin
     public function publicRestartMap(Bill $bill)
     {
         $player = $this->storage->getPlayerObject($bill->getSourceLogin());
-        $this->eXpChatSendServerMessage($this->msg_prestart, null, array($player->nickName));
+        $this->eXpChatSendServerMessage($this->msg_prestart, null, array($player->cleanNickName));
 
         if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\Maps\\Maps')) {
             $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\Maps\\Maps", "replayMap", $bill->getSourceLogin());
@@ -174,18 +165,13 @@ class Widgets_ResSkip extends ExpPlugin
         $this->skipActive = true;
         $this->connection->nextMap($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_CUP);
         $player = $this->storage->getPlayerObject($bill->getSourceLogin());
-        $this->eXpChatSendServerMessage($this->msg_pskip, null, array($player->nickName));
+        $this->eXpChatSendServerMessage($this->msg_pskip, null, array($player->cleanNickName));
     }
 
     public function skipMap($login)
     {
-        $nbSkips = isset($this->skipCount[$login]) ? $this->skipCount[$login] : 0;
-
-        if (isset($this->config->publicSkipAmount[$nbSkips])
-            && $this->config->publicSkipAmount[$nbSkips]
-            != -1 && $nbSkips < count($this->config->publicSkipAmount)
-        ) {
-            $amount = $this->config->publicSkipAmount[$nbSkips];
+        if (isset($this->config->publicSkipAmount[$this->skipCount]) && $this->config->publicSkipAmount[$this->skipCount] != -1 && $this->skipCount < count($this->config->publicSkipAmount)) {
+            $amount = $this->config->publicSkipAmount[$this->skipCount];
 
             if (!empty($this->donateConfig->toLogin)) {
                 $toLogin = $this->donateConfig->toLogin;
@@ -193,13 +179,7 @@ class Widgets_ResSkip extends ExpPlugin
                 $toLogin = $this->storage->serverLogin;
             }
 
-            $bill = $this->eXpStartBill(
-                $login,
-                $toLogin,
-                $amount,
-                __("Are you sure you want to skip this map", $login),
-                array($this, 'publicSkipMap')
-            );
+            $bill = $this->eXpStartBill($login, $toLogin, $amount, __("Are you sure you want to skip this map", $login), array($this, 'publicSkipMap'));
             $bill->setSubject('map_skip');
         } else {
             if (empty($this->config->publicSkipAmount) || $this->config->publicSkipAmount[0] == -1) {
@@ -221,23 +201,29 @@ class Widgets_ResSkip extends ExpPlugin
         $this->resActive = false;
 
         if (!$this->skipActive) {
-            $this->skipCount = array();
+            $this->skipCount = 0;
         }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        ResSkipButtons::EraseAll();
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
+            return;
+        }
+        $this->widget->erase();
     }
 
     public function onBeginMatch()
     {
         $this->countMapRestart();
-        $this->showResSkip(null);
+        $this->showResSkip();
     }
 
     public function eXpOnUnload()
     {
-        ResSkipButtons::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
     }
 }

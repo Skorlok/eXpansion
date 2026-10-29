@@ -1,0 +1,6 @@
+<frame scale="0.9">
+    <exp:dropdown name="channel" itemsVarName="channels" selectedIndex="0"/>
+    <frame posn="35 0 1">
+        <exp:button sizeX="32" sizeY="6" text="Change" action="exp:eXpansion.Chat:selectChannel"/>
+    </frame>
+</frame>

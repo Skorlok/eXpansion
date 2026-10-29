@@ -1,29 +1,21 @@
 
 foreach (Player in Players) {
 
-    declare <?php echo $this->varName ?> for Player = -1;
+    declare {{ varName }} for Player = -1;
 
-    if (<?php echo $this->varName ?> != Player.CurRace.Checkpoints.count) {
+    if ({{ varName }} != Player.CurRace.Checkpoints.count) {	
 		//Update the current checkpoint of this user
-		declare curCp = Player.CurRace.Checkpoints.count -1 ;
-		<?php echo $this->varName ?> = curCp+1;
+		declare curCp = Player.CurRace.Checkpoints.count -1 ;	
+		{{ varName }} = curCp+1;
 
 
 		//Check if valid checkpoint
 		if(curCp >= 0){
-			if((curCp+1) == totalCp*nbLaps){
-			nbFinish += 1;
-			}
 			needUpdate = True;
 			//Check if max Checkpoint
 			if(maxCp <= curCp){
 			maxCp = curCp+1;
 			}
-
-			declare <?php echo $this->varName ?>_cpPosition for Player = -1;
-			declare newCpPosition = 0;
-
-			playersTeam[Player.Login] = Player.RequestedClan;
 
 			//Register Checkpoint time
 			if(!playerTimes.existskey(curCp)){
@@ -38,7 +30,6 @@ foreach (Player in Players) {
 			}
 			playerTimes[curCp][Player.Login] = Player.CurRace.Checkpoints[curCp];
 			playerNickNames[curCp][Player.Login] = Player.Name;
-			updatedPlayers[Player.Login] = True;
 			//Remove from older checkpoint
 			if(curCp > 0){
 				if(playerTimes.existskey(curCp-1)){
@@ -67,7 +58,7 @@ if(!needUpdate){
     lastUpdateTime = Now;
 }
 
-if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered) || exp_widgetVisibilityChanged)) {
+if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer))) {
 
     needUpdate = False;
     lastUpdateTime = Now;
@@ -77,7 +68,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered) |
     declare betterDiff = -1;
 
     declare cpIndex = maxCp -1;
-    declare i = 0;
     while(cpIndex >= 0){
         if(playerTimes.existskey(cpIndex)){
             playerTimes[cpIndex] = playerTimes[cpIndex].sort();
@@ -99,8 +89,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered) |
                 if(myDiff == -1){
                     betterDiff = Score - bestCps[cpIndex];
                 }
-
-                i += 1;
             }
             if(myDiff != -1 && worseDiff != -1 && betterDiff!= -1){
                 break;

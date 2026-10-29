@@ -2,16 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\Emotes;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
-    public $iconLol = "http://reaby.kapsi.fi/ml/icon_smile.png";
-    public $iconGG = "http://reaby.kapsi.fi/ml/icon_gg.png";
-    public $iconBG = "http://reaby.kapsi.fi/ml/icon_bg.png";
-    public $iconAfk = "http://reaby.kapsi.fi/ml/icon_afk.png";
-    public $iconMenu = "http://reaby.kapsi.fi/ml/icon_smile.png";
-    public $showPanel = false;
-
-
     public $bootme = array("chooses the real life, bye all!",
         "takes the blue pill!", "exits, stage left!",
         "chooses to boot to the life!",

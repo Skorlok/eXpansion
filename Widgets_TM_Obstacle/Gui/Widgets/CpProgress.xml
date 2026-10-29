@@ -1,0 +1,50 @@
+<frame posn="0 0 0">
+	<label id="player_0" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_0" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_0" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -6 0">
+	<label id="player_1" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_1" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_1" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -12 0">
+	<label id="player_2" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_2" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_2" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -18 0">
+	<label id="player_3" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_3" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_3" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -24 0">
+	<label id="player_4" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_4" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_4" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -30 0">
+	<label id="player_5" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_5" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_5" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -36 0">
+	<label id="player_6" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_6" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_6" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -42 0">
+	<label id="player_7" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_7" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_7" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -48 0">
+	<label id="player_8" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_8" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_8" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>
+<frame posn="0 -54 0">
+	<label id="player_9" posn="30 0 0" sizen="30 9" halign="right" valign="top" style="TextStaticSmall" text="player_0"/>
+	<gauge id="gauge_9" posn="30 -2 1.0E-5" sizen="30 9" halign="left" valign="center2" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+	<label id="cp_9" posn="60 0 2.0E-5" sizen="10 9" halign="left" valign="top" style="TextStaticSmall" text="1"/>
+</frame>

@@ -1,67 +1,60 @@
 <?php
 
-/*
- * Copyright (C) 2014 Reaby
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 namespace ManiaLivePlugins\eXpansion\Widgets_TM_topPanel;
 
-/**
- * Description of Widgets_TM_topPanel
- *
- * @author Reaby
- */
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+
 class Widgets_TM_topPanel extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
+    /** @var StaticWidget */
+    private $widget;
 
-    /** @var  \ManiaLive\PluginHandler\PluginHandler */
-    private $pluginhandler;
+    /** @var Script */
+    private $nbPlayerScript;
 
     public function eXpOnReady()
     {
-
-        $this->pluginhandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
-        $pluginsToUnload = array("Widgets_ServerInfo", "Widgets_Clock", "Widgets_BestCheckpoints");
-
-        foreach ($pluginsToUnload as $plugin) {
-            if ($this->isPluginLoaded($this->getPluginId($plugin))) {
-                $this->pluginhandler->unload($this->getPluginId($plugin));
-            }
-        }
-
         $this->enableDedicatedEvents();
 
-        $widget = Gui\Widgets\TopPanel::Create(null);
-        $widget->show();
+        $this->widget = new StaticWidget('Widgets_TM_topPanel\Gui\Widgets\TopPanel.xml');
+        $this->widget->setName("Top Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition(0, 90, -60);
+        $this->widget->registerScript(new Script('Widgets_TM_topPanel\Gui\Scripts\clock'));
+        $this->widget->registerScript(new Script('Widgets_TM_topPanel\Gui\Scripts\serverInfo'));
+        $this->widget->registerScript(new Script('Widgets_TM_topPanel\Gui\Scripts\mapInfo'));
+
+        $this->nbPlayerScript = new Script('Widgets_TM_topPanel\Gui\Scripts\nbPlayer');
+        $this->widget->registerScript($this->nbPlayerScript);
+
+        $this->showWidget();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        Gui\Widgets\TopPanel::EraseAll();
-        $widget = Gui\Widgets\TopPanel::Create(null);
-        $widget->show();
+        $this->showWidget();
     }
 
-    private function getPluginId($plugin)
+    private function showWidget()
     {
-        return '\\ManiaLivePlugins\\eXpansion\\' . $plugin . '\\' . $plugin;
+        $this->nbPlayerScript->setParam('maxPlayers', $this->storage->server->currentMaxPlayers);
+        $this->nbPlayerScript->setParam('maxSpecs', $this->storage->server->currentMaxSpectators);
+
+        $this->widget->setParam("ladderLimits", $this->widget->addLang('Ladder limits %1$s - %2$sk', array($this->storage->server->ladderServerLimitMin / 1000, $this->storage->server->ladderServerLimitMax / 1000)));
+        $this->widget->setParam("mapName", $this->widget->handleSpecialChars(Formatting::stripCodes($this->storage->currentMap->name, "wosn")));
+        $this->widget->setParam("mapAuthor", $this->widget->handleSpecialChars(Formatting::stripCodes($this->storage->currentMap->author, "wosn")));
+
+        $this->widget->show(null, true);
     }
 
     public function eXpOnUnload()
     {
-        Gui\Widgets\TopPanel::EraseAll();
+        if ($this->widget instanceof StaticWidget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
+        $this->nbPlayerScript = null;
     }
 }

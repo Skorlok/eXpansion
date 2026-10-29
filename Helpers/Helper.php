@@ -23,8 +23,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Helpers;
 
-use ManiaLib\Utils\Formatting;
-use ManiaLive\Data\Storage as MlStorage;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLive\Utilities\Console;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\Config;
@@ -67,7 +66,9 @@ class Helper
 
     public static function log($message, $tags = array('eXpansion', 'AdminPanel'))
     {
-        $logFile = MlStorage::getInstance()->serverLogin . ".console.log";
+        /** @var Storage $storage */
+        $storage = Storage::getInstance();
+        $logFile = $storage->serverLogin . ".console.log";
         $message = ($tags ? '[' . implode('][', $tags) . '] ' : '') . print_r($message, true);
         Logger::log(Formatting::stripStyles($message), true, $logFile);
         Console::println(Con::outTm($message . Con::white, true));

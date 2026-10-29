@@ -20,6 +20,8 @@
 namespace ManiaLivePlugins\eXpansion\TM_Stunts;
 
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 /**
  * Description of TM_Stunts
@@ -29,41 +31,53 @@ use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 class TM_Stunts extends ExpPlugin
 {
 
-    private $stuntWindow;
+    private $config;
 
-    private $counter;
+    private $widget;
 
     public function eXpOnReady()
     {
+        $this->config = Config::getInstance();
 
-        $this->stuntWindow = Gui\Widgets\StuntWidget::Create(null, true);
-        $this->stuntWindow->setSize(60, 12);
-        $this->stuntWindow->setPosition(-30, 58);
+        $this->widget = new Widget("TM_Stunts\Gui\Widgets\StuntWidget.xml");
+        $this->widget->setName("Stunts Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(60, 12);
+        $this->widget->registerScript(new Script("TM_Stunts/Gui/Script"));
+
         $this->enableScriptEvents("LibXmlRpc_OnStunt");
+        $this->enableScriptEvents("Trackmania.Event.Stunt");
     }
 
-    public function onTick()
+    public function eXpOnModeScriptCallback($callback, $array)
     {
-        if ($this->counter % 10 == 0) {
-            $this->stuntWindow->setLabels("StuntName 180", "");
-            $this->stuntWindow->show("reaby");
+        switch ($callback) {
+            case "Trackmania.Event.Stunt":
+                call_user_func_array(array($this, "onPlayerStunt"), json_decode($array[0], true));
+                break;
         }
-
-        $this->counter++;
     }
 
-    public function LibXmlRpc_OnStunt(
-        $login,
-        $points,
-        $combo,
-        $totalScore,
-        $factor,
-        $stuntname,
-        $angle,
-        $isStraight,
-        $isReversed,
-        $isMasterJump
-    ) {
+    public function onPlayerStunt($time,$login,$racetime,$laptime,$stuntsscore,$figure,$angle,$points,$combo,$isstraight,$isreverse,$ismasterjump,$factor) {
+        $figure = str_replace("::EStuntFigure::", "", $figure);
+
+        if ($angle || ($figure != "StraightJump" && $figure != "RespawnPenalty")) {
+            if ($isreverse) {
+                $figure = "Reversed" . $figure;
+            }
+            if ($angle == 0) {
+                $angle = "";
+            }
+            $split = preg_split('/(?=\p{Lu})/u', $figure);
+            $figure = implode(" ", $split) . " " . $angle;
+
+            $this->widget->setPosition($this->config->stuntWidget_PosX, $this->config->stuntWidget_PosY, 10);
+            $this->widget->setParam("text", $figure);
+            $this->widget->show($login);
+        }
+    }
+
+    public function LibXmlRpc_OnStunt($login,$points,$combo,$totalScore,$factor,$stuntname,$angle,$isStraight,$isReversed,$isMasterJump) {
         $stuntname = str_replace("::EStuntFigure::", "", $stuntname);
 
         if ($angle || ($stuntname != "StraightJump" && $stuntname != "RespawnPenalty")) {
@@ -75,13 +89,19 @@ class TM_Stunts extends ExpPlugin
             }
             $split = preg_split('/(?=\p{Lu})/u', $stuntname);
             $stuntname = implode(" ", $split) . " " . $angle;
-            $this->stuntWindow->setLabels($stuntname, $points);
-            $this->stuntWindow->show($login);
+
+            $this->widget->setPosition($this->config->stuntWidget_PosX, $this->config->stuntWidget_PosY, 10);
+            $this->widget->setParam("text", $stuntname);
+            $this->widget->show($login);
         }
     }
 
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
     }
 }

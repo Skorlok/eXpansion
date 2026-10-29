@@ -1,0 +1,13 @@
+<manialink id="{widgetHashName}" version="2" layer="{layer}" name="{widgetName}">
+{languages}
+<frame posn="{pos}" id="{widgetName}">
+
+{xml}
+
+<script>
+<!--
+{mlScripts}
+-->
+</script>
+</frame>
+</manialink>

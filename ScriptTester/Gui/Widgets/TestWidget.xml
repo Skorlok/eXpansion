@@ -1,0 +1,11 @@
+<frame posn="0 6 0">
+    <exp:widgettitle sizeX="100" sizeY="4" text="@Preview of widget"/>
+</frame>
+
+<quad posn="0 0 2.0E-5" sizen="100 40" style="Bgs1InRace" substyle="BgColorContour" colorize="f00"/>
+
+<frame posn="74 3.5 1">
+    <exp:button sizeX="32" sizeY="6" text="@Close" action="exp:eXpansion.ScriptTester:closeTest" isTextId="true"/>
+</frame>
+
+{userXml}

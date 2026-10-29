@@ -1,0 +1,29 @@
+declare persistent Boolean[Text][Text] EXP_widgetVisible = Boolean[Text][Text];
+declare Text gameMode = "{{ gameMode }}";
+
+declare Text outText = "";
+declare CMlEntry widgetStatus <=> (Page.GetFirstChild("widgetStatus") as CMlEntry);
+
+declare Text action = "exp:eXpansion.Gui:showHudConfig";
+
+
+outText = "";
+foreach (id => temp in EXP_widgetVisible) {
+	if (!EXP_widgetVisible[id].existskey(gameMode)) {
+		continue;
+	}
+
+	declare status = EXP_widgetVisible[id][gameMode];
+	declare Text bool = "0";
+	if (status == True) {
+		bool = "1";
+	}
+
+	outText = id ^ ":" ^ gameMode ^ ":" ^ bool ^ "|";
+
+	widgetStatus.Value = outText;
+	TriggerPageAction(action);
+}
+
+widgetStatus.Value = "finished";
+TriggerPageAction(action);

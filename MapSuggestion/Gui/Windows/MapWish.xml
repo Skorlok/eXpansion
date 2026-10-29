@@ -1,0 +1,12 @@
+<frame posn="2 -6 0">
+	<exp:inputbox name="from" sizeX="60" editable="false" label="@From" text="{from}" isTextId="true"/>
+	<frame posn="0 -12 1">
+		<exp:inputbox name="mxid" sizeX="60" label="@Mania-Exchange ID-number for map wish" isTextId="true"/>
+	</frame>
+	<frame posn="0 -24 1">
+		<exp:inputbox name="description" sizeX="60" label="@Why you would like this map to be added ?" isTextId="true"/>
+	</frame>
+	<frame posn="0 -36 1">
+		<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.MapSuggestion:mapWishOk" isTextId="true"/>
+	</frame>
+</frame>

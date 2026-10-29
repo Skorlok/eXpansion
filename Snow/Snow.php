@@ -2,42 +2,78 @@
 
 namespace ManiaLivePlugins\eXpansion\Snow;
 
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 class Snow extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    private $wasWarmup = false;
+    /** @var StaticWidget */
+    private $widget;
+
+    /** @var Script */
+    private $script;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+
+        /** @var Config $config */
+        $config = Config::getInstance();
+        Gui::preloadImage($config->texture);
+        Gui::preloadUpdate();
+
+        $this->script = new Script('Snow\Gui\Script');
+
+        $this->widget = new StaticWidget('Snow\Gui\Windows\SnowParticle.xml');
+        $this->widget->setName("Snow");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition(0, 0, -60);
+        $this->widget->registerScript($this->script);
+    }
+
+    public function snow()
+    {
+        /** @var Config $config */
+        $config = Config::getInstance();
+
+        $particles = array();
+        for ($i = 0; $i < $config->particleCount; $i++) {
+            $particles[] = array('index' => $i, 'posX' => $i * 4);
+        }
+
+        $this->script->setParam("particleCount", $config->particleCount);
+        $this->widget->setParam("particles", $particles);
+        $this->widget->setParam("texture", $this->widget->handleSpecialChars($config->texture));
+        $this->widget->show(null, true);
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        Gui\Windows\SnowParticle::EraseAll();
+        $this->widget->erase();
     }
 
     public function onBeginMatch()
     {
-        Gui\Windows\SnowParticle::EraseAll();
-    }
-
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
+        $this->widget->erase();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        $window = Gui\Windows\SnowParticle::Create(null);
-        $window->show();
+        $this->snow();
     }
 
     public function eXpOnUnload()
     {
-        Gui\Windows\SnowParticle::EraseAll();
+        if ($this->widget instanceof StaticWidget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
+        $this->script = null;
+
         parent::eXpOnUnload();
     }
 }

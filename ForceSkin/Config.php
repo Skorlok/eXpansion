@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\ForceSkin;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
     public $skinUrl = "";
     public $name = "";

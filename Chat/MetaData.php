@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\ColorCode;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 
 /**
  * Description of MetaData
@@ -18,7 +19,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Color Customization");
+        $this->setName("Chat: Color Customization");
         $this->setDescription('Reroute chat to controller and customize the chat colors and look!');
         $this->setGroups(array('Chat'));
 
@@ -39,19 +40,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new Boolean('publicChatActive', 'Enable public chat for players', $config, false, false);
-        $var->setDescription(
-            'Admins with required permissions can continue to chat. A personal message is sent to other players'
-        );
+        $var->setDescription('Admins with required permissions can continue to chat. A personal message is sent to other players');
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 
-        $var = new Boolean(
-            'enableSpectatorChat',
-            'Enable chat for spectators when othervice disabled',
-            $config,
-            false,
-            false
-        );
+        $var = new Boolean('enableSpectatorChat', 'Enable chat for spectators when othervice disabled', $config, false, false);
         $var->setDefaultValue(false);
         $this->registerVariable($var);
 
@@ -79,5 +72,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue('$0af»$z$s ');
         $this->registerVariable($var);
 
+        $var = new TypeFloat("chatSelector_PosX", "Position of Chat Selector Widget X", $config, false, false);
+        $var->setDefaultValue(-153);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("chatSelector_PosY", "Position of Chat Selector Widget Y", $config, false, false);
+        $var->setDefaultValue(77);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
     }
 }

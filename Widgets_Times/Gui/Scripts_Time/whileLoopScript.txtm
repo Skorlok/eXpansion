@@ -7,40 +7,57 @@ if (target == "") {
 foreach (Player in Players) {
     if (Player.Login == target) {
         declare PrevCheckpointCount for Player = -1;
+
         if (PrevCheckpointCount != Player.CurRace.Checkpoints.count) {
             PrevCheckpointCount = Player.CurRace.Checkpoints.count;
             curCp = Player.CurRace.Checkpoints.count;
 
-            if (curCp > 0 && curCp != totalCp) {
+            if (curCp > 0) {
 
-            if (playSound) {
-                Audio.PlaySoundEvent(CAudioManager::ELibSound::Checkpoint  , 0, -0.5);
-            }
-                    declare temp = (curCp % totalCp) - 1;
-                    if(temp == -1) {
-                        continue;
-                    }
+                if (playSound) {
+                    Audio.PlaySoundEvent(CAudioManager::ELibSound::Checkpoint, 0, -0.5);
+                }
+                declare temp = (curCp % totalCp) - 1;
+                if (temp == -1) {
+                    temp = totalCp - 1;
+                }
+                
                 // checkpoint & laps counter
-                if (lapRace) {
-                     Cp.SetText("Lap:" ^ (Player.CurrentNbLaps + 1 ) ^ " Cp:" ^ (curCp % totalCp) ^ "/" ^ totalCp);
+                declare cpsCount = (curCp % totalCp);
+                if (cpsCount == 0) {
+                    cpsCount = totalCp;
+                }
+                if (lapRace == 1 || lapRace == 2) {
+                    if (cpsCount == totalCp) {
+                        Cp.SetText("Lap:" ^ (Player.CurrentNbLaps) ^ " Cp:" ^ cpsCount ^ "/" ^ totalCp);
+                    } else {
+                        Cp.SetText("Lap:" ^ (Player.CurrentNbLaps + 1) ^ " Cp:" ^ cpsCount ^ "/" ^ totalCp);
+                    }
                 } else {
-                    Cp.SetText((curCp % totalCp) ^ "/" ^ totalCp);
+                    Cp.SetText(cpsCount ^ "/" ^ totalCp);
                 }
 
                 // localrecords
-                if (Checkpoints.count > (curCp % totalCp) && Checkpoints[temp] != -1) {
+                if (pbCheckpoints.count > (curCp % totalCp) && pbCheckpoints[temp] != -1) {
                     declare Integer diff = 0;
 
-                    if (lapRace) {
-                        declare Integer lastCpIndex = curCp - totalCp - 1;
-                        diff = (Player.CurLap.Checkpoints[temp] - Checkpoints[temp]);
+                    if (lapRace == 1) {
+                        if (cpsCount == totalCp) {
+                            if (Player.CurrentNbLaps == 1) {
+                                diff = Player.CurRace.Checkpoints[temp] - pbCheckpoints[temp];
+                            } else {
+                                declare lastRaceTime = Player.CurRace.Checkpoints[totalCp * (Player.CurrentNbLaps - 1) - 1];
+                                diff = (Player.CurRace.Checkpoints[totalCp * (Player.CurrentNbLaps) - 1] - lastRaceTime) - pbCheckpoints[temp];
+                            }
+                        } else {
+                            diff = Player.CurLap.Checkpoints[temp] - pbCheckpoints[temp];
+                        }
                     } else {
-                       // log("Comparing "^(Player.CurRace.Checkpoints[curCp-1])^" & "^ Checkpoints[temp]);
-                        diff =(Player.CurRace.Checkpoints[curCp-1] - Checkpoints[temp]);
+                        diff = Player.CurRace.Checkpoints[curCp-1] - pbCheckpoints[temp];
                     }
 
                     declare Text color = "$d00$s+";
-                     if (diff <= 0) {
+                    if (diff <= 0) {
                         color = "$00f$s";
                     }
                     Label.SetText(color ^ TimeToText(diff));
@@ -48,52 +65,57 @@ foreach (Player in Players) {
                     Label.SetText("$fff$s" ^ TimeToText(Player.CurRace.Checkpoints[curCp-1]));
                 }
 
-                //dedimania
-                if (Deditimes.count > (curCp % totalCp) && Deditimes[temp] != -1) {
-                      declare Integer diff = 0;
-                      if (lapRace) {
-                          declare Integer lastCpIndex = curCp - totalCp - 1;
-                          diff = (Player.CurLap.Checkpoints[temp] - Deditimes[temp]);
-                      }
-                      else {
-                          diff =(Player.CurRace.Checkpoints[curCp-1] - Deditimes[temp]);
-                      }
-
-                      declare Text color = "$d00$s+";
-                       if (diff <= 0) {
-                          color = "$00f$s";
-                      }
-                      DediLabel.SetText(color ^ TimeToText(diff));
-                      CpTop1.SetText("$fffDedi"^reference);
-                } else {
-                      DediLabel.SetText("");
-                      CpTop1.SetText("");
-                }
-
-
-
-            } else {
-                if(curCp % totalCp == 0 && curCp > 0){
-                    //End of a Lap or Race.
-                    declare temp = totalCp - 1;
-                    declare Integer diff = -1;
-                    //log(Checkpoints);
-                    if( Checkpoints[temp] > 0){
-                        diff =(Player.CurRace.Checkpoints[curCp-1] - Checkpoints[temp]);
+                //target (local or dedi)
+                if (targetCheckpoints.count > (curCp % totalCp) && targetCheckpoints[temp] != -1) {
+                    declare Integer diff = 0;
+                    if (lapRace == 1) {
+                        if (cpsCount == totalCp) {
+                            if (Player.CurrentNbLaps == 1) {
+                                diff = Player.CurRace.Checkpoints[temp] - targetCheckpoints[temp];
+                            } else {
+                                declare lastRaceTime = Player.CurRace.Checkpoints[totalCp * (Player.CurrentNbLaps - 1) - 1];
+                                diff = (Player.CurRace.Checkpoints[totalCp * (Player.CurrentNbLaps) - 1] - lastRaceTime) - targetCheckpoints[temp];
+                            }
+                        } else {
+                            diff = Player.CurLap.Checkpoints[temp] - targetCheckpoints[temp];
+                        }
+                    } else {
+                        diff = Player.CurRace.Checkpoints[curCp-1] - targetCheckpoints[temp];
                     }
 
-                    if(diff < 0){
+                    declare Text color = "$d00$s+";
+                    if (diff <= 0) {
+                        color = "$00f$s";
+                    }
+                    DediLabel.SetText(color ^ TimeToText(diff));
+                    CpTop1.SetText("$fff"^reference);
+                } else {
+                    DediLabel.SetText("");
+                    CpTop1.SetText("");
+                }
+            } else {
+                Cp.SetText("");
+                Label.SetText("");
+                DediLabel.SetText("");
+                CpTop1.SetText("");
+            }
+            
+            if (curCp % totalCp == 0 && curCp > 0) {
+                //End of a Lap or Race.
+                declare temp = totalCp - 1;
+                declare Integer diff = -1;
+                if (lapRace != 2) {
+                    if (pbCheckpoints[temp] > 0) {
+                        diff = (Player.CurRace.Checkpoints[curCp-1] - pbCheckpoints[temp]);
+                    }
+
+                    if (diff < 0) {
                         //New Best time
-                        for(i, 0, totalCp-1) {
-                            //log(i);
-                            Checkpoints[i] = Player.CurRace.Checkpoints[(curCp - totalCp) + i];
+                        for (i, 0, totalCp-1) {
+                            pbCheckpoints[i] = Player.CurRace.Checkpoints[(curCp - totalCp) + i];
                         }
                     }
                 }
-                Label.SetText("");
-                DediLabel.SetText("");
-                Cp.SetText("");
-                CpTop1.SetText("");
             }
         }
     }

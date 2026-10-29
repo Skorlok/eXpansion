@@ -3,32 +3,56 @@
 namespace ManiaLivePlugins\eXpansion\Gui;
 
 use Exception;
-use ManiaLive\Gui\ActionHandler;
-use ManiaLive\Gui\GuiHandler;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Widgets as WConfig;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\HudPanel;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Preloader;
-use ManiaLivePlugins\eXpansion\Gui\Widgets\Widget;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Configuration;
-use ManiaLivePlugins\eXpansion\Gui\Windows\ConfirmDialog;
-use ManiaLivePlugins\eXpansion\Gui\Windows\HudMove;
-use ManiaLivePlugins\eXpansion\Gui\Windows\Notice;
-use ManiaLivePlugins\eXpansion\Gui\Windows\ResetHud;
-use ManiaLivePlugins\eXpansion\Helpers\Helper;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\ManiaLink as MLPage;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window as MLWindow;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 class Gui extends ExpPlugin
 {
     private $titleId;
     private $msg_params;
     private $msg_disabled;
-    private $resetLogins = array();
     private $counter = 0;
-    private $preloader;
+
+    /** @var MLPage */
+    private static $preloader = null;
+    /** @var string[] url hash => url */
+    private static $preloadCache = array();
     // next 2 is used by contextMenu
     public static $items = array();
     public static $callbacks = array();
+
+    // used to sent widgets to players when they join, it's more efficient than sending statics widgets with callbacks in plugins
+    public static $persistentWidgets = array();
+
+    /** @var MLWindow */
+    private static $errorWindow = null;
+
+    /** @var MLWindow */
+    private static $noticeWindow = null;
+
+    /** @var MLWindow */
+    private static $confirmWindow = null;
+    /** @var Script */
+    private static $confirmScript = null;
+
+    /** @var MLWindow */
+    private static $playerSelectionWindow = null;
+    private static $playerSelectionCallbacks = array();
+
+    public $playersWidgets = array();
+
+    /** @var MLWindow */
+    private $configWindow;
+    private $configStatuses = array();
+    private $configGameMode = array();
+
+    /** @var MLPage */
+    private $getPlayerWidgets;
+    /** @var Script */
+    private $getPlayerWidgetsScript;
 
     public function eXpOnInit()
     {
@@ -37,30 +61,66 @@ class Gui extends ExpPlugin
 
     public function eXpOnLoad()
     {
-        HudPanel::$mainPlugin = $this;
-
-        if ($this->expStorage->simpleEnviTitle == "SM") {
-            $settings = array("S_UseScriptCallbacks" => true);
-            $this->connection->setModeScriptSettings($settings);
-        }
-
         $config = Config::getInstance();
     }
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->enableTickerEvent();
+
+        $this->registerManialinkCallback('showConfirmDialogMl', false, true);
+        $this->registerManialinkCallback('configurationOk', true);
+        $this->registerManialinkCallback('selectPlayerClick', false, true);
+        $this->registerManialinkCallback('showHudConfig', true);
+
         $this->registerChatCommand("hud", "hudCommands", 0, true);
         $this->registerChatCommand("hud", "hudCommands", 1, true);
+        
         $this->setPublicMethod("hudCommands");
-        $this->setPublicMethod("showConfigWindow");
 
-        $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset");
+        $this->msg_params = eXpGetMessage("possible parameters: move, lock, reset, config");
         $this->msg_disabled = eXpGetMessage("#error#Server Admin has disabled personal huds. Sorry!");
 
-        $this->preloader = Preloader::Create(null);
-        $this->preloader->show();
+        self::$preloader = new MLPage("Gui\\Widgets\\Preloader.xml");
+        self::$preloader->setName("Preloader");
+        self::$preloader->setLayer("normal");
+        self::$preloader->setPosition(-400, 240, -60);
+        self::preloadUpdate();
+
+        self::$errorWindow = new MLWindow("Gui\\Windows\\Error.xml");
+        self::$errorWindow->setName("Gui Error");
+        self::$errorWindow->setSize(120, 90);
+        self::$errorWindow->setTitle("Error");
+
+        self::$noticeWindow = new MLWindow("Gui\\Windows\\Notice.xml");
+        self::$noticeWindow->setName("Gui Notice");
+        self::$noticeWindow->setSize(90, 60);
+        self::$noticeWindow->setTitle("Notice");
+        self::$noticeWindow->setParam("closeAction", self::$noticeWindow->getCloseAction());
+
+        self::$confirmScript = new Script("Gui/Scripts/ConfirmDialog");
+        self::$confirmWindow = new MLWindow("Gui\\Windows\\ConfirmDialog.xml");
+        self::$confirmWindow->setName("Gui Confirm");
+        self::$confirmWindow->setSize(57, 16);
+        self::$confirmWindow->setTitle("Really do this ?");
+        self::$confirmWindow->registerScript(self::$confirmScript);
+
+        self::$playerSelectionWindow = new MLWindow("Gui\\Windows\\PlayerSelection.xml");
+        self::$playerSelectionWindow->setName("Gui Player Selection");
+        self::$playerSelectionWindow->setSize(85, 100);
+        self::$playerSelectionWindow->registerCloseCallback(array($this, 'erasePlayerSelection'));
+
+        $this->configWindow = new MLWindow("Gui\\Windows\\Configuration.xml");
+        $this->configWindow->setName("HUD Configuration");
+        $this->configWindow->setSize(120, 90);
+        $this->configWindow->setTitle("Configure HUD");
+
+        $this->getPlayerWidgetsScript = new Script("Gui\Scripts\GetPlayerWidgets");
+        $this->getPlayerWidgets = new MLPage("Gui\\Widgets\\GetPlayerWidgets.xml");
+        $this->getPlayerWidgets->setName("GetPlayerWidgets");
+        $this->getPlayerWidgets->setLayer("normal");
+        $this->getPlayerWidgets->setPosition(0, 0, -60);
+        $this->getPlayerWidgets->setScripts($this->getPlayerWidgetsScript);
 
         foreach ($this->storage->players as $player) {
             $this->onPlayerConnect($player->login, false);
@@ -68,12 +128,6 @@ class Gui extends ExpPlugin
         foreach ($this->storage->spectators as $player) {
             $this->onPlayerConnect($player->login, true);
         }
-
-        $this->loadWidgetConfigs();
-
-       /* $edge = Widgets\Edge::Create(null);
-        $edge->setPosition(-160, -35);
-        $edge->show(); */
     }
 
     public static function getScaledSize($sizes, $totalSize)
@@ -94,77 +148,124 @@ class Gui extends ExpPlugin
         return $nsize;
     }
 
-    public function loadWidgetConfigs()
-    {
-        $config = WConfig::getInstance();
-        foreach ($config as $confName => $values) {
-
-            $confs = explode('_', $confName);
-            if (sizeof($confs) > 1) {
-
-                $widgetName = str_replace(" ", "", $confs[0]);
-                Widget::setParameter($widgetName, $confs[1], $values);
-            }
-        }
-    }
-
-    public function onTick()
-    {
-        if (count($this->resetLogins) > 0) {
-            /** @var GuiHandler */
-            $guiHandler = GuiHandler::getInstance();
-            foreach ($this->resetLogins as $login => $value) {
-                $this->resetLogins[$login]++;
-                switch ($this->resetLogins[$login]) {
-                    case 1:
-                        ResetHud::Erase($login);
-                        break;
-                    case 2:
-                        $guiHandler->toggleGui($login);
-                        break;
-                    case 3:
-                        $guiHandler->toggleGui($login);
-                        unset($this->resetLogins[$login]);
-                        $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
-                        break;
-                }
-            }
-        }
-        if ($this->counter != 0 && time() - $this->counter > 2) {
-            $this->connection->sendDisplayManialinkPage(
-                null,
-                "<manialinks><manialink id=\"0\"><quad></quad></manialink>
-<custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                0,
-                false
-            );
-            $this->counter = 0;
-        }
-    }
-
     public function onPlayerConnect($login, $isSpectator)
     {
         try {
-
-            if ($this->expStorage->simpleEnviTitle == "SM") {
+            if ($this->storage->simpleEnviTitle == "SM") {
                 $this->counter = time();
                 $this->connection->TriggerModeScriptEvent("LibXmlRpc_DisableAltMenu", $login);
-                $this->connection->sendDisplayManialinkPage(
-                    $login,
-                    "<manialinks><manialink id=\"0\"><quad></quad></manialink
-><custom_ui><altmenu_scores visible=\"false\" /></custom_ui></manialinks>",
-                    0,
-                    false
-                );
+                $this->connection->sendDisplayManialinkPage($login, '<manialinks><manialink id="0"><quad></quad></manialink><custom_ui><altmenu_scores visible="false" /></custom_ui></manialinks>', 0, false);
             }
         } catch (Exception $e) {
             $this->console("Error while disabling alt menu : " . $e->getMessage());
+        }
+
+        $this->connection->sendDisplayManialinkPage(null,
+<<<EOT
+<manialink id="GuiChecker" version="2" layer="scorestable" name="GuiChecker">
+<script><!--
+main () {
+    declare persistent Boolean exp_isWidgetsHidden = False;
+    declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+    declare persistent Boolean edge_isLockedVisible = True;
+    declare Boolean edge_isMinimized for UI = False;
+    declare Boolean lastValue = edge_isMinimized;
+    declare Boolean is_edge_animated for UI = edge_isMinimized;
+    declare Integer eXp_lastClockUpdate = Now;
+
+    while(True) {
+        yield;
+        foreach (Event in PendingEvents) {
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F8") {
+                exp_isWidgetsHidden = !exp_isWidgetsHidden;
+                if (exp_isWidgetsHidden == True) {
+                    exp_needToCheckPersistentVars = True;
+                } else {
+                    exp_needToCheckPersistentVars = True;
+                }
+            }
+            if (Event.Type == CMlEvent::Type::KeyPress && Event.KeyName == "F9") {
+                edge_isLockedVisible = !edge_isLockedVisible;
+            }
+        }
+
+        if (edge_isLockedVisible == False && (Now - eXp_lastClockUpdate) >= 50) {
+            if (InputPlayer != Null) {
+                declare Real Speed = InputPlayer.Speed*3.6;
+        
+                if ((Speed < 10.0 && Speed > -10.0) || (InputPlayer.RaceState == CTmMlPlayer::ERaceState::Finished || PageIsVisible)) {
+                    if (lastValue == True) {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = False;
+                        lastValue = False;
+                    }
+                }
+        
+                if ((Speed > 10.0 || Speed < -10.0) && (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Finished && !PageIsVisible)) {
+                    if (lastValue == False) {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                        is_edge_animated = True;
+                    } else {
+                        edge_isMinimized = True;
+                        lastValue = True;
+                    }
+                }
+            }
+        
+            eXp_lastClockUpdate = Now;
+        }
+
+        if (edge_isLockedVisible == True && (Now - eXp_lastClockUpdate) >= 500) {
+            if (lastValue == True) {
+                edge_isMinimized = False;
+                lastValue = False;
+                is_edge_animated = True;
+            }
+        }
+    }
+}
+--></script>
+</manialink>
+EOT
+        , 0, false, false);
+
+        
+        $widgetsToSend = "";
+        foreach (self::$persistentWidgets as $widget) {
+            $widgetsToSend .= $widget;
+        }
+
+        if ($widgetsToSend != "") {
+            try {
+                $this->connection->sendDisplayManialinkPage($login, $widgetsToSend, 0, false, false);
+            } catch (Exception $e) {
+                if ($e->getMessage() != "Login unknown.") {
+                    $this->console("Impossible to send persistent widgets to player, server said: " . $e->getMessage());
+                    $this->console("Trying to send persistent widgets to player again.");
+                    foreach (self::$persistentWidgets as $widget) {
+                        try {
+                            $this->connection->sendDisplayManialinkPage($login, $widget, 0, false, false);
+                        } catch (Exception $e) {
+                            $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+                        }
+                    }
+                } else {
+                    $this->console("Cannot send persistent widgets to player, server said: " . $e->getMessage());
+                }
+            }
         }
     }
 
     public function onPlayerDisconnect($login, $reason = null)
     {
-
+        unset($this->configStatuses[$login]);
+        unset($this->configGameMode[$login]);
+        unset(self::$playerSelectionCallbacks[$login]);
     }
 
     public function hudCommands($login, $param = "null")
@@ -179,6 +280,9 @@ class Gui extends ExpPlugin
             case "lock":
                 $this->disableHudMove($login);
                 break;
+            case "config":
+                $this->getPlayersWidgets($login);
+                break;
             default:
                 $this->eXpChatSendServerMessage($this->msg_params, $login);
                 break;
@@ -190,9 +294,20 @@ class Gui extends ExpPlugin
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = HudMove::Create($login, false);
-            $window->enable();
-            $window->show();
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_enableHudMove for UI = False;
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        exp_enableHudMove = True;
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
         }
     }
 
@@ -201,9 +316,42 @@ class Gui extends ExpPlugin
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = HudMove::Create($login, false);
-            $window->disable();
-            $window->show();
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_enableHudMove for UI = False;
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        exp_enableHudMove = False;
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
+        }
+    }
+
+    public function getPlayersWidgets($login)
+    {
+        $this->getPlayerWidgetsScript->setParam("gameMode", $this->storage->getCleanGamemodeName());
+        $this->getPlayerWidgets->show($login);
+    }
+
+    public function showHudConfig($login, $entries = array())
+    {
+        if (!isset($this->playersWidgets[$login])) {
+            $this->playersWidgets[$login] = "";
+        }
+        if (isset($entries['widgetStatus'])) {
+            if ($entries['widgetStatus'] != 'finished') {
+                $this->playersWidgets[$login] .= $entries['widgetStatus'];
+            } else {
+                $this->showConfigWindow($login, array('widgetStatus' => $this->playersWidgets[$login]));
+                unset($this->playersWidgets[$login]);
+                $this->getPlayerWidgets->erase($login);
+            }
         }
     }
 
@@ -211,12 +359,66 @@ class Gui extends ExpPlugin
     {
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
-        } else {
-            $window = Configuration::Create($login, true);
-            $window->setSize(120, 90);
-            $window->setData($entries);
-            $window->show();
+            return;
         }
+        if (!array_key_exists("widgetStatus", $entries)) {
+            return;
+        }
+
+        $rawEntries = explode("|", $entries["widgetStatus"]);
+        $statuses   = array();
+        $gameMode   = "";
+        foreach ($rawEntries as $entry) {
+            if (empty($entry)) {
+                continue;
+            }
+            $val      = explode(":", $entry, 3);
+            $gameMode = $val[1];
+            $statuses[] = array('id' => $val[0], 'value' => ($val[2] != "0"));
+        }
+
+        $this->configStatuses[$login] = $statuses;
+        $this->configGameMode[$login] = $gameMode;
+
+        $items = array();
+        foreach ($statuses as $status) {
+            $items[] = array(
+                'text'   => $this->configWindow->handleSpecialChars($status['id']),
+                'active' => $status['value'] ? 'true' : 'false',
+            );
+        }
+
+        $this->configWindow->setParam("items", $items);
+        $this->configWindow->show($login);
+    }
+
+    public function configurationOk($login, $params = array())
+    {
+        if (!isset($this->configStatuses[$login])) {
+            return;
+        }
+
+        $xml = '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+                        declare persistent Boolean[Text][Text] EXP_widgetVisible;';
+
+        foreach ($this->configStatuses[$login] as $x => $status) {
+            $xml .=     'EXP_widgetVisible["' . $status['id'] . '"]["' . $this->configGameMode[$login] . '"] = ' . ((isset($params['cb_' . $x]) && $params['cb_' . $x] == '1') ? "True" : "False") . ';';
+        }
+
+        $xml .= '        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>';
+
+        $this->connection->sendDisplayManialinkPage($login, $xml);
+        $this->configWindow->erase($login);
+        unset($this->configStatuses[$login]);
+        unset($this->configGameMode[$login]);
     }
 
     public function resetHud($login)
@@ -224,11 +426,38 @@ class Gui extends ExpPlugin
         if (Config::getInstance()->disablePersonalHud) {
             $this->eXpChatSendServerMessage($this->msg_disabled, $login);
         } else {
-            $window = ResetHud::Create($login);
-            $window->setTimeout(1);
-            $window->show();
-            $this->resetLogins[$login] = 0;
-            $this->eXpChatSendServerMessage(eXpGetMessage("Starting hud reset, please wait"), $login);
+            $this->connection->sendDisplayManialinkPage($login,
+            '<manialink id="hudMoveHandler" version="2" layer="normal" name="hudMoveHandler">
+                <script>
+                <!--
+                    main () {
+                        declare persistent Vec3[Text] EXP_windowLastPos;
+                        declare persistent Vec3[Text] EXP_windowLastPosRel;
+
+                        declare persistent Vec3[Text][Text] EXP_widgetLastPos;
+                        declare persistent Vec3[Text][Text] EXP_widgetLastPosRel;
+                        declare persistent Boolean[Text][Text] EXP_widgetVisible;
+                        declare persistent Text[Text][Text] EXP_widgetLayers;
+
+                        declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+                        declare persistent Boolean exp_chatVisible = True;
+                        exp_chatVisible = True;
+
+                        EXP_windowLastPos.clear();
+                        EXP_windowLastPosRel.clear();
+                        EXP_widgetLastPos.clear();
+                        EXP_widgetLastPosRel.clear();
+                        EXP_widgetVisible.clear();
+                        EXP_widgetLayers.clear();
+
+                        exp_needToCheckPersistentVars = True;
+                    }
+                -->
+                </script>
+            </manialink>');
+
+            $this->eXpChatSendServerMessage(eXpGetMessage("Hud reset done!"), $login);
         }
     }
 
@@ -237,26 +466,6 @@ class Gui extends ExpPlugin
         $mem = "Memory Usage: " . round(memory_get_usage() / 1024) . "Kb";
         Logger::getLog("memory")->write($mem);
         print "\n" . $mem . "\n";
-    }
-
-    public function onPlayerManialinkPageAnswer($playerUid, $login, $answer, array $entries)
-    {
-        if (strpos($answer, "onMenuItemClick") !== false) {
-
-            $parseStr = str_replace("onMenuItemClick?", "", $answer);
-            $parsed = array();
-
-            parse_str($parseStr, $parsed);
-
-            if (!array_key_exists($parsed['hash'], self::$callbacks)) {
-                return;
-            }
-            $item = $parsed['item'];
-            $hash = $parsed['hash'];
-            $value = $parsed['dataId'];
-
-            $test = \call_user_func(self::$callbacks[$hash], array($login, $item, self::$items[$hash][$value]->data));
-        }
     }
 
     /**
@@ -268,14 +477,28 @@ class Gui extends ExpPlugin
      */
     public static function fixString($string, $multiline = false)
     {
-        $out = str_replace("\r", '', $string);
+        if ($multiline) {
+            return str_replace(array("\r", '"',  '\\',  '-'),
+                               array('',   "'", '\\\\', '–'), $string);
+        }
+        return str_replace(array("\r", "\n", '"',  '\\',  '-'),
+                           array('',   '',   "'", '\\\\', '–'), $string);
+    }
+
+    /**
+     * Cleans the string for maniascript purposes.
+     *
+     * @param string $string The string to clean
+     * @param bool $multiline if the string is multiline
+     * @return string cleaned up string
+     */
+    public static function fixString2($string, $multiline = false)
+    {
+        $out = str_replace('\\', '\\\\', $string);
+        $out = str_replace('"', '\\"', $out);
         if (!$multiline) {
             $out = str_replace("\n", '', $out);
         }
-        $out = str_replace('"', "'", $out);
-        $out = str_replace('\\', '\\\\', $out);
-        $out = str_replace('-', '–', $out);
-
         return $out;
     }
 
@@ -286,10 +509,66 @@ class Gui extends ExpPlugin
      */
     public static function showConfirmDialog($login, $actionId, $text = "")
     {
-        $window = ConfirmDialog::Create($login);
-        $window->setText($text);
-        $window->setInvokeAction($actionId);
-        $window->show();
+        self::$confirmScript->setParam("action", $actionId);
+        self::$confirmWindow->setParam("text", self::$confirmWindow->handleSpecialChars($text));
+        self::$confirmWindow->show($login);
+    }
+
+    public function showConfirmDialogMl($login, $actionId, $text = "")
+    {
+        self::$confirmScript->setParam("action", $actionId);
+        self::$confirmWindow->setParam("text", self::$confirmWindow->handleSpecialChars($text));
+        self::$confirmWindow->show($login);
+    }
+
+    public static function showPlayerSelection($login, $callback, $title, $buttonText = 'Select', $extra = null, $excludedLogin = null)
+    {
+        /** @var \ManiaLivePlugins\eXpansion\Helpers\Storage $storage */
+        $storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach (array_merge($storage->players, $storage->spectators) as $player) {
+            if ($excludedLogin && $player->login === $excludedLogin || !$excludedLogin && $player->login === $login) {
+                continue;
+            }
+            $items[$i] = array(self::fixString($player->login), self::fixString($player->nickName));
+            $data[$i] = array(-1, -1, 'exp:eXpansion.Gui:selectPlayerClick:' . $player->login);
+            $i++;
+        }
+
+        self::$playerSelectionCallbacks[$login] = array($callback, $extra);
+
+        self::$playerSelectionWindow->setParam('buttonText', $buttonText);
+        self::$playerSelectionWindow->setParam('playerItems', $items);
+        self::$playerSelectionWindow->setParam('playerData', $data);
+        self::$playerSelectionWindow->setTitle($title);
+        self::$playerSelectionWindow->show($login);
+    }
+
+    public static function erasePlayerSelection($login)
+    {
+        unset(self::$playerSelectionCallbacks[$login]);
+    }
+
+    public function selectPlayerClick($login, $target)
+    {
+        $target = str_replace('–', '-', $target);
+
+        if (!isset(self::$playerSelectionCallbacks[$login])) {
+            return;
+        }
+        $callback = self::$playerSelectionCallbacks[$login][0];
+        $extra    = self::$playerSelectionCallbacks[$login][1];
+        unset(self::$playerSelectionCallbacks[$login]);
+        self::$playerSelectionWindow->erase($login);
+
+        if ($extra) {
+            call_user_func($callback, $login, $target, $extra);
+        } else {
+            call_user_func($callback, $login, $target);
+        }
     }
 
     /**
@@ -299,19 +578,9 @@ class Gui extends ExpPlugin
      */
     public static function showNotice($message, $login, $args = array())
     {
-        $window = null;
-        if (is_array($login)) {
-            $grp = \ManiaLive\Gui\Group::Create("notice", $login);
-            $window = Notice::Create($grp);
-        } else {
-            $window = Notice::Create($login);
-        }
-
-        if (is_string($message)) {
-            $message = eXpGetMessage($message);
-        }
-        $window->setMessage($message, $args);
-        $window->show($login);
+        $textId = self::$noticeWindow->addLang((string)$message, empty($args) ? null : $args);
+        self::$noticeWindow->setParam("textId", $textId);
+        self::$noticeWindow->show($login);
     }
 
     /**
@@ -320,15 +589,15 @@ class Gui extends ExpPlugin
      */
     public static function showError($message, $login)
     {
-        $window = null;
-        if (is_array($login)) {
-            $grp = \ManiaLive\Gui\Group::Create("error", $login);
-            $window = Windows\Error::Create($grp);
-        } else {
-            $window = Windows\Error::Create($login);
+        $out = $message;
+        if (is_array($message)) {
+            $out = '';
+            foreach ($message as $line) {
+                $out .= trim($line) . "\n";
+            }
         }
-        $window->setMessage($message);
-        $window->show($login);
+        self::$errorWindow->setParam("message", self::$errorWindow->handleSpecialChars($out));
+        self::$errorWindow->show($login);
     }
 
     /**
@@ -338,23 +607,38 @@ class Gui extends ExpPlugin
      */
     public static function preloadImage($url)
     {
-        Preloader::add($url);
+        if ($url == "") {
+            return;
+        }
+        self::$preloadCache[md5($url)] = $url;
     }
 
     /**
      * Preload image
      *
-     * @param type $url
+     * @param string $url
      */
     public static function preloadRemove($url)
     {
-        Preloader::remove($url);
+        $md5 = md5($url);
+        if (array_key_exists($md5, self::$preloadCache)) {
+            unset(self::$preloadCache[$md5]);
+        }
     }
 
     public static function preloadUpdate()
     {
-        $preloader = Preloader::Create(null);
-        $preloader->show();
+        if (!self::$preloader instanceof MLPage) {
+            return;
+        }
+
+        $quads = "";
+        foreach (self::$preloadCache as $url) {
+            $quads .= '<quad sizen="6 6" image="' . self::$preloader->handleSpecialChars($url) . '"/>';
+        }
+
+        self::$preloader->setParam("quads", $quads);
+        self::$preloader->show(null, true);
     }
 
     /**
@@ -363,11 +647,6 @@ class Gui extends ExpPlugin
      */
     public static function createConfirm($finalAction)
     {
-        $outAction = ActionHandler::getInstance()->createAction(
-            array('\\ManiaLivePlugins\\eXpansion\\Gui\\Gui', 'showConfirmDialog'),
-            $finalAction
-        );
-
-        return $outAction;
+        return 'exp:eXpansion.Gui:showConfirmDialogMl:' . $finalAction;
     }
 }

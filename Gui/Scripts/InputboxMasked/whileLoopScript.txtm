@@ -1,0 +1,20 @@
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseOver && Event.ControlId == "{{ btName }}_bt") {
+        if (passwordEntry_{{ btName }} != Null && clearLabel_{{ btName }} != Null) {
+            clearLabel_{{ btName }}.SetText(passwordEntry_{{ btName }}.Value);
+            passwordEntry_{{ btName }}.Hide();
+            clearLabel_{{ btName }}.Show();
+        } else if (maskedLabel_{{ btName }} != Null && clearLabel_{{ btName }} != Null) {
+            maskedLabel_{{ btName }}.Hide();
+            clearLabel_{{ btName }}.Show();
+        }
+    } else if (Event.Type == CMlEvent::Type::MouseOut && Event.ControlId == "{{ btName }}_bt") {
+        if (passwordEntry_{{ btName }} != Null && clearLabel_{{ btName }} != Null) {
+            clearLabel_{{ btName }}.Hide();
+            passwordEntry_{{ btName }}.Show();
+        } else if (maskedLabel_{{ btName }} != Null && clearLabel_{{ btName }} != Null) {
+            clearLabel_{{ btName }}.Hide();
+            maskedLabel_{{ btName }}.Show();
+        }
+    }
+}

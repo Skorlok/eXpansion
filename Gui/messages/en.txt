@@ -10,8 +10,8 @@ Apply
 Cancel
 Cancel
 
-possible parameters: move, lock, reset
-possible parameters: move, lock, reset
+possible parameters: move, lock, reset, config
+possible parameters: move, lock, reset, config
 
 #error#Server Admin has disabled personal huds. Sorry!
 #error#Server Admin has disabled personal huds. Sorry!

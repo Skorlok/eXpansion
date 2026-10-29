@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\IdleKick;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $idleMinutes = 10;

@@ -3,9 +3,7 @@
 namespace ManiaLivePlugins\eXpansion\Core\types {
 
     use Exception;
-    use ManiaLib\Application\ErrorHandling;
-    use ManiaLive\Data\Player;
-    use ManiaLive\Data\Storage as Storage2;
+    use ManiaLive\Application\ErrorHandling;
     use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
     use ManiaLive\Event\Dispatcher;
     use ManiaLive\PluginHandler\Dependency;
@@ -31,18 +29,20 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
     use ManiaLivePlugins\eXpansion\Core\types\config\MetaData;
     use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
     use ManiaLivePlugins\eXpansion\Helpers\Helper;
+    use ManiaLivePlugins\eXpansion\Helpers\PlayerStorage;
     use ManiaLivePlugins\eXpansion\Helpers\Storage;
+    use ManiaLivePlugins\eXpansion\Helpers\StorageListener as PlayerStorageListener;
+    use ManiaLivePlugins\eXpansion\Helpers\StorageEvent as PlayerStorageEvent;
     use Maniaplanet\DedicatedServer\Structures\GameInfos;
     use Maniaplanet\DedicatedServer\Structures\PlayerNetInfo;
     use Maniaplanet\DedicatedServer\Xmlrpc\UnknownPlayerException;
-    use Phine\Exception\Exception as Exception2;
 
     /**
      * Description of BasicPlugin
      *
      * @author oliverde8
      */
-    class BasicPlugin extends Plugin implements WaitingCompliant, GameSettingsEventListener, PlayerEventListener, GlobalEventListener
+    class BasicPlugin extends Plugin implements WaitingCompliant, GameSettingsEventListener, PlayerEventListener, GlobalEventListener, PlayerStorageListener
     {
 
         public static $plugins_list;
@@ -99,11 +99,17 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         /**
          * @var Storage
          */
-        protected $expStorage;
+        protected $storage;
+        private $eventsStorage = 0;
+
+        /**
+         * @var array[]
+         */
+        private $allowedManialinkCallbacks = array();
 
         final public function onInit()
         {
-            $this->expStorage = Storage::getInstance();
+            $this->storage = Storage::getInstance();
 
             $this->loadMetaData();
             if (!$this->metaData->checkAll()) {
@@ -161,9 +167,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             Dispatcher::register(GlobalEvent::getClass(), $this);
         }
 
-        /**
-         *
-         */
         private function loadMetaData()
         {
             $pieces = explode('\\', get_class($this));
@@ -199,6 +202,24 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         }
 
         /**
+         * Start listening for Storage events.
+         */
+        final protected function enableStorageEvents($events = PlayerStorageEvent::ALL)
+        {
+            Dispatcher::register(PlayerStorageEvent::getClass(), $this, $events & ~$this->eventsStorage);
+            $this->eventsStorage |= $events;
+        }
+
+        /**
+         * Stop listening for Storage Events.
+         */
+        final protected function disableStorageEvents($events = PlayerStorageEvent::ALL)
+        {
+            Dispatcher::unregister(PlayerStorageEvent::getClass(), $this, $events & $this->eventsStorage);
+            $this->eventsStorage &= ~$events;
+        }
+
+        /**
          * enables eXpansion modescript bidings
          *
          * example:
@@ -231,7 +252,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                 $this->eXpOnLoad();
             } catch (Exception $e) {
                 $this->console("onLoad exception:" . $this->getId() . " -> " . $e->getMessage() . "\n");
-                $this->console(ErrorHandling::computeMessage($e));
+                $this->console(implode("\n", ErrorHandling::computeMessage($e)));
             }
         }
 
@@ -244,9 +265,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         {
         }
 
-        /**
-         *
-         */
         final public function onReady()
         {
             if (!$this->metaData->checkAll()) {
@@ -340,6 +358,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             Dispatcher::unregister(GameSettingsEvent::getClass(), $this);
             Dispatcher::unregister(PlayerEvent::getClass(), $this);
             Dispatcher::unregister(GlobalEvent::getClass(), $this);
+            $this->disableStorageEvents();
 
             try {
                 $this->eXpOnUnload();
@@ -431,6 +450,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         private function eXpRedirectedChatSendServerMessage($msg, $login, $forceNoRedirect = false)
         {
             $sender = get_class($this);
+            $fromPlugin = explode("\\", $sender);
+            $fromPlugin = str_replace("_", " ", end($fromPlugin));
 
             if (isset(self::$eXpChatRedirected[$sender])) {
                 $message = $msg;
@@ -471,7 +492,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
 
         /**
          * Sends announcement through chat to the server or redirects it to another plugin
-         * @deprecated
+         *  @deprecated
          * @param MultiLangMsg $msg The message to send to all users
          * @param string $icon Icon for the message (might be used by some plugins)
          * @param callable $callback
@@ -481,6 +502,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         protected function eXpAnnounce($msg, $icon = null, $callback = null, $pluginid = null)
         {
             $sender = get_class($this);
+            $fromPlugin = explode("\\", $sender);
+            $fromPlugin = str_replace("_", " ", end($fromPlugin));
 
             if (isset(self::$eXpAnnounceRedirected[$sender])) {
                 $message = clone $msg;
@@ -514,7 +537,6 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          *
          * @param MultiLangMsg $msg
          * @param array $args
-         * @param bool $forceNoRedirect
          */
         protected function eXpMultilangAnnounce(MultiLangMsg $msg, array $args, $forceNoRedirect = false)
         {
@@ -528,9 +550,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                     } catch (UnknownPlayerException $ex) {
                         $this->console("Attempt to send Multilang Announce to a login failed. Login unknown");
                     } catch (Exception $e) {
-                        $this->console(
-                            "Error while sending Multilang Announce message => Server said:" . $e->getMessage()
-                        );
+                        $this->console("Error while sending Multilang Announce message => Server said:" . $e->getMessage());
                     }
                     return;
                 }
@@ -609,6 +629,8 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             $this->eXpUnloading = true;
             $pHandler->unload($this->getId());
             self::$plugins_onHold[$this->getId()] = $this->getId();
+
+            $this->allowedManialinkCallbacks = array();
         }
 
         /**
@@ -695,7 +717,9 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          */
         final public static function eXpGetCurrentCompatibilityGameMode()
         {
-            $gameInfo = Storage2::getInstance()->gameInfos;
+            /** @var Storage $storage */
+            $storage = Storage::getInstance();
+            $gameInfo = $storage->gameInfos;
             if ($gameInfo->gameMode == GameInfos::GAMEMODE_SCRIPT) {
                 return self::eXpGetScriptCompatibilityMode($gameInfo->scriptName);
             } else {
@@ -711,6 +735,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
          */
         final public static function eXpGetScriptCompatibilityMode($scriptName)
         {
+            $class = get_called_class();
             $soft = true;
 
             $compatibility = explode(".", $scriptName);
@@ -719,14 +744,12 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
             if ($soft) {
                 if (strpos($compatibility, 'TIMEATTACK') !== false) {
                     $compatibility = GameInfos::GAMEMODE_TIMEATTACK;
-                } elseif (strpos($compatibility, 'ROUNDS') !== false
-                    || strpos($compatibility, 'ROUNDSBASE') !== false
-                ) {
+                } elseif (strpos($compatibility, 'ROUNDS') !== false || strpos($compatibility, 'ROUNDSBASE') !== false) {
                     $compatibility = GameInfos::GAMEMODE_ROUNDS;
                 } elseif (strpos($compatibility, 'TEAM') !== false) {
                     $compatibility = GameInfos::GAMEMODE_TEAM;
                 } elseif (strpos($compatibility, 'CUP') !== false) {
-                    $compatibility = GameInfos::GAMEMODE_ROUNDS;
+                    $compatibility = GameInfos::GAMEMODE_CUP;
                 } elseif (strpos($compatibility, 'LAPS') !== false) {
                     $compatibility = GameInfos::GAMEMODE_LAPS;
                 } else {
@@ -809,18 +832,97 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         }
 
         /**
+         * Security measure to allow only certain functions to be called from manialink callbacks.
+         * 
+         * @param string $callback The function name to allow
+         * @param boolean $allowEntries If true, allows the function to be called with entries, otherwise it will be called without entries
+         * @param boolean $allowParams If true, allows the function to be called with parameters, otherwise it will be called without parameters
+         */
+        public function registerManialinkCallback($callback, $allowEntries = false, $allowParams = false)
+        {
+            if (!isset($this->allowedManialinkCallbacks[$callback])) {
+                $this->allowedManialinkCallbacks[$callback] = array($allowEntries, $allowParams);
+            }
+        }
+
+        public function unregisterManialinkCallback($callback)
+        {
+            if (isset($this->allowedManialinkCallbacks[$callback])) {
+                unset($this->allowedManialinkCallbacks[$callback]);
+            }
+        }
+
+        public function onPlayerManialinkPageAnswer($playerUid, $login, $answer, array $entries)
+        {
+            if ($answer === 'eXpOptimizedPagerAction') {
+                foreach ($entries as $entry) {
+                    if ($entry['Name'] === 'eXpOptimizedPager' && substr(trim($entry['Value']), 0, 4) === 'exp:') {
+                        $answer = trim($entry['Value']); // For some reason there is sometimes a space at the beginning of the value
+                        break;
+                    }
+                }
+            }
+
+            if (substr($answer, 0, 4) === 'exp:') {
+
+                $parts      = explode(':', $answer, 4);
+                $classParts = explode('\\', get_class($this));
+                $partialNs  = isset($classParts[2]) ? $classParts[1] . '.' . $classParts[2] : $classParts[1];
+
+                if (count($parts) >= 3 && $parts[1] === $partialNs) {
+                    $method = $parts[2];
+
+                    if (!isset($this->allowedManialinkCallbacks[$method])) {
+                        $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" not registered in ' . get_class($this));
+                        $this->console('Player: ' . $login . ' answer: ' . $answer);
+                        return;
+                    }
+
+                    $cbConfig = $this->allowedManialinkCallbacks[$method];
+
+                    if (method_exists($this, $method)) {
+
+                        $params = array($login);
+                        if ($cbConfig[1] && isset($parts[3])) {
+                            $params[] = $parts[3];
+                        } else if (!$cbConfig[1] && isset($parts[3])) {
+                            $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" does not allow parameters in ' . get_class($this));
+                            $this->console('Player: ' . $login . ' answer: ' . $answer);
+                        }
+                        
+                        if ($cbConfig[0] && count($entries)) {
+                            $entryValues = array();
+                            foreach ($entries as $entry) {
+                                if ($entry['Name'] !== 'eXpOptimizedPager') {
+                                    $entryValues[$entry['Name']] = $entry['Value'];
+                                }
+                            }
+                            if (count($entryValues)) {
+                                $params[] = $entryValues;
+                            }
+                        }
+                        call_user_func_array(array($this, $method), $params);
+                    } else {
+                        $this->console('onPlayerManialinkPageAnswer: method "' . $method . '" not found in ' . get_class($this));
+                        $this->console('Player: ' . $login . ' answer: ' . $answer);
+                    }
+                }
+            }
+        }
+
+        /**
          * Returns player object from given playerId
          *
          * @param mixed $id
          *
          * @return Player
          *
-         * @throws Exception2
+         * @throws Exception
          */
         public function getPlayerObjectById($id)
         {
             if (!is_numeric($id)) {
-                throw new Exception2("player id is not numeric");
+                throw new Exception("player id is not numeric");
             }
             foreach ($this->storage->players as $login => $player) {
                 if ($player->playerId == $id) {
@@ -833,7 +935,7 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
                 }
             }
 
-            return new Player();
+            return new PlayerStorage();
         }
 
         /**
@@ -889,6 +991,11 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
 
         }
 
+        public function onScoresCalculated($scores)
+        {
+
+        }
+
         public function onMapRestart()
         {
 
@@ -911,13 +1018,15 @@ namespace ManiaLivePlugins\eXpansion\Core\types {
         {
 
         }
+
+        // storage events
+        public function onPlayerChangeSide($player, $oldSide) {}
+        public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap) {}
     }
 }
 
 namespace {
 
-    use ManiaLive\Data\Storage;
-    use ManiaLivePlugins\eXpansion\Core\I18n;
     use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
     /**
@@ -947,7 +1056,7 @@ namespace {
     }
 
     // fix for  php 5.5.0
-    error_reporting(E_ALL ^ E_DEPRECATED);
+    error_reporting(E_ALL);
     // do custom logging also
     $limit = ini_get('memory_limit');
     if (shorthand2bytes($limit) < 512 * 1048576) {
@@ -977,7 +1086,7 @@ namespace {
             $language = null;
             if (sizeof($args) > 0) {
                 $login = array_shift($args);
-                $player = Storage::getInstance()->getPlayerObject($login);
+                $player = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance()->getPlayerObject($login);
                 if ($player == null) {
                     $language = null;
                 } else {
@@ -990,19 +1099,10 @@ namespace {
             if (is_object($message)) {
                 $lang = $message->getMessage($language);
             } else {
-                $lang = I18n::getInstance()->getString($message, $language);
+                $lang = \ManiaLivePlugins\eXpansion\Core\I18n::getInstance()->getString($message, $language);
             }
 
-            array_unshift($args, $lang);
-
-            try {
-                return call_user_func_array('sprintf', $args);
-            } catch (\Exception $e) {
-                Helper::logError('[basicPlugin/Chat]Error with translations strings : ' . $lang);
-                Helper::logError('[basicPlugin/Chat]' . $e->getMessage());
-
-                return $lang;
-            }
+            return \ManiaLivePlugins\eXpansion\Core\I18n\Message::format($lang, $args);
         }
     } else {
         exit("function '__()' is already defined, can't continue.");
@@ -1017,6 +1117,6 @@ namespace {
      */
     function eXpGetMessage($string)
     {
-        return I18n::getInstance()->getObject($string);
+        return \ManiaLivePlugins\eXpansion\Core\I18n::getInstance()->getObject($string);
     }
 }

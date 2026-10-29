@@ -17,7 +17,7 @@ class Question
     /** @var Answer[] answer */
     public $answer = array();
 
-    /** @var \ManiaLive\Data\Player */
+    /** @var \ManiaLivePlugins\eXpansion\Helpers\PlayerStorage */
     public $asker;
 
     /** var float */
@@ -40,12 +40,10 @@ class Question
     public $boxOrder = array();
 
 
-    public function __construct(\ManiaLive\Data\Player $player, $question)
+    public function __construct(\ManiaLivePlugins\eXpansion\Helpers\PlayerStorage $player, $question)
     {
         $this->asker = $player;
         $this->question = $question;
-
-        return $this;
     }
 
     /**

@@ -2,11 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\Core\types\config;
 
-use ManiaLive\Data\Storage;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
-use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
@@ -100,7 +99,7 @@ abstract class MetaData
     /**
      * @var string[] List of incompatible plugin ids
      */
-    private $incompatiblePlugins = [];
+    private $incompatiblePlugins = array();
 
     /**
      * @param string $pluginId The Id of the plugin the meta data is working for
@@ -464,25 +463,21 @@ abstract class MetaData
      *
      * @return boolean IF is compatible with the game mode
      */
-    public function checkGameCompatibility($gamemode = null, $scriptName = null)
+    public function checkGameCompatibility()
     {
 
         if (!empty($this->gameModeSupport)) {
-            //Get current state if need be
-            if ($gamemode == null) {
-                $storage = Storage::getInstance();
-                $gamemode = $storage->gameInfos->gameMode;
-                if ($gamemode == GameInfos::GAMEMODE_SCRIPT) {
-                    $scriptName = $storage->gameInfos->scriptName;
-                }
-            }
 
-            //Scrit mode special checking.
-            if ($gamemode == GameInfos::GAMEMODE_SCRIPT) {
+            /** @var Storage $storage */
+            $storage = Storage::getInstance();
+            $scriptName = $storage->getCleanGamemodeName();
+            $gamemode = Core::eXpGetScriptCompatibilityMode($scriptName);
+
+            if ($gamemode == 0) {
                 return $this->checkScriptGameModeCompatibility($scriptName);
+            } else {
+                return isset($this->gameModeSupport[$gamemode]) ? $this->gameModeSupport[$gamemode] : $this->checkScriptGameModeCompatibility($scriptName);
             }
-
-            return isset($this->gameModeSupport[$gamemode]) ? $this->gameModeSupport[$gamemode] : false;
         } else {
             //No rules for game compatibility, this plugin supports all modes
             return true;
@@ -499,13 +494,19 @@ abstract class MetaData
     protected function checkScriptGameModeCompatibility($scriptName)
     {
         if ($this->scriptCompatibiliyMode) {
-            $gmode = Core::eXpGetScriptCompatibilityMode($scriptName);
+            if (isset($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT]) && is_array($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT])) {
+                foreach ($this->gameModeSupport[GameInfos::GAMEMODE_SCRIPT] as $supportedScript => $active) {
+                    if ($scriptName == $supportedScript) {
+                        return true;
+                    }
+                }
+            }
 
-            return isset($this->gameModeSupport[$gmode]) ? $this->gameModeSupport[$gmode] : false;
+            return false;
         }
 
         if (isset($this->gameModeSupport[0]) && !empty($this->gameModeSupport[0])) {
-            foreach ($this->gameModeSupport[0] as $supportedScript) {
+            foreach ($this->gameModeSupport[0] as $supportedScript => $active) {
                 if ($this->softScriptCompatibility && strpos($scriptName, $supportedScript) !== false) {
                     return true;
                 } else {
@@ -536,14 +537,14 @@ abstract class MetaData
                  * @var Storage $storage
                  */
                 if ($this->checkTitleCompatibility(
-                    eXpStorage::getInstance()->version->titleId
+                    Storage::getInstance()->version->titleId
                 )
                 ) {
                     return true;
                 }
-                $titleName = eXpStorage::getInstance()->simpleEnviTitle;
+                $titleName = Storage::getInstance()->simpleEnviTitle;
             } else {
-                $titleName = eXpStorage::getInstance()->version->titleId;
+                $titleName = Storage::getInstance()->version->titleId;
             }
         }
 
@@ -572,7 +573,7 @@ abstract class MetaData
      */
     public function checkOtherCompatibility()
     {
-        if (eXpStorage::getInstance()->isRelay && !$this->getRelaySupport()) {
+        if (Storage::getInstance()->isRelay && !$this->getRelaySupport()) {
             return array('This plugin don\'t support Relay servers');
         }
 

@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Dedimania;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $login = null;
@@ -12,4 +12,5 @@ class Config extends \ManiaLib\Utils\Singleton
     public $disableMessages = false;
     public $noRedirectTreshold = 30;
     public $allowBannedPlayersToJoin = false;
+
 }

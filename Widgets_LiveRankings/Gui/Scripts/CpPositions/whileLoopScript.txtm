@@ -1,12 +1,160 @@
+if (EXP_widgetLastPosRel.existskey(id) && EXP_widgetLastPosRel[id].existskey(gameMode)) {
+    declare Vec3 p = EXP_widgetLastPosRel[id][gameMode];
+    declare MenuIcon = (Page.GetFirstChild("toggleMicroMenu") as CMlQuad);
+    declare MicroMenu = (Page.GetFirstChild("MicroMenu") as CMlFrame);
+
+    if (p.X > 0) {
+        MenuIcon.PosnX = 0.0;
+        MicroMenu.PosnX = -31.0;
+    } else {
+        MenuIcon.PosnX = 49.0;
+        MicroMenu.PosnX = 43.0;
+    }
+	MicroMenu.PosnY = -3.0;
+
+	declare i = 1;
+
+	if (maxCp > 0) {
+		foreach (Score in playerTimes[maxCp -1]) {
+			declare labelInfo1 = (Page.GetFirstChild("RecInfo1_"^i) as CMlLabel);
+			declare labelInfo2 = (Page.GetFirstChild("RecInfo2_"^i) as CMlLabel);
+			declare labelCp1 = (Page.GetFirstChild("RecCp1_"^i) as CMlLabel);
+			declare labelCp2 = (Page.GetFirstChild("RecCp2_"^i) as CMlLabel);
+	
+			if (p.X > 0) {
+				labelCp1.Show();
+				labelCp2.Hide();
+				labelInfo1.Show();
+				labelInfo2.Hide();
+			} else {
+				MenuIcon.PosnX = 49.0;
+				labelCp1.Hide();
+				labelCp2.Show();
+				labelInfo1.Hide();
+				labelInfo2.Show();
+			}
+		}
+	}
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "toggleMicroMenu") {
+        showMenu[id] = !showMenu[id];
+
+        if (showMenu[id]) {
+            showStamp = Now;
+            MicroMenu.Show();
+        } else {
+            hideStamp = Now;
+        }
+    }
+
+	if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_1") {
+
+        if (EXP_widgetLayers[id][gameMode] == "normal") {
+            EXP_widgetLayers[id][gameMode] = "scorestable";
+            exp_needToCheckPersistentVars = True;
+        } else {
+            EXP_widgetLayers[id][gameMode] = "normal";
+            exp_needToCheckPersistentVars = True;
+        }
+
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+
+    if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "mQuad_2") {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}
+
+/*if (MouseLeftButton) {
+    if (id == "LocalRecords Panel") {
+        log("MouseLeftButton: " ^ showStamp);
+    }
+    
+    if (showMenu[id] && showStamp == 0) {
+        showMenu[id] = False;
+        hideStamp = Now;
+    }
+}*/
+
+if (hideStamp != 0) {
+    if ((Now - hideStamp) > 600) {
+        hideStamp = 0;
+        MicroMenu.Hide();
+    }
+    declare delay = 340;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - hideStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time - delay) * 1., .75, -.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time -delay) * 1., 1., -1., 350.);
+        delay -= 40;
+    }
+}
+
+if (showStamp != 0) {
+    if ((Now - showStamp) > 600) {
+        showStamp = 0;
+    }
+    declare delay = 0;
+    for (i, 1, itemCount ) {
+        declare quad = (Page.GetFirstChild("mQuad_"^i) as CMlQuad);
+        declare item = (Page.GetFirstChild("item_"^i) as CMlLabel);
+        declare time = (Now - showStamp);
+
+        if (time < 0) {
+            time = 0;
+        }
+
+        quad.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 0.75, 350.);
+        item.Opacity = AL::Ease("LinearOut", (time-delay) * 1., 0., 1., 350.);
+        delay += 40;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 foreach (Player in Players) {
 
-    declare <?php echo $this->varName ?> for Player = -1;
+    declare {{ varName }} for Player = -1;
 
-    if (<?php echo $this->varName ?> != Player.CurRace.Checkpoints.count) {
+    if ({{ varName }} != Player.CurRace.Checkpoints.count) {
 		//Update the current checkpoint of this user
 		declare curCp = Player.CurRace.Checkpoints.count -1 ;
-		<?php echo $this->varName ?> = curCp+1;
+		{{ varName }} = curCp+1;
 
 
 		//Check if valid checkpoint
@@ -20,7 +168,7 @@ foreach (Player in Players) {
 			maxCp = curCp+1;
 			}
 
-			declare <?php echo $this->varName ?>_cpPosition for Player = -1;
+			declare {{ varName }}_cpPosition for Player = -1;
 			declare newCpPosition = 0;
 
 			playersTeam[Player.Login] = Player.RequestedClan;
@@ -36,9 +184,7 @@ foreach (Player in Players) {
 				}
 			}
 			playerTimes[curCp][Player.Login] = Player.CurRace.Checkpoints[curCp];
-			playerNickNames[Player.Login] = TextExt_StripLinks(Player.Name);
-                        log(Player.Name);
-                        log(playerNickNames[Player.Login]);
+			playerNickNames[Player.Login] = stripLinks(Player.Name);
 
 			updatedPlayers[Player.Login] = True;
 			//Remove from older checkpoint
@@ -68,12 +214,10 @@ if(!needUpdate){
     lastUpdateTime = Now;
 }
 
-if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer) || exp_widgetVisibilityChanged)) {
+if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered && exp_widgetLayersBuffered == activeLayer))) {
     lastUpdateTime = Now;
 
     needUpdate = False;
-
-    log ("update: " ^ id);
 
     declare i = 1;
     declare nbRec = 1;
@@ -170,21 +314,21 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 
 				if(isTeam){
 					if(playersTeam[p] == 1){
-						timeLabel.SetText("$3AF"^TimeToText(Score));
-						rank.SetText("$3AF"^nbRec);
-						declare point = total - nbRec;
-						if(point < 0){
-							point = 0;
+						timeLabel.SetText(team1Color^TimeToText(Score));
+						rank.SetText(team1Color^nbRec);
+						if((cpIndex+1) == totalCp*nbLaps){
+							if(points.existskey(nbRec-1)){
+								teamBlueScore += points[nbRec-1];
+							}
 						}
-						teamBlueScore +=  point;
 					}else{
-						timeLabel.SetText("$D00"^TimeToText(Score));
-						rank.SetText("$D00"^nbRec);
-						declare point = total - nbRec;
-						if(point < 0){
-							point = 0;
+						timeLabel.SetText(team2Color^TimeToText(Score));
+						rank.SetText(team2Color^nbRec);
+						if((cpIndex+1) == totalCp*nbLaps){
+							if(points.existskey(nbRec-1)){
+								teamRedScore += points[nbRec-1];
+							}
 						}
-						teamRedScore += point;
 					}
 				}else{
 					timeLabel.SetText(TimeToText(Score));
@@ -225,14 +369,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 				declare labelCp2 = (Page.GetFirstChild("RecCp2_"^i) as CMlLabel);
 
 				if((cpIndex+1) == totalCp*nbLaps && givePoints){
-				if(isTeam){
-				   declare point = total  - nbRec;
-					if(point < 0){
-						point = 0;
-					}
-					labelCp1.SetText("$2A2"^point^" pts");
-					labelCp2.SetText("$2A2"^point^" pts");
-				}else{
 					if(points.existskey(nbRec-1)){
 						labelCp1.SetText("$2A2"^points[nbRec-1]^" pts");
 						labelCp2.SetText("$2A2"^points[nbRec-1]^" pts");
@@ -240,7 +376,6 @@ if (needUpdate && (((Now - lastUpdateTime) > 500 && exp_widgetVisibleBuffered &&
 						labelCp1.SetText("$2A20P");
 						labelCp2.SetText("$2A20P");
 					}
-				}
 				}else{
 					if(nbRec == 1){
 						 declare lap = 0;
@@ -309,11 +444,11 @@ foreach (Event in PendingEvents) {
     }
 
     if (Event.Type == CMlEvent::Type::MouseClick && Event.ControlId == "setLayer") {
-		if (eXp_widgetLayers[version][id][gameMode] == "normal") {
-			eXp_widgetLayers[version][id][gameMode] = "scorestable";
+		if (EXP_widgetLayers[id][gameMode] == "normal") {
+			EXP_widgetLayers[id][gameMode] = "scorestable";
 			exp_needToCheckPersistentVars = True;
 		} else {
-			eXp_widgetLayers[version][id][gameMode] = "normal";
+			EXP_widgetLayers[id][gameMode] = "normal";
 			exp_needToCheckPersistentVars = True;
 		}
     }

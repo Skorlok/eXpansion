@@ -6,6 +6,7 @@ use ManiaLivePlugins\eXpansion\Core\types\config\types\BasicList;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeInt;
 use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeString;
+use ManiaLivePlugins\eXpansion\Core\types\config\types\TypeFloat;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 
 /**
@@ -19,7 +20,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Server Neighborhood");
+        $this->setName("Tools: Server Neighborhood");
         $this->setDescription('Connects to other server to show information');
         $this->setGroups(array("Widgets", "Connectivity", "Tools"));
         $config = Config::getInstance();
@@ -29,13 +30,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
 
-        $var = new TypeInt(
-            'refresh_interval',
-            "Refresh the Panel every [INT] seconds",
-            $config,
-            Variable::SCOPE_GLOBAL,
-            false
-        );
+        $var = new TypeInt('refresh_interval', "Refresh the Panel every [INT] seconds", $config, Variable::SCOPE_GLOBAL, false);
         $var->setDefaultValue(20);
         $this->registerVariable($var);
 
@@ -43,13 +38,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(5);
         $this->registerVariable($var);
 
-        $var = new TypeString(
-            'storing_path',
-            "Path to store server information",
-            $config,
-            Variable::SCOPE_SERVER,
-            false
-        );
+        $var = new TypeString('style', "Widget Style (can be \"Small\" or \"UndefStyle\")", $config, Variable::SCOPE_SERVER, false);
+        $var->setDefaultValue("Small");
+        $this->registerVariable($var);
+
+        $var = new TypeString('storing_path', "Path to store server information", $config, Variable::SCOPE_SERVER, false);
         $var->setDefaultValue("../");
         $this->registerVariable($var);
 
@@ -59,5 +52,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $var->setDefaultValue(array());
         $this->registerVariable($var);
 
+        $var = new TypeFloat("serverPanel_PosX", "Position of ServerPanel Widget X", $config, false, false);
+        $var->setDefaultValue(-160);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
+
+        $var = new TypeFloat("serverPanel_PosY", "Position of ServerPanel Widget Y", $config, false, false);
+        $var->setDefaultValue(80);
+        $var->setGroup("Widgets");
+        $this->registerVariable($var);
     }
 }

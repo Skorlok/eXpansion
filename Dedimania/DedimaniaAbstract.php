@@ -2,14 +2,20 @@
 
 namespace ManiaLivePlugins\eXpansion\Dedimania;
 
-use ManiaLive\Application\ErrorHandling;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Time;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection as DediConnection;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as DediEvent;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
 /**
  * Description of DedimaniaAbstract
@@ -18,10 +24,7 @@ use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediRecord;
  */
 abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements \ManiaLivePlugins\eXpansion\Dedimania\Events\Listener
 {
-    const DEBUG_NONE = 0; //00000
-    const DEBUG_MAX_RANKS = 1; //00001
-
-    public $debug = self::DEBUG_MAX_RANKS;
+    protected $endMapTriggered = false;
 
     /** @var DediConnection */
     protected $dedimania;
@@ -48,23 +51,37 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     /* @var integer $recordCount */
     protected $recordCount = 30;
 
-    /* @var bool $warmup */
-    protected $wasWarmup = false;
-    protected $msg_newRecord;
+    private $settingsChanged = array();
+
     protected $msg_norecord;
-    protected $msg_record;
     protected $msg_welcome;
     protected $msg_premium;
     protected $msg_regular;
+    protected $msg_new;
+    protected $msg_secure;
+    protected $msg_improved;
+
+    /** @var Window */
+    protected $dediReportWindow;
+
+    /** @var Window */
+    protected $recordsWindow;
+
+    /** @var Window LocalRecords Cps.xml, filled with the checkpoint times */
+    protected $cpsWindow;
+
+    /** @var Window Same template as $cpsWindow, filled with the sector times instead */
+    protected $secCpsWindow;
+
+    /** @var Window LocalRecords CpDiff.xml */
+    protected $cpDiffWindow;
 
     public static $actionOpenRecs = -1;
-    public static $actionOpenCps = -1;
 
     public function eXpOnInit()
     {
         $this->setPublicMethod("isRunning");
         $this->config = Config::getInstance();
-
     }
 
     public function eXpOnLoad()
@@ -84,18 +101,19 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         }
         Dispatcher::register(DediEvent::getClass(), $this);
         $this->dedimania = DediConnection::getInstance();
-        $this->msg_record = eXpGetMessage(
-            '%1$s #dedirecord#claims #rank#%2$s.#dedirecord# '
-            . 'Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)'
-        );
         $this->msg_welcome = eXpGetMessage('#variable#Dedimania $0f0Connected! #variable#Top #rank#%1$s #variable#records enabled for you (%2$s #variable#account)');
         $this->msg_premium = eXpGetMessage('$FC3p$FD2r$FE1e$FF0m$FF0i$FE2u$FC3m');
         $this->msg_regular = eXpGetMessage('regular');
-
-        $this->msg_newRecord = eXpGetMessage(
-            '%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s'
-        );
         $this->msg_norecord = eXpGetMessage('#dedirecord#No dedimania records found for the map!');
+        $this->msg_new = eXpGetMessage('%1$s #dedirecord#new #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s');
+        $this->msg_improved = eXpGetMessage('%1$s #dedirecord#improves #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
+        $this->msg_secure = eXpGetMessage('%1$s #dedirecord#secures #rank#%2$s.#dedirecord# Dedimania Record! #time#%3$s #dedirecord#(#rank#%4$s #time#-%5$s#dedirecord#)');
+
+        Menu::addMenuItem("Dedimania",
+            array("Records" => array(null, array(
+                "Dedimania" => array(null, 'exp:eXpansion.Dedimania:showRecs')
+            )))
+        );
     }
 
     public function eXpOnReady()
@@ -105,50 +123,55 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->enableApplicationEvents();
         $this->enableStorageEvents();
 
-        \ManiaLive\Event\Dispatcher::register(
-            \ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent::getClass(),
-            $this
-        );
+        $this->registerManialinkCallback('showRecs');
+        $this->registerManialinkCallback('showCps', false, true);
+        $this->registerManialinkCallback('showSecCps', false, true);
+        $this->registerManialinkCallback('showDediReport', false, true);
+
+        \ManiaLive\Event\Dispatcher::register(\ManiaLivePlugins\eXpansion\Core\Events\ScriptmodeEvent::getClass(), $this);
 
         $this->tryConnection();
         // $this->previewDediMessages();
+
+        $this->dediReportWindow = new Window("Dedimania\Gui\Windows\DediReport.xml");
+        $this->dediReportWindow->setName("DediReport");
+        $this->dediReportWindow->setSize(100, 100);
+        $this->dediReportWindow->setTitle('Report for Dedimania');
+
+        $this->recordsWindow = new Window("Dedimania\Gui\Windows\Records.xml");
+        $this->recordsWindow->setName("DediRecords");
+        $this->recordsWindow->setSize(120, 100);
+
+        // these three windows use the templates of the LocalRecords plugin, the layout is the same
+        $this->cpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->cpsWindow->setName("DediCps");
+        $this->cpsWindow->setSize(170, 110);
+
+        $this->secCpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->secCpsWindow->setName("DediSecCps");
+        $this->secCpsWindow->setSize(170, 110);
+
+        $this->cpDiffWindow = new Window("LocalRecords\Gui\Windows\CpDiff.xml");
+        $this->cpDiffWindow->setName("DediCpDiff");
+        $this->cpDiffWindow->setSize(200, 100);
+        $this->cpDiffWindow->setTitle('Dedimania CheckPoints Difference');
     }
 
     public function previewDediMessages()
     {
+        $this->eXpChatSendServerMessage($this->msg_improved, null, array(Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
 
-        $this->eXpChatSendServerMessage(
-            $this->msg_record,
-            null,
-            array(
-                \ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'),
-                rand(1, 100),
-                Time::fromTM(rand(10000, 100000)),
-                rand(1, 100), Time::fromTM(rand(10000, 100000))
-            )
-        );
-
-        $this->eXpChatSendServerMessage(
-            $this->msg_newRecord,
-            null,
-            array(
-                \ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'),
-                rand(1, 100),
-                Time::fromTM(rand(10000, 100000))
-            )
-        );
-
+        $this->eXpChatSendServerMessage($this->msg_new, null, array(Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
     }
-
-
-    private $settingsChanged = array();
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         $this->settingsChanged[$var->getName()] = true;
-        if ($this->settingsChanged['login'] && $this->settingsChanged['code']) {
-            $this->tryConnection();
-            $this->settingsChanged = array();
+        if (isset($this->settingsChanged['login']) && isset($this->settingsChanged['code'])) {
+            if ($this->settingsChanged['login'] && $this->settingsChanged['code']) {
+                $this->tryConnection();
+                $this->settingsChanged = array();
+            }
         }
     }
 
@@ -157,36 +180,33 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         if (!$this->running) {
             if (empty($this->config->login) || empty($this->config->code)) {
                 $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                $admins->announceToPermission(
-                    Permission::EXPANSION_PLUGIN_SETTINGS,
-                    "#admin_error#Server login or/and Server code is empty in Dedimania Configuration"
-                );
+                $admins->announceToPermission(Permission::EXPANSION_PLUGIN_SETTINGS, "#admin_error#Server login or/and Server code is empty in Dedimania Configuration");
                 $this->console("\$f00Server code or/and login is not configured for dedimania plugin!");
             } else {
                 try {
-                    $this->dedimania->openSession($this->expStorage->version->titleId, $this->config);
+                    $this->dedimania->openSession($this->storage->version->titleId, $this->config);
                     $this->registerChatCommand("dedirecs", "showRecs", 0, true);
                     $this->registerChatCommand("dedicps", "showCps", 0, true);
+                    $this->registerChatCommand("dediseccps", "showSecCps", 0, true);
+                    $this->registerChatCommand("dedicps", "showCpDiff", 1, true);
+                    $cmd = AdminGroups::addAdminCommand("savededi", $this, "force_dedisave", Permission::GAME_SETTINGS);
+                    $cmd->setHelp("Force dedimania to send dedi records");
+                    $cmd = AdminGroups::addAdminCommand("sendlocaldedi", $this, "sendlocaldedi", Permission::GAME_SETTINGS);
+                    $cmd->setHelp("Send local records to dedimania if ReplaySaver is enabled");
+                    
                     $this->setPublicMethod("showRecs");
                     $this->setPublicMethod("showCps");
+                    $this->setPublicMethod("showSecCps");
+                    $this->setPublicMethod("getRecords");
 
                     $this->running = true;
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                    $admins->announceToPermission(
-                        'expansion_settings',
-                        "#admin_action#Dedimania connection successfull."
-                    );
+                    $admins->announceToPermission('expansion_settings', "#admin_action#Dedimania connection successfull.");
 
-                    self::$actionOpenRecs = \ManiaLive\Gui\ActionHandler::getInstance()
-                        ->createAction(array($this, "showRecs"));
-                    self::$actionOpenCps = \ManiaLive\Gui\ActionHandler::getInstance()
-                        ->createAction(array($this, "showCps"));
+                    self::$actionOpenRecs = 'exp:eXpansion.Dedimania:showRecs';
                 } catch (\Exception $ex) {
                     $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                    $admins->announceToPermission(
-                        'expansion_settings',
-                        "#admin_error#Server login or/and Server code is wrong in Dedimania Configuration"
-                    );
+                    $admins->announceToPermission('expansion_settings', "#admin_error#Server login or/and Server code is wrong in Dedimania Configuration");
                     $admins->announceToPermission('expansion_settings', "#admin_error#" . $ex->getMessage());
                     $this->console("\$f00Server code or/and login is wrong for the dedimania plugin!");
                 }
@@ -216,21 +236,30 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
         $this->dedimania->playerDisconnect($login);
     }
 
-    public function onBeginMatch()
+    public function BeginMap()
     {
-        if (!$this->running) {
+        $this->endMapTriggered = true;
+        $this->records = array();
+        if ($this->storage->currentMap->nbCheckpoints <= 1) {
             return;
         }
-        $this->records = array();
         $this->dedimania->getChallengeRecords();
     }
 
-    public function onBeginRound()
+    public function onBeginMatch()
     {
-        if (!$this->running) {
-            return;
+        if (!$this->endMapTriggered) {
+            $this->records = array();
+            if ($this->storage->currentMap->nbCheckpoints <= 1) {
+                return;
+            }
+            $this->dedimania->getChallengeRecords();
         }
-        $this->wasWarmup = $this->connection->getWarmUp();
+    }
+
+    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
+    {
+        $this->endMapTriggered = true;
     }
 
     /**
@@ -266,14 +295,15 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
                 if ($record->place > $maxrank) {
                     $this->debugMaxRanks("record place: " . $record->place . " is greater than max rank: " . $maxrank);
                     $this->debugMaxRanks("not adding record.");
+                    unset($this->records[$login]);
                     continue;
                 }
 
 
                 // update checkpoints for the record
+                $playerinfo = \ManiaLivePlugins\eXpansion\Core\Core::$playerInfo;
 
-              //  $playerinfo = \ManiaLivePlugins\eXpansion\Core\Core::$playerInfo;
-              //  $record->checkpoints = implode(",", $playerinfo[$login]->checkpoints);
+                $record->checkpoints = implode(",", $playerinfo[$login]->checkpoints);
 
                 // add record
                 $newrecords[$record->login] = $record;
@@ -338,7 +368,9 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
         $this->dedimania->playerMultiConnect($players);
 
-        $this->dedimania->getChallengeRecords();
+        if ($this->storage->currentMap->nbCheckpoints > 1) {
+            $this->dedimania->getChallengeRecords();
+        }
 
         $this->rankings = array();
     }
@@ -368,11 +400,33 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
     {
         $this->disableTickerEvent();
         $this->disableDedicatedEvents();
-        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::EraseAll();
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenCps);
-        \ManiaLive\Gui\ActionHandler::getInstance()->deleteAction(self::$actionOpenRecs);
+
+        if ($this->dediReportWindow instanceof Window) {
+            $this->dediReportWindow->erase();
+        }
+        $this->dediReportWindow = null;
+
+        if ($this->recordsWindow instanceof Window) {
+            $this->recordsWindow->erase();
+        }
+        $this->recordsWindow = null;
+
+        if ($this->cpsWindow instanceof Window) {
+            $this->cpsWindow->erase();
+        }
+        $this->cpsWindow = null;
+
+        if ($this->secCpsWindow instanceof Window) {
+            $this->secCpsWindow->erase();
+        }
+        $this->secCpsWindow = null;
+
+        if ($this->cpDiffWindow instanceof Window) {
+            $this->cpDiffWindow->erase();
+        }
+        $this->cpDiffWindow = null;
+
         self::$actionOpenRecs = -1;
-        self::$actionOpenCps = -1;
 
 
         Dispatcher::unregister(DediEvent::getClass(), $this);
@@ -417,12 +471,7 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             if ($record->place <= Config::getInstance()->noRedirectTreshold) {
                 $noRedirect = true;
             }
-            $this->eXpChatSendServerMessage(
-                $this->msg_newRecord,
-                $recepient,
-                array(\ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"), $record->place, $time),
-                $noRedirect
-            );
+            $this->eXpChatSendServerMessage($this->msg_new,$recepient,array(Formatting::stripCodes(Formatting::fixTags($record->nickname), "wosnm"), $record->place, $time),$noRedirect);
         } catch (\Exception $e) {
             $this->console("Error: couldn't show dedimania message" . $e->getMessage());
         }
@@ -467,17 +516,12 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
             if ($record->place <= Config::getInstance()->noRedirectTreshold) {
                 $noRedirect = true;
             }
-            $this->eXpChatSendServerMessage(
-                $this->msg_record,
-                $recepient,
-                array(
-                    \ManiaLib\Utils\Formatting::stripCodes($record->nickname, "wos"),
-                    $record->place,
-                    $time,
-                    $oldRecord->place, $diff
-                ),
-                $noRedirect
-            );
+
+            if ($oldRecord->place != $record->place) {
+                $this->eXpChatSendServerMessage($this->msg_improved,$recepient,array(Formatting::stripCodes(Formatting::fixTags($record->nickname), "wosnm"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+            } else {
+                $this->eXpChatSendServerMessage($this->msg_secure,$recepient,array(Formatting::stripCodes(Formatting::fixTags($record->nickname), "wosnm"),$record->place,$time,$oldRecord->place, $diff),$noRedirect);
+            }
             $this->debug("message sent.");
         } catch (\Exception $e) {
             $this->console("Error: couldn't show dedimania message");
@@ -505,51 +549,312 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     }
 
-    public function showRecs($login)
+    public function getRecords()
     {
-        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::Erase($login);
-
-        if (sizeof($this->records) == 0) {
-            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
-
-            return;
-        }
-        try {
-            $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\Records::Create($login);
-            $window->setTitle(__('Dedimania -records for', $login), $this->storage->currentMap->name);
-            $window->centerOnScreen();
-            $window->populateList($this->records);
-            $url = "http://dedimania.net/tm2stats/?do=stat&Envir=" . $this->storage->currentMap->environnement
-                . "&RecOrder3=REC-ASC&UId=" . $this->storage->currentMap->uId . "&Show=RECORDS";
-            $window->setDediUrl($url);
-
-            $window->setSize(120, 100);
-            $window->show();
-        } catch (\Exception $e) {
-            ErrorHandling::displayAndLogError($e);
-        }
+        return $this->records;
     }
 
-    public function showCps($login)
+    public function showRecs($login)
     {
-        \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\RecordCps::Erase($login);
-
         if (sizeof($this->records) == 0) {
             $this->eXpChatSendServerMessage($this->msg_norecord, $login);
-
             return;
         }
-        try {
-            $window = \ManiaLivePlugins\eXpansion\Dedimania\Gui\Windows\RecordCps::Create($login);
-            $window->setTitle(__('Dedimania cps for ', $login), $this->storage->currentMap->name);
-            $window->centerOnScreen();
-            $window->populateList($this->records);
-
-            $window->setSize(170, 110);
-            $window->show();
-        } catch (\Exception $e) {
-            ErrorHandling::displayAndLogError($e);
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->records as $record) {
+            $items[$i] = array(($i + 1) . ".", Time::fromTM($record->time), $record->nickname, $record->login);
+            $data[$i] = array(-1, -1, -1, -1, 'exp:eXpansion.Dedimania:showDediReport:' . $record->login);
+            $i++;
         }
+
+        $url = "http://dedimania.net/tm2stats/?do=stat&Envir=" . $this->storage->currentMap->environnement . "&RecOrder3=REC-ASC&UId=" . $this->storage->currentMap->uId . "&Show=RECORDS";
+
+        $this->recordsWindow->setTitle('Dedimania records for %s', array($this->storage->currentMap->name));
+        $this->recordsWindow->setParam("dediUrl",      $this->recordsWindow->handleSpecialChars($url));
+        $this->recordsWindow->setParam("recordItems",  $items);
+        $this->recordsWindow->setParam("recordData",   $data);
+        $this->recordsWindow->show($login);
+    }
+
+    public function showCps($login, $offset = 0)
+    {
+        if (sizeof($this->records) == 0) {
+            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
+            return;
+        }
+
+        $this->cpsWindow->setTitle('Dedimania cps for %s', array($this->storage->currentMap->name));
+        $this->fillCpsWindow($this->cpsWindow, $login, $offset, false, 'exp:eXpansion.Dedimania:showCps', 'dediCps');
+    }
+
+    public function showSecCps($login, $offset = 0)
+    {
+        if (sizeof($this->records) == 0) {
+            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
+            return;
+        }
+
+        $this->secCpsWindow->setTitle('Dedimania sectors for %s', array($this->storage->currentMap->name));
+        $this->fillCpsWindow($this->secCpsWindow, $login, $offset, true, 'exp:eXpansion.Dedimania:showSecCps', 'dediSecCps');
+    }
+
+    private function fillCpsWindow(Window $window, $login, $offset, $sectors, $action, $pagerVarName)
+    {
+        $offset = is_numeric($offset) ? (int)$offset : 0;
+
+        if ($offset > $this->storage->currentMap->nbCheckpoints - 7) {
+            $offset = $this->storage->currentMap->nbCheckpoints - 7;
+        }
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        /** @var \ManiaLivePlugins\eXpansion\Core\ColorParser $colorParser */
+        $colorParser = \ManiaLivePlugins\eXpansion\Core\ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->records as $record) {
+            $cps = explode(",", $record->checkpoints);
+            $row = array($rankColor . ($i + 1), $record->nickname);
+            // always 7 cells, a record without that checkpoint simply leaves it empty
+            for ($x = $offset; $x < $offset + 7; $x++) {
+                if (!isset($cps[$x])) {
+                    $row[] = "";
+                } else if ($sectors && $x > 0) {
+                    $row[] = Time::fromTM($cps[$x] - $cps[$x - 1]);
+                } else {
+                    $row[] = Time::fromTM($cps[$x]);
+                }
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        for ($c = 0; $c < 7; $c++) {
+            $window->setParam("cp" . ($c + 1), "Cp " . ($offset + $c + 1));
+        }
+        $window->setParam("cpsItems", $items);
+        $window->setParam("cpsData", $data);
+        $window->setParam("pagerVarName", $pagerVarName);
+        $window->setParam("prevPageAction", $action . ':' . ($offset - 7));
+        $window->setParam("nextPageAction", $action . ':' . ($offset + 7));
+        $window->show($login);
+    }
+
+    public function showCpDiff($login, $params)
+    {
+        if (sizeof($this->records) == 0) {
+            $this->eXpChatSendServerMessage($this->msg_norecord, $login);
+            return;
+        }
+
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+            $localrecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+        }
+        $player_localrec = ArrayOfObj::getObjbyPropValue($localrecs, "login", $login);
+        if ($player_localrec) {
+            if (isset($this->records[$login])) {
+                if ($this->records[$login]->time > $player_localrec->time) {
+                    $player = $player_localrec;
+                } else {
+                    $player = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+                    $player->place = $this->records[$login]->place;
+                    $player->nickName = $this->records[$login]->nickname;
+                    $player->ScoreCheckpoints = explode(",", $this->records[$login]->checkpoints);
+                }
+            } else {
+                $player = $player_localrec;
+            }
+        } else {
+            if (!isset($this->records[$login])) {
+                $this->eXpChatSendServerMessage("#admin_error#You must have a record on this map!", $login);
+                return;
+            }
+            $player = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+            $player->place = $this->records[$login]->place;
+            $player->nickName = $this->records[$login]->nickname;
+            $player->ScoreCheckpoints = explode(",", $this->records[$login]->checkpoints);
+        }
+
+        $target_data = ArrayOfObj::getObjbyPropValue($this->records, "place", $params);
+        if (!$target_data) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
+        $target = new \ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record();
+        $target->place = $target_data->place;
+        $target->nickName = $target_data->nickname;
+        $target->ScoreCheckpoints = explode(",", $target_data->checkpoints);
+
+        $items = array();
+        $data  = array();
+        $nbCps = count($player->ScoreCheckpoints);
+        for ($x = 0; $x < $nbCps; $x++) {
+            if (!isset($target->ScoreCheckpoints[$x])) {
+                $items[$x] = array(($x + 1) . ".", Time::fromTM($player->ScoreCheckpoints[$x]), "", "", "");
+                $data[$x]  = array(-1, -1, -1, -1, -1);
+                continue;
+            }
+
+            $diff = $player->ScoreCheckpoints[$x] - $target->ScoreCheckpoints[$x];
+            if ($x > 0 && isset($target->ScoreCheckpoints[$x - 1])) {
+                $diffCp = $diff - ($player->ScoreCheckpoints[$x - 1] - $target->ScoreCheckpoints[$x - 1]);
+            } else {
+                $diffCp = $diff;
+            }
+
+            $items[$x] = array(
+                ($x + 1) . ".",
+                Time::fromTM($player->ScoreCheckpoints[$x]),
+                Time::fromTM($target->ScoreCheckpoints[$x]),
+                ($diff   <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diff),
+                ($diffCp <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diffCp),
+            );
+            $data[$x] = array(-1, -1, -1, -1, -1);
+        }
+
+        $this->cpDiffWindow->setParam("headerPlayer", $this->cpDiffWindow->handleSpecialChars("#" . $player->place . ": " . $player->nickName));
+        $this->cpDiffWindow->setParam("headerTarget", $this->cpDiffWindow->handleSpecialChars("#" . $target->place . ": " . $target->nickName));
+        $this->cpDiffWindow->setParam("cpDiffItems", $items);
+        $this->cpDiffWindow->setParam("cpDiffData", $data);
+        $this->cpDiffWindow->setParam("pagerVarName", "dediCpDiff");
+        $this->cpDiffWindow->show($login);
+    }
+
+    public function showDediReport($login, $reportLogin)
+    {
+        $reportText  = "Login to check: " . str_replace('–', '-', $reportLogin) . "&#10;";
+        $reportText .= "Map: " . $this->storage->currentMap->uId . "&#10;";
+        $reportText .= "Reason: *edit your reason here*&#10;";
+        $reportText .= "Reportee: " . $login . "&#10;";
+        
+        $this->dediReportWindow->setParam("reportText", $reportText);
+        $this->dediReportWindow->show($login);
+    }
+
+    public function force_dedisave($fromLogin, $params)
+    {
+        if ($this->storage->currentMap->nbCheckpoints <= 1) {
+            $this->eXpChatSendServerMessage("#admin_error#Map not supported (need at least 1 CP), dedimania records not sent !", $fromLogin);
+            return;
+        }
+
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+
+        if ($gamemode == GameInfos::GAMEMODE_TEAM) {
+            $this->sendScores();
+            $this->endMapTriggered = false;
+            $this->records = array();
+            $this->dedimania->getChallengeRecords();
+
+            $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
+            return;
+        }
+
+        $rankings = array();
+        foreach(Core::$rankings as $rank) {
+
+            if (isset($rank->best_lap_checkpoints) && $rank->bestTime > 0) {
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP) {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->best_race_checkpoints));
+                } else {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->best_race_checkpoints));
+                }
+            }
+
+            elseif (isset($rank->bestCheckpoints) && $rank->bestTime > 0) {
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP) {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->bestCheckpoints));
+                } else {
+                    $rankings[$rank->login] = array('Login' => $rank->login, 'BestTime' => $rank->bestTime, 'BestCheckpoints' => implode(",", $rank->bestCheckpoints));
+                }
+            }
+        }
+
+        if (count($rankings) < 1) {
+            $this->eXpChatSendServerMessage("#admin_error#No score found, dedi not sent !", $fromLogin);
+            return;
+        }
+        usort($rankings, array($this, "compare_BestTime"));
+
+        $this->rankings = $rankings;
+
+        $firstPlayerInfos = ArrayOfObj::getObjbyPropValue(Core::$rankings, "login", $rankings[0]['Login']);
+
+        if (isset($firstPlayerInfos->best_race_checkpoints)) {
+            $this->getVReplay($rankings[0]['Login'], $firstPlayerInfos->best_race_checkpoints);
+        } else {
+            $this->getVReplay($rankings[0]['Login'], array());
+        }
+        $this->getGReplay($rankings[0]['Login']);
+
+        $gReplaySaved = $this->gReplay;
+        $vReplaySaved = $this->vReplay;
+
+        $this->sendScores();
+        $this->endMapTriggered = false;
+        $this->records = array();
+        $this->dedimania->getChallengeRecords();
+
+        // rankings are reset in sensScores()
+        $this->rankings = $rankings;
+        $this->gReplay = $gReplaySaved;
+        $this->vReplay = $vReplaySaved;
+
+        $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $fromLogin);
+    }
+
+    public function sendlocaldedi($login)
+    {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords')) {
+            $lRecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\LocalRecords\\LocalRecords", "getRecords");
+        } else {
+            $this->eXpChatSendServerMessage("#admin_error#Local records plugin not loaded!", $login);
+            return;
+        }
+
+        $rankings = array();
+        $gReplay = "";
+        $vReplay = "";
+        $allCps = array();
+        foreach ($lRecs as $record) {
+            $rankings[$record->login] = array('Login' => $record->login, 'BestTime' => $record->time, 'BestCheckpoints' => $record->ScoreCheckpoints);
+            
+            if ($record->place == 1) {
+                $fileNameReplay = $this->connection->gameDataDirectory() . 'Replays' . DIRECTORY_SEPARATOR . $this->storage->serverLogin . DIRECTORY_SEPARATOR . $this->storage->currentMap->uId . DIRECTORY_SEPARATOR . $record->login;
+                
+                if (file_exists($fileNameReplay . ".VReplay.Gbx")) {
+                    $gReplay = file_get_contents($fileNameReplay . ".VReplay.Gbx");
+                } else {
+                    $this->expChatSendServerMessage("Replay not found: " . $fileNameReplay . ".VReplay.Gbx", $login);
+                    return;
+                }
+
+                if (file_exists($fileNameReplay . ".Replay.Gbx")) {
+                    $vReplay = file_get_contents($fileNameReplay . ".Replay.Gbx");
+                } else {
+                    $this->expChatSendServerMessage("Replay not found: " . $fileNameReplay . ".Replay.Gbx", $login);
+                    return;
+                }
+
+                $allCps = implode(",", $record->ScoreCheckpoints);
+            }
+        }
+
+        if (count($rankings) < 1) {
+            $this->eXpChatSendServerMessage("#admin_error#No score found, dedi not sent !", $login);
+            return;
+        }
+
+        $this->dedimania->setChallengeTimes($this->storage->currentMap, $rankings, $vReplay, $gReplay, $allCps);
+        $this->eXpChatSendServerMessage('$0c0Dedimania records sent', $login);
+        $this->dedimania->getChallengeRecords();
     }
 
     public function isRunning()
@@ -559,8 +864,6 @@ abstract class DedimaniaAbstract extends \ManiaLivePlugins\eXpansion\Core\types\
 
     protected function debugMaxRanks($debugMsg)
     {
-        if (($this->debug & self::DEBUG_MAX_RANKS) == self::DEBUG_MAX_RANKS) {
-            $this->console('[Max Ranks]' . $debugMsg);
-        }
+        $this->debug('[Max Ranks]' . $debugMsg);
     }
 }

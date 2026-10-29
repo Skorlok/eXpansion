@@ -1,2 +1,14 @@
 You are being ignored. Message not sent.
 You are being ignored. Message not sent.
+
+#personalmessage#Player with login "%1$s" is not found at server!
+#personalmessage#Player with login "%1$s" is not found at server!
+
+#personalmessage#No message to send to!
+#personalmessage#No message to send to!
+
+#personalmessage#You can't send a message to yourself.
+#personalmessage#You can't send a message to yourself.
+
+#personalmessage#Usage /send [login] your personal message here
+#personalmessage#Usage /send [login] your personal message here

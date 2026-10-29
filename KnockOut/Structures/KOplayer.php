@@ -33,7 +33,7 @@ class KOplayer extends \Maniaplanet\DedicatedServer\Structures\AbstractStructure
 
     public $nickName = "";
 
-    public function __construct(\ManiaLive\Data\Player $player)
+    public function __construct(\ManiaLivePlugins\eXpansion\Helpers\PlayerStorage $player)
     {
         // $this->player = $player;
         $this->login = $player->login;

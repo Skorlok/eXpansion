@@ -1,0 +1,140 @@
+<?php
+
+namespace ManiaLivePlugins\eXpansion\Gui\ManiaLink;
+
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
+
+class Window extends ManiaLink
+{
+    protected $guiConfig;
+    protected $size;
+    protected $title;
+    protected $closeAction;
+
+    /** @var Script[] */
+    private $userScript = array();
+
+    /** @var Script */
+    private $windowScript;
+
+    protected $closeCallback;
+
+    public function __construct($path, $pluginsRoot = false)
+    {
+        parent::__construct($path, $pluginsRoot = false);
+
+        /** @var guiConfig */
+        $this->guiConfig = guiConfig::getInstance();
+
+        $this->maniaLinkPath = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . "Gui\ManiaLink\Window.xml";
+        $this->windowScript  = new Script('Gui\Scripts\templateWindowScript');
+
+        $this->size  = array(0, 0);
+        $this->title = "";
+
+        /** @var ActionManager */
+        $aM = ActionManager::getInstance();
+        $this->closeAction = $aM->createAction(array($this, 'closeWindow'));
+    }
+
+    public function setTitle($text, $parameter = null)
+    {
+        $this->title = $this->addLang($text, $parameter);
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getSizeX()
+    {
+        return $this->size[0];
+    }
+
+    public function getSizeY()
+    {
+        return $this->size[1];
+    }
+
+    public function setSize($x, $y)
+    {
+        $this->size = array($x, $y);
+    }
+
+    public function getCloseAction()
+    {
+        return $this->closeAction;
+    }
+
+    public function closeWindow($login)
+    {
+        $this->erase($login);
+        if (is_callable($this->closeCallback)) {
+            call_user_func($this->closeCallback, $login);
+        }
+    }
+
+    public function registerScript(Script $script)
+    {
+        $this->userScript[] = $script;
+    }
+
+    protected function getMlScripts()
+    {
+        $dDeclares = "";
+        $wLoop     = "";
+        $scriptLib = "";
+
+        foreach ($this->userScript as $script) {
+            $dDeclares .= $script->getDeclarationScript();
+            $dDeclares .= $script->getEndScript();
+            $wLoop     .= $script->getWhileLoopScript();
+            $scriptLib .= $script->getlibScript();
+        }
+
+        foreach ($this->overrideScripts as $script) {
+            $dDeclares .= $script->getDeclarationScript();
+            $dDeclares .= $script->getEndScript();
+            $wLoop     .= $script->getWhileLoopScript();
+            $scriptLib .= $script->getlibScript();
+        }
+
+        foreach ($this->elementsScript as $elementScript) {
+            $dDeclares .= $elementScript->getDeclarationScript();
+            $dDeclares .= $elementScript->getEndScript();
+            $wLoop     .= $elementScript->getWhileLoopScript();
+            $scriptLib .= $elementScript->getlibScript();
+        }
+
+        $this->windowScript->setParam("name",              $this->getWidgetName());
+        $this->windowScript->setParam("dDeclares",         $dDeclares);
+        $this->windowScript->setParam("scriptLib",         $scriptLib);
+        $this->windowScript->setParam("wLoop",             $wLoop);
+        $this->windowScript->setParam("closeAction",       $this->closeAction);
+        $this->windowScript->setParam("forceReset",        $this->getBoolean(DEBUG));
+        $this->windowScript->setParam("disableAnimations", $this->getBoolean($this->guiConfig->disableAnimations));
+        $this->windowScript->setParam("startPosX",         (-1 * intval($this->getSizeX() / 2)) . ".0");
+        $this->windowScript->setParam("startPosY",         intval($this->getSizeY() / 2) . ".0");
+
+        return $this->windowScript->getDeclarationScript();
+    }
+
+    public function registerCloseCallback($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \Exception("Callback is not callable");
+        }
+        $this->closeCallback = $callback;
+    }
+
+    public function __destruct()
+    {
+        /** @var ActionManager */
+        $aM = ActionManager::getInstance();
+        $aM->deleteAction($this->closeAction);
+        $this->closeAction = null;
+        $this->windowScript = null;
+    }
+}

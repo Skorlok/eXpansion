@@ -2,128 +2,182 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_AroundMe;
 
-use Maniaplanet\DedicatedServer\Structures\GameInfos;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
-class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
+class Widgets_AroundMe extends ExpPlugin
 {
 
-
-    public static $me = null;
-
-    public static $secondMap = false;
-    private $forceUpdate = false;
-    private $needUpdate = false;
-
-    private $widgetIds = array();
     public static $raceOn;
-    public static $roundPoints;
 
     /** @var Config */
     private $config;
+    /** @var Script */
+    private $script;
+    /** @var Widget */
+    private $widget;
 
     public function eXpOnLoad()
     {
-
         $this->config = Config::getInstance();
     }
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
-        $this->updateAroundMe();
-        self::$me = $this;
 
-        $this->getRoundsPoints();
+        $this->script = new Script('Widgets_AroundMe/Gui/Scripts/CpPositions');
+        $this->script->setParam('varName', 'aroundMe');
+
+        $this->widget = new Widget("Widgets_AroundMe\Gui\Widgets\AroundMe.xml");
+        $this->widget->setName("Around Me Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(30, 10);
+        $this->widget->registerScript(new Script('Gui/Script_libraries/TimeToText'));
+        $this->widget->registerScript($this->script);
+
+
+        $this->updateAroundMe();
+
+        $this->enableScriptEvents("Maniaplanet.StartRound_Start");
     }
 
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Maniaplanet.StartRound_Start":
+                $this->onBeginRound();
+                break;
+        }
+    }
 
     public function updateAroundMe($login = null)
     {
-        Gui\Widgets\AroundMe::$connection = $this->connection;
-
-        $localRecs = Gui\Widgets\AroundMe::GetAll();
-        if ($login == null) {
-            $panelMain = Gui\Widgets\AroundMe::Create($login);
-            $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-            $panelMain->setSizeX(40);
-            $this->widgetIds["AroundMe"] = $panelMain;
-            $this->widgetIds["AroundMe"]->update();
-            $this->widgetIds["AroundMe"]->show();
-        } elseif (isset($localRecs[0])) {
-            $localRecs[0]->update();
-            $localRecs[0]->show($login);
+        $data = array('Integer[Text][Integer]', 'Text[Text][Integer]', 'Integer[Integer]', -1);
+        if (Widgets_AroundMe::$raceOn) {
+            $data = $this->getWidgetData();
         }
 
+        $this->script->setParam("playerTimes", $data[0]);
+        $this->script->setParam("nickNames", $data[1]);
+        $this->script->setParam("bestCps", $data[2]);
+        $this->script->setParam("maxCp", $data[3]);
+
+        $this->widget->setPosition($this->config->aroundmeWidget_PosX, $this->config->aroundmeWidget_PosY, 0);
+        $this->widget->show($login);
     }
 
-    public function showAroundMe($login)
+    private function getWidgetData()
     {
-        $this->updateAroundMe($login);
+        $playerCps = array();
+        $playerNickNames = array();
+        $bestCps = array();
+        $biggestCp = -1;
+
+        foreach (Core::$playerInfo as $login => $player) {
+            $lastCpIndex = count($player->checkpoints) - 1;
+            if ($player->isPlaying && $lastCpIndex >= 0 && isset($player->checkpoints[$lastCpIndex]) && $player->checkpoints[$lastCpIndex] > 0) {
+
+                if ($lastCpIndex > $biggestCp) {
+                    $biggestCp = $lastCpIndex;
+                }
+
+                $playerCps[$lastCpIndex][$login] = $player->checkpoints[$lastCpIndex];
+                $playerNickNames[$lastCpIndex][$login] = Formatting::stripColors($player->nickName);
+            }
+        }
+
+        if (empty($playerCps)) {
+            return array('Integer[Text][Integer]', 'Text[Text][Integer]', 'Integer[Integer]', -1);
+        }
+
+        $newPlayerCps = array();
+        foreach ($playerCps as $coIndex => $cpsTimes) {
+            arsort($cpsTimes);
+            $newPlayerCps[$coIndex] = $cpsTimes;
+        }
+
+        $playerTimes = "[";
+        $NickNames = "[";
+
+        $cpCount = 0;
+        foreach ($newPlayerCps as $cpIndex => $cpTimes) {
+            if ($cpCount != 0) {
+                $playerTimes .= ", ";
+                $NickNames .= ", ";
+            }
+            $playerTimes .= $cpIndex . "=>[";
+            $NickNames .= $cpIndex . "=>[";
+
+            $cCount = 0;
+            foreach ($cpTimes as $login => $score) {
+                if ($cCount != 0) {
+                    $playerTimes .= ", ";
+                    $NickNames .= ", ";
+                }
+                $playerTimes .= '"' . $login . "\"=>" . $score;
+                $NickNames .= '"' . $login . "\"=>\"" . Gui::fixString($playerNickNames[$cpIndex][$login]) . "\"";
+                $cCount++;
+
+                if (!isset($bestCps[$cpIndex]) || $score < $bestCps[$cpIndex]) {
+                    $bestCps[$cpIndex] = $score;
+                }
+            }
+
+            $playerTimes .= "]";
+            $NickNames .= "]";
+            $cpCount++;
+
+        }
+        $playerTimes .= "]";
+        $NickNames .= "]";
+
+        $bestCpsText = '';
+        foreach ($bestCps as $cpIndex => $time) {
+            if ($bestCpsText != "") {
+                $bestCpsText .= ', ';
+            }
+            $bestCpsText .= $cpIndex . '=>' . $time;
+        }
+
+        return array($playerTimes, $NickNames, '[' . $bestCpsText . ']', $biggestCp + 1);
     }
 
     public function hideAroundMe()
     {
-        $this->widgetIds = array();
-        Gui\Widgets\AroundMe::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
         self::$raceOn = false;
         $this->hideAroundMe();
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        if ($wasWarmUp) {
-            self::$raceOn = false;
-            $this->forceUpdate = true;
-            $this->updateAroundMe();
-            self::$secondMap = true;
-            self::$raceOn = true;
-        } else {
-            $this->hideAroundMe();
-        }
-    }
-
-    public function getRoundsPoints()
-    {
-        if ($this->storage->gameInfos->gameMode != GameInfos::GAMEMODE_SCRIPT) {
-            $points = $this->connection->getRoundCustomPoints();
-            if (empty($points)) {
-                self::$roundPoints = array(10, 6, 4, 3, 2, 1);
-            } else {
-                self::$roundPoints = $points;
-            }
-        } else {
-            self::$roundPoints = array(10, 6, 4, 3, 2, 1);
-        }
+        $this->hideAroundMe();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        $this->getRoundsPoints();
         self::$raceOn = false;
-        $this->forceUpdate = true;
         $this->hideAroundMe();
-        $this->updateAroundMe();
-        self::$secondMap = true;
         self::$raceOn = true;
     }
 
     public function onBeginMatch()
     {
         self::$raceOn = false;
-        $this->forceUpdate = true;
         $this->hideAroundMe();
         $this->updateAroundMe();
-        self::$secondMap = true;
         self::$raceOn = true;
-    }
-
-    public function onEndRound()
-    {
     }
 
     public function onBeginRound()
@@ -135,22 +189,16 @@ class Widgets_AroundMe extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         self::$raceOn = true;
     }
 
-
     public function onPlayerConnect($login, $isSpectator)
     {
-
-        $this->showAroundMe($login);
+        $this->updateAroundMe($login);
     }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        Gui\Widgets\AroundMe::Erase($login);
-    }
-
 
     public function eXpOnUnload()
     {
-        Gui\Widgets\AroundMe::EraseAll();
-        self::$me = null;
+        $this->hideAroundMe();
+        $this->config = null;
+        $this->script = null;
+        $this->widget = null;
     }
 }

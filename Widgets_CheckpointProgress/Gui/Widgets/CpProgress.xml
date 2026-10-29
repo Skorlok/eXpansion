@@ -1,0 +1,2 @@
+<gauge id="totalProgress" sizen="160 7" halign="left" valign="top" style="EnergyBar" color="2f2" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>
+<gauge id="myProgress" posn="0 -3 1.0E-5" sizen="160 7" halign="left" valign="top" style="EnergyBar" color="2af" grading="1" ratio="0" drawbg="0" drawblockbg="1"/>

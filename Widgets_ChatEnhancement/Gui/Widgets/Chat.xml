@@ -1,0 +1,7 @@
+<frame hidden="{hideChatLog}">
+    <exp:icon sizeX="8" sizeY="8" description="@Display Chat History" icon="UIConstruction_Buttons" iconSub="Text" action="exp:eXpansion.Widgets_ChatEnhancement:showChatLog" id="chatLog" isTextId="true"/>
+</frame>
+
+<frame posn="2 -4 30">
+    <exp:icon sizeX="4" sizeY="4" description="@Is public chat active" icon="Icons64x64_1" iconSub="{chatStateIcon}" action="exp:eXpansion.Widgets_ChatEnhancement:toogleChatStatus" id="chatState" isTextId="true"/>
+</frame>

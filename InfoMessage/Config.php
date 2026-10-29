@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\InfoMessage;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $infoMessages = array();

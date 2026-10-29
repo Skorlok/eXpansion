@@ -27,3 +27,6 @@ Poista
 
 Waiting Queue
 Odotusjono
+
+Remove player from queue
+Remove player from queue

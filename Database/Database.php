@@ -2,10 +2,16 @@
 
 namespace ManiaLivePlugins\eXpansion\Database;
 
-use ManiaLib\Utils\Formatting as StringFormatting;
-use ManiaLive\Data\Player;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting as StringFormatting;
+use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
 
 /**
@@ -15,8 +21,14 @@ use ManiaLivePlugins\eXpansion\Database\Structures\DbPlayer;
  */
 class Database extends ExpPlugin
 {
-
     private $config;
+    private $updateServerChallengesPending = false;
+
+    /** @var Window */
+    private $maintainanceWindow;
+
+    /** @var Window */
+    private $backupRestoreWindow;
 
     public function eXpOnInit()
     {
@@ -33,6 +45,7 @@ class Database extends ExpPlugin
             die();
         }
         $this->enableDedicatedEvents();
+        $this->enableTickerEvent();
         $this->initCreateTables();
 
         foreach ($this->storage->players as $login => $player) { // get players
@@ -43,24 +56,88 @@ class Database extends ExpPlugin
         }
 
         $this->setPublicMethod('getPlayer');
-        $this->setPublicMethod('getDatabaseVersion');
-        $this->setPublicMethod('setDatabaseVersion');
         $this->setPublicMethod('showDbMaintenance');
         $this->updateServerChallenges();
         // add admin command ;)
-        $cmd = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::addAdminCommand(
-            'dbtools',
-            $this,
-            'showDbMaintenance',
-            Permission::SERVER_DATABASE
-        );
+        $cmd = AdminGroups::addAdminCommand('dbtools', $this, 'showDbMaintenance', Permission::SERVER_DATABASE);
         $cmd->setHelp('shows administrative window for database');
         $cmd->setMinParam(0);
+
+        $this->maintainanceWindow = new Window("Database\Gui\Windows\Maintainance.xml");
+        $this->maintainanceWindow->setName("DbMaintainance");
+        $this->maintainanceWindow->setSize(160, 100);
+        $this->maintainanceWindow->setTitle("Database Maintenance");
+
+        $this->backupRestoreWindow = new Window("Database\Gui\Windows\BackupRestore.xml");
+        $this->backupRestoreWindow->setName("DbBackupRestore");
+        $this->backupRestoreWindow->setSize(160, 100);
+        $this->backupRestoreWindow->setTitle('Database Backup and Restore');
+    }
+
+    public function eXpOnReady()
+    {
+        $this->registerManialinkCallback('maintainanceTruncate', true);
+        $this->registerManialinkCallback('maintainanceRepair', true);
+        $this->registerManialinkCallback('maintainanceOptimize', true);
+        $this->registerManialinkCallback('maintainanceBackup', true);
+        $this->registerManialinkCallback('restoreFile', false, true);
+        $this->registerManialinkCallback('deleteFile', false, true);
+        $this->registerManialinkCallback('exportToSql', true);
+    }
+
+    public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
+    {
+        $this->config = Config::getInstance();
+    }
+
+    public function onTick()
+    {
+        if ($this->updateServerChallengesPending) {
+            $this->updateServerChallenges();
+        }
+        if ($this->config->enableBackup) {
+            if (time() % (60 * 15) == 0) { // check every 15 minutes
+                $var = MetaData::getInstance()->getVariable('autoBackupFiles');
+                $params = $var->getRawValue();
+
+                // check if we need to do a backup
+                $lastBackupTime = 0;
+                if (!empty($params)) {
+                    $backupTimes = array_keys($params);
+                    $lastBackupTime = end($backupTimes);
+                }
+                if (time() - $lastBackupTime < ($this->config->backupInterval * 60 * 60)) {
+                    return;
+                }
+
+                $date = date("Y-m-d_H-i");
+                $this->exportToSql(null, array("filename" => $this->storage->serverLogin . "_" . $date));
+
+                $params[time()] = $this->storage->serverLogin . "_" . $date . ".sql";
+
+                $retention = intval($this->config->backupRetention);
+                if ($retention < 1) {
+                    $retention = 1;
+                }
+                $cutoff = time() - ($retention * 24 * 60 * 60); // in days
+                foreach ($params as $time => $filename) {
+                    if ($time < $cutoff) {
+                        unset($params[$time]);
+                        $filePath = "./backup/" . $filename;
+                        if (file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                }
+
+                $var->setRawValue($params);
+                \ManiaLivePlugins\eXpansion\Core\ConfigManager::getInstance()->check();
+            }
+        }
     }
 
     public function onPlayerConnect($login, $isSpec)
     {
-
         $g = "SELECT * FROM `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
         $query = $this->db->execute($g);
         // get player data
@@ -70,14 +147,11 @@ class Database extends ExpPlugin
 
         if ($query->recordCount() == 0) {
             $q = "INSERT INTO `exp_players`
-                    (`player_login`,`player_nickname`, `player_nicknameStripped`, `player_updated`, `player_ip`,
-                        `player_onlinerights`, `player_nation`, `player_wins`, `player_timeplayed`)
+                    (`player_login`,`player_nickname`, `player_updated`, `player_ip`, `player_nation`, `player_wins`, `player_timeplayed`)
                     VALUES (" . $this->db->quote($player->login) . ",
                             " . $this->db->quote($player->nickName) . ",
-                            " . $this->db->quote(StringFormatting::stripColors($player->nickName)) . ",
                             " . $this->db->quote($time) . ",
                             " . $this->db->quote($player->iPAddress) . ",
-                            " . $this->db->quote($player->onlineRights) . ",
                             " . $this->db->quote($player->path) . ",
                             0,
                             0
@@ -86,45 +160,35 @@ class Database extends ExpPlugin
 
             $dbPlayer = new DbPlayer($player->login, 0, $time, 0);
         } else {
-            $q = "UPDATE `exp_players`
-             SET
+            $q = "UPDATE `exp_players` SET
                 `player_nickname` = " . $this->db->quote($player->nickName) . ",
-                `player_nicknameStripped` = " . $this->db->quote(StringFormatting::stripColors($player->nickName)) . ",
                 `player_updated` = " . $this->db->quote($time) . ",
-                `player_ip` =  " . $this->db->quote($player->iPAddress) . ",
-                `player_onlinerights` = " . $this->db->quote($player->onlineRights) . "
-             WHERE
-             `player_login` = " . $this->db->quote($login) . ";";
+                `player_ip` =  " . $this->db->quote($player->iPAddress) . "
+             WHERE `player_login` = " . $this->db->quote($login) . ";";
             $this->db->execute($q);
 
             $query = $query->fetchObject();
 
             $dbPlayer = new DbPlayer($player->login, $query->player_timeplayed, $time, $query->player_wins);
         }
-        $this->expStorage->dbPlayers[$login] = $dbPlayer;
+        $this->storage->dbPlayers[$login] = $dbPlayer;
     }
 
     public function onPlayerDisconnect($login, $reason = null)
     {
-        $this->updatePlayTime($this->storage->getPlayerObject($login));
-        unset($this->expStorage->dbPlayers[$login]);
+        $this->updatePlayTime($this->storage->getDisconnectPlayerObject($login));
+        unset($this->storage->dbPlayers[$login]);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        $firstFound = false;
+        $winner = ArrayOfObj::getObjbyPropValue(Core::$rankings, "rank", "1");
+        if (sizeof($this->storage->players) > 1 && $this->eXpGetCurrentCompatibilityGameMode() != GameInfos::GAMEMODE_TEAM && !Core::$useTeams && $winner && $winner->bestTime != -1) {
+            $this->incrementWins($winner);
+        }
 
-        foreach ($rankings as $key => $playerArr) { // get players
-            /** @var Player $player */
-            $player = Player::fromArray($playerArr);
-            if (array_key_exists($player->login, $this->storage->players)) {
-                $this->updatePlayTime($this->storage->players[$player->login]);
-            }
-
-            if ($player->rank == 1 && sizeof($rankings) > 1 && !$firstFound) {
-                $this->incrementWins($player);
-                $firstFound = true;
-            }
+        foreach ($this->storage->players as $login => $player) { // get players
+            $this->updatePlayTime($player);
         }
 
         foreach ($this->storage->spectators as $login => $player) { // get spectators
@@ -134,21 +198,18 @@ class Database extends ExpPlugin
 
     public function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
     {
-        $this->updateServerChallenges();
+        $this->updateServerChallengesPending = true;
     }
 
     public function updatePlayTime($player)
     {
         $time = time();
-        if (empty($player) || (!$player->spectator && $this->expStorage->isRelay)) {
+        if (empty($player) || (!$player->spectator && $this->storage->isRelay))
             return;
-        }
 
         if (isset($player->lastTimeUpdate)) {
             $playtime = $time - $player->lastTimeUpdate;
-            $q = "UPDATE `exp_players`
-             SET `player_timeplayed` = (`player_timeplayed` + $playtime)
-             WHERE `player_login` = " . $this->db->quote($player->login) . ";";
+            $q = "UPDATE `exp_players` SET `player_timeplayed` = (`player_timeplayed` + $playtime) WHERE `player_login` = " . $this->db->quote($player->login) . ";";
             $this->db->execute($q);
         }
         $player->lastTimeUpdate = $time;
@@ -156,7 +217,8 @@ class Database extends ExpPlugin
 
     public function updateServerChallenges()
     {
-        if ($this->expStorage->isRelay) {
+        $this->updateServerChallengesPending = false;
+        if ($this->storage->isRelay) {
             return;
         }
         //get database challenges
@@ -165,28 +227,47 @@ class Database extends ExpPlugin
         foreach ($this->storage->maps as $map) {
             $uids .= $this->db->quote($map->uId) . ",";
             $mapsByUid[$map->uId] = $map;
+
+            if (!isset($map->strippedName)) {
+                $map->strippedName = Formatting::stripStyles($map->name);
+            }
         }
         $uids = trim($uids, ",");
         $g = "SELECT * FROM `exp_maps`  WHERE challenge_uid IN ($uids);";
-        $query = $this->db->execute($g);
+
+        try{
+            $query = $this->db->execute($g);
+        } catch (\Exception $e) {
+            $this->dumpException("Error while updating server challenges", $e);
+            return;
+        }
 
 
-        while ($data = $query->fetchStdObject()) {
+        while ($data = $query->fetchObject()) {
             if (isset($mapsByUid[$data->challenge_uid])) {
                 $mapsByUid[$data->challenge_uid]->addTime = $data->challenge_addtime;
                 unset($mapsByUid[$data->challenge_uid]);
             }
         }
 
+        $count = count($mapsByUid);
+
         if (!empty($mapsByUid)) {
+            $this->console("Found " . $count . " new maps to add to database.");
+            $inserted = 0;
             foreach ($mapsByUid as $map) {
                 $this->insertMap($map);
                 $map->addTime = time();
+                $inserted++;
+                if ($inserted % 100 === 0) {
+                    $this->console("Adding maps to database: " . $inserted . " / " . $count . "...");
+                }
             }
+            $this->console("Done adding maps to database: " . $inserted . " / " . $count . ".");
         }
     }
 
-    public function insertMap($data, $login = 'n/a')
+    public function insertMap($data)
     {
         if (empty($data->mood)) {
             $connection = $this->connection;
@@ -211,12 +292,10 @@ class Database extends ExpPlugin
                                     `challenge_lapRace`,
                                     `challenge_nbLaps`,
                                     `challenge_nbCheckpoints`,
-                                    `challenge_addedby`,
-                                    `challenge_addtime`
-                                    )
+                                    `challenge_addtime`)
                                 VALUES (" . $this->db->quote($data->uId) . ",
                                 " . $this->db->quote($data->name) . ",
-                                " . $this->db->quote(StringFormatting::stripColors($data->name)) . ",
+                                " . $this->db->quote(StringFormatting::stripStyles($data->name)) . ",
                                 " . $this->db->quote($data->fileName) . ",
                                 " . $this->db->quote($data->author) . ",
                                 " . $this->db->quote($data->environnement) . ",
@@ -229,162 +308,134 @@ class Database extends ExpPlugin
                                 " . $this->db->quote($data->lapRace ? 1 : 0) . ",
                                 " . $this->db->quote($data->nbLaps) . ",
                                 " . $this->db->quote($data->nbCheckpoints) . ",
-                                " . $this->db->quote($login) . ",
-                                " . $this->db->quote(time()) . "
-                                )";
+                                " . $this->db->quote(time()) . ")";
         $this->db->execute($q);
     }
 
     public function initCreateTables()
     {
-        if (!$this->db->tableExists('exp_databaseversion')) {
-            $this->createDatabaseTable();
-        }
-
         if (!$this->db->tableExists('exp_players')) {
             $this->createPlayersTable();
         }
 
-        if ($this->getDatabaseVersion('exp_players') == 1) {
-            $this->updatePlayersTableTo2();
+        $playerDB = $this->db->execute("DESCRIBE `exp_players`")->fetchArrayOfObject();
+
+        if ($playerDB[5]->Type != 'int(12)') {
+            $q = "ALTER TABLE `exp_players` CHANGE `player_timeplayed` `player_timeplayed` INT( 12 ) NOT NULL DEFAULT '0';";
+            $this->db->execute($q);
         }
+        if ($playerDB[3]->Type != 'int(12)') {
+            $q = "ALTER TABLE `exp_players` CHANGE `player_updated` `player_updated` INT( 12 ) NOT NULL DEFAULT '0';";
+            $this->db->execute($q);
+        }
+
+        if (count($playerDB) > 8) {
+            $sql = "ALTER TABLE exp_players
+                DROP COLUMN player_onlinerights,
+                DROP COLUMN player_nicknameStripped;";
+            $this->db->execute($sql);
+        }
+
 
         if (!$this->db->tableExists('exp_maps')) {
             $this->createMapTable();
         }
 
-        if ($this->getDatabaseVersion('exp_maps') == 1) {
+        $mapsDB = $this->db->execute("DESCRIBE `exp_maps`")->fetchArrayOfObject();
+
+        if (!$mapsDB[1]->Key) {
             $this->db->execute('ALTER TABLE exp_maps ADD KEY(challenge_uid);');
-            $this->setDatabaseVersion('exp_maps', 2);
         }
 
-        if ($this->getDatabaseVersion('exp_maps') == 2) {
-            $this->updateMapsTableTo3();
+        if (count($mapsDB) > 18) {
+            $sql = "ALTER TABLE exp_maps
+                DROP COLUMN mx_trackID,
+                DROP COLUMN mx_userID,
+                DROP COLUMN mx_username,
+                DROP COLUMN mx_uploadedAt,
+                DROP COLUMN mx_updatedAt,
+                DROP COLUMN mx_typeName,
+                DROP COLUMN mx_mapType,
+                DROP COLUMN mx_titlePack,
+                DROP COLUMN mx_styleName,
+                DROP COLUMN mx_displayCost,
+                DROP COLUMN mx_modName,
+                DROP COLUMN mx_lightMap,
+                DROP COLUMN mx_exeVersion,
+                DROP COLUMN mx_exeBuild,
+                DROP COLUMN mx_environmentName,
+                DROP COLUMN mx_vehicleName,
+                DROP COLUMN mx_unlimiterRequired,
+                DROP COLUMN mx_routeName,
+                DROP COLUMN mx_lengthName,
+                DROP COLUMN mx_laps,
+                DROP COLUMN mx_difficultyName,
+                DROP COLUMN mx_replayTypeName,
+                DROP COLUMN mx_replayWRID,
+                DROP COLUMN mx_replayWRTime,
+                DROP COLUMN mx_replayWRUserID,
+                DROP COLUMN mx_replayWRUsername,
+                DROP COLUMN mx_ratingVoteCount,
+                DROP COLUMN mx_ratingVoteAverage,
+                DROP COLUMN mx_replayCount,
+                DROP COLUMN mx_trackValue,
+                DROP COLUMN mx_comments,
+                DROP COLUMN mx_commentsCount,
+                DROP COLUMN mx_awardCount,
+                DROP COLUMN mx_hasScreenshot,
+                DROP COLUMN mx_hasThumbnail;";
+            $this->db->execute($sql);
         }
 
-    }
-
-    public function createDatabaseTable()
-    {
-
-        $q = "CREATE TABLE `exp_databaseversion` (
-                    `database_id` mediumint(9) NOT NULL AUTO_INCREMENT,
-                    `database_table` varchar(50) NOT NULL,
-                    `database_version` mediumint(9) NOT NULL,
-                     PRIMARY KEY (`database_id`),
-                     KEY(`database_table`)
-                ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM;";
-        $this->db->execute($q);
+        if (count($mapsDB) > 17) {
+            $sql = "ALTER TABLE exp_maps DROP COLUMN challenge_addedby;";
+            $this->db->execute($sql);
+        }
     }
 
     public function createPlayersTable()
     {
-        if ($this->getDatabaseVersion('exp_players') == false) {
-            $this->setDatabaseVersion('exp_players', 1);
-        }
-        $q = "CREATE TABLE `exp_players` (
-                    `player_login` varchar(50) NOT NULL,
-                    `player_nickname` varchar(100) NOT NULL,
-                    `player_nicknameStripped` varchar(100) NOT NULL,
-                    `player_updated` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_wins` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_timeplayed` mediumint(9) NOT NULL DEFAULT '0',
-                    `player_onlinerights` varchar(10) NOT NULL,
-                    `player_ip` varchar(50),
-                    `player_nation` varchar(100),
-                    PRIMARY KEY (`player_login`)
-                ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE=MyISAM;";
+        $q = "CREATE TABLE IF NOT EXISTS `exp_players` (
+                `player_login` varchar(50) NOT NULL,
+                `player_nickname` varchar(100) NOT NULL,
+                `player_updated` mediumint(9) NOT NULL DEFAULT '0',
+                `player_wins` mediumint(9) NOT NULL DEFAULT '0',
+                `player_timeplayed` mediumint(9) NOT NULL DEFAULT '0',
+                `player_ip` varchar(50),
+                `player_nation` varchar(100),
+                PRIMARY KEY (`player_login`)
+            ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=MyISAM;";
         $this->db->execute($q);
-    }
-
-    public function updatePlayersTableTo2()
-    {
-        $q = "ALTER TABLE `exp_players` CHANGE `player_timeplayed` `player_timeplayed` INT( 12 ) NOT NULL DEFAULT '0';";
-        $this->db->execute($q);
-        $q = "ALTER TABLE `exp_players` CHANGE `player_updated` `player_updated` INT( 12 ) NOT NULL DEFAULT '0';";
-        $this->db->execute($q);
-        $this->setDatabaseVersion('exp_players', 2);
     }
 
     public function createMapTable()
     {
-        if ($this->getDatabaseVersion('exp_maps') == false) {
-            $this->setDatabaseVersion('exp_maps', 1);
-        }
-
-        $q = "CREATE TABLE `exp_maps` (
-                                    `challenge_id` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
-                                    `challenge_uid` VARCHAR( 27 ) NOT NULL ,
-                                    `challenge_name` VARCHAR( 100 ) NOT NULL ,
-                                    `challenge_nameStripped` VARCHAR( 100 ) NOT NULL ,
-                                    `challenge_file` VARCHAR( 200 ) NOT NULL ,
-                                    `challenge_author` VARCHAR( 30 ) NOT NULL ,
-                                    `challenge_environment` VARCHAR( 15 ) NOT NULL,
-
-                                    `challenge_mood` VARCHAR( 50 ) NOT NULL,
-                                    `challenge_bronzeTime` INT( 10 ) NOT NULL,
-                                    `challenge_silverTime` INT( 10 ) NOT NULL,
-                                    `challenge_goldTime` INT( 10 ) NOT NULL,
-                                    `challenge_authorTime` INT( 10 ) NOT NULL,
-                                    `challenge_copperPrice` INT( 10 ) NOT NULL,
-                                    `challenge_lapRace` INT( 3 ) NOT NULL,
-                                    `challenge_nbLaps` INT( 3 ) NOT NULL,
-                                    `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
-                                    `challenge_addedby` VARCHAR(200),
-                                    `challenge_addtime` INT(9)
-                                    ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = MYISAM ;";
+        $q = "CREATE TABLE IF NOT EXISTS `exp_maps` (
+                `challenge_id` MEDIUMINT( 5 ) NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+                `challenge_uid` VARCHAR( 27 ) NOT NULL ,
+                `challenge_name` VARCHAR( 300 ) NOT NULL ,
+                `challenge_nameStripped` VARCHAR( 100 ) NOT NULL ,
+                `challenge_file` VARCHAR( 200 ) NOT NULL ,
+                `challenge_author` VARCHAR( 30 ) NOT NULL ,
+                `challenge_environment` VARCHAR( 15 ) NOT NULL,
+                `challenge_mood` VARCHAR( 50 ) NOT NULL,
+                `challenge_bronzeTime` INT( 10 ) NOT NULL,
+                `challenge_silverTime` INT( 10 ) NOT NULL,
+                `challenge_goldTime` INT( 10 ) NOT NULL,
+                `challenge_authorTime` INT( 10 ) NOT NULL,
+                `challenge_copperPrice` INT( 10 ) NOT NULL,
+                `challenge_lapRace` INT( 3 ) NOT NULL,
+                `challenge_nbLaps` INT( 3 ) NOT NULL,
+                `challenge_nbCheckpoints` INTEGER( 3 ) NOT NULL,
+                `challenge_addtime` INT(9)
+                ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = MYISAM ;";
         $this->db->execute($q);
     }
 
-
-    public function updateMapsTableTo3()
-    {
-
-        $sql = "ALTER TABLE `exp_maps` 
-              ADD `mx_trackID` INT UNSIGNED NULL , 
-              ADD `mx_userID` INT UNSIGNED NULL , 
-              ADD `mx_username` VARCHAR(100) NULL , 
-              ADD `mx_uploadedAt` DATETIME NULL , 
-              ADD `mx_updatedAt` DATETIME NULL , 
-              ADD `mx_typeName` VARCHAR(100) NULL , 
-              ADD `mx_mapType` VARCHAR(255) NULL , 
-              ADD `mx_titlePack` VARCHAR(255) NULL , 
-              ADD `mx_styleName` VARCHAR(255) NULL , 
-              ADD `mx_displayCost` INT NULL , 
-              ADD `mx_modName` VARCHAR(255) NULL , 
-              ADD `mx_lightMap` INT NULL ,
-              ADD `mx_exeVersion` VARCHAR(50) NULL ,
-              ADD `mx_exeBuild` VARCHAR(100) NULL , 
-              ADD `mx_environmentName` VARCHAR(255) NULL ,
-              ADD `mx_vehicleName` VARCHAR(255) NULL , 
-              ADD `mx_unlimiterRequired` BOOLEAN NULL , 
-              ADD `mx_routeName` VARCHAR(255) NULL , 
-              ADD `mx_lengthName` VARCHAR(100) NULL , 
-              ADD `mx_laps` INT NULL,
-              ADD `mx_difficultyName` VARCHAR(100) NULL,
-              ADD `mx_replayTypeName` VARCHAR(100) NULL,
-              ADD `mx_replayWRID` INT UNSIGNED NULL,
-              ADD `mx_replayWRTime` INT NULL,
-              ADD `mx_replayWRUserID` INT NULL,
-              ADD `mx_replayWRUsername` VARCHAR(255) NULL,
-              ADD `mx_ratingVoteCount` INT NULL,
-              ADD `mx_ratingVoteAverage` FLOAT NULL,                                          
-              ADD `mx_replayCount` INT NULL,
-              ADD `mx_trackValue` INT NULL,
-              ADD `mx_comments` TEXT NULL,
-              ADD `mx_commentsCount` INT NULL,
-              ADD `mx_awardCount` INT NULL,
-              ADD `mx_hasScreenshot` BOOLEAN NULL,
-              ADD `mx_hasThumbnail` BOOLEAN NULL;";
-        $this->db->execute($sql);
-        $this->setDatabaseVersion('exp_maps', 3);
-    }
-
-
     public function getPlayer($login)
     {
-        if (isset($this->expStorage->dbPlayers[$login])) {
-            return $this->expStorage->dbPlayers[$login];
+        if (isset($this->storage->dbPlayers[$login])) {
+            return $this->storage->dbPlayers[$login];
         }
 
         $g = "SELECT * FROM `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
@@ -394,7 +445,7 @@ class Database extends ExpPlugin
         if ($query->recordCount() == 0) {
             return null;
         } else {
-            $player = $query->fetchStdObject();
+            $player = $query->fetchObject();
 
             return $player;
         }
@@ -402,35 +453,27 @@ class Database extends ExpPlugin
 
     public function incrementWins($player)
     {
-        $q = "UPDATE `exp_players`
-             SET `player_wins` = (`player_wins` + 1)
-             WHERE `player_login` = " . $this->db->quote($player->login) . ";";
+        $q = "UPDATE `exp_players` SET `player_wins` = (`player_wins` + 1) WHERE `player_login` = " . $this->db->quote($player->login) . ";";
         $this->db->execute($q);
         if ($this->config->showWins) {
-            $q = "SELECT `player_wins` FROM `exp_players` WHERE `player_login` = "
-                . $this->db->quote($player->login) . ";";
+            $q = "SELECT `player_wins` FROM `exp_players` WHERE `player_login` = " . $this->db->quote($player->login) . ";";
             $query = $this->db->execute($q);
-            $data = $query->fetchStdObject();
+
+            $data = $query->fetchObject();
             $w = $data->player_wins;
-            $msg_pub = eXpGetMessage(
-                '#rank#Congratulations to #variable#%1$s#rank# for their #variable#%2$s#rank# win!'
-            );
+
+            $msg_pub = eXpGetMessage('#rank#Congratulations to #variable#%1$s#rank# for their #variable#%2$s#rank# win!');
             $msg_self = eXpGetMessage('#rank#Congratulations for your #variable#%1$s#rank# win!');
+
             $wins = $this->numberize($w);
             if ($w <= 100 && $w % 10 == 0) {
-                $this->eXpChatSendServerMessage(
-                    $msg_pub,
-                    null,
-                    array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins)
-                );
+                $this->eXpChatSendServerMessage($msg_pub, null, array(StringFormatting::stripCodes($player->cleanNickName, "wosnm"), $wins));
             } elseif ($w % 25 == 0) {
-                $this->eXpChatSendServerMessage(
-                    $msg_pub,
-                    null,
-                    array(\ManiaLib\Utils\Formatting::stripCodes($player->nickName, "wosnm"), $wins)
-                );
+                $this->eXpChatSendServerMessage($msg_pub, null, array(StringFormatting::stripCodes($player->cleanNickName, "wosnm"), $wins));
             } else {
-                $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
+                if (isset($this->storage->players[$player->login]) || isset($this->storage->spectators[$player->login])) {
+                    $this->eXpChatSendServerMessage($msg_self, $player->login, array($wins));
+                }
             }
         }
     }
@@ -452,69 +495,262 @@ class Database extends ExpPlugin
         return $num;
     }
 
-    public function getDatabaseVersion($table, $fromPlugin = null)
+    public function showDbMaintenance($login)
     {
-        $g = "SELECT * FROM `exp_databaseversion` WHERE `database_table` = " . $this->db->quote($table) . ";";
-        $query = $this->db->execute($g);
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+        /** @var \ManiaLive\Database\Config $dbConfig */
+        $dbConfig = \ManiaLive\Database\Config::getInstance();
+        $rows     = $this->db->execute("SHOW TABLES in `" . $dbConfig->database . "`;")->fetchArrayOfRow();
+        $tables   = array();
+        foreach ($rows as $row) {
+            $tables[] = array(
+                'name' => $row[0],
+                'text' => $this->maintainanceWindow->handleSpecialChars($row[0]),
+            );
+        }
+        $this->maintainanceWindow->setParam("tables", $tables);
+        $this->maintainanceWindow->show($login);
+    }
 
-        if ($query->recordCount() == 0) {
-            return false;
-        } else {
-            $record = $query->fetchStdObject();
-            return (int)$record->database_version;
+    public function maintainanceRepair($login, $params = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $status    = $this->db->execute("REPAIR TABLE " . $tableName . ";")->fetchObject();
+                $this->connection->chatSendServerMessage(
+                    "Table " . $status->Table . " repaired with " . $status->Msg_type . ":" . $status->Msg_text,
+                    $login
+                );
+            }
         }
     }
 
-    public function showDbMaintenance($login)
+    public function maintainanceOptimize($login, $params = array())
     {
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
-            $window = Gui\Windows\Maintainance::Create($login);
-            $window->init($this->db);
-            $window->setTitle(__('Database Maintenance'));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-
-            $window->show();
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
         }
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $status    = $this->db->execute("OPTIMIZE TABLE `" . $tableName . "`;")->fetchObject();
+                $this->connection->chatSendServerMessage(
+                    "Table " . $status->Table . " Optimized with " . $status->Msg_type . ":" . $status->Msg_text,
+                    $login
+                );
+            }
+        }
+    }
+
+    public function maintainanceTruncate($login, $params = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+        foreach ($params as $key => $value) {
+            if (strpos($key, 'cb_') === 0 && $value == '1') {
+                $tableName = substr($key, 3);
+                $this->db->execute("TRUNCATE TABLE " . $tableName . ";");
+                $this->connection->chatSendServerMessage(
+                    'Table \'$0d0' . $tableName . '$fff\' contents is now $d00CLEARED$fff!',
+                    $login
+                );
+            }
+        }
+    }
+
+    public function maintainanceBackup($login, $params = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+        $this->showBackupRestore($login);
+    }
+
+    public function eXpOnUnload()
+    {
+        if ($this->maintainanceWindow !== null) {
+            $this->maintainanceWindow->erase();
+        }
+        $this->maintainanceWindow = null;
+
+        if ($this->backupRestoreWindow !== null) {
+            $this->backupRestoreWindow->erase();
+        }
+        $this->backupRestoreWindow = null;
     }
 
     public function showBackupRestore($login)
     {
-        if (\ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
-            $window = Gui\Windows\BackupRestore::Create($login);
-            $window->init($this->db);
-            $window->setTitle(__('Database Backup and Restore'));
-            $window->centerOnScreen();
-            $window->setSize(160, 100);
-            $window->show();
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
         }
+
+        if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                $this->connection->chatSendServerMessage("Error while creating backup folder", $login);
+                return;
+            }
+        }
+
+        $files = glob("./backup/*.sql");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($files as $file) {
+            $name      = basename($file);
+            $items[$i] = array(Gui::fixString($name));
+            $data[$i]  = array(
+                -1,
+                'exp:eXpansion.Database:restoreFile:' . $name,
+                'exp:eXpansion.Database:deleteFile:' . $name,
+            );
+            $i++;
+        }
+
+        $this->backupRestoreWindow->setParam('backupItems', $items);
+        $this->backupRestoreWindow->setParam('backupData', $data);
+        $this->backupRestoreWindow->show($login);
     }
 
-    public function setDatabaseVersion($table, $version)
+    public function restoreFile($login, $file)
     {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
 
-        $g = "SELECT * FROM `exp_databaseversion` WHERE `database_table` = " . $this->db->quote($table) . ";";
-        $query = $this->db->execute($g);
+        $file = str_replace('–', '-', $file);
+        $path = './backup/' . basename($file);
+        if (!is_file($path)) {
+            $this->connection->chatSendServerMessage("Backup file not found.", $login);
+            return;
+        }
 
-        if ($query->recordCount() == 0) {
-
-            $q = "INSERT INTO `exp_databaseversion` (`database_table`,
-                                 `database_version`
-                                 ) VALUES (
-                                 " . $this->db->quote($table) . ",
-                                 " . $this->db->quote($version) . "
-                                 )";
-            $this->db->execute($q);
-        } else {
-            $record = $query->fetchStdObject();
-
-            if ($record->database_version < $version) {
-                $q = "UPDATE `exp_databaseversion`
-                SET `database_version` = " . $this->db->quote($version) . "
-                WHERE `database_table` = " . $this->db->quote($table) . ";";
-
-                $this->db->execute($q);
+        $tempLine = '';
+        $lines    = file($path);
+        foreach ($lines as $line) {
+            if (substr($line, 0, 2) == '--' || $line == '') {
+                continue;
             }
+
+            $tempLine .= $line;
+            if (substr(trim($line), -1, 1) == ';') {
+                try {
+                    $this->db->execute($tempLine);
+                } catch (\Exception $e) {
+                    $this->connection->chatSendServerMessage("Error while restoring file: " . $e->getMessage(), $login);
+                    return;
+                }
+                $tempLine = '';
+            }
+        }
+
+        $this->connection->chatSendServerMessage("Backup restored successfully.", $login);
+    }
+
+    public function deleteFile($login, $file)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return;
+        }
+
+        $file = str_replace('–', '-', $file);
+        $path = './backup/' . basename($file);
+        if (is_file($path)) {
+            unlink($path);
+        }
+        $this->connection->chatSendServerMessage("Deleted.", $login);
+        $this->showBackupRestore($login);
+    }
+
+    public function exportToSql($login, $inputboxes = "")
+    {
+        if ($login !== null && !AdminGroups::hasPermission($login, Permission::SERVER_DATABASE)) {
+            return false;
+        }
+
+        if (empty($inputboxes['filename'])) {
+            if ($login !== null) {
+                $this->connection->chatSendServerMessage("No backup filename given, canceling backup!", $login);
+            }
+            return false;
+        }
+
+        if (!is_dir("./backup")) {
+            if (!mkdir("./backup", 0777)) {
+                if ($login !== null) {
+                    $this->connection->chatSendServerMessage("Error while creating backup folder", $login);
+                }
+                return false;
+            }
+        }
+
+        $fileName = "./backup/" . $inputboxes['filename'] . ".sql";
+
+        if (file_exists($fileName)) {
+            if ($login !== null) {
+                $this->connection->chatSendServerMessage("Backup file already exists, canceling backup!", $login);
+            }
+            return false;
+        }
+
+        $fileHandler = fopen($fileName, "wb");
+        if ($login !== null) {
+            $this->connection->chatSendServerMessage("Creating database backup...", $login);
+        }
+
+        /** @var \ManiaLive\Database\Config $dbconfig */
+        $dbconfig = \ManiaLive\Database\Config::getInstance();
+        $dbName = $dbconfig->database;
+
+        $tables = $this->db->execute('SHOW TABLES in `' . $dbName . '`;')->fetchArrayOfRow();
+
+        foreach ($tables as $table) {
+            $create = $this->db->execute('SHOW CREATE TABLE `' . $table[0] . '`;')->fetchAssoc();
+
+            if (fwrite($fileHandler, "-- --------------------------------------------------------\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "--\n-- Table structure for table `" . $table[0] . "`\n--\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "DROP TABLE IF EXISTS `" . $table[0] . "`;\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, $create['Create Table'] . ";\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            if (fwrite($fileHandler, "--\n-- Dumping data for table `" . $table[0] . "`\n--\n\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+            
+            $data = $this->db->execute("SELECT * FROM `" . $table[0] . "`;")->fetchArrayOfRow();
+            foreach ($data as $row) {
+                $vals = array();
+                foreach ($row as $val) {
+                    $vals[] = is_null($val) ? "NULL" : $this->db->quote($val);
+                }
+                if (fwrite($fileHandler, "INSERT INTO `" . $table[0] . "` VALUES(" . implode(", ", $vals) . ");\n") === false) {
+                    throw new \Exception("Writting to file failed!", 4);
+                }
+            }
+            if (fwrite($fileHandler, "\n") === false) {
+                throw new \Exception("Writting to file failed!", 4);
+            }
+        }
+
+        fclose($fileHandler);
+
+        if ($login !== null) {
+            $this->connection->chatSendServerMessage("Backup Complete!", $login);
+            $this->showBackupRestore($login);
         }
     }
 }

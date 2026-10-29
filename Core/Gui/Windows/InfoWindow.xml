@@ -1,0 +1,107 @@
+<frame posn="0 2 0" scale="0.8">
+	<frame>
+		<frame>
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Server Login}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{serverLogin}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -6 4.0E-5">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Server version}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vVersion}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -12 8.0E-5">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Server Build}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vBuild}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -18 0.00012">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Server ApiVersion}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{vApi}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -24 0.00016">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Server Titlepack}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{titleId}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -30 0.0002">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Manialive version}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{mlVersion}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -36 0.00024">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@eXpansion version}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{expVer}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -42 0.00028">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Php Version}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{phpVer}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -48 0.00032">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Admin contact}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{admContact}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<label posn="0 -54 0.00036" sizen="10 7" style="TextStaticSmall"/>
+		<frame posn="0 -61 1" scale="1.2">
+			<exp:inputbox name="join" sizeX="77" label="@Join link:" text="{joinLink}" isTextId="true"/>
+		</frame>
+		<frame posn="0 -75.4 1" scale="1.2">
+			<exp:inputbox name="fav" sizeX="77" label="@Favourite link:" text="{favLink}" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="78 -69 1" hidden="{hideServerStats}">
+	<exp:button sizeX="30" sizeY="6" text="@Server Stats" action="exp:eXpansion.ServerStatistics:showStats" isTextId="true"/>
+</frame>
+<frame posn="80 -60.5 1">
+	<exp:button sizeX="20" sizeY="6" text="@Add to Fav's" manialink="{favUrl}" isTextId="true"/>
+</frame>

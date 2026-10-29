@@ -24,7 +24,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Irc;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $hostname = 0;
@@ -37,6 +37,9 @@ class Config extends \ManiaLib\Utils\Singleton
     public $channel = "#driftstation";
     public $channelKey = "";
     public $allowedIrcLogins = array();
+
+    public $includeChatCommand = false;
+    public $showIRCNick = true;
 
     public $plugins = array("AdminPrivateTriggers");
 }

@@ -3,40 +3,29 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLivePlugins\eXpansion\Dedimania\Classes\Connection;
-use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
-use ManiaLivePlugins\eXpansion\Widgets_DedimaniaRecords\Gui\Widgets\DediPanel;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Dedimania\DedimaniaAbstract;
+use ManiaLivePlugins\eXpansion\Widgets_LocalRecords\Widgets_LocalRecords;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-    const NONE = 0x0;
-    const DEDIMANIA = 0x2;
-    const DEDIMANIA_FORCE = 0x8;
-    const All = 0x31;
-
-    public static $me = null;
     public static $dedirecords = array();
-    public static $secondMap = false;
-    private $lastUpdate;
-    private $forceUpdate = false;
-    private $needUpdate = false;
-    private $dedi = true;
-    private $widgetIds = array();
-    public static $raceOn;
-    public static $roundPoints;
-
-    /** @var Config */
+    public static $raceOn = true;
     private $config;
-    private $panelSizeX = 42;
+    private $script;
+    private $trayScript;
+
+    private $widget;
+    private $widget2;
 
     public function eXpOnLoad()
     {
-        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')
-            || $this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania_Script\\Dedimania_Script')
-        ) {
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
             Dispatcher::register(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
         }
-
         $this->config = Config::getInstance();
     }
 
@@ -44,112 +33,166 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
     {
         $this->enableDedicatedEvents();
 
-        $this->lastUpdate = time();
-        $this->enableTickerEvent();
+        $libScript = new Script('Gui/Script_libraries/TimeToText');
+
+        $this->trayScript = new Script("Gui/Scripts/NewTray");
+
+        $this->script = new Script("Widgets_LocalRecords/Gui/Scripts/PlayerFinish");
+        $this->script->setParam("playerTimes", "[]");
+        $this->script->setParam("nbRecord", 100);
+        $this->script->setParam('varName', 'DedimaniaRecords');
+
+        $this->widget = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
+        $this->widget->setName("Dedimania Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->registerScript($libScript);
+        $this->widget->registerScript($this->script);
+        $this->widget->registerScript($this->trayScript);
+
+        $this->widget2 = new Widget("Widgets_LocalRecords\Gui\Widgets\LocalRecords.xml");
+        $this->widget2->setName("Dedimania Panel");
+        $this->widget2->setLayer("scorestable");
+        $this->widget2->registerScript($libScript);
+        $this->widget2->registerScript($this->script);
+        $this->widget2->registerScript($this->trayScript);
 
         $this->updateDediPanel();
-        self::$me = $this;
     }
 
-    public function onTick()
+    public function updateDediPanel($login = null, $update = false)
     {
-        if (($this->needUpdate & self::DEDIMANIA) == self::DEDIMANIA
-            || $this->forceUpdate
-            || ($this->needUpdate & self::DEDIMANIA_FORCE) == self::DEDIMANIA_FORCE
-        ) {
-            if ($this->dedi || $this->needUpdate == self::DEDIMANIA_FORCE) {
-                $this->updateDediPanel();
-                $this->dedi = false;
-            }
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
+            return;
         }
 
-        $this->lastUpdate = time();
-        $this->forceUpdate = false;
-        $this->needUpdate = false;
+        $data = $this->getWidgetData();
+
+        if ($update) {
+            $xml = '<manialink id="dedimaniarecords_updater" version="2" name="dedimaniarecords_updater">';
+            $xml .= '<script><!--';
+            $xml .= 'main () {';
+            $xml .= 'declare Integer[Text] playerTimesDedimaniaRecords for UI = Integer[Text];';
+            $xml .= 'playerTimesDedimaniaRecords = ' . $data[0] . ';';
+            $xml .= 'declare Text[Text] playerNickNameDedimaniaRecords for UI = Text[Text];';
+            $xml .= 'playerNickNameDedimaniaRecords = ' . $data[1] . ';';
+            $xml .= 'declare Boolean needUpdateDedimaniaRecords for UI = True;';
+            $xml .= 'needUpdateDedimaniaRecords = True;';
+            $xml .= '}';
+            $xml .= '--></script>';
+            $xml .= '</manialink>';
+            $this->connection->sendDisplayManialinkPage($login, $xml);
+            return;
+        }
+
+        if (!$this->callPublicMethod('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania', 'isRunning')) {
+            return;
+        }
+
+        /** @var \ManiaLivePlugins\eXpansion\Gui\Config $gui */
+        $gui = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
+
+        //gamemode specific settings
+        if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Laps;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Laps;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Laps;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Laps;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Rounds;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Rounds;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Rounds;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Rounds;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_TEAM) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Team;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Team;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Team;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Team;
+        } elseif (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_CUP) {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Cup;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Cup;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Cup;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Cup;
+        } else {
+            $posX = $this->config->dedimaniaRecordsPanel_PosX_Default;
+            $posY = $this->config->dedimaniaRecordsPanel_PosY_Default;
+            $nbF = $this->config->dedimaniaRecordsPanel_nbFields_Default;
+            $nbFF = $this->config->dedimaniaRecordsPanel_nbFirstFields_Default;
+        }
+
+        $sizeX = 42;
+        $sizeY = 3 + $nbF * 4;
+
+        $this->trayScript->setParam("sizeX", $this->trayScript->getNumber($sizeX));
+        $this->trayScript->setParam("sizeY", $this->trayScript->getNumber(3 + $nbF * 4));
+        $this->script->setParam("nbFields", $nbF);
+        $this->script->setParam("nbFirstFields", $nbFF);
+        $this->script->setParam("playerTimes", $data[0]);
+        $this->script->setParam("playerNicks", $data[1]);
+
+        $this->widget->setPosition($posX, $posY, 0);
+        $this->widget->setSize($sizeX, $sizeY);
+        Widgets_LocalRecords::setPanelParams($this->widget, $sizeX, $nbF, "Dedimania Records", DedimaniaAbstract::$actionOpenRecs);
+        $this->widget->show($login);
+
+        if (!$gui->disablePersonalHud) {
+            $this->widget2->setPosition($posX, $posY, 0);
+            $this->widget2->setSize($sizeX, $sizeY);
+            Widgets_LocalRecords::setPanelParams($this->widget2, $sizeX, $nbF, "Dedimania Records", DedimaniaAbstract::$actionOpenRecs);
+            $this->widget2->show($login);
+        }
     }
 
-    public function updateDediPanel($login = null)
+    private function getWidgetData()
     {
+        $recsData = "";
+        $nickData = "";
 
-        $dedi1 = '\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania';
-        $dedi2 = '\ManiaLivePlugins\\eXpansion\\Dedimania_Script\\Dedimania_Script';
-
-        try {
-            if (($this->isPluginLoaded($dedi1) && $this->callPublicMethod($dedi1, 'isRunning'))
-                || ($this->isPluginLoaded($dedi2) && $this->callPublicMethod($dedi2, 'isRunning'))
-            ) {
-                $localRecs = DediPanel::GetAll();
-                if (!isset($localRecs[0])) {
-                    $panelMain = Gui\Widgets\DediPanel::Create($login);
-                    $panelMain->setLayer(\ManiaLive\Gui\Window::LAYER_NORMAL);
-                    $panelMain->setSizeX($this->panelSizeX);
-                    if (!$this->config->isHorizontal) {
-                        $panelMain->setDirection("right");
-                    }
-                    $this->widgetIds["DediPanel"] = $panelMain;
-                    $this->widgetIds["DediPanel"]->update();
-                    $this->widgetIds["DediPanel"]->show();
-                } elseif (isset($localRecs[0])) {
-                    $localRecs[0]->update();
-                    $localRecs[0]->show($login);
-                }
+        $index = 1;
+        foreach (self::$dedirecords as $record) {
+            if ($index > 1) {
+                $recsData .= ', ';
+                $nickData .= ', ';
             }
-        } catch (\Exception $ex) {
-
+            $recsData .= '"' . $record['Login'] . '"=> ' . $record['Best'];
+            $nickData .= '"' . $record['Login'] . '"=>"' . Gui::fixString2($record['NickName']) . '"';
+            $index++;
         }
+
+        if (empty($recsData)) {
+            $recsData = 'Integer[Text]';
+            $nickData = 'Text[Text]';
+        } else {
+            $recsData = '[' . $recsData . ']';
+            $nickData = '[' . $nickData . ']';
+        }
+
+        return array($recsData, $nickData);
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
         if ($var->getConfigInstance() instanceof Config) {
-            Gui\Widgets\DediPanel::EraseAll();
+            $this->config = Config::getInstance();
             $this->updateDediPanel();
         }
-    }
-
-    public function showDediPanel($login)
-    {
-        $this->updateDediPanel($login);
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-
         self::$raceOn = false;
-        $this->widgetIds = array();
-        Gui\Widgets\DediPanel::EraseAll();
-
+        $this->hideWidgets();
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-        if ($restartMap) {
-            self::$secondMap = true;
-        }
-        if ($wasWarmUp) {
-            self::$raceOn = false;
-            $this->forceUpdate = true;
-            $this->updateDediPanel();
-            self::$secondMap = true;
-            self::$raceOn = true;
-        } else {
-            self::$secondMap = false;
-            self::$dedirecords = array(); // reset
-            $this->widgetIds = array();
-            Gui\Widgets\DediPanel::EraseAll();
-
-        }
+        self::$dedirecords = array();
+        $this->hideWidgets();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         self::$raceOn = false;
-        $this->forceUpdate = true;
-        $this->widgetIds = array();
-        Gui\Widgets\DediPanel::EraseAll();
-
         $this->updateDediPanel();
-        self::$secondMap = true;
         self::$raceOn = true;
     }
 
@@ -160,76 +203,69 @@ class Widgets_DedimaniaRecords extends \ManiaLivePlugins\eXpansion\Core\types\Ex
         }
 
         self::$raceOn = false;
-        $this->forceUpdate = true;
-        $this->widgetIds = array();
-        Gui\Widgets\DediPanel::EraseAll();
-
         $this->updateDediPanel();
-        self::$secondMap = true;
         self::$raceOn = true;
-    }
-
-    public function onEndRound()
-    {
-
     }
 
     public function onDedimaniaGetRecords($data)
     {
         self::$dedirecords = $data['Records'];
-        $this->dedi = true;
-        $this->needUpdate = self::DEDIMANIA_FORCE;
-    }
-
-    public function onPlayerConnect($login, $isSpectator)
-    {
-        $this->showDediPanel($login);
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        Gui\Widgets\DediPanel::Erase($login);
-
-    }
-
-    public function onDedimaniaOpenSession()
-    {
-
+        $this->updateDediPanel();
     }
 
     public function onDedimaniaUpdateRecords($data)
     {
-
+        self::$dedirecords = $data['Records'];
+        $this->updateDediPanel(null, true);
     }
 
-    public function onDedimaniaNewRecord($data)
+    public function onPlayerConnect($login, $isSpectator)
     {
-
-    }
-
-    /**
-     * @param $data DediPlayer
-     */
-    public function onDedimaniaPlayerConnect($data)
-    {
-        if ($data->maxRank > Connection::$serverMaxRank) {
-            $this->needUpdate = self::DEDIMANIA_FORCE;
+        if (self::$raceOn == true) {
+            $this->updateDediPanel($login);
         }
     }
 
-    public function onDedimaniaPlayerDisconnect()
+    private function hideWidgets()
     {
-
-    }
-
-    public function onDedimaniaRecord($record, $oldrecord)
-    {
-
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        if ($this->widget2 instanceof Widget) {
+            $this->widget2->erase();
+        }
     }
 
     public function eXpOnUnload()
     {
-        Gui\Widgets\DediPanel::EraseAll();
+        $this->hideWidgets();
+        self::$dedirecords = array();
+        $this->config = null;
+        $this->script = null;
+        $this->trayScript = null;
+        $this->widget = null;
+        $this->widget2 = null;
+
         Dispatcher::unregister(\ManiaLivePlugins\eXpansion\Dedimania\Events\Event::getClass(), $this);
+    }
+
+    public function onDedimaniaOpenSession()
+    {
+    }
+
+    public function onDedimaniaNewRecord($data)
+    {
+    }
+
+    public function onDedimaniaPlayerConnect($data)
+    {
+    }
+
+    public function onDedimaniaPlayerDisconnect()
+    {
+    }
+
+    public function onDedimaniaRecord($record, $oldrecord)
+    {
     }
 }

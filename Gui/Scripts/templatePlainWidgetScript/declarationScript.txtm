@@ -1,0 +1,19 @@
+declare Window <=> Page.GetFirstChild("{{ name }}");
+
+declare Boolean exp_needToCheckPersistentVars for UI = False;
+
+declare persistent Vec3[Text][Text] EXP_widgetLastPosRel =  Vec3[Text][Text];
+declare persistent Boolean exp_isWidgetsHidden = False;
+
+declare Text id = "{{ name }}";
+declare Text gameMode = "{{ gameMode }}";
+declare Text[] exp_windowStack for UI = Text[];
+
+if (!EXP_widgetLastPosRel.existskey(id)) {
+    EXP_widgetLastPosRel[id] = Vec3[Text];
+}
+EXP_widgetLastPosRel[id][gameMode] = < {{ posX }}, {{ posY }}, -3.0>;
+
+if (exp_isWidgetsHidden == True) {
+    Window.Hide();
+}

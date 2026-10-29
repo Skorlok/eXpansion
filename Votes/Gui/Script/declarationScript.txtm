@@ -1,0 +1,27 @@
+
+declare Text actionYes = "{{ actionYes }}";
+declare Text actionNo = "{{ actionNo }}";
+declare Text actionPass = "{{ actionPass }}";
+declare Text actionCancel = "{{ actionCancel }}";
+
+declare Real countdown = ML::NearestReal({{ countdown }});
+declare Integer startTime = Now;
+declare Integer remaining;
+declare Integer remainingSeconds;
+
+declare countdownBar = (Page.GetFirstChild("CountdownBar") as CMlGauge);
+declare countdownText = (Page.GetFirstChild("CountdownText") as CMlLabel);
+
+declare Integer voters = {{ voters }};
+declare Boolean canVote = False;
+
+declare lastUpdateTime = -1;
+
+declare Text[Text] votes_playerVotes for UI = Text[Text];
+votes_playerVotes = {{ votes }};
+
+
+declare Integer nbYes = 0;
+declare Integer nbNo = 0;
+declare Integer nbTotal = 0;
+declare Real agreeSize = 29.0;

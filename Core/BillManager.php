@@ -1,20 +1,17 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core;
 
 use ManiaLive\Database\Connection as DbConnection;
 use ManiaLive\DedicatedApi\Callback\Event as ServerEvent;
-use ManiaLive\DedicatedApi\Callback\Listener;
-use ManiaLive\Event\Dispatcher;
-use ManiaLivePlugins\eXpansion\Core\types\BasicPlugin;
-use Maniaplanet\DedicatedServer\Connection;
 
 /**
- * This will manage bills in order to insert them into the database so that all transactions are saved. It will allow
+ * This will menage bills in order to insert them into the database so that all transactions are saved. It will allow
  * advanced statistics to be done on planet transgers
  *
  * @author De Cramer Oliver
  */
-class BillManager implements Listener
+class BillManager implements \ManiaLive\DedicatedApi\Callback\Listener
 {
 
     /**
@@ -41,23 +38,25 @@ class BillManager implements Listener
     /**
      * Connection to the Dedicated server
      *
-     * @var Connection
+     * @var \Maniaplanet\DedicatedServer\Connection
      */
     private $connection;
 
     /**
      * Creates a bill manager
      *
-     * @param Connection $connection connection to the dedicated server
+     * @param \Maniaplanet\DedicatedServer\Connection $connection connection to the dedicated server
      * @param DbConnection $dbcon The database connection
-     * @param BasicPlugin $plugin
+     * @param                                         $plugin     A plugin to have
      */
-    public function __construct(Connection $connection, DbConnection $dbcon, $plugin)
+    public function __construct(\Maniaplanet\DedicatedServer\Connection $connection, DbConnection $dbcon, $plugin)
     {
 
         $this->connection = $connection;
         self::$instance = $this;
         $this->db = $dbcon;
+
+        $pHandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
 
         if (!$this->db->tableExists("exp_planet_transaction")) {
             $q = "CREATE TABLE `exp_planet_transaction` (
@@ -97,7 +96,7 @@ class BillManager implements Listener
         );
 
         if (empty($this->bills)) {
-            Dispatcher::register(ServerEvent::getClass(), $this);
+            \ManiaLive\Event\Dispatcher::register(ServerEvent::getClass(), $this);
         }
 
         $this->bills[$billId] = $bill;
@@ -116,7 +115,7 @@ class BillManager implements Listener
     {
         //If there isn't any un going bills, well stop listening
         if (count($this->bills) == 0) {
-            Dispatcher::unregister(ServerEvent::getClass(), $this);
+            \ManiaLive\Event\Dispatcher::unregister(ServerEvent::getClass(), $this);
         }
 
         //If the bill Manager is managing this bill let do what needs to be done
@@ -126,8 +125,7 @@ class BillManager implements Listener
                 //Sucess :D
 
                 //Insert bill into database
-                $q = 'INSERT INTO `exp_planet_transaction` (`transaction_fromLogin`, `transaction_toLogin`
-                            ,`transaction_plugin`
+                $q = 'INSERT INTO `exp_planet_transaction` (`transaction_fromLogin`, `transaction_toLogin`, `transaction_plugin`
                             ,`transaction_subject`, `transaction_amount`)
                         VALUES(' . $this->db->quote($bill->getSourceLogin()) . ',
                             ' . $this->db->quote($bill->getDestinationLogin()) . ',

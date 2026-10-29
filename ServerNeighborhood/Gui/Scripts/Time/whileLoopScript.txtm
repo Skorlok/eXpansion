@@ -1,4 +1,4 @@
-declare Integer remaining = ((time+<?php echo $this->refresh_interval; ?>)-Now)/1000;
+declare Integer remaining = ((time+{{ refresh_interval }})-Now)/1000;
 if(remaining < 0)
   seconds.Value = "-";
 else

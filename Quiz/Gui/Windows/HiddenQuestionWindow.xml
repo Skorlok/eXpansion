@@ -1,0 +1,28 @@
+<quad posn="0 7 0" sizen="{imageSize}" image="{imageUrl}"/>
+<frame posn="0 7 1.0E-5">
+	<quad id="quad_0" posn="{colX0} {rowY0} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_0" posn="{centerX0} {centerY0} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_1" posn="{colX0} {rowY1} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_1" posn="{centerX0} {centerY1} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_2" posn="{colX0} {rowY2} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_2" posn="{centerX0} {centerY2} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_3" posn="{colX1} {rowY0} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_3" posn="{centerX1} {centerY0} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_4" posn="{colX1} {rowY1} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_4" posn="{centerX1} {centerY1} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_5" posn="{colX1} {rowY2} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_5" posn="{centerX1} {centerY2} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_6" posn="{colX2} {rowY0} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_6" posn="{centerX2} {centerY0} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_7" posn="{colX2} {rowY1} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_7" posn="{centerX2} {centerY1} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+	<quad id="quad_8" posn="{colX2} {rowY2} 0" sizen="{cellSize}" bgcolor="0000" bgcolorfocus="3af4" scriptevents="1" class="quad"/>
+	<label id="lbl_8" posn="{centerX2} {centerY2} 1.0E-5" sizen="{cellSize}" halign="center" valign="center" style="TextRaceMessageBig" class="label" textsize="3"/>
+</frame>
+<frame posn="64 -23 1">
+	<exp:button sizeX="32" sizeY="6" text="@Undo" id="undo" isTextId="true"/>
+</frame>
+<frame posn="66 -74 1">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Quiz:hiddenOk" isTextId="true"/>
+</frame>
+<entry posn="0 907 0" id="boxOrder" scriptevents="1" class="isTabIndex isEditable" name="boxOrder" hidden="1"/>

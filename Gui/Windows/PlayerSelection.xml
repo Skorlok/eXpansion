@@ -1,0 +1,99 @@
+<frame posn="0 -1 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -1 0.0001" id="row_0">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_0_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_0_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -7 0.0001" id="row_1">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_1_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_1_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -13 0.0001" id="row_2">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_2_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_2_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -19 0.0001" id="row_3">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_3_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_3_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -25 0.0001" id="row_4">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_4_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_4_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -31 0.0001" id="row_5">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_5_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_5_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -37 0.0001" id="row_6">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_6_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_6_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -43 0.0001" id="row_7">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_7_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_7_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -49 0.0001" id="row_8">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_8_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_8_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -55 0.0001" id="row_9">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_9_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_9_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -61 0.0001" id="row_10">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_10_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_10_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -67 0.0001" id="row_11">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_11_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_11_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -73 0.0001" id="row_12">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_12_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_12_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_12_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -79 0.0001" id="row_13">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_13_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_13_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_13_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -85 0.0001" id="row_14">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_14_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_14_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_14_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <frame posn="0 -91 0.0001" id="row_15">
+        <quad sizen="4 4" halign="center" valign="center2" style="Icons64x64_1" substyle="Buddy"/>
+        <label id="column_15_0" posn="4 0 1.0E-5" sizen="30 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_15_1" posn="28 0 2.0E-5" sizen="40 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <frame posn="64 0 0.01" scale="0.8"><exp:button sizeX="20" sizeY="6" text="{buttonText}" action="eXpOptimizedPagerAction" id="column_15_2" class="eXpOptimizedPagerAction"/></frame>
+    </frame>
+    <exp:optimizedpager sizeX="83" sizeY="95" itemsVarName="playerItems" dataVarName="playerData" rowsPerPage="16" itemsPerRow="2" varName="playerSelection"/>
+</frame>

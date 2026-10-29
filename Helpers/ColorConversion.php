@@ -114,4 +114,33 @@ class ColorConversion
 
         return array(floor($r), floor($g), floor($b));
     }
+
+    public static function RGBToHUE($r, $g, $b) {
+        $r = ($r / 255.0);
+        $g = ($g / 255.0);
+        $b = ($b / 255.0);
+    
+        $min = min(min($r, $g), $b);
+        $max = max(max($r, $g), $b);
+        $delta = $max - $min;
+    
+        if ($delta == 0) {
+            return (float)0.0;
+        } else {
+            if ($r == $max) {
+                $hue = (($g - $b) / 6) / $delta;
+            } else if ($g == $max) {
+                $hue = (1.0 / 3) + (($b - $r) / 6) / $delta;
+            } else {
+                $hue = (2.0 / 3) + (($r - $g) / 6) / $delta;
+            }
+    
+            if ($hue < 0)
+                $hue += 1;
+            if ($hue > 1)
+                $hue -= 1;
+    
+            return (float)($hue * 360);
+        }
+    }
 }

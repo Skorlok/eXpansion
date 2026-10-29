@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\ServerNeighborhood;
 
 use ManiaLive\Utilities\Time as TmTime;
 use Maniaplanet\DedicatedServer\Connection;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 
 class Server
 {
@@ -20,14 +21,14 @@ class Server
 
     private $server_oldOnline;
 
-    private $inDb = false;
+    public $mlAction;
 
     public function __construct()
     {
         $this->server_oldOnline = time() - 10;
     }
 
-    public function create_fromConnection(Connection $connection, \ManiaLive\Data\Storage $storage)
+    public function create_fromConnection(Connection $connection, \ManiaLivePlugins\eXpansion\Helpers\Storage $storage)
     {
 
         $this->server_titleId = $connection->getVersion()->titleId;
@@ -39,11 +40,11 @@ class Server
         $this->server_ladder_max = $ladders->ladderServerLimitMax / 1000;
     }
 
-    public function createXML(Connection $connection, \ManiaLive\Data\Storage $storage)
+    public function createXML(Connection $connection, \ManiaLivePlugins\eXpansion\Helpers\Storage $storage)
     {
 
         $serverName = $storage->server->name;
-        $serverName = \ManiaLib\Utils\Formatting::stripCodes($serverName, 'l');
+        $serverName = Formatting::stripCodes($serverName, 'l');
         $serverName = $this->removespecials($serverName);
 
         $xml = '<?xml version="1.0" encoding="utf-8" ?>' . "\n";
@@ -55,7 +56,7 @@ class Server
         $xml .= '  <zone>' . $this->server_path . '</zone>' . "\n";
         $xml .= '  <private>' . ($storage->server->password == "" ? 'false' : 'true') . '</private>' . "\n";
         $xml .= '  <game>MP</game>' . "\n";
-        $xml .= '  <gamemode>' . $storage->gameInfos->gameMode . '</gamemode>' . "\n";
+        $xml .= '  <gamemode>' . $storage->getCleanGamemodeName() . '</gamemode>' . "\n";
         $xml .= '  <title>' . $this->server_titleId . '</title>' . "\n";
         $xml .= '  <packmask>' . $this->server_titleId . '</packmask>' . "\n";
         $xml .= '  <players>' . "\n";
@@ -86,7 +87,7 @@ class Server
         $xml .= '  <players>' . "\n";
         foreach ($storage->players as $player) {
             $nickname = $this->removespecials($player->nickName);
-            $nickname = \ManiaLib\Utils\Formatting::stripCodes($nickname, 'l');
+            $nickname = Formatting::stripCodes($nickname, 'l');
 
             $xml .= '   <player>' . "\n";
             $xml .= '     <nickname>' . $nickname . '</nickname>' . "\n";
@@ -98,7 +99,7 @@ class Server
         }
         foreach ($storage->spectators as $player) {
             $nickname = $this->removespecials($player->nickName);
-            $nickname = \ManiaLib\Utils\Formatting::stripCodes($nickname, 'l');
+            $nickname = Formatting::stripCodes($nickname, 'l');
 
             $xml .= '   <player>' . "\n";
             $xml .= '     <nickname>' . $nickname . '</nickname>' . "\n";
@@ -114,34 +115,6 @@ class Server
 
         return $xml;
     }
-
-    public function saveToDb(\ManiaLive\Database\Connection $db, \Connection $connection, \ManiaLive\Data\Storage $storage)
-    {
-
-        $data = $this->createXML($connection, $storage);
-
-        if (!$this->inDb) {
-
-            $sql = 'SELECT * FROM ode8_servers WHERE server_login = ' . $db->quote($storage->serverLogin) . '';
-            $dbData = $db->query($sql);
-
-            if ($dbData->recordCount() == 0) {
-                $sql = 'INSERT INTO ode8_servers VALUES
-                            (null, ' . $db->quote($storage->serverLogin) . ', ' . time() . ',' . $db->quote($data) . ')';
-                $db->query($sql);
-                $this->inDb = true;
-
-                return;
-            }
-        }
-
-        $sql = 'UPDATE ode8_servers 
-                    SET server_lastmodified = ' . $db->quote(time()) . '
-                        , server_data = ' . $db->quote($data) . '
-                    WHERE server_login = ' . $db->quote($storage->serverLogin) . '';
-        $db->query($sql);
-    }
-
 
     private function removespecials($text)
     {

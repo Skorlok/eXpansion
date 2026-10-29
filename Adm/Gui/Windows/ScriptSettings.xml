@@ -1,0 +1,24 @@
+<frame posn="5 0 0">
+    <frame id="Pager" scriptevents="1">
+        <exp:foreach items="settings" as="setting" index="i">
+        <frame>
+            <frame posn="-2 0 0"><exp:listbg indexNumber="{i}" sizeX="147" sizeY="6"/></frame>
+            <frame posn="0 0 1.0E-5">
+                <quad sizen="4 4" halign="center" valign="center2" style="Icons128x128_1" substyle="Challenge"/>
+                <label posn="4 0 1.0E-5" sizen="120 4" scale="0.8" halign="left" valign="center" style="TextStaticSmall" text="{setting.label}"/>
+                <frame posn="104 0 1">
+                    <exp:if test="setting.isBool">
+                        <exp:checkbox name="{setting.name}" active="{setting.value}"/>
+                    <exp:else/>
+                        <exp:inputbox name="{setting.name}" sizeX="20" text="{setting.value}"/>
+                    </exp:if>
+                </frame>
+            </frame>
+        </frame>
+        </exp:foreach>
+    </frame>
+    <exp:pager sizeX="155" sizeY="92" itemSizeY="6"/>
+</frame>
+<frame posn="140 -95.75 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0d0" action="exp:eXpansion.Adm:scriptSettingsApply" isTextId="true"/>
+</frame>

@@ -3,26 +3,30 @@
 namespace ManiaLivePlugins\eXpansion\SM_CheckpointCount;
 
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\SM_CheckpointCount\Gui\Widgets\CPPanel;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 
 class SM_CheckpointCount extends ExpPlugin
 {
 
-    public function eXpOnLoad()
+    private $config;
+    private $widget;
+
+    /*public function eXpOnLoad()
     {
         $this->enableScriptEvents("LibXmlRpc_OnWayPoint");
-    }
+    }*/
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
 
-        foreach ($this->storage->players as $player) {
-            $this->onPlayerConnect($player->login, false);
-        }
-        foreach ($this->storage->spectators as $player) {
-            $this->onPlayerConnect($player->login, true);
-        }
+        $this->widget = new Widget("SM_CheckpointCount\Gui\Widgets\CpPanel.xml");
+        $this->widget->setName("Checkpoint counter");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(35, 6);
+
+        $this->displayWidget();
     }
 
     /**
@@ -34,51 +38,52 @@ class SM_CheckpointCount extends ExpPlugin
      */
     protected function displayWidget($login = null, $cpIndex = "-")
     {
-        if ($login == null) {
-            CPPanel::EraseAll();
-        } else {
-            CPPanel::Erase($login);
+        $text = '$fff' . $cpIndex . " / " . ($this->storage->currentMap->nbCheckpoints - 1);
+        if ($cpIndex == ($this->storage->currentMap->nbCheckpoints - 1)) {
+            $text = '$f00Finish now';
         }
 
-        $info = CPPanel::Create($login);
-        $info->setSize(35, 6);
-        $text = $cpIndex . " / " . ($this->storage->currentMap->nbCheckpoints - 1);
-        $info->setText('$fff' . $text);
-        $info->setPosition(-17.5, -60);
-        $info->show();
+        $this->widget->setPosition($this->config->checkpointCounter_PosX, $this->config->checkpointCounter_PosY, 0);
+        $this->widget->setParam("text", $text);
+        $this->widget->show($login, true);
     }
 
-    public function LibXmlRpc_OnWayPoint($login, $blockId, $time, $cpIndex, $isEndBlock, $lapTime, $lapNb, $isLapEnd)
+    /*public function LibXmlRpc_OnWayPoint($login, $blockId, $time, $cpIndex, $isEndBlock, $lapTime, $lapNb, $isLapEnd)
     {
         $cp = $cpIndex;
         if ($isEndBlock) {
             $cp = "-";
         }
         $this->displayWidget($login, $cp);
+    }*/
+
+    public function onPlayerCheckpoint($playerUid, $login, $timeOrScore, $curLap, $checkpointIndex)
+    {
+        $this->displayWidget($login, $checkpointIndex + 1);
+    }
+
+    public function onPlayerFinish($playerUid, $login, $timeOrScore)
+    {
+        $this->displayWidget($login, "-");
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        CPPanel::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function onBeginMatch()
     {
-        foreach ($this->storage->players as $player) {
-            $this->onPlayerConnect($player->login, false);
-        }
-        foreach ($this->storage->spectators as $player) {
-            $this->onPlayerConnect($player->login, true);
-        }
+        $this->displayWidget();
     }
 
-    public function onPlayerConnect($login, $isSpectator)
+    public function eXpOnUnload()
     {
-        $this->displayWidget($login);
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        CPPanel::Erase($login);
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+            $this->widget = null;
+        }
     }
 }

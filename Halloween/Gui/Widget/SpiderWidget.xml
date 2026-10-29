@@ -1,0 +1,4 @@
+<exp:foreach items="spiders" as="n">
+<quad id="rope{n}" posn="500 99 -1" sizen="0.5 180" halign="center" valign="bottom" bgcolor="222a"/>
+<quad id="spider{n}" posn="500 99 0" sizen="20 20" halign="center" valign="top" image="{texture}" scriptevents="1"/>
+</exp:foreach>

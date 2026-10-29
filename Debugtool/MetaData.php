@@ -13,7 +13,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Debug Tool");
+        $this->setName("Developers: DebugTool");
         $this->setDescription('Debugtool for developers');
         $this->setGroups(array('Tools'));
     }

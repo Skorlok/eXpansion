@@ -1,0 +1,15 @@
+<frame posn="2 1 1">
+	<frame posn="0 0 1">
+		<exp:inputbox name="parameter" sizeX="100" label="@Give a reason" text="Bad Behavior" isTextId="true"/>
+	</frame>
+	<frame posn="0 -6 1" hidden="{hideDrop}">
+		<exp:dropdown name="select" itemsVarName="dropdownItems"/>
+	</frame>
+</frame>
+<entry posn="10000 10000 0" sizen="50 5" style="" scriptevents="0" textformat="default" textsize="1" textcolor="fff" name="adminAction" default="{adminAction}"/>
+<entry posn="10000 10000 0" sizen="50 5" style="" scriptevents="0" textformat="default" textsize="1" textcolor="fff" name="adminTarget" default="{adminTarget}"/>
+<frame posn="62 -7 1">
+	<frame posn="25.5 0 1">
+		<exp:button sizeX="32" sizeY="6" text="{@{adminAction}}" action="exp:eXpansion.ChatAdmin:parameterDialogOk" isTextId="true"/>
+	</frame>
+</frame>

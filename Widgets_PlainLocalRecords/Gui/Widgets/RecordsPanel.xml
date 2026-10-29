@@ -1,0 +1,21 @@
+<frame posn="0 0 2.0E-5" id="Frame">
+    <frame>
+        <exp:widgetbg sizeX="46" sizeY="{bgSizeY}"/>
+    </frame>
+    <frame posn="0 0 1.0E-5">
+        <exp:widgettitle sizeX="46" sizeY="4" text="{@{title}}"/>
+    </frame>
+    <frame posn="24 -5 3.0E-5">
+        <frame>
+            <exp:foreach items="records" as="r">
+            <frame posn="-19 {r.posY} 0">
+                <quad id="RecBgBlink_{r.index}" posn="38 1.5 0" sizen="4 45.6" halign="left" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerLine" opacity="0.75" hidden="1" rot="90" colorize="0f0"/>
+                <quad id="RecBg_{r.index}" posn="0 -2.25 1.0E-5" sizen="4 57" halign="left" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerLine" opacity="0.75" hidden="1" rot="270" colorize="3af"/>
+                <label id="RecRank_{r.index}" posn="3 0 2.0E-5" sizen="4 4" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="ff0" text="{r.index}"/>
+                <label id="RecTime_{r.index}" posn="3.7 0 3.0E-5" sizen="11 5" halign="left" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="{r.time}"/>
+                <label id="RecNick_{r.index}" posn="15.5 0 4.0E-5" sizen="22 4" halign="left" valign="center" style="TextCardSmallScores2" scriptevents="1" class="nickLabel" textsize="1" textcolor="fff" text="{r.nickname}"/>
+            </frame>
+            </exp:foreach>
+        </frame>
+    </frame>
+</frame>

@@ -1,0 +1,25 @@
+<frame scale="0.8">
+    <frame>
+        <quad sizen="12 12" image="{flag0}"/>
+        <label posn="12 0 1.0E-5" sizen="40 6" style="TextRaceMessageBig" text="{teamName0}"/>
+        <label posn="61 -2 2.0E-5" sizen="18 6" halign="center" valign="top" style="TextRaceChrono" text="{score0}"/>
+        <label posn="79 -2 3.0E-5" sizen="18 6" halign="center" valign="top" style="TextRaceChrono" text="{score1}"/>
+        <label posn="88 0 4.0E-5" sizen="40 6" style="TextRaceMessageBig" text="{teamName1}"/>
+        <quad posn="128 0 5.0E-5" sizen="12 12" image="{flag1}"/>
+    </frame>
+    <frame posn="0 -12 6.0E-5">
+        <label sizen="16 6" style="TextStaticSmall"/>
+        <frame posn="16 0 1">
+            <exp:button sizeX="9" sizeY="6" text="+" action="exp:eXpansion.ScoreDisplay:add:0"/>
+        </frame>
+        <frame posn="24.25 0 1">
+            <exp:button sizeX="9" sizeY="6" text="-" action="exp:eXpansion.ScoreDisplay:sub:0"/>
+        </frame>
+        <frame posn="84.5 0 1">
+            <exp:button sizeX="9" sizeY="6" text="+" action="exp:eXpansion.ScoreDisplay:add:1"/>
+        </frame>
+        <frame posn="92.75 0 1">
+            <exp:button sizeX="9" sizeY="6" text="-" action="exp:eXpansion.ScoreDisplay:sub:1"/>
+        </frame>
+    </frame>
+</frame>

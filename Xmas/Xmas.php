@@ -2,43 +2,77 @@
 
 namespace ManiaLivePlugins\eXpansion\Xmas;
 
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+
 class Xmas extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
-    private $wasWarmup = false;
+    /** @var StaticWidget */
+    private $widget;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+
+        /** @var Config $config */
+        $config = Config::getInstance();
+        Gui::preloadImage($config->texture);
+        Gui::preloadUpdate();
+
+        $this->widget = new StaticWidget('Xmas\Gui\Windows\XmasWindow.xml');
+        $this->widget->setName("Xmas lights");
+        $this->widget->setLayer("normal");
+        $this->widget->registerScript(new Script('Xmas\Gui\Script'));
+    }
+
+    public function lights()
+    {
+        /** @var Config $config */
+        $config = Config::getInstance();
+
+        $this->widget->setPosition(-($config->width * $config->repeat * $config->scale) / 2, $config->height * $config->scale, -60);
+
+        $lights = array();
+        for ($i = 0; $i < $config->repeat; $i++) {
+            $lights[] = array('index' => $i, 'posX' => $config->posX + $i * $config->width);
+        }
+
+        $this->widget->setParam("lights", $lights);
+        $this->widget->setParam("width", $config->width);
+        $this->widget->setParam("height", $config->height);
+        $this->widget->setParam("posY", $config->posY);
+        $this->widget->setParam("posZ", $config->posZ);
+        $this->widget->setParam("scale", $config->scale);
+        $this->widget->setParam("texture", $this->widget->handleSpecialChars($config->texture));
+        $this->widget->show(null, true);
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        Gui\Windows\XmasWindow::EraseAll();
+        $this->widget->erase();
     }
 
     public function onBeginMatch()
     {
-        Gui\Windows\XmasWindow::EraseAll();
-    }
-
-    public function onBeginRound()
-    {
-        $this->wasWarmup = $this->connection->getWarmUp();
+        $this->widget->erase();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        if ($this->wasWarmup) {
+        if ($this->storage->getCleanGamemodeName() == "endurocup" && \ManiaLivePlugins\eXpansion\Endurance\Endurance::$last_round == false) {
             return;
         }
-        $window = Gui\Windows\XmasWindow::Create(null);
-        $window->show();
+        $this->lights();
     }
 
     public function eXpOnUnload()
     {
-        Gui\Windows\XmasWindow::EraseAll();
+        if ($this->widget instanceof StaticWidget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
+
         parent::eXpOnUnload();
     }
 }

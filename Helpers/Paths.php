@@ -8,27 +8,11 @@ class Paths
     private $mapsDirectory;
     private $gameDataDirectory;
 
-    /**
-     * @var \ManiaLib\Utils\Path $path ;
-     */
-    private $path;
-
     public function __construct()
     {
         $connection = Helper::getSingletons()->getDediConnection();
         $this->mapsDirectory = $connection->getMapsDirectory();
         $this->gameDataDirectory = $connection->gameDataDirectory();
-        $this->path = \ManiaLib\Utils\Path::getInstance();
-    }
-
-    /**
-     * gets manialive root directory
-     *
-     * @return string
-     */
-    public function getManialiveRoot()
-    {
-        return $this->path->getRoot();
     }
 
     protected function getBaseMap()
@@ -58,7 +42,7 @@ class Paths
 
     public function getDownloadMapsPath()
     {
-        return $this->mapsDirectory . $this->getBaseMap() . 'Downloaded' . DIRECTORY_SEPARATOR;
+        return $this->mapsDirectory . $this->getBaseMap() . 'Downloaded'. DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -68,7 +52,7 @@ class Paths
      */
     public function getGameDataPath()
     {
-        return dirname($this->gameDataDirectory) . DIRECTORY_SEPARATOR . "GameData" . DIRECTORY_SEPARATOR;
+        return $this->gameDataDirectory;
     }
 
     public function fileHasExtension($fileName, $extension)

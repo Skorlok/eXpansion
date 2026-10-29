@@ -3,53 +3,24 @@
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLive\Utilities\Time;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEvent;
-use ManiaLivePlugins\eXpansion\Core\Events\ExpansionEventListener;
+use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
+use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Core\I18n\Message;
-use ManiaLivePlugins\eXpansion\Core\types\config\types\Boolean;
 use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\LocalRecords\Events\Event;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Cps;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Ranks;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Records;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\Sector;
-use ManiaLivePlugins\eXpansion\LocalRecords\Gui\Windows\TopSumsWindow;
 use ManiaLivePlugins\eXpansion\LocalRecords\Structures\Record;
+use ManiaLivePlugins\eXpansion\Menu\Menu;
 
-abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements ExpansionEventListener
+abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
-    //This numbers are important do not change. THey are using binarie thinking.
-
-    const DEBUG_NONE = 0; //00000
-
-    const DEBUG_RECS_SAVE = 1; //00001
-
-    const DEBUG_RECS_DB = 2; //00010
-
-    const DEBUG_RECS_FULL = 3; //00011
-
-    const DEBUG_RANKS = 4; //00100
-
-    const DEBUG_LAPS = 8; //01000
-
-    const DEBUG_RECPROCESSTIME = 16; //10000
-
-    const DEBUG_ALL = 31; //11111currentMap
 
     const SCORE_TYPE_TIME = 'time';
 
     const SCORE_TYPE_SCORE = 'score';
-
-    /**
-     * Activating the debug mode of the plugin
-     *
-     * @var int
-     */
-    protected $debug = self::DEBUG_NONE;
 
     /**
      * List of the records for the current track
@@ -57,6 +28,29 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      * @var Record[] Array int => Record
      */
     protected $currentChallengeRecords = array();
+
+    /** @var Window */
+    protected $recordsWindow;
+
+    /** @var Window */
+    protected $ranksWindow;
+
+    /** @var Window */
+    protected $topSumsWindow;
+
+    /** @var Window */
+    protected $sectorWindow;
+
+    /** @var Window */
+    protected $cpsWindow;
+
+    /** @var Window */
+    protected $cpDiffWindow;
+
+    /** @var Window Same template as $cpsWindow, filled with sector times instead */
+    protected $secCpsWindow;
+
+    protected $extendedClassName;
 
     /**
      * The best times and other statistics of the current players on the server
@@ -70,13 +64,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected $currentChallangeSectorsCps = array();
 
     /**
-     * Number of maps that was played since the plugin started
-     *
-     * @var int
-     */
-    protected $map_count = 0;
-
-    /**
      * The current 100 best ranks in the server
      *
      * @var array int => login
@@ -84,7 +71,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected $ranks = array();
 
     /**
-     * The rank of players connected to the
+     * The rank of every ranked player
      *
      * @var array login => int
      */
@@ -97,14 +84,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     protected $total_ranks = -1;
 
-    protected $ranks_reset = false;
-
     /**
-     * Checking if we trued to get ranks before
+     * Ranks have to be (re)loaded from the database
      *
      * @var bool
      */
-    protected $rank_needUpdated = false;
+    protected $rank_needUpdated = true;
 
     /**
      * @var Config
@@ -131,12 +116,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected $msg_new_top5;
     protected $msg_improved_top1;
     protected $msg_improved_top5;
-    protected $msg_admin_savedRecs;
     protected $msg_equals;
     protected $msg_equals_top5;
     protected $msg_equals_top1;
-
-    protected $lastSave = 0;
+    protected $msg_showRankAndAverage;
+    protected $msg_nextRankAndAverage;
+    protected $msg_no_nextRank;
 
     public static $txt_rank;
     public static $txt_nick;
@@ -151,28 +136,26 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     public static $txt_ptime;
     public static $txt_nbRecords;
 
-    public static $openSectorsAction = -1;
-
     public static $openRecordsAction = -1;
 
-    public static $openCpsAction = -1;
+    abstract protected function getScoreType();
 
-    private $deleteTempLogin = null;
+    abstract public function formatScore($score);
+
+    abstract protected function isBetterTime($newTime, $oldTime);
+
+    abstract protected function secureBy($newTime, $oldTime);
+
+    abstract protected function getDbOrderCriteria();
+
+    abstract public function getNbOfLaps();
 
     public function eXpOnInit()
     {
-        //Activating debug for records only
-        $this->debug = self::DEBUG_NONE;
+        $classParts = explode('\\', get_class($this));
+        $this->extendedClassName = end($classParts);
 
-        LocalBase::$openSectorsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(
-            array($this, 'showSectorWindow')
-        );
-        LocalBase::$openRecordsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(
-            array($this, 'showRecsWindowExternal')
-        );
-        LocalBase::$openCpsAction = \ManiaLive\Gui\ActionHandler::getInstance()->createAction(
-            array($this, 'showCpWindow')
-        );
+        LocalBase::$openRecordsAction = 'exp:eXpansion.' . $this->extendedClassName . ':showRecsWindow';
 
         $this->config = Config::getInstance();
 
@@ -185,12 +168,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->setPublicMethod("showRecsWindow");
         $this->setPublicMethod("showRanksWindow");
         $this->setPublicMethod("showCpWindow");
+        $this->setPublicMethod("showSecCpWindow");
         $this->setPublicMethod("showTopSums");
 
         //The Database plugin is needed.
-        $this->addDependency(
-            new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database")
-        );
+        $this->addDependency(new \ManiaLive\PluginHandler\Dependency("\\ManiaLivePlugins\\eXpansion\\Database\\Database"));
     }
 
     public function eXpOnLoad()
@@ -198,44 +180,33 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         //Recovering the multi language messages
 
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_secure = eXpGetMessage('#variable#%1$s #record#secures #rank#%2$s. #record#Local Record!'
-            . ' #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
+        $this->msg_secure = eXpGetMessage('#variable#%1$s #record#secures #rank#%2$s. #record#Local Record!#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
         // %1$s - nickname; %2$s - rank; %3$s - time
         $this->msg_new = eXpGetMessage('#variable#%1$s #record#new #rank#%2$s.#record# Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time
-        $this->msg_equals = eXpGetMessage('#record#Oops! #variable#%1$s #record#equals #rank#%2$s#record#. '
-            . 'Local Record! #time#%3$s');
+        $this->msg_equals = eXpGetMessage('#record#Oops! #variable#%1$s #record#equals #rank#%2$s#record#. Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_improved = eXpGetMessage('#variable#%1$s #record#improves #rank#%2$s. #record#Local Record! ' .
-            '#time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
+        $this->msg_improved = eXpGetMessage('#variable#%1$s #record#improves #rank#%2$s. #record#Local Record! #time#%3$s #record#(#rank#%4$s #time#-%5$s#record#)');
 
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_secure_top5 = eXpGetMessage('#variable#%1$s #record_top#secures #rank#%2$s.#record_top# '
-            . 'Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)');
+        $this->msg_secure_top5 = eXpGetMessage('#variable#%1$s #record_top#secures #rank#%2$s.#record_top# Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)');
         // %1$s - nickname; %2$s - rank; %3$s - time
-        $this->msg_new_top5 = eXpGetMessage('#variable#%1$s #record_top#new #rank#%2$s.#record_top# '
-            . 'Local Record! #time#%3$s');
+        $this->msg_new_top5 = eXpGetMessage('#variable#%1$s #record_top#new #rank#%2$s.#record_top# Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time
-        $this->msg_equals_top5 = eXpGetMessage('#record_top#Oops! #variable#%1$s #record_top#equals #rank#%2$s#record_top#. '
-            . 'Local Record! #time#%3$s');
+        $this->msg_equals_top5 = eXpGetMessage('#record_top#Oops! #variable#%1$s #record_top#equals #rank#%2$s#record_top#. Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_improved_top5 = eXpGetMessage('#variable#%1$s #record_top#improves #rank#%2$s.#record_top# '
-            . 'Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)');
+        $this->msg_improved_top5 = eXpGetMessage('#variable#%1$s #record_top#improves #rank#%2$s.#record_top# Local Record! #time#%3$s #record_top#(#rank#%4$s #time#-%5$s#record_top#)');
 
 
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_secure_top1 = eXpGetMessage('$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!'
-            . '$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)');
+        $this->msg_secure_top1 = eXpGetMessage('$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)');
         // %1$s - nickname; %2$s - rank; %3$s - time
-        $this->msg_new_top1 = eXpGetMessage('$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!'
-            . '$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s');
+        $this->msg_new_top1 = eXpGetMessage('$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$f90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time
 
-        $this->msg_equals_top1 = eXpGetMessage('$o$0CFO$2DFo$3DFo$5EFo$6EFp$8FFs$9FF!$fff %1$s $z$s$9ff$oequals '
-            . '#rank#%2$s.$9ff$o Local Record! #time#%3$s');
+        $this->msg_equals_top1 = eXpGetMessage('$o$0CFO$2DFo$3DFo$5EFo$6EFp$8FFs$9FF!$fff %1$s $z$s$9ff$oequals #rank#%2$s.$9ff$o Local Record! #time#%3$s');
         // %1$s - nickname; %2$s - rank; %3$s - time; %4$s - old rank; %5$s - time difference
-        $this->msg_improved_top1 = eXpGetMessage('$z$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$F90!'
-            . '$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)');
+        $this->msg_improved_top1 = eXpGetMessage('$z$o$FF0Co$FE0ng$FD0rat$FC0ul$FB0ati$FA0on$F90s$fff %1$s$F90!$z$s$o$fff %2$s.$f90 Local Record! #time#%3$s $f90(#rank#%4$s #time#-%5$s$F90)');
 
         // %1$s - map name,
         $this->msg_newMap = eXpGetMessage('#variable#%1$s  #record#is a new Map. Currently no record!');
@@ -246,8 +217,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->msg_noPB = eXpGetMessage('#admin_error# $iYou have not finished this map yet..');
         // %1$s - server rank, %2$s - total # of ranks
         $this->msg_showRank = eXpGetMessage('#record#Server rank: #rank#%1$s#record#/#rank#%2$s');
+        // %1$s - server rank, %2$s - total # of ranks, %3 - average score
+        $this->msg_showRankAndAverage = eXpGetMessage('#record#Server rank: #rank#%1$s#record#/#rank#%2$s #record#Average: $s#time#%3$s');
         $this->msg_noRank = eXpGetMessage('#admin_error#$iNot enough local records to obtain ranking yet..');
-        $this->msg_admin_savedRecs = eXpGetMessage('#admin_action#Records saved sucessfully into the database');
+        // %1$s - nextplayerlogin, %2$s - server rank, %3$s - total # of ranks, %4 - average score, %5 - diff
+        $this->msg_nextRankAndAverage = eXpGetMessage('#record#The next better ranked player is #variable#%1$s: #rank#%2$s#record#/#rank#%3$s #record#Average: $s#time#%4$s [$s#time#%5$s]');
+        $this->msg_no_nextRank = eXpGetMessage('#record#You are already the best ranked player');
 
         self::$txt_rank = eXpGetMessage("#");
         self::$txt_nick = eXpGetMessage("NickName");
@@ -265,8 +240,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $this->enableStorageEvents();
         $this->enableDedicatedEvents();
         $this->enableDatabase();
-        $this->enableTickerEvent();
-        Dispatcher::register(ExpansionEvent::getClass(), $this);
 
         //List of all records
         $cmd = $this->registerChatCommand("recs", "showRecsWindow", 0, true);
@@ -285,63 +258,55 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $cmd = $this->registerChatCommand("rank", "chat_showRank", 0, true);
         $cmd->help = 'Show Player Rank';
 
+        $cmd = $this->registerChatCommand("nextrank", "chat_nextRank", 0, true);
+        $cmd->help = 'Show the next better ranked player';
+
         $cmd = $this->registerChatCommand("pb", "chat_personalBest", 0, true);
         $cmd->help = 'Show Player Personal Best';
 
         $cmd = $this->registerChatCommand("cps", "showCpWindow", 0, true);
         $cmd->help = 'Show Checkpoint times';
 
+        $cmd = $this->registerChatCommand("seccps", "showSecCpWindow", 0, true);
+        $cmd->help = 'Show Sectors times';
+
+        $cmd = $this->registerChatCommand("cps", "showCPDiffWindow", 1, true);
+        $cmd->help = 'Show Checkpoint difference';
+
+        $cmd = $this->registerChatCommand("localcps", "showCpDiffNoDediWindow", 1, true);
+        $cmd->help = 'Show Checkpoint difference without dedimania';
+
         $cmd = $this->registerChatCommand("sectors", "showSectorWindow", 0, true);
         $cmd->help = 'Show Players Best Sector times';
 
-        $cmd = AdminGroups::addAdminCommand("saverecs", $this, "chat_forceSave", "records_save");
-        $cmd->setHelp("Will force the save of the records changes in the Database");
-
-        $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", "records_save");
+        $cmd = AdminGroups::addAdminCommand("delrec", $this, "chat_delRecord", Permission::LOCAL_RECORDS_DELETE);
         $cmd->setHelp("Deletes all records by login");
+
+        Menu::addMenuItem("LocalRecords",
+            array("Records" => array(null, array(
+                "Local" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showRecsWindow'),
+                "Hall of Fame" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showTopSums'),
+                "Server Ranks" => array(null, 'exp:eXpansion.' . $this->extendedClassName . ':showRanksWindow')
+            )))
+        );
 
         //$this->previewRecordMessages();
     }
 
     public function previewRecordMessages()
     {
+        $messages = array($this->msg_improved_top1, $this->msg_improved_top5, $this->msg_improved, $this->msg_secure_top1, $this->msg_secure_top5, $this->msg_secure);
 
-        $messages = array(
-            $this->msg_improved_top1, $this->msg_improved_top5, $this->msg_improved,
-            $this->msg_secure_top1, $this->msg_secure_top5, $this->msg_secure
-        );
-
-        $messages2 = array($this->msg_equals_top1, $this->msg_equals_top5, $this->msg_equals,
-            $this->msg_new_top1, $this->msg_new_top5, $this->msg_new);
+        $messages2 = array($this->msg_equals_top1, $this->msg_equals_top5, $this->msg_equals, $this->msg_new_top1, $this->msg_new_top5, $this->msg_new);
 
         foreach ($messages as $msg) {
-            $this->eXpChatSendServerMessage(
-                $msg,
-                null,
-                array(
-                    \ManiaLib\Utils\Formatting::stripCodes('test', 'wosnm'),
-                    rand(1, 100),
-                    Time::fromTM(rand(10000, 100000)),
-                    rand(1, 100),
-                    Time::fromTM(rand(10000, 100000))
-                )
-            );
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes('test', 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000)), rand(1, 100), Time::fromTM(rand(10000, 100000))));
         }
 
         foreach ($messages2 as $msg) {
-            $this->eXpChatSendServerMessage(
-                $msg,
-                null,
-                array(
-                    \ManiaLib\Utils\Formatting::stripCodes("test", 'wosnm'),
-                    rand(1, 100),
-                    Time::fromTM(rand(10000, 100000))
-                )
-            );
+            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes("test", 'wosnm'), rand(1, 100), Time::fromTM(rand(10000, 100000))));
         }
-
     }
-
 
     public function eXpOnReady()
     {
@@ -362,132 +327,88 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $this->db->execute($q);
         }
 
-        //Checking the version if the table
-        $version = $this->callPublicMethod(
-            '\ManiaLivePlugins\eXpansion\Database\Database',
-            'getDatabaseVersion',
-            'exp_records'
-        );
-        if (!$version) {
-            $version = $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Database\Database',
-                'setDatabaseVersion',
-                'exp_records',
-                1
-            );
-        }
+        $database = $this->db->execute("DESCRIBE `exp_records`")->fetchArrayOfObject();
 
-        $version = $this->callPublicMethod(
-            '\ManiaLivePlugins\eXpansion\Database\Database',
-            'getDatabaseVersion',
-            'exp_records'
-        );
-        // update for version2
-        if ($version == 1) {
-            $q = "ALTER TABLE `exp_records` CHANGE `record_date` `record_date` INT( 12 ) NOT NULL;";
-            $this->db->execute($q);
-            $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Database\Database',
-                'setDatabaseVersion',
-                'exp_records',
-                2
-            );
-        }
-
-        $version = $this->callPublicMethod(
-            '\ManiaLivePlugins\eXpansion\Database\Database',
-            'getDatabaseVersion',
-            'exp_records'
-        );
-
-        //Update for version 3
-        if ($version <= 2) {
-            try {
-                $q = "ALTER TABLE `exp_records` ADD COLUMN score_type VARCHAR(10) DEFAULT 'time'";
-                $this->db->execute($q);
-            } catch (\Exception $e) {
-                $this->console(
-                    "There was error while updating database structure to version 3, "
-                    . "setting version 3 as mostlikely it's already converted.."
-                );
+        // CHECK
+        $recordDateFound = false;
+        foreach ($database as $field) {
+            if ($field->Field == "record_date") {
+                if ($field->Type != "int(12)") {
+                    $q = "ALTER TABLE `exp_records` CHANGE `record_date` `record_date` INT( 12 ) NOT NULL;";
+                    $this->db->execute($q);
+                }
             }
-            $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Database\Database',
-                'setDatabaseVersion',
-                'exp_records',
-                3
-            );
+
+            if ($field->Field == "score_type") {
+                $recordDateFound = true;
+            }
         }
 
-
-        if (!$this->db->tableExists("exp_ranks")) {
-            $q = "CREATE TABLE `exp_ranks` (
-                    `rank_playerlogin` VARCHAR( 30 ) NOT NULL DEFAULT '0',
-                    `rank_rank` INT(6) NOT NULL DEFAULT '0',
-                    `rank_challengeuid` VARCHAR( 27 ) NOT NULL DEFAULT '0',
-                    `rank_nbLaps` INT( 3 ) NOT NULL,
-                    KEY(`rank_challengeuid` ,  `rank_playerlogin` ,  `rank_nbLaps`)
-                ) CHARACTER SET utf8 COLLATE utf8_general_ci ENGINE = MYISAM ;";
+        if (!$recordDateFound) {
+            $q = "ALTER TABLE `exp_records` ADD COLUMN score_type VARCHAR(10) DEFAULT 'time'";
             $this->db->execute($q);
-            $this->resetRanks();
         }
+
+
+        if ($this->db->tableExists("exp_ranks")) {
+            $q = 'DROP TABLE `exp_ranks`;';
+            $this->db->execute($q);
+        }
+
+        $this->computerServerRanks();
 
         $this->onBeginMap("", "", "");
-        if ($this->isPluginLoaded('eXpansion\Menu')) {
-            $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Menu', 'addSeparator', __('Records'), true);
-            $this->callPublicMethod(
-                '\ManiaLivePlugins\eXpansion\Menu',
-                'addItem',
-                __('Map Records'),
-                null,
-                array($this, 'showRecsMenuItem'),
-                false
-            );
-        }
 
-        $this->getRanks();
+        $this->registerManialinkCallback('showRecsWindow', false, true);
+        $this->registerManialinkCallback('deleteRecord', false, true);
+        $this->registerManialinkCallback('showCpWindow', false, true);
+        $this->registerManialinkCallback('showSecCpWindow', false, true);
+        $this->registerManialinkCallback('showSectorWindow');
+        $this->registerManialinkCallback('showRanksWindow');
+        $this->registerManialinkCallback('showTopSums');
+        $this->registerManialinkCallback('delRec', false, true);
+        $this->registerManialinkCallback('delRecs', false, true);
+
+        $this->recordsWindow = new Window("LocalRecords\Gui\Windows\Records.xml");
+        $this->recordsWindow->setName("Records");
+        $this->recordsWindow->setSize(180, 100);
+        $this->recordsWindow->setTitle('Records on a Map');
+
+        $this->ranksWindow = new Window("LocalRecords\Gui\Windows\Ranks.xml");
+        $this->ranksWindow->setName("Ranks");
+        $this->ranksWindow->setSize(150, 100);
+        $this->ranksWindow->setTitle('Server Ranks');
+
+        $this->topSumsWindow = new Window("LocalRecords\Gui\Windows\TopSums.xml");
+        $this->topSumsWindow->setName("TopSums");
+        $this->topSumsWindow->setSize(100, 90);
+        $this->topSumsWindow->setTitle("TopSums");
+
+        $this->sectorWindow = new Window("LocalRecords\Gui\Windows\Sector.xml");
+        $this->sectorWindow->setName("Sectors");
+        $this->sectorWindow->setSize(160, 100);
+        $this->sectorWindow->setTitle('Sector Times on Map');
+
+        $this->cpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->cpsWindow->setName("Cps");
+        $this->cpsWindow->setSize(170, 110);
+        $this->cpsWindow->setTitle('CheckPoints on Map');
+
+        $this->secCpsWindow = new Window("LocalRecords\Gui\Windows\Cps.xml");
+        $this->secCpsWindow->setName("SecCps");
+        $this->secCpsWindow->setSize(170, 110);
+        $this->secCpsWindow->setTitle('Sectors on Map');
+
+        $this->cpDiffWindow = new Window("LocalRecords\Gui\Windows\CpDiff.xml");
+        $this->cpDiffWindow->setName("CpDiff");
+        $this->cpDiffWindow->setSize(200, 100);
+        $this->cpDiffWindow->setTitle('Local CheckPoints Difference');
     }
 
     public function onSettingsChanged(\ManiaLivePlugins\eXpansion\Core\types\config\Variable $var)
     {
-        if ($var->getName() == 'resetRanks' && $var instanceof Boolean) {
-            if ($var->getRawValue()) {
-                $admins = \ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups::getInstance();
-                $admins->announceToPermission(
-                    'expansion_settings',
-                    "#admin_action#Reseting and generating all server ranks..."
-                );
-                $this->resetRanks();
-                $var->setValue(false);
-                $admins->announceToPermission(
-                    'expansion_settings',
-                    "#admin_action#Server ranks reset done. Ranks generated : " . $this->config->nbMap_rankProcess
-                );
-            }
-        }
+        $this->config = Config::getInstance();
     }
-
-    public function showRecsMenuItem($login)
-    {
-        $this->showRecsWindow($login);
-    }
-
-    public function showRecsWindowExternal($login, $entries = null)
-    {
-        $this->showRecsWindow($login);
-    }
-
-    abstract protected function getScoreType();
-
-    abstract public function formatScore($score);
-
-    abstract protected function isBetterTime($newTime, $oldTime);
-
-    abstract protected function secureBy($newTime, $oldTime);
-
-    abstract protected function getDbOrderCriteria();
-
-    abstract public function getNbOfLaps();
 
     /**
      * getPlayersRecordsForAllMaps($login)
@@ -498,80 +419,45 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function getPlayersRecordsForAllMaps($login)
     {
-
         $count = 0;
         $uids = "";
         foreach ($this->storage->maps as $map) {
-            $uids .= $this->db->quote($map->uId) . ",";
-            $count++;
+            if (!isset($map->localRecords)) {
+                $map->localRecords = array();
+            }
+            if (!isset($map->localRecords[$login])) {
+                $count++;
+
+                $uids .= $this->db->quote($map->uId) . ",";
+                $mapsByUid[$map->uId] = $map;
+            }
         }
 
         if ($count > 0) {
             $uids = trim($uids, ",");
 
-            $q = ' SELECT `rank_rank` as rank,`rank_challengeuid` as uid '
-                . ' FROM `exp_ranks` '
-                . ' WHERE rank_challengeuid IN (' . $uids . ')'
-                . '	AND rank_playerlogin = ' . $this->db->quote($login);
+            $q = 'SELECT `rank`, `record_challengeuid` as `uid`, `record_score` as `score` FROM (SELECT *, IF(@prev <> exp_records.record_challengeuid, @rn:=-1,@rn), @prev:=exp_records.record_challengeuid, @rn:=@rn+1 AS `rank` FROM `exp_records`, (SELECT @rn:=0) rn, (SELECT @prev:=\'\') prev ORDER BY exp_records.record_challengeuid ASC, exp_records.record_score ASC) temp  WHERE `record_challengeuid` IN (' . $uids . ')	AND `record_playerlogin` = ' . $this->db->quote($login);
             $data = $this->db->execute($q);
 
-            $mapsByUid = array();
             while ($row = $data->fetchObject()) {
-                $mapsByUid[$row->uid] = $row->rank;
-            }
-        }
-        return $mapsByUid;
-    }
-
-    public function onTick()
-    {
-        if ($this->config->saveRecFrequency != 0) {
-            if ((time() - $this->lastSave) > ($this->config->saveRecFrequency * 60)) {
-                $this->onEndMatch(array(), array());
-                $this->lastSave = time();
+                $mapsByUid[$row->uid]->localRecords[$login] = array($row->rank, $row->score);
             }
         }
     }
-
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
         //We get all the records
         $this->updateCurrentChallengeRecords();
-        //New map, so map count ++
-        $this->map_count++;
-
-        //Checking for lap constraints
-        if ($this->useLapsConstraints()) {
-            $nbLaps = $this->getNbOfLaps();
-        } else {
-            $nbLaps = 1;
-        }
-
-        if (($this->debug & self::DEBUG_LAPS) == self::DEBUG_LAPS) {
-            $this->debug("Nb Laps : " . $nbLaps);
-        }
 
         //Sending begin map messages
         if (sizeof($this->currentChallengeRecords) == 0 && $this->config->sendBeginMapNotices) {
-            $this->eXpChatSendServerMessage(
-                $this->msg_newMap,
-                null,
-                array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'))
-            );
+            $this->eXpChatSendServerMessage($this->msg_newMap, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
         } else {
             if ($this->config->sendBeginMapNotices) {
                 $time = $this->formatScore($this->currentChallengeRecords[0]->time);
 
-                $this->eXpChatSendServerMessage(
-                    $this->msg_BeginMap,
-                    null,
-                    array(
-                        \ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'),
-                        $time,
-                        \ManiaLib\Utils\Formatting::stripCodes($this->currentChallengeRecords[0]->nickName, 'wosnm')
-                    )
-                );
+                $this->eXpChatSendServerMessage($this->msg_BeginMap, null, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, Formatting::stripCodes(Formatting::fixTags($this->currentChallengeRecords[0]->nickName), 'wosnm')));
                 foreach ($this->storage->players as $login => $player) {
                     $this->chat_personalBest($login, null);
                 }
@@ -580,6 +466,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 }
             }
         }
+
         //send Ranking
         if ($this->config->sendRankingNotices) {
             foreach ($this->storage->players as $login => $player) {
@@ -590,31 +477,17 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $this->chat_showRank($login);
             }
         }
-
-        // Consider save done.
-        $this->lastSave = time();
     }
 
     public function onEndMatch($rankings, $winnerTeamOrMap)
     {
-        $cons = "";
         //Checking for lap constraints
-        if ($this->useLapsConstraints()) {
-            $nbLaps = $this->getNbOfLaps();
-            $cons .= " AND rank_nbLaps = " . $this->getNbOfLaps();
-        } else {
-            $nbLaps = 1;
-            $cons .= " AND rank_nbLaps = 1";
-        }
+        $nbLaps = $this->getNbOfLaps();
 
-        if (($this->debug & self::DEBUG_LAPS) == self::DEBUG_LAPS) {
-            $this->debug("Nb Laps : " . $nbLaps);
-        }
-
-        $updated = false;
+        $this->debug("Nb Laps : " . $nbLaps);
 
         //We update the database
-        //Firs of the best records
+        //First of the best records
         $currentMap = $this->storage->currentMap;
         foreach ($this->storage->maps as $map) {
             if ($map->uId == $this->storage->currentMap->uId) {
@@ -622,40 +495,18 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 break;
             }
         }
+
         $currentMap->localRecords = array();
         foreach ($this->currentChallengeRecords as $i => $record) {
-            $currentMap->localRecords[$record->login] = $record->place;
-            $newUpdate = $this->updateRecordInDatabase($record, $nbLaps);
-            $updated = $updated || $newUpdate;
-        }
-        //Now the rest of the times as well(PB)
-        foreach ($this->currentChallengePlayerRecords as $i => $record) {
-            $newUpdate = $this->updateRecordInDatabase($record, $nbLaps);
-            $updated = $updated || $newUpdate;
-        }
-
-        if ($updated) {
-            $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
-        } else {
-            $q = "SELECT rank_playerlogin FROM `exp_ranks`"
-                . " WHERE rank_challengeuid = " . $this->db->quote($this->storage->currentMap->uId) . $cons;
-            $data = $this->db->execute($q);
-            if (sizeof($data->fetchArray()) == 0) {
-                $this->updateRanks($this->storage->currentMap->uId, $nbLaps, true);
-            }
+            $currentMap->localRecords[$record->login] = array($record->place - 1, $record->time);
         }
     }
 
     public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
     {
-
-        if ($this->ranks_reset) {
-            $this->resetRanks();
-        }
-
         // Added this to calulate the new ranks during every map change -reaby
         $this->rank_needUpdated = true;
-        $this->getRanks();
+        $this->computerServerRanks();
     }
 
     public function onPlayerConnect($login, $isSpectator)
@@ -666,23 +517,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
         //Send a message telling him about records on this map
         if (sizeof($this->currentChallengeRecords) == 0 && $this->config->sendBeginMapNotices) {
-            $this->eXpChatSendServerMessage(
-                $this->msg_newMap,
-                $login,
-                array(\ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'))
-            );
+            $this->eXpChatSendServerMessage($this->msg_newMap, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm')));
         } else {
             if ($this->config->sendBeginMapNotices) {
                 $time = $this->formatScore($this->currentChallengeRecords[0]->time);
 
-                $this->eXpChatSendServerMessage(
-                    $this->msg_BeginMap,
-                    $login,
-                    array(
-                        \ManiaLib\Utils\Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'),
-                        $time, \ManiaLib\Utils\Formatting::stripCodes($this->currentChallengeRecords[0]->nickName, 'wosnm')
-                    )
-                );
+                $this->eXpChatSendServerMessage( $this->msg_BeginMap, $login, array(Formatting::stripCodes($this->storage->currentMap->name, 'wosnm'), $time, Formatting::stripCodes(Formatting::fixTags($this->currentChallengeRecords[0]->nickName), 'wosnm')));
             }
         }
 
@@ -694,22 +534,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     private function checkRecordTreshold($place)
     {
-        if ($place <= Config::getInstance()->noRedirectTreshold) {
+        /** @var Config $config */
+        $config = Config::getInstance();
+        if ($place <= $config->noRedirectTreshold) {
             return true;
         }
         return false;
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        if (isset($this->player_ranks[$login]) && $this->player_ranks[$login] > 100) {
-            //And rank data
-            unset($this->player_ranks[$login]);
-        }
-    }
-
-    public function onMapListModified($curMapIndex, $nextMapIndex, $isListModified)
-    {
     }
 
     /**
@@ -718,21 +548,18 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      *
      * @param string $login the login of the player who did the time
      * @param int $score His score/time
-     * @param int $gamemode The gamemode while he did the record
      * @param array() $cpScore list of CheckPoint times
      */
-    public function addRecord($login, $score, $gamemode, $cpScore)
+    public function addRecord($login, $score, $cpScore)
     {
         $uid = $this->storage->currentMap->uId;
         $player = $this->storage->getPlayerObject($login);
         $force = false;
+        $isNew = false;
         $this->currentChallangeSectorTimes = array();
 
         if (is_object($player) == false) {
-            $this->console(
-                "Notice: Error while saving record for login '" . $login . "',couldn't fetch player object!"
-            );
-
+            $this->console("Notice: Error while saving record for login '" . $login . "',couldn't fetch player object!");
             return;
         }
 
@@ -744,7 +571,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $record->time = $score;
             $record->nbFinish = 1;
             $record->avgScore = $score;
-            $record->gamemode = self::eXpGetCurrentCompatibilityGameMode();
             $record->nation = $player->path;
             $record->uId = $uid;
             $record->place = sizeof($this->currentChallengeRecords) + 1;
@@ -755,32 +581,21 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
             $this->currentChallengeRecords[$i] = $record;
             $this->currentChallengePlayerRecords[$login] = $record;
-            $this->currentChallengePlayerRecords[$login]->isNew = true;
+
             $force = true;
-            if (($this->debug & self::DEBUG_RECS_SAVE) == self::DEBUG_RECS_SAVE) {
-                $this->debug("$login just did his firs time of $score on this map");
-            }
+            $isNew = true;
+
+            $this->debug("$login just did his firs time of $score on this map");
         } else {
             //We update the old records average time and nbFinish
             $this->currentChallengePlayerRecords[$login]->nbFinish++;
-            $avgScore = (
-                    ($this->currentChallengePlayerRecords[$login]->nbFinish - 1)
-                    * $this->currentChallengePlayerRecords[$login]->avgScore + $score
-                ) / $this->currentChallengePlayerRecords[$login]->nbFinish;
+            $avgScore = (($this->currentChallengePlayerRecords[$login]->nbFinish - 1) * $this->currentChallengePlayerRecords[$login]->avgScore + $score) / $this->currentChallengePlayerRecords[$login]->nbFinish;
             $this->currentChallengePlayerRecords[$login]->avgScore = $avgScore;
 
-            if (($this->debug & self::DEBUG_RECS_SAVE) == self::DEBUG_RECS_SAVE) {
-                $this->debug(
-                    "$login just did a new time of $score. His current rank is "
-                    . $this->currentChallengePlayerRecords[$login]->place
-                );
-            }
+            $this->debug("$login just did a new time of $score. His current rank is " . $this->currentChallengePlayerRecords[$login]->place);
         }
 
         $nrecord = $this->currentChallengePlayerRecords[$login];
-
-        //We flag it as it needs to be updated in the database as well
-        $nrecord->isUpdated = true;
 
         //Now we need to find it's rank
         if ($force || $this->isBetterTime($score, $nrecord->time)) {
@@ -805,11 +620,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $i = $this->config->recordsCount - 1;
             }
 
-            if (($this->debug & self::DEBUG_RECS_FULL) == self::DEBUG_RECS_FULL) {
-                $this->console(
-                    "Starting to look for the rank of $login 's record at rank $i+1"
-                );
-            }
+            $this->debug("Starting to look for the rank of $login 's record at rank $i+1");
 
             $firstRecord = ($i < 0);
 
@@ -817,12 +628,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             while ($i >= 0 && !$this->isBetterTime($this->currentChallengeRecords[$i]->time, $nrecord->time)) {
                 $record = $this->currentChallengeRecords[$i];
 
-                if (($this->debug & self::DEBUG_RECS_FULL) == self::DEBUG_RECS_FULL) {
-                    $this->console(
-                        "$login is getting better : " . $nrecord->place . "=>" . ($nrecord->place - 1)
-                        . "And " . $record->login . " is getting worse" . $record->place . "=>" . ($record->place + 1)
-                    );
-                }
+                $this->debug("$login is getting better : " . $nrecord->place . "=>" . ($nrecord->place - 1) . "And " . $record->login . " is getting worse" . $record->place . "=>" . ($record->place + 1));
 
                 //New record takes old recs place
                 $this->currentChallengeRecords[$i] = $nrecord;
@@ -839,14 +645,11 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 $nrecord->place = 1;
             }
             $nrecord->ScoreCheckpoints = $cpScore;
-            if (($this->debug & self::DEBUG_RECS_SAVE) == self::DEBUG_RECS_SAVE) {
-                $this->console(
-                    "$login new rec Rank found" . $nrecord->place . " Old was : " . $recordrank_old
-                );
-            }
+
+            $this->debug("$login new rec Rank found : " . $nrecord->place . " Old was : " . $recordrank_old);
 
             //If relay don't send message, host server will send one.
-            if ($this->expStorage->isRelay) {
+            if ($this->storage->isRelay) {
                 return;
             }
 
@@ -870,30 +673,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                         }
                     }
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            null,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time,
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            $login,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                     }
-                    // improves time
+
+                // improves time
                 } else {
                     $msg = $this->msg_secure;
                     if ($nrecord->place <= 5) {
@@ -903,38 +688,15 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                         }
                     }
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            null,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time,
-                                $recordrank_old,
-                                $securedBy
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            $login,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time,
-                                $recordrank_old,
-                                $securedBy
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     }
                 }
 
-                \ManiaLive\Event\Dispatcher::dispatch(
-                    new Event(Event::ON_UPDATE_RECORDS, $this->currentChallengeRecords)
-                );
-            } else { //Improved time and new Rank
+                Dispatcher::dispatch(new Event(Event::ON_UPDATE_RECORDS, $this->currentChallengeRecords));
+            } else {
+                //Improved time and new Rank
                 if ($nrecord->place < $recordrank_old && !$force && $nrecord->place <= $this->config->recordsCount) {
                     $securedBy = $this->secureBy($nrecord->time, $recordtime_old);
 
@@ -947,37 +709,14 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                     }
 
                     if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            null,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time,
-                                $recordrank_old,
-                                $securedBy
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     } else {
-                        $this->eXpChatSendServerMessage(
-                            $msg,
-                            $login,
-                            array(
-                                \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                $nrecord->place,
-                                $time,
-                                $recordrank_old,
-                                $securedBy
-                            ),
-                            $this->checkRecordTreshold($nrecord->place)
-                        );
+                        $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time, $recordrank_old, $securedBy), $this->checkRecordTreshold($nrecord->place));
                     }
 
-                    \ManiaLive\Event\Dispatcher::dispatch(
-                        new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord)
-                    );
-                } else {//First record the player drove
+                    Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
+                } else {
+                    //First record the player drove
                     if ($nrecord->place <= $this->config->recordsCount) {
                         $msg = $this->msg_new;
                         if ($nrecord->place <= 5) {
@@ -987,38 +726,20 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                             }
                         }
                         if ($nrecord->place <= $this->config->recordPublicMsgTreshold) {
-                            $this->eXpChatSendServerMessage(
-                                $msg,
-                                null,
-                                array(
-                                    \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                    $nrecord->place,
-                                    $time
-                                ),
-                                $this->checkRecordTreshold($nrecord->place)
-                            );
+                            $this->eXpChatSendServerMessage($msg, null, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                         } else {
-                            $this->eXpChatSendServerMessage(
-                                $msg,
-                                $login,
-                                array(
-                                    \ManiaLib\Utils\Formatting::stripCodes($nrecord->nickName, 'wosnm'),
-                                    $nrecord->place,
-                                    $time
-                                ),
-                                $this->checkRecordTreshold($nrecord->place)
-                            );
+                            $this->eXpChatSendServerMessage($msg, $login, array(Formatting::stripCodes($player->cleanNickName, 'wosnm'), $nrecord->place, $time), $this->checkRecordTreshold($nrecord->place));
                         }
 
-                        \ManiaLive\Event\Dispatcher::dispatch(
-                            new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord)
-                        );
+                        Dispatcher::dispatch(new Event(Event::ON_NEW_RECORD, $this->currentChallengeRecords, $nrecord));
                     }
                 }
             }
-            \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_PERSONAL_BEST, $nrecord));
+            Dispatcher::dispatch(new Event(Event::ON_PERSONAL_BEST, $nrecord));
+            $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         } else {
-            \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_NEW_FINISH, $login));
+            Dispatcher::dispatch(new Event(Event::ON_NEW_FINISH, $nrecord));
+            $this->updateRecordInDatabase($this->currentChallengePlayerRecords[$login], $isNew);
         }
     }
 
@@ -1026,66 +747,28 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      * Will update the record in the database.
      *
      * @param Record $record
-     * @param        $nbLaps
+     * @param        $isNew
      *
      * @return bool Was the record updated in the database
      */
-    protected function updateRecordInDatabase(Record $record, $nbLaps)
+    protected function updateRecordInDatabase(Record $record, $isNew)
     {
         //If relay server host will save records no need to do it here
-        if ($this->expStorage->isRelay) {
+        if ($this->storage->isRelay) {
             return;
         }
 
-        //print_r($record);
-        //$uid = $this->storage->currentMap->uId;
         $uid = $record->uId;
-        $changed = false;
-        if ($record->isDelete) {
-            $this->deleteRecordInDatabase($record, $nbLaps);
 
-            return true;
+        if ($isNew) {
+            //If the record is new we insert
+            $q = 'INSERT INTO `exp_records` (`record_challengeuid`, `record_playerlogin`, `record_nbLaps` ,`record_score`, `record_nbFinish`, `record_avgScore`, `record_checkpoints`, `record_date` , `score_type`) VALUES(' . $this->db->quote($uid) . ', ' . $this->db->quote($record->login) . ', ' . $this->db->quote($this->getNbOfLaps()) . ', ' . $this->db->quote($record->time) . ', ' . $this->db->quote($record->nbFinish) . ', ' . $this->db->quote($record->avgScore) . ', ' . $this->db->quote(implode(",", $record->ScoreCheckpoints)) . ', ' . $this->db->quote($record->date) . ', ' . $this->db->quote($this->getScoreType()) . ')';
+            $this->db->execute($q);
         } else {
-            if ($record->isNew) {
-                //If the record is new we insert
-                $q = 'INSERT INTO `exp_records` (`record_challengeuid`, `record_playerlogin`, `record_nbLaps`
-                            ,`record_score`, `record_nbFinish`, `record_avgScore`, `record_checkpoints`, `record_date`
-                            , `score_type`)
-                        VALUES(' . $this->db->quote($uid) . ',
-                            ' . $this->db->quote($record->login) . ',
-                            ' . $this->db->quote($nbLaps) . ',
-                            ' . $this->db->quote($record->time) . ',
-                            ' . $this->db->quote($record->nbFinish) . ',
-                            ' . $this->db->quote($record->avgScore) . ',
-                            ' . $this->db->quote(implode(",", $record->ScoreCheckpoints)) . ',
-                            ' . $this->db->quote($record->date) . ',
-                            ' . $this->db->quote($this->getScoreType()) . '
-                        )';
-                $this->db->execute($q);
-                $record->isNew = false;
-                $changed = true;
-            } else {
-                if ($record->isUpdated) {
-                    //If it isn't but it has been updated we update
-                    $q = 'UPDATE `exp_records`
-                        SET `record_score` = ' . $this->db->quote($record->time) . ',
-                            `record_nbFinish` = ' . $this->db->quote($record->nbFinish) . ',
-                            `record_avgScore` = ' . $this->db->quote($record->avgScore) . ',
-                            `record_checkpoints` = ' . $this->db->quote(implode(",", $record->ScoreCheckpoints)) . ',
-                            `record_date` = ' . $this->db->quote($record->date) . '
-                        WHERE `record_challengeuid` = ' . $this->db->quote($uid) . '
-                            AND `record_playerlogin` =  ' . $this->db->quote($record->login) . '
-                            AND `record_nbLaps` = ' . $this->db->quote($nbLaps) . '
-                            AND `score_type` = ' . $this->db->quote($this->getScoreType()) . ';';
-                    $this->db->execute($q);
-                    $changed = true;
-                }
-            }
+            //If it isn't but it has been updated we update
+            $q = 'UPDATE `exp_records` SET `record_score` = ' . $this->db->quote($record->time) . ', `record_nbFinish` = ' . $this->db->quote($record->nbFinish) . ', `record_avgScore` = ' . $this->db->quote($record->avgScore) . ', `record_checkpoints` = ' . $this->db->quote(implode(",", $record->ScoreCheckpoints)) . ', `record_date` = ' . $this->db->quote($record->date) . ' WHERE `record_challengeuid` = ' . $this->db->quote($uid) . ' AND `record_playerlogin` =  ' . $this->db->quote($record->login) . ' AND `record_nbLaps` = ' . $this->db->quote($this->getNbOfLaps()) . ' AND `score_type` = ' . $this->db->quote($this->getScoreType()) . ';';
+            $this->db->execute($q);
         }
-        //We flag it as updated
-        $record->isUpdated = false;
-
-        return $changed;
     }
 
     /**
@@ -1097,45 +780,12 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected function deleteRecordInDatabase(Record $record, $nbLaps)
     {
         try {
-            $q = 'DELETE FROM `exp_records`
-				WHERE record_challengeuid = ' . $this->db->quote($record->uId) . '
-					AND record_playerlogin =' . $this->db->quote($record->login) . '
-					AND record_nbLaps = ' . $this->db->quote($nbLaps) . '
-					AND score_type = ' . $this->db->quote($this->getScoreType());
-
+            $q = 'DELETE FROM `exp_records` WHERE record_challengeuid = ' . $this->db->quote($record->uId) . ' AND record_playerlogin =' . $this->db->quote($record->login) . ' AND record_nbLaps = ' . $this->db->quote($nbLaps) . ' AND score_type = ' . $this->db->quote($this->getScoreType());
             $this->db->execute($q);
         } catch (\Exception $ex) {
             return false;
         }
-
         return true;
-    }
-
-    public function deleteRecordOfPlayerOnMap($adminLogin, $login)
-    {
-        if ($this->expStorage->isRelay) {
-            $this->eXpChatSendServerMessage("#admin_error#Can't delete a record on Relay server.", $adminLogin);
-        }
-
-        if (isset($this->currentChallengePlayerRecords[$login])) {
-            $record = $this->currentChallengePlayerRecords[$login];
-
-            if ($record->isDelete) {
-                $record->isDelete = false;
-                $this->eXpChatSendServerMessage("#admin_action#Delete of record player canceled!", $adminLogin);
-            } else {
-                $this->eXpChatSendServerMessage(
-                    "#admin_action#Record of player deleted! Restart map to take in account.",
-                    $adminLogin
-                );
-                $record->isDelete = true;
-            }
-        } else {
-            $this->eXpChatSendServerMessage(
-                "#admin_error#Player doesn't have a record on this map! can't delete.",
-                $adminLogin
-            );
-        }
     }
 
     /**
@@ -1148,7 +798,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     protected function updateCurrentChallengeRecords()
     {
         //If relay server host will save records no need to do it here
-        if ($this->expStorage->isRelay) {
+        if ($this->storage->isRelay) {
             return;
         }
 
@@ -1172,39 +822,21 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             $this->getFromDbPlayerRecord($login, $uid);
         }
         //Dispatch event
-        \ManiaLive\Event\Dispatcher::dispatch(new Event(Event::ON_RECORDS_LOADED, $this->currentChallengeRecords));
+        Dispatcher::dispatch(new Event(Event::ON_RECORDS_LOADED, $this->currentChallengeRecords));
     }
 
     /**
      * It will get the list of records of this map from the database
      *
-     * @param mixed $gamemode
-     *
      * @return Record[]
      */
-    protected function buildCurrentChallangeRecords($gamemode = null)
+    protected function buildCurrentChallangeRecords()
     {
         $challenge = $this->storage->currentMap;
 
-        if ($gamemode === null || $gamemode == '') {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-        }
+        $cons = " AND record_nbLaps = " . $this->getNbOfLaps();
 
-        $cons = "";
-        if ($this->useLapsConstraints()) {
-            $cons .= " AND record_nbLaps = " . $this->getNbOfLaps();
-        } else {
-            $cons .= " AND record_nbLaps = 1";
-        }
-
-        $q = "SELECT * FROM `exp_records`, `exp_players`
-                    WHERE `record_challengeuid` = " . $this->db->quote($challenge->uId) . " " . $cons . "
-                        AND `exp_records`.`record_playerlogin` = `exp_players`.`player_login`
-                        " . $cons . "
-                        AND `score_type` = " . $this->db->quote($this->getScoreType()) . "
-                    ORDER BY  " . $this->getDbOrderCriteria() . "
-                    LIMIT 0, " . $this->config->recordsCount . ";";
-
+        $q = "SELECT * FROM `exp_records`, `exp_players` WHERE `record_challengeuid` = " . $this->db->quote($challenge->uId) . " " . $cons . " AND `exp_records`.`record_playerlogin` = `exp_players`.`player_login` " . $cons . " AND `score_type` = " . $this->db->quote($this->getScoreType()) . " ORDER BY  " . $this->getDbOrderCriteria() . " LIMIT 0, " . $this->config->recordsCount . ";";
         $dbData = $this->db->execute($q);
 
         if ($dbData->recordCount() == 0) {
@@ -1214,8 +846,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $i = 1;
         $records = array();
         $players = array();
-        while ($data = $dbData->fetchStdObject()) {
-
+        while ($data = $dbData->fetchObject()) {
             $record = new Record();
             $this->currentChallengePlayerRecords[$data->record_playerlogin] = $record;
 
@@ -1242,29 +873,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     }
 
     /**
-     * deletes a record from database for map.
-     *
-     * @param \Maniaplanet\DedicatedServer\Structures\Map $challenge
-     * @param string $login
-     *
-     * @return boolean
-     */
-    protected function deleteRecord(\Maniaplanet\DedicatedServer\Structures\Map $challenge, $login)
-    {
-
-        $q = "DELETE FROM `exp_records` WHERE `exp_records`.`record_challengeuid` = "
-            . $this->db->quote($challenge->uId) . " and "
-            . "`exp_records`.`record_playerlogin` = " . $this->db->quote($login) . ";";
-        try {
-            $this->db->execute($q);
-
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
      * get topsums
      *
      * @return array["string login"] = array("stats" => array(0,1,2), total);
@@ -1272,10 +880,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function getTopSums()
     {
-        $q = 'SELECT `record_challengeuid`, GROUP_CONCAT(`record_playerlogin` ORDER BY `record_score` ASC) logins
-			  FROM     `exp_records`
-			  WHERE `record_challengeuid` IN (' . $this->getUidSqlString() . ')
-			  GROUP BY  `record_challengeuid`';
+        $q = 'SELECT `record_challengeuid`, GROUP_CONCAT(`record_playerlogin` ORDER BY `record_score` ASC) logins FROM     `exp_records` WHERE `record_challengeuid` IN (' . $this->getUidSqlString() . ') GROUP BY  `record_challengeuid`';
         $sql = $this->db->execute($q);
 
         $topSums = array();
@@ -1311,7 +916,6 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             if ($a->total == $b->total) {
                 return 0;
             }
-
             return ($a->total > $b->total) ? -1 : 1;
         });
 
@@ -1319,40 +923,22 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     }
 
     /**
-     * getRecordsForMap().
      * gets the records for a map and returns array of record objects
      *
-     * @param mixed $gamemode
      * @param Map $challenge
      * @param string $plugin
      *
      * @return array(Record)
      */
-    public function getRecordsForMap($gamemode = null, $challenge = null, $plugin = null)
+    public function getRecordsForMap($challenge = null, $plugin = null)
     {
-
         if ($challenge === null || $challenge == '') {
             $challenge = $this->storage->currentMap;
         }
 
-        if ($gamemode === null || $gamemode == '') {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-        }
+        $cons = " AND record_nbLaps = " . $this->getNbOfLaps();
 
-        $cons = "";
-        if ($this->useLapsConstraints()) {
-            $cons .= " AND record_nbLaps = " . $this->getNbOfLaps();
-        } else {
-            $cons .= " AND record_nbLaps = 1";
-        }
-
-        $q = "SELECT * FROM `exp_records`, `exp_players`
-                    WHERE `record_challengeuid` = " . $this->db->quote($challenge->uId) . " " . $cons . "
-                        AND `exp_records`.`record_playerlogin` = `exp_players`.`player_login`
-                        " . $cons . "
-                        AND `score_type` = " . $this->db->quote($this->getScoreType()) . "
-                    ORDER BY " . $this->getDbOrderCriteria() . "
-                    LIMIT 0, " . $this->config->recordsCount . ";";
+        $q = "SELECT * FROM `exp_records`, `exp_players` WHERE `record_challengeuid` = " . $this->db->quote($challenge->uId) . " " . $cons . " AND `exp_records`.`record_playerlogin` = `exp_players`.`player_login` " . $cons . " AND `score_type` = " . $this->db->quote($this->getScoreType()) . " ORDER BY " . $this->getDbOrderCriteria() . " LIMIT 0, " . $this->config->recordsCount . ";";
 
         $dbData = $this->db->execute($q);
 
@@ -1363,10 +949,9 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $i = 1;
         $records = array();
 
-        while ($data = $dbData->fetchStdObject()) {
+        while ($data = $dbData->fetchObject()) {
 
             $record = new Record();
-            // $this->currentChallengePlayerRecords[$data->record_playerlogin] = $record;
 
             $record->place = $i;
             $record->login = $data->record_playerlogin;
@@ -1402,25 +987,13 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             return $this->currentChallengePlayerRecords[$login];
         }
 
-        $cons = "";
-        if ($this->useLapsConstraints()) {
-            $cons .= " AND record_nbLaps = " . $this->getNbOfLaps();
-        } else {
-            $cons .= " AND record_nbLaps = 1";
-        }
-
-        $q = "SELECT * FROM `exp_records`, `exp_players`
-                WHERE `record_challengeuid` = " . $this->db->quote($uId) . "
-                    AND `record_playerlogin` = " . $this->db->quote($login) . "
-                    AND `player_login` = `record_playerlogin`
-                    AND `score_type` = " . $this->db->quote($this->getScoreType()) . "
-                    " . $cons . ";";
+        $q = "SELECT * FROM `exp_records`, `exp_players` WHERE `record_challengeuid` = " . $this->db->quote($uId) . " AND `record_playerlogin` = " . $this->db->quote($login) . " AND `player_login` = `record_playerlogin` AND `score_type` = " . $this->db->quote($this->getScoreType()) . "  AND record_nbLaps = " . $this->getNbOfLaps() . ";";
 
         $dbData = $this->db->execute($q);
         if ($dbData->recordCount() > 0) {
 
             $record = new Record();
-            $data = $dbData->fetchStdObject();
+            $data = $dbData->fetchObject();
 
             $record->place = $this->config->recordsCount + 1;
             $record->login = $data->record_playerlogin;
@@ -1441,8 +1014,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
 
     public function getCurrentChallangePlayerRecord($login)
     {
-        return isset($this->currentChallengePlayerRecords[$login])
-            ? $this->currentChallengePlayerRecords[$login] : null;
+        return isset($this->currentChallengePlayerRecords[$login]) ? $this->currentChallengePlayerRecords[$login] : null;
     }
 
     public function getRecords()
@@ -1450,41 +1022,24 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         return $this->currentChallengeRecords;
     }
 
-    /**
-     * useLapsConstraints()
-     * Helper function, checks game mode.
-     *
-     * @return int $laps
-     */
-    public function useLapsConstraints()
-    {
-        if (!$this->config->lapsModeCount1lap) {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
-            if ($gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TIMEATTACK
-                || $gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS
-                || $gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS
-                || $gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP
-            ) {
-                $nbLaps = $this->getNbOfLaps();
-                if ($nbLaps > 1) {
-                    return $this->storage->currentMap->lapRace;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public function showTopSums($login)
     {
-        TopSumsWindow::EraseAll();
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
 
-        $win = TopSumsWindow::Create($login);
-        $win->setTitle("TopSums");
-        $win->setDatas($this->getTopSums());
-        $win->setSize(100, 90);
-        $win->show();
+        $items = array();
+        $data  = array();
+        $x     = 0;
+        foreach ($this->getTopSums() as $sumLogin => $value) {
+            $items[$x] = array($rankColor . ($x + 1), isset($value->nickName) ? $value->nickName : $sumLogin, $value->stats[0], $value->stats[1], $value->stats[2]);
+            $data[$x] = array(-1, -1, -1, -1, -1);
+            $x++;
+        }
+
+        $this->topSumsWindow->setParam("topSumItems", $items);
+        $this->topSumsWindow->setParam("topSumData", $data);
+        $this->topSumsWindow->show($login);
     }
 
     /**
@@ -1497,25 +1052,90 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function showRecsWindow($login, $map = null)
     {
-        Records::Erase($login);
         if ($map === null) {
-            $records = $this->currentChallengeRecords;
+            $records = array();
+            foreach ($this->currentChallengeRecords as $record) {
+                $records[] = clone $record;
+            }
             $map = $this->storage->currentMap;
         } else {
-            $records = $this->getRecordsForMap(null, $map);
+            $records = $this->getRecordsForMap($map);
         }
         $currentMap = false;
         if ($map == null || $map->uId == $this->storage->currentMap->uId) {
             $currentMap = true;
         }
 
-        $window = Records::Create($login);
-        /** @var Records $window */
-        $window->setTitle(__('Records on a Map', $login));
-        $window->centerOnScreen();
-        $window->setSize(120, 100);
-        $window->populateList($records, $this->config->recordsCount, $currentMap, $this);
-        $window->show();
+        if ($this->config->hideRecords) {
+            foreach ($records as $key => $record) {
+                if ($record->login != $login) {
+                    $records[$key]->time = 'HIDDEN';
+                    $records[$key]->avgScore = 'HIDDEN';
+                    $records[$key]->nbFinish = 'HIDDEN';
+                    $records[$key]->ScoreCheckpoints = array();
+                }
+            }
+        }
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        while ($i < sizeof($records)) {
+            /** @var Record $record */
+            $record = $records[$i];
+
+            $recLogin = $record->login;
+            if ($recLogin == $record->nickName) {
+                $recLogin = $recLogin . ' '; // hack to make it work
+            }
+
+            $items[$i] = array(
+                $record->place,
+                Gui::fixString($record->nickName),
+                $recLogin,
+                $this->formatScore($record->time) . " ",
+                $this->formatScore($record->avgScore),
+                "#" . $record->nbFinish,
+                date('d/m/Y', $record->date),
+                'Delete',
+            );
+            $data[$i] = array(-1, -1, -1, -1, -1, -1, -1, $currentMap ? ('exp:eXpansion.' . $this->extendedClassName . ':deleteRecord:' . $record->login) : -1);
+            $i++;
+        }
+        $hideRemoveButtons = !$currentMap || !AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE);
+
+        $this->recordsWindow->setParam("hideRemoveButtons", $hideRemoveButtons);
+        $this->recordsWindow->setParam("hideMapButtons",    !$currentMap);
+        $this->recordsWindow->setParam("sectorsAction",     'exp:eXpansion.' . $this->extendedClassName . ':showSectorWindow');
+        $this->recordsWindow->setParam("cpsAction",         'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow');
+        $this->recordsWindow->setParam("secCpsAction",      'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow');
+        $this->recordsWindow->setParam("recordsItems",      $items);
+        $this->recordsWindow->setParam("recordsData",       $data);
+        $this->recordsWindow->show($login);
+    }
+
+    /**
+     * exp: callback fired by the delete cell of a row in Records.xml
+     */
+    public function deleteRecord($login, $recordLogin)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        // Gui::fixString() (used by the pager to build the ManiaScript "data" array, see
+        // OptimizedPager::formatMsArray) rewrites every "-" into an en-dash "–" to avoid "--"
+        // being read as a ManiaScript comment. Real logins never contain an en-dash, so this
+        // round-trip conversion is undone before comparing against $record->login.
+        $recordLogin = str_replace('–', '-', $recordLogin);
+
+        foreach ($this->currentChallengeRecords as $record) {
+            if ($record->login === $recordLogin) {
+                $this->actionDelete($login, $record);
+                return;
+            }
+        }
     }
 
     /**
@@ -1525,32 +1145,263 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function showRanksWindow($login)
     {
-        Ranks::Erase($login);
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        while ($i < sizeof($this->ranks)) {
+            $rank = $this->ranks[$i];
 
-        $window = Ranks::Create($login);
-        $window->setTitle(__('Server Ranks', $login));
-        $window->centerOnScreen();
-        $window->populateList($this->getRanks(), 100);
-        $window->setSize(150, 100);
-        $window->show();
+            $items[$i] = array(
+                ($i + 1) . ".",
+                isset($rank->player_nickname) ? $rank->player_nickname : $rank->login,
+                isset($rank->player_wins) ? $rank->player_wins : 0,
+                number_format($rank->tscore + 1, 2),
+                isset($rank->nbFinish) ? $rank->nbFinish : 0,
+                $rank->nbRecords . '/' . $rank->nbMaps,
+                $this->formatRankPlayTime(isset($rank->player_timeplayed) ? $rank->player_timeplayed : 0),
+                isset($rank->lastRec) ? date("j F Y", $rank->lastRec) : "",
+            );
+            $data[$i] = array(-1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        $this->ranksWindow->setParam("rankItems",       $items);
+        $this->ranksWindow->setParam("rankData",        $data);
+        $this->ranksWindow->show($login);
     }
 
-    public function showCpWindow($login)
+    /**
+     * Play time of a player, as shown in the server ranks window
+     */
+    private function formatRankPlayTime($time)
     {
-        Cps::Erase($login);
+        $min = (int)($time / 60);
+        $hour = (int)($min / 60);
+        $min = $min % 60;
+        $day = (int)($hour / 24);
+        $hour = $hour % 24;
 
-        $window = Cps::Create($login);
-        /** @var Cps $window */
-        $window->setTitle(__('CheckPoints on Map', $login));
-        $window->populateList($this->currentChallengeRecords, 100, $this);
-        $window->setSize(200, 100);
-        $window->centerOnScreen();
-        $window->show();
+        return $day . 'd ' . $hour . 'h ' . $min . 'm';
+    }
+
+    public function showCpWindow($login, $offset = 0)
+    {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
+        $offset = is_numeric($offset) ? (int)$offset : 0;
+
+        if ($offset > $this->storage->currentMap->nbCheckpoints - 7) {
+            $offset = $this->storage->currentMap->nbCheckpoints - 7;
+        }
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallengeRecords as $record) {
+            $row = array($rankColor . ($i + 1), $record->nickName);
+            // always 7 cells, a record without that checkpoint simply leaves it empty
+            for ($x = $offset; $x < $offset + 7; $x++) {
+                $row[] = isset($record->ScoreCheckpoints[$x]) ? Time::fromTM($record->ScoreCheckpoints[$x]) : "";
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        for ($c = 0; $c < 7; $c++) {
+            $this->cpsWindow->setParam("cp" . ($c + 1), "Cp " . ($offset + $c + 1));
+        }
+        $this->cpsWindow->setParam("cpsItems", $items);
+        $this->cpsWindow->setParam("cpsData", $data);
+        $this->cpsWindow->setParam("pagerVarName", "localCps");
+        $this->cpsWindow->setParam("prevPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow:' . ($offset - 7));
+        $this->cpsWindow->setParam("nextPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showCpWindow:' . ($offset + 7));
+        $this->cpsWindow->show($login);
+    }
+
+    public function showSecCpWindow($login, $offset = 0)
+    {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
+        $offset = is_numeric($offset) ? (int)$offset : 0;
+
+        if ($offset > $this->storage->currentMap->nbCheckpoints - 7) {
+            $offset = $this->storage->currentMap->nbCheckpoints - 7;
+        }
+        if ($offset < 0) {
+            $offset = 0;
+        }
+
+        /** @var ColorParser $colorParser */
+        $colorParser = ColorParser::getInstance();
+        $rankColor   = $colorParser->parseColors("#rank#");
+
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallengeRecords as $record) {
+            $row = array($rankColor . ($i + 1), $record->nickName);
+            // always 7 cells, a record without that checkpoint simply leaves it empty
+            for ($x = $offset; $x < $offset + 7; $x++) {
+                if (!isset($record->ScoreCheckpoints[$x])) {
+                    $row[] = "";
+                } else if ($x == 0) {
+                    // the first sector is the time of the first checkpoint
+                    $row[] = Time::fromTM($record->ScoreCheckpoints[$x]);
+                } else {
+                    $row[] = Time::fromTM($record->ScoreCheckpoints[$x] - $record->ScoreCheckpoints[$x - 1]);
+                }
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        for ($c = 0; $c < 7; $c++) {
+            $this->secCpsWindow->setParam("cp" . ($c + 1), "Sector " . ($offset + $c + 1));
+        }
+        $this->secCpsWindow->setParam("cpsItems", $items);
+        $this->secCpsWindow->setParam("cpsData", $data);
+        $this->secCpsWindow->setParam("pagerVarName", "localSecCps");
+        $this->secCpsWindow->setParam("prevPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow:' . ($offset - 7));
+        $this->secCpsWindow->setParam("nextPageAction", 'exp:eXpansion.' . $this->extendedClassName . ':showSecCpWindow:' . ($offset + 7));
+        $this->secCpsWindow->show($login);
+    }
+
+    public function showCpDiffWindow($login, $params)
+    {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
+        if (!is_numeric($params)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
+            return;
+        }
+        $params = intval(preg_replace("/[^0-9]/", "", $params));
+        $params-=1;
+
+        if ($this->isPluginLoaded('\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania')) {
+            $dedirecs = $this->callPublicMethod("\\ManiaLivePlugins\\eXpansion\\Dedimania\\Dedimania", "getRecords");
+        }
+        if (isset($dedirecs[$login])) {
+            if ($this->getCurrentChallangePlayerRecord($login)) {
+                if ($this->getCurrentChallangePlayerRecord($login)->time <= $dedirecs[$login]->time) {
+                    $player = $this->getCurrentChallangePlayerRecord($login);
+                } else {
+                    $player = new Record();
+                    $player->place = $dedirecs[$login]->place;
+                    $player->nickName = $dedirecs[$login]->nickname;
+                    $player->ScoreCheckpoints = explode(",", $dedirecs[$login]->checkpoints);
+                }
+            } else {
+                $player = new Record();
+                $player->place = $dedirecs[$login]->place;
+                $player->nickName = $dedirecs[$login]->nickname;
+                $player->ScoreCheckpoints = explode(",", $dedirecs[$login]->checkpoints);
+            }
+        } else {
+            $player = $this->getCurrentChallangePlayerRecord($login);
+        }
+
+        if (!isset($this->currentChallengeRecords[$params])) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
+
+        $target = $this->currentChallengeRecords[$params];
+
+        $this->showCpDiff($login, $player, $target);
+    }
+
+    public function showCpDiffNoDediWindow($login, $params)
+    {
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+
+        if (!is_numeric($params)) {
+            $this->eXpChatSendServerMessage(eXpGetMessage('#admin_error#You need to provide a correct number'), $login);
+            return;
+        }
+        $params = intval(preg_replace("/[^0-9]/", "", $params));
+        $params-=1;
+
+        if (!isset($this->currentChallengeRecords[$params])) {
+            $this->eXpChatSendServerMessage("#admin_error#There is no such record!", $login);
+            return;
+        }
+
+        $this->showCpDiff($login, $this->getCurrentChallangePlayerRecord($login), $this->currentChallengeRecords[$params]);
+    }
+
+    /**
+     * Fill and show CpDiff.xml, comparing the checkpoints of two records
+     */
+    private function showCpDiff($login, $player, $target)
+    {
+        if (!$player) {
+            $this->eXpChatSendServerMessage("#admin_error#You have no record on this map!", $login);
+            return;
+        }
+
+        $items = array();
+        $data  = array();
+        $nbCps = count($player->ScoreCheckpoints);
+        for ($x = 0; $x < $nbCps; $x++) {
+            if (!isset($target->ScoreCheckpoints[$x])) {
+                $items[$x] = array(($x + 1) . ".", Time::fromTM($player->ScoreCheckpoints[$x]), "", "", "");
+                $data[$x]  = array(-1, -1, -1, -1, -1);
+                continue;
+            }
+
+            $diff = $player->ScoreCheckpoints[$x] - $target->ScoreCheckpoints[$x];
+            if ($x > 0 && isset($target->ScoreCheckpoints[$x - 1])) {
+                $diffCp = $diff - ($player->ScoreCheckpoints[$x - 1] - $target->ScoreCheckpoints[$x - 1]);
+            } else {
+                $diffCp = $diff;
+            }
+
+            $items[$x] = array(
+                ($x + 1) . ".",
+                Time::fromTM($player->ScoreCheckpoints[$x]),
+                Time::fromTM($target->ScoreCheckpoints[$x]),
+                ($diff   <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diff),
+                ($diffCp <= 0 ? '$0f0- ' : '$f00+ ') . Time::fromTM($diffCp),
+            );
+            $data[$x] = array(-1, -1, -1, -1, -1);
+        }
+
+        $this->cpDiffWindow->setParam("pagerVarName", "localcpdiff");
+        $this->cpDiffWindow->setParam("headerPlayer", $this->cpDiffWindow->handleSpecialChars("#" . $player->place . ": " . $player->nickName));
+        $this->cpDiffWindow->setParam("headerTarget", $this->cpDiffWindow->handleSpecialChars("#" . $target->place . ": " . $target->nickName));
+        $this->cpDiffWindow->setParam("cpDiffItems", $items);
+        $this->cpDiffWindow->setParam("cpDiffData", $data);
+        $this->cpDiffWindow->show($login);
     }
 
     public function showSectorWindow($login)
     {
-
+        if ($this->config->hideRecords) {
+            $this->eXpChatSendServerMessage("#admin_error#Seeing other records is disable!", $login);
+            return;
+        }
+        
         if (empty($this->currentChallangeSectorTimes)) {
 
             $secs = array();
@@ -1561,10 +1412,8 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                     $prevIndex = $cpt == 0 ? -1 : $this->currentChallangeSectorsCps[$cpt - 1] - 1;
 
                     if (isset($rec->ScoreCheckpoints[$currentIndex])) {
-                        $old = ($prevIndex < 0) ? 0 : (isset($rec->ScoreCheckpoints[$prevIndex])
-                            ? $rec->ScoreCheckpoints[$prevIndex] : 0);
-                        $secs[$cpt][] = array('sectorTime' => $rec->ScoreCheckpoints[$currentIndex] - $old,
-                            'recordObj' => $rec);
+                        $old = ($prevIndex < 0) ? 0 : (isset($rec->ScoreCheckpoints[$prevIndex]) ? $rec->ScoreCheckpoints[$prevIndex] : 0);
+                        $secs[$cpt][] = array('sectorTime' => $rec->ScoreCheckpoints[$currentIndex] - $old, 'recordObj' => $rec);
                     }
                 }
             }
@@ -1576,18 +1425,32 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
             }
         }
 
-        $window = Sector::Create($login);
-        /** @var Sector $window */
-        $window->setTitle(__('Sector Times on Map', $login));
-        $window->populateList($this->currentChallangeSectorTimes, 100, $this);
-        $window->setSize(160, 100);
-        $window->centerOnScreen();
-        $window->show();
+        $items = array();
+        $data  = array();
+        $i     = 0;
+        foreach ($this->currentChallangeSectorTimes as $sector) {
+            $row = array(($i + 1) . ".");
+            foreach (array_slice($sector, 0, 5) as $best) {
+                $row[] = $best['recordObj']->nickName;
+                $row[] = $this->formatScore($best['sectorTime']);
+            }
+            // always 11 cells, even when less than 5 players have a time on this sector
+            while (count($row) < 11) {
+                $row[] = "";
+            }
+            $items[$i] = $row;
+            $data[$i]  = array(-1, -1, -1, -1, -1);
+            $i++;
+        }
+
+        $this->sectorWindow->setParam("sectorItems", $items);
+        $this->sectorWindow->setParam("sectorData", $data);
+        $this->sectorWindow->show($login);
     }
 
     protected function calcCP($totalcps)
     {
-        $cpsect = floor($totalcps * 0.33);
+        $cpsect = floor($totalcps * 0.001);
         $sect = 0;
         $cp = 0;
         $array = array();
@@ -1641,73 +1504,13 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
     }
 
     /**
-     * Ranks of all players online on the server
+     * Ranks of all ranked players
      *
      * @return array
      */
     public function getOnlineRanks()
     {
         return $this->player_ranks;
-    }
-
-    protected function resetRanks()
-    {
-        //If relay server host can't reset ranks
-        if ($this->expStorage->isRelay) {
-            return;
-        }
-
-        $this->db->execute('DELETE FROM exp_ranks WHERE rank_challengeuid IN (' . $this->getUidSqlString() . ')');
-        $this->ranks = array();
-        $this->player_ranks = array();
-
-        $i = 0;
-        foreach ($this->storage->maps as $map) {
-            $this->updateRanks($map->uId, 1, true);
-            if ($i > $this->config->nbMap_rankProcess) {
-                break;
-            }
-            $i++;
-        }
-    }
-
-    protected function updateRanks($challengeId, $nbLaps, $log = true)
-    {
-        //If relay server don't update ranks
-        if ($this->expStorage->isRelay) {
-            return;
-        }
-
-        $id = -1;
-        if ($log) {
-            $id = \ManiaLivePlugins\eXpansion\Helpers\Timer::startNewTimer(
-                "[LocalRecods]Updating Ranks for $challengeId"
-            );
-        }
-
-        $this->db->execute(
-            'DELETE FROM exp_ranks
-                                        WHERE rank_challengeuid = \'' . $challengeId . '\'
-                                AND rank_nbLaps = ' . $nbLaps
-        );
-
-        $q = 'INSERT INTO exp_ranks
-                SELECT record_playerlogin, 
-                        (SELECT Count(*) FROM exp_records r2
-                            WHERE r1.record_challengeuid = r2.record_challengeuid
-                                AND r1.record_nbLaps = r2.record_nbLaps
-                                AND r2.record_score < r1.record_score
-                                ORDER BY record_score ASC) as rank,
-                        record_challengeuid, record_nbLaps
-                FROM exp_records r1
-                WHERE record_challengeuid = \'' . $challengeId . '\'
-                                AND record_nbLaps = ' . $nbLaps . '
-                GROUP BY record_playerlogin, record_challengeuid, record_nbLaps, record_score, record_date
-                ORDER BY ' . $this->getDbOrderCriteria() . '
-                LIMIT 0, ' . $this->config->recordsCount;
-
-        $this->db->execute($q);
-        \ManiaLivePlugins\eXpansion\Helpers\Timer::endTimer($id, "[LocalRecods]Updating Ranks for $challengeId");
     }
 
     /**
@@ -1717,47 +1520,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function getTotalRanked()
     {
-        if ($this->total_ranks == -1 && !$this->expStorage->isRelay) {
-            $q = 'SELECT Count(*) as nbRanked
-                    FROM exp_ranks
-                    WHERE rank_challengeuid IN (' . $this->getUidSqlString() . ')'
-                . ' GROUP BY rank_playerlogin'
-                . ' HAVING COUNT(*) > 5';
-
-            $data = $this->db->execute($q);
-
-            if ($data->recordCount() == 0) {
-                $this->total_ranks = -1;
-            } else {
-                $vals = $data->fetchStdObject();
-                $this->total_ranks = $data->recordCount();
-            }
-        }
-
         return $this->total_ranks;
-    }
-
-    /**
-     * Returns the players server rank as it is buffered.
-     *
-     * @param $login
-     *
-     * @return int
-     */
-    public function getPlayerRank_old($login)
-    {
-        $id = -1;
-        foreach ($this->ranks as $id => $class) {
-            if (!property_exists($class, "rank_playerlogin")) {
-                return -1;
-            }
-
-            if ($class->rank_playerlogin == $login) {
-                return $id + 1;
-            }
-        }
-
-        return -1; // added failsafe
     }
 
     /**
@@ -1769,89 +1532,40 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
      */
     public function getPlayerRank($login)
     {
-        if ($this->expStorage->isRelay) {
+        if ($this->storage->isRelay) {
             return -1;
         }
 
-        if (!isset($this->player_ranks[$login])) {
+        return isset($this->player_ranks[$login]) ? $this->player_ranks[$login] : -1;
+    }
 
-            $nbTrack = sizeof($this->storage->maps);
-            $uids = $this->getUidSqlString();
-
-
-            $q = 'SELECT ((SUM( rank_rank ) + (' . $nbTrack . ' - COUNT( * ) ) *'
-                . $this->config->recordsCount . ')/' . $nbTrack . ') AS points,
-                        COUNT(*) as nbFinish
-                    FROM exp_ranks
-                    WHERE rank_playerlogin = ' . $this->db->quote($login)
-                . ' AND rank_challengeuid IN (' . $uids . ')';
-
-            $data = $this->db->execute($q);
-
-            if ($data->recordCount() == 0) {
-                $this->player_ranks[$login] = -1;
-
-                return -1;
-            } else {
-                $vals = $data->fetchStdObject();
-                $points = $vals->points;
-
-                if (empty($points) || $vals->nbFinish <= 5) {
-                    $this->player_ranks[$login] = -1;
-
-                    return -1;
-                }
-            }
-
-            $q = 'SELECT rank_playerlogin as betters
-                    FROM exp_ranks
-                    WHERE rank_challengeuid IN (' . $uids . ')
-                    GROUP BY rank_playerlogin
-                    HAVING ((SUM(rank_rank) + (' . $nbTrack . ' - Count(*))*'
-                . $this->config->recordsCount . ')/' . $nbTrack . ') < ' . $points . ''
-                . 'AND Count(*) > 5';
-
-            $data = $this->db->execute($q);
-
-            if ($data->recordCount() == 0) {
-                $this->player_ranks[$login] = 1;
-            } else {
-
-                $this->player_ranks[$login] = $data->recordCount() + 1;
-            }
-        }
-
-        return $this->player_ranks[$login];
+    public function getRanks()
+    {
+        return $this->ranks;
     }
 
     /**
-     *  Updates the bufffer of the 100 best ranked players if needed
+     *  Updates the bufffer of the 100 best ranked players and the rank of every ranked player if needed
      *
      * @return array
      */
-    public function getRanks()
+    private function computerServerRanks()
     {
-        if ((empty($this->ranks) || $this->rank_needUpdated) && !$this->expStorage->isRelay) {
+        if (!$this->storage->isRelay) {
 
             $this->debug("Fetching Server Ranks from Database !");
 
             $this->rank_needUpdated = false;
             $this->total_ranks = -1;
-            $this->getTotalRanked();
+            $this->player_ranks = array();
 
             $nbTrack = sizeof($this->storage->maps);
             $uids = $this->getUidSqlString();
 
-            $q = 'SELECT rank_playerlogin as login,
-                            ((SUM(rank_rank) + (' . $nbTrack . ' - Count(*))*'
-                . $this->config->recordsCount . ')/' . $nbTrack . ') as tscore,                            
-                            Count(1) as nbRecords,                         
-                            ' . $nbTrack . ' as nbMaps
-               FROM exp_ranks
-               WHERE rank_challengeuid IN (' . $uids . ')                                       
-               GROUP BY login
-               ORDER BY tscore ASC
-               LIMIT 0,100';
+            // All the ranked players in a single query, instead of 2 queries for each player
+            $q = 'SELECT record_playerlogin as login, ((SUM(`rank`) + (' . $nbTrack . ' - Count(*))*' . $this->config->recordsCount . ')/' . $nbTrack . ') as `tscore`, Count(1) as nbRecords,  ' . $nbTrack . ' as nbMaps FROM
+            (SELECT *, IF(@prev <> exp_records.record_challengeuid, @rn:=-1,@rn), @prev:=exp_records.record_challengeuid, @rn:=@rn+1 AS `rank` FROM `exp_records`, (SELECT @rn:=0) rn, (SELECT @prev:=\'\') prev ORDER BY exp_records.record_challengeuid ASC, exp_records.record_score ASC) temp
+            WHERE record_challengeuid IN (' . $uids . ') GROUP BY record_playerlogin ORDER BY tscore ASC';
 
             $dbData = $this->db->execute($q);
 
@@ -1861,48 +1575,53 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                 return $this->ranks;
             }
 
+            $this->total_ranks = $dbData->recordCount();
+
             $tempranks = array();
             $loginlist = array();
             $i = 1;
+            $betters = 0;
+            $previousScore = null;
 
-            while ($data = $dbData->fetchStdObject()) {
-                $tempranks[$data->login] = $data;
-                $loginlist[] = $data->login;
-                $this->player_ranks[$data->login] = $i++;
+            while ($data = $dbData->fetchObject()) {
+                // players with the same score share the same rank
+                if ($data->tscore !== $previousScore) {
+                    $betters = $i - 1;
+                    $previousScore = $data->tscore;
+                }
+
+                if ($i <= 100) {
+                    $tempranks[$data->login] = $data;
+                    $loginlist[] = $data->login;
+                    $this->player_ranks[$data->login] = $i;
+                } elseif (empty($data->tscore) || $data->nbRecords <= 5) {
+                    $this->player_ranks[$data->login] = -1;
+                } else {
+                    $this->player_ranks[$data->login] = $betters + 1;
+                }
+                $i++;
             }
 
             $this->debug("Fetching Records from Database !");
 
-            $q = 'SELECT record_playerlogin AS login,
-                  SUM(record_nbFinish) as nbFinish,
-                  MAX(record_date) AS lastRec 
-                  FROM exp_records WHERE record_playerlogin IN ('
-                . $this->getLoginSqlString($loginlist) . ') GROUP BY record_playerlogin LIMIT 0,100';
+            $q = 'SELECT record_playerlogin AS login, SUM(record_nbFinish) as nbFinish, MAX(record_date) AS lastRec FROM exp_records WHERE record_playerlogin IN (' . $this->getLoginSqlString($loginlist) . ') GROUP BY record_playerlogin LIMIT 0,100';
 
             $dbData = $this->db->execute($q);
 
-            while ($data = $dbData->fetchStdObject()) {
+            while ($data = $dbData->fetchObject()) {
                 $tempranks[$data->login] = (object)array_merge((array)$tempranks[$data->login], (array)$data);
             }
 
             $this->debug("Fetching Players from Database !");
-            $q = 'SELECT player_login as login,
-		  player_nickname,
-          player_updated,
-          player_wins,
-          player_timeplayed,
-          player_nation
-          FROM exp_players WHERE player_login IN (' . $this->getLoginSqlString($loginlist) . ') LIMIT 0,100;';
+            $q = 'SELECT player_login as login, player_nickname, player_updated, player_wins, player_timeplayed, player_nation FROM exp_players WHERE player_login IN (' . $this->getLoginSqlString($loginlist) . ') LIMIT 0,100;';
 
             $dbData = $this->db->execute($q);
-            while ($data = $dbData->fetchStdObject()) {
+            while ($data = $dbData->fetchObject()) {
                 $tempranks[$data->login] = (object)array_merge((array)$tempranks[$data->login], (array)$data);
             }
 
             $this->ranks = array_values($tempranks);
         }
-
-        return $this->ranks;
     }
 
     /**
@@ -1913,12 +1632,48 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         if ($login != null) {
 
             $rank = $this->getPlayerRank($login);
-
             $rankTotal = $this->getTotalRanked();
-            if ($rank > 0) {
-                $this->eXpChatSendServerMessage($this->msg_showRank, $login, array($rank, $rankTotal));
-            } else {
 
+            if ($rank > 0) {
+
+                $average = $this->getObjbyPropValue($this->ranks, "login", $login);
+
+                if ($average) {
+                    $this->eXpChatSendServerMessage($this->msg_showRankAndAverage, $login, array($rank, $rankTotal, round($average[0]->tscore + 1, 2)));
+                } else {
+                    $this->eXpChatSendServerMessage($this->msg_showRank, $login, array($rank, $rankTotal));
+                }
+            } else {
+                $this->eXpChatSendServerMessage($this->msg_noRank, $login);
+            }
+        }
+    }
+
+    /**
+     * Chat message displaying the next better ranked player
+     */
+    public function chat_nextRank($login = null)
+    {
+        if ($login != null) {
+
+            $rank = $this->getPlayerRank($login);
+            $rankTotal = $this->getTotalRanked();
+
+            if ($rank > 0) {
+
+                $ranks = $this->ranks;
+                $average = $this->getObjbyPropValue($ranks, "login", $login);
+
+                if ($average[1] == 0) {
+                    $this->eXpChatSendServerMessage($this->msg_no_nextRank, $login);
+                    return;
+                }
+
+                if ($average) {
+                    $this->eXpChatSendServerMessage($this->msg_nextRankAndAverage, $login, array($ranks[$average[1] - 1]->player_nickname, $this->getPlayerRank($ranks[$average[1] - 1]->login), $rankTotal, round($ranks[$average[1] - 1]->tscore + 1, 2), round($ranks[$average[1] - 1]->tscore - $average[0]->tscore, 2)));
+                }
+            } else {
+                $this->eXpChatSendServerMessage($this->msg_noRank, $login);
             }
         }
     }
@@ -1928,7 +1683,7 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         if ($login != null) {
             $record = $this->getCurrentChallangePlayerRecord($login);
             if (!$record) {
-
+                $this->eXpChatSendServerMessage($this->msg_noPB, $login);
             } else {
                 $time = $this->formatScore($record->time);
                 $avg = $this->formatScore($record->avgScore);
@@ -1939,19 +1694,58 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
                     $place = '--';
                 }
 
-                $this->eXpChatSendServerMessage(
-                    $this->msg_personalBest,
-                    $login,
-                    array($time, $place, $avg, $record->nbFinish)
-                );
+                $this->eXpChatSendServerMessage($this->msg_personalBest, $login, array($time, $place, $avg, $record->nbFinish));
             }
         }
     }
 
-    public function chat_forceSave($login)
+    public function actionDelete($login, $record)
     {
-        $this->onEndMatch(array(), array());
-        $this->eXpChatSendServerMessage($this->msg_admin_savedRecs, $login);
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        Gui::showConfirmDialog($login, 'exp:eXpansion.' . $this->extendedClassName . ':delRec:' . $record->login, "Delete records " . $record->place . " by " . $record->nickName . "?");
+    }
+
+    public function delRec($login, $recordLogin)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        $record = $this->getCurrentChallangePlayerRecord($recordLogin);
+        if (!$record) {
+            $this->eXpChatSendServerMessage('Error while remove player record', $login);
+            return;
+        }
+        
+        if (!$this->deleteRecordInDatabase($record, $this->getNbOfLaps())) {
+            $this->eXpChatSendServerMessage('Error while remove player record', $login);
+            return;
+        }
+
+        unset($this->currentChallengePlayerRecords[$record->login]);
+
+        foreach ($this->currentChallengeRecords as $i => $rec) {
+            if ($rec->login == $record->login) {
+                unset($this->currentChallengeRecords[$i]);
+                continue;
+            }
+            if ($rec->place > $record->place) {
+                $rec->place--;
+            }
+        }
+        // Re-index to a clean 0-based sequential array (index i <-> place i+1), self-healing any
+        // previous gap/duplicate left by an older buggy run of this function.
+        $this->currentChallengeRecords = array_values($this->currentChallengeRecords);
+
+        Dispatcher::dispatch(new Event(Event::ON_RECORD_DELETED, $record, $this->currentChallengeRecords));
+
+        $this->eXpChatSendServerMessage('Record deleted', $login);
+        $this->showRecsWindow($login);
     }
 
     public function chat_delRecord($login, $playerLogin = array())
@@ -1959,41 +1753,32 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         $playerLogin = array_shift($playerLogin);
 
         if (!$playerLogin) {
-            $this->eXpChatSendServerMessage("This command takes a login as parameter, none entered");
+            $this->eXpChatSendServerMessage("This command takes a login as parameter, none entered", $login);
             return;
         }
 
-        $q = "SELECT * FROM `exp_records` WHERE `exp_records`.`record_playerlogin` = "
-            . $this->db->quote($playerLogin) . ";";
+        $q = "SELECT * FROM `exp_records` WHERE `exp_records`.`record_playerlogin` = " . $this->db->quote($playerLogin) . ";";
         $ret = $this->db->execute($q);
 
         if ($ret->recordCount() == 0) {
-            $this->eXpChatSendServerMessage(
-                "Can't delete records: Login %s has no records.",
-                $login,
-                array($playerLogin)
-            );
+            $this->eXpChatSendServerMessage("Can't delete records: Login %s has no records.", $login, array($playerLogin));
             return;
         }
 
-        $ac = ActionHandler::getInstance();
-        $action = $ac->createAction(array($this, "delRecs"), $playerLogin);
-
-        Gui::showConfirmDialog($login, $action, "Delete all records by " . $playerLogin . "?");
-
+        Gui::showConfirmDialog($login, 'exp:eXpansion.' . $this->extendedClassName . ':delRecs:' . $playerLogin, "Delete all records by " . $playerLogin . "?");
     }
 
     public function delRecs($login, $playerLogin)
     {
-        $q = "DELETE FROM `exp_records` WHERE `exp_records`.`record_playerlogin` = "
-            . $this->db->quote($playerLogin) . ";";
+        if (!AdminGroups::hasPermission($login, Permission::LOCAL_RECORDS_DELETE)) {
+            $this->eXpChatSendServerMessage("#admin_error#You don't have permission to delete records!", $login);
+            return;
+        }
+
+        $q = "DELETE FROM `exp_records` WHERE `exp_records`.`record_playerlogin` = " . $this->db->quote($playerLogin) . ";";
         try {
             $this->db->execute($q);
-            Gui::showNotice(
-                "All records by " . $playerLogin
-                . " are now deleted\n Widgets and records will update at next map.",
-                $login
-            );
+            Gui::showNotice("All records by " . $playerLogin . " are now deleted\n Widgets and records will update at next map.", $login);
         } catch (\Exception $e) {
             Gui::showNotice("Error deleting records by " . $playerLogin, $login);
         }
@@ -2039,24 +1824,62 @@ abstract class LocalBase extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugi
         return trim($out, ",");
     }
 
-
-    public function eXp_onRestartStart()
+    public function getObjbyPropValue(&$array, $prop, $value)
     {
-        $this->onEndMatch(array(), array());
-    }
+        if (!is_array($array)) {
+            return false;
+        }
 
-    public function eXp_onRestartEnd()
-    {
-    }
+        $index = 0;
+        foreach ($array as $class) {
+            if (!property_exists($class, $prop)) {
+                throw new \Exception("Property $prop doesn't exists!");
+            }
 
+            if ($class->$prop == $value) {
+                return array($class, $index);
+            }
+            $index++;
+        }
+        return false;
+    }
 
     public function eXpOnUnload()
     {
-        Dispatcher::unregister(ExpansionEvent::ON_RESTART_START, $this);
-        $this->onEndMatch(array(), array());
-        Sector::EraseAll();
-        Cps::EraseAll();
-        Ranks::EraseAll();
-        Records::EraseAll();
+
+        if ($this->recordsWindow instanceof Window) {
+            $this->recordsWindow->erase();
+        }
+        $this->recordsWindow = null;
+
+        if ($this->ranksWindow instanceof Window) {
+            $this->ranksWindow->erase();
+        }
+        $this->ranksWindow = null;
+
+        if ($this->topSumsWindow instanceof Window) {
+            $this->topSumsWindow->erase();
+        }
+        $this->topSumsWindow = null;
+
+        if ($this->sectorWindow instanceof Window) {
+            $this->sectorWindow->erase();
+        }
+        $this->sectorWindow = null;
+
+        if ($this->cpsWindow instanceof Window) {
+            $this->cpsWindow->erase();
+        }
+        $this->cpsWindow = null;
+
+        if ($this->cpDiffWindow instanceof Window) {
+            $this->cpDiffWindow->erase();
+        }
+        $this->cpDiffWindow = null;
+
+        if ($this->secCpsWindow instanceof Window) {
+            $this->secCpsWindow->erase();
+        }
+        $this->secCpsWindow = null;
     }
 }

@@ -1,0 +1,6 @@
+<label posn="0 0 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg0}"/>
+<label posn="0 -3.5 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg1}"/>
+<label posn="0 -7 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg2}"/>
+<label posn="0 -10.5 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg3}"/>
+<label posn="0 -14 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg4}"/>
+<label posn="0 -17.5 0" sizen="100 4" style="TextRaceChat" textcolor="fff" text="{msg5}"/>

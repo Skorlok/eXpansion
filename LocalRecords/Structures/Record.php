@@ -4,10 +4,6 @@ namespace ManiaLivePlugins\eXpansion\LocalRecords\Structures;
 
 class Record
 {
-
-    public $isNew = false;
-    public $isUpdated = false;
-    public $isDelete = false;
     public $place;
     public $login;
     public $nickName;

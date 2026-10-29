@@ -27,3 +27,6 @@ Remove
 
 Waiting Queue
 Waiting Queue
+
+Remove player from queue
+Remove player from queue

@@ -1,0 +1,111 @@
+<frame posn="0 -5 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 -2.25 0.0001" id="row_0">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_0_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_0_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_0_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_0_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_0_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_0_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_0_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_0_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <frame posn="0 -16.25 0.0001" id="row_1">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_1_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_1_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_1_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_1_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_1_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_1_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_1_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_1_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <frame posn="0 -30.25 0.0001" id="row_2">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_2_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_2_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_2_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_2_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_2_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_2_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_2_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_2_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <frame posn="0 -44.25 0.0001" id="row_3">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_3_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_3_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_3_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_3_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_3_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_3_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_3_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_3_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <frame posn="0 -58.25 0.0001" id="row_4">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_4_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_4_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_4_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_4_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_4_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_4_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_4_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_4_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <frame posn="0 -72.25 0.0001" id="row_5">
+        <frame posn="0 -6.75 0" scale="1.333333333">
+            <exp:icon sizeX="108" sizeY="11.5" description="@Click to show more info" descSizeX="40" action="eXpOptimizedPagerAction" icon="Bgs1" iconSub="BgCardOnline" id="column_5_0_" class="eXpOptimizedPagerAction" isTextId="true"/>
+        </frame>
+        <label id="column_5_0" posn="3 -1.65 1" sizen="20 4.6666666666667" scale="0.8" halign="left" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="3 -5.85 1" sizen="50 4.6666666666667" halign="left" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <frame posn="3 -11 1" scale="0.8">
+            <quad sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="Buddy"/>
+            <label id="column_5_2" posn="4.6666666666667 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="18.666666666667 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons64x64_1" substyle="IconPlayers"/>
+            <label id="column_5_3" posn="23.333333333333 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+            <quad posn="37.333333333333 0 0" sizen="4.6666666666667 4.6666666666667" halign="left" valign="center" style="Icons128x128_1" substyle="LadderPoints"/>
+            <label id="column_5_4" posn="42 1.2 1.0E-5" sizen="14 4.6666666666667" halign="left" valign="center" style="TextStaticSmall"/>
+        </frame>
+        <label id="column_5_5" posn="108 -2.05 1" sizen="50 4.6666666666667" halign="right" valign="center" style="TextRaceMessageBig" textsize="2"/>
+        <label id="column_5_6" posn="108 -6.55 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall"/>
+        <label id="column_5_7" posn="108 -11.05 1" sizen="20 4.6666666666667" halign="right" valign="center" style="TextStaticSmall" textsize="1"/>
+    </frame>
+    <exp:optimizedpager sizeX="118" sizeY="82" itemsVarName="serverItems" dataVarName="serverData" rowsPerPage="6" itemsPerRow="8" varName="snserverlist"/>
+</frame>

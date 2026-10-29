@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Ants;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $spriteCount = 20;

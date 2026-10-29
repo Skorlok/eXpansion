@@ -1,0 +1,14 @@
+Manialink editor
+Éditeur de Manialink
+
+Maniascript editor
+Éditeur de Maniascript
+
+Save &amp; Test
+Enregistrer &amp; tester
+
+Close
+Fermer
+
+Preview of widget
+Aperçu du widget

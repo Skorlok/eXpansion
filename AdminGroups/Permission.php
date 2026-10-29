@@ -16,6 +16,7 @@ class Permission
     const PLAYER_KICK = 'player_kick';
     const PLAYER_GUEST = 'player_guest';
     const PLAYER_CHANGE_TEAM = 'player_changeTeam';
+    const PLAYER_WARN = 'player_warn';
 
     //concerning Server Settings
     const SERVER_ADMIN = 'server_admin';

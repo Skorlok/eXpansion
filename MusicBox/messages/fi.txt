@@ -1,17 +1,8 @@
 Queue
 Toivo
 
-#variable# %1$s - %2$s $z$s#music# is been played next requested by %3$s #variable#
-#variable# %1$s - %2$s $z$s#music# toistetaan, pyynnön teki %3$s #variable#
-
-#music#Next song: $z$s#variable# %1$s - %2$s
-#music#Seuraava kappale: $z$s#variable# %1$s - %2$s
-
-#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s 
-#music#Seuraavana soi: #variable#%1$s#music# tekijänä #variable#  %2$s #music# , toivojana #variable# %3$s 
-
-#music#Next song: $z$s#variable# %1$s #music#by#variable# %2$s
-#music#Seuraava kappale: $z$s#variable# %1$s #music#tekijä#variable# %2$s
+#variable# %1$s#music# by#variable#  %2$s #music# is been played next requested by #variable# %3$s
+#music#Seuraavana soi: #variable#%1$s#music# tekijänä #variable#  %2$s #music# , toivojana #variable# %3$s
 
 MusicBox error http-code: %s
 MusicBox virhe (http-koodilla %s)

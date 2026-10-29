@@ -2,12 +2,21 @@
 
 namespace ManiaLivePlugins\eXpansion\Maps;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
-    public $bufferSize = 5;
+    public $skipLeft = true;
+    public $skipRight = false;
     public $historySize = 7;
-    public $showCurrentMapWidget = false;
-    public $showNextMapWidget = false;
-    public $showEndMatchNotices = false;
-    public $publicQueueAmount = array(0);
+    public $maxPlayerQueueSize = 1;
+    public $showCurrentMapWidget = true;
+    public $showNextMapWidget = true;
+    public $showEndMatchNotices = true;
+    public $showEndMatchNoticesJukebox = true;
+    public $publicQueueAmount = array();
+
+    public $currentMapWidget_PosX = -80;
+    public $currentMapWidget_PosY = 61;
+
+    public $nextMapWidget_PosX = 20;
+    public $nextMapWidget_PosY = 61;
 }

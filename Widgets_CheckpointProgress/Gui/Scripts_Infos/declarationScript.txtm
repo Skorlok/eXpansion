@@ -1,6 +1,6 @@
 declare totalProgress = (Page.GetFirstChild("totalProgress") as CMlGauge);
 declare myProgress = (Page.GetFirstChild("myProgress") as CMlGauge);
-declare Integer totalCheckpoints = <?php echo $this->totalCp; ?>;
+declare Integer totalCheckpoints = {{ totalCp }};
 declare Real divGrad = 1.0;
 declare Integer highestCp = 0;
 declare Integer curCp = 0;

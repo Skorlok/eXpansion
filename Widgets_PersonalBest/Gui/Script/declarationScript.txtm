@@ -1,0 +1,17 @@
+declare Text[Text] playersPb = {{ playersPb }};
+declare Text[Text] playersAverage = {{ playersAverage }};
+declare Text[Text] playersFinishes = {{ playersFinishes }};
+declare Text[Text] playersRank = {{ playersRank }};
+declare Integer rankTotal = {{ rankTotal }};
+
+declare pbTimeLabel = (Page.GetFirstChild("pbTime") as CMlLabel);
+declare avgTimeLabel = (Page.GetFirstChild("avgTime") as CMlLabel);
+declare nbFinishLabel = (Page.GetFirstChild("nbFinish") as CMlLabel);
+declare rankLabel = (Page.GetFirstChild("rank") as CMlLabel);
+
+if (LocalUser != Null) {
+    pbTimeLabel.SetText(playersPb[LocalUser.Login]);
+    avgTimeLabel.SetText(playersAverage[LocalUser.Login]);
+    nbFinishLabel.SetText(playersFinishes[LocalUser.Login]);
+    rankLabel.SetText(playersRank[LocalUser.Login] ^ "$n $m/$n $m" ^ rankTotal);
+}

@@ -14,17 +14,19 @@
 
 namespace ManiaLivePlugins\eXpansion\Chat;
 
-use ManiaLib\Utils\Formatting;
-use ManiaLive\Data\Player;
+use Exception;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use ManiaLivePlugins\eXpansion\Helpers\PlayerStorage;
 use ManiaLive\DedicatedApi\Callback\Event;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Utilities\Logger;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\Chat\Gui\Widgets\ChatSelect;
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 /**
  * Redirects the chat in order to display it nicer.
@@ -42,21 +44,33 @@ class Chat extends ExpPlugin
      */
     private $enabled = true;
 
-    public static $channels = array();
-    public static $playerChannels = array("Public");
+    public $channels = array();
+    public $playerChannels = array("Public");
 
     /** @var Config */
     private $config;
     private $exclude = array();
     private $badWords = array();
 
+    private $widget;
+
     /**
      *
      */
     public function eXpOnLoad()
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
         $this->loadProfanityList();
-        self::$channels = array_merge(array("Public"), Config::getInstance()->channels);
+        $this->channels = array_merge(array("Public"), $config->channels);
+
+        $this->widget = new Widget("Chat\Gui\Widgets\ChatSelect.xml");
+        $this->widget->setName("Chat Channel Selector");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(55, 6);
+        if ($this->storage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
     }
 
     /**
@@ -66,13 +80,18 @@ class Chat extends ExpPlugin
     {
         $this->enableDedicatedEvents(Event::ON_PLAYER_CONNECT);
         $this->enableDedicatedEvents(Event::ON_PLAYER_DISCONNECT);
+        $this->enableDedicatedEvents(Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
+        
+        $this->registerManialinkCallback('selectChannel', true);
 
         Dispatcher::register(Event::getClass(), $this, Event::ON_PLAYER_CHAT, 10);
+
+        $this->config = Config::getInstance();
 
         try {
             $this->connection->chatEnableManualRouting(true);
             $cmd = AdminGroups::addAdminCommand('chat', $this, 'admChat', Permission::GAME_SETTINGS);
-            $cmd->setHelp('/adm chat enable or disable');
+            $cmd->setHelp('//chat enable or disable');
             $this->registerChatCommand("chat", "cmdChat", 1, true);
             $this->registerChatCommand("chat", "cmdChat", 0, true);
         } catch (\Exception $e) {
@@ -80,11 +99,7 @@ class Chat extends ExpPlugin
             $this->enabled = false;
         }
 
-        if (Config::getInstance()->useChannels) {
-            $this->initChat();
-        }
-
-        $this->config = Config::getInstance();
+        $this->initChat();
     }
 
 
@@ -93,10 +108,14 @@ class Chat extends ExpPlugin
      */
     public function initChat()
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
         $all = $this->storage->players + $this->storage->spectators;
         foreach ($all as $login => $player) {
-            self::$playerChannels[$login] = "Public";
-            $this->displayWidget($login);
+            $this->playerChannels[$login] = "Public";
+            if ($config->useChannels) {
+                $this->displayWidget($login);
+            }
         }
     }
 
@@ -128,19 +147,25 @@ class Chat extends ExpPlugin
      */
     public function onSettingsChanged(Variable $var)
     {
+        /** @var Config $config */
+        $config = Config::getInstance();
 
         if ($var->getConfigInstance() instanceof Config) {
             if ($var->getName() == "useChannels") {
                 if ($var->getRawValue() == true) {
                     $this->initChat();
                 } else {
-                    ChatSelect::EraseAll();
+                    if ($this->widget instanceof Widget) {
+                        $this->widget->erase();
+                    }
                 }
             }
             if ($var->getName() == "channels") {
-                self::$channels = array_merge(array("Public"), $var->getRawValue());
-                if (Config::getInstance()->useChannels) {
-                    ChatSelect::EraseAll();
+                $this->channels = array_merge(array("Public"), $var->getRawValue());
+                if ($config->useChannels) {
+                    if ($this->widget instanceof Widget) {
+                        $this->widget->erase();
+                    }
                     $this->initChat();
                 }
             }
@@ -177,14 +202,14 @@ class Chat extends ExpPlugin
                 if (array_key_exists($login, $this->exclude)) {
                     unset($this->exclude[$login]);
                 }
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages enabled."), $login);
                 break;
             case "off":
                 $this->exclude[$login] = $login;
-                $this->connection->chatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Chat messages disabled."), $login);
                 break;
             default:
-                $this->connection->chatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
+                $this->eXpChatSendServerMessage(eXpGetMessage("Usage: /chat on or /chat off."), $login);
                 break;
         }
     }
@@ -193,20 +218,25 @@ class Chat extends ExpPlugin
      * @param $login
      * @param $params
      */
-    public function admChat($login, $params)
+    public function admChat($login, $params = array())
     {
         $command = array_shift($params);
 
         $var = MetaData::getInstance()->getVariable('publicChatActive');
 
-        switch (strtolower($command)) {
+        switch ($command ? strtolower($command) : "") {
             case "enable":
+            case "on":
                 $var->setRawValue(true);
                 $this->eXpChatSendServerMessage("#admin_action#Public chat is now #variable#Enabled");
                 break;
             case "disable":
+            case "off":
                 $var->setRawValue(false);
                 $this->eXpChatSendServerMessage("#admin_action#Public chat is now #variable#Disabled");
+                break;
+            default:
+                $this->eXpChatSendServerMessage(eXpGetMessage("Usage: //chat on or //chat off."), $login);
                 break;
         }
     }
@@ -219,8 +249,10 @@ class Chat extends ExpPlugin
      */
     public function onPlayerConnect($login, $isSpectator)
     {
-        self::$playerChannels[$login] = "Public";
-        if (Config::getInstance()->useChannels) {
+        /** @var Config $config */
+        $config = Config::getInstance();
+        $this->playerChannels[$login] = "Public";
+        if ($config->useChannels) {
             $this->displayWidget($login);
         }
         $player = $this->storage->getPlayerObject($login);
@@ -239,18 +271,16 @@ class Chat extends ExpPlugin
      */
     public function onPlayerDisconnect($login, $reason = null)
     {
-        if (isset(self::$playerChannels['login'])) {
-            unset(self::$playerChannels['login']);
+        if (isset($this->playerChannels[$login])) {
+            unset($this->playerChannels[$login]);
         }
-        $player = $this->storage->getPlayerObject($login);
+        $player = $this->storage->getDisconnectPlayerObject($login);
         if (empty($player)) {
             return;
         }
         Logger::getLog('chat')->write(
             " (" . $player->iPAddress . ") [" . $login . "] Disconnected"
         );
-
-        ChatSelect::Erase($login);
     }
 
     /**
@@ -258,10 +288,18 @@ class Chat extends ExpPlugin
      */
     public function displayWidget($login)
     {
-        /** @var ChatSelect $widget */
-        $widget = ChatSelect::Create($login);
-        $widget->sync();
-        $widget->show();
+        $this->widget->setParam("channels", $this->channels);
+        $this->widget->setPosition($this->config->chatSelector_PosX, $this->config->chatSelector_PosY, 0);
+        $this->widget->show($login);
+    }
+
+    public function selectChannel($login, $entries)
+    {
+        $channel = $this->channels[$entries['channel']];
+        if ($this->playerChannels[$login] == $channel) return;
+
+        $this->playerChannels[$login] = $channel;
+        $this->connection->chatSendServerMessage('Your chat channel is set to: $0d0' . $channel, $login);
     }
 
     /**
@@ -281,7 +319,7 @@ class Chat extends ExpPlugin
 
         $recepients = array();
         foreach ($array as $player) {
-            if ($player instanceof Player) {
+            if ($player instanceof PlayerStorage) {
                 $recepients[$player->login] = $player->login;
             } else {
                 $recepients[$player] = $player;
@@ -317,10 +355,11 @@ class Chat extends ExpPlugin
         }
 
         if ($playerUid != 0 && substr($text, 0, 1) != "/" && $this->enabled) {
+            /** @var Config $config */
             $config = Config::getInstance();
             $force = "";
             $source_player = $this->storage->getPlayerObject($login);
-            $nick = $source_player->nickName;
+            $nick = $source_player->cleanNickName;
             if ($config->allowMPcolors) {
                 if (strstr($source_player->nickName, '$>')) {
                     $nick = $source_player->nickName;
@@ -351,9 +390,9 @@ class Chat extends ExpPlugin
             if ($this->config->publicChatActive || AdminGroups::hasPermission($login, Permission::CHAT_ON_DISABLED)) {
                 $playersCombined = $this->storage->players + $this->storage->spectators;
                 $channels = array();
-                $currentChannel = self::$playerChannels[$login];
+                $currentChannel = $this->playerChannels[$login];
 
-                foreach (self::$playerChannels as $key => $value) {
+                foreach ($this->playerChannels as $key => $value) {
                     $channels[$value][] = $key;
                 }
 
@@ -361,9 +400,9 @@ class Chat extends ExpPlugin
                 $receivers = null;
                 $channel = "";
 
-                if (Config::getInstance()->useChannels) {
+                if ($config->useChannels) {
                     // if group
-                    if (self::$playerChannels[$login] != "Public") {
+                    if ($this->playerChannels[$login] != "Public") {
                         $channel = "[" . ucfirst($currentChannel) . "] ";
                         $receivers = implode(",", array_intersect(array_keys($playersCombined),
                                 (AdminGroups::getAdminsByPermission(Permission::CHAT_ADMINCHAT)
@@ -377,7 +416,7 @@ class Chat extends ExpPlugin
                     if (AdminGroups::isInList($login)) {
                         $color = $config->adminChatColor;
 
-                        if ($this->expStorage->isRelay) {
+                        if ($this->storage->isRelay) {
                             $color = $config->otherServerChatColor;
                         }
                         $this->connection->chatSendServerMessage(
@@ -388,7 +427,7 @@ class Chat extends ExpPlugin
                         );
                     } else {
                         $color = $config->publicChatColor;
-                        if ($this->expStorage->isRelay) {
+                        if ($this->storage->isRelay) {
                             $color = $config->otherServerChatColor;
                         }
 
@@ -457,8 +496,17 @@ class Chat extends ExpPlugin
      */
     public function eXpOnUnload()
     {
-        Dispatcher::unregister(Event::getClass(), $this, Event::ON_PLAYER_CHAT);
-        $this->connection->chatEnableManualRouting(false);
-        ChatSelect::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->config = null;
+        $this->widget = null;
+
+        try {
+			Dispatcher::unregister(Event::getClass(), $this, Event::ON_PLAYER_CHAT);
+            $this->connection->chatEnableManualRouting(false);
+		} catch (Exception $e) {
+			return;
+		}
     }
 }

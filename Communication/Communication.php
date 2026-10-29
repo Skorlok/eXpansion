@@ -19,12 +19,11 @@
 
 namespace ManiaLivePlugins\eXpansion\Communication;
 
-use ManiaLib\Utils\Formatting;
-use ManiaLive\Gui\ActionHandler;
-use ManiaLivePlugins\eXpansion\Communication\Gui\Widgets\CommunicationWidget;
-use ManiaLivePlugins\eXpansion\Communication\Gui\Widgets\Messager;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
-use ManiaLivePlugins\eXpansion\Gui\Windows\PlayerSelection;
+use ManiaLivePlugins\eXpansion\Gui\Gui;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 /**
  * Description of Communication
@@ -35,6 +34,17 @@ class Communication extends ExpPlugin
 {
 
     private $lastCheck = 0;
+    private $config;
+
+    private $widget;
+    private $script;
+    private $trayScript;
+
+    /** @var \ManiaLivePlugins\eXpansion\Core\I18n\Message */
+    private $msg_noLogin;
+    private $msg_noMessage;
+    private $msg_self;
+    private $msg_help;
 
     /** @var \Maniaplanet\DedicatedServer\Structures\Player */
     private $cachedIgnoreList = array();
@@ -42,57 +52,132 @@ class Communication extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        
+        $this->registerManialinkCallback('selectPlayer');
+        $this->registerManialinkCallback('guiSendMessage', true);
 
-        CommunicationWidget::$action = ActionHandler::getInstance()->createAction(array($this, "guiSendMessage"));
-        CommunicationWidget::$selectPlayer = ActionHandler::getInstance()->createAction(array($this, "selectPlayer"));
+        $this->config = Config::getInstance();
 
-        $widget = CommunicationWidget::Create();
-        $widget->show();
+        $this->msg_noLogin = eXpGetMessage('#personalmessage#Player with login "%1$s" is not found at server!');
+        $this->msg_noMessage = eXpGetMessage("#personalmessage#No message to send to!");
+        $this->msg_self = eXpGetMessage("#personalmessage#You can't send a message to yourself.");
+        $this->msg_help = eXpGetMessage("#personalmessage#Usage /send [login] your personal message here");
+
+        $this->trayScript = new Script("Gui\Scripts\TrayWidget");
+        $this->trayScript->setParam('smaller', '>=');
+        $this->trayScript->setParam('isMinimized', "True");
+        $this->trayScript->setParam('autoCloseTimeout', 0); //TODO: add config
+        $this->trayScript->setParam('posXMin', $this->trayScript->getNumber(-116));
+        $this->trayScript->setParam('posX', $this->trayScript->getNumber(-116));
+        $this->trayScript->setParam('posXMax', $this->trayScript->getNumber(-4));
+
+        $this->script = new Script("Communication\Gui\Script");
+
+        $this->widget = new Widget("Communication\Gui\Widgets\CommunicationWidget.xml");
+        $this->widget->setName("Messaging Widget");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(120, 39);
+        $this->widget->setDisableAxis("x");
+        $this->widget->registerScript($this->trayScript);
+        $this->widget->registerScript($this->script);
+        if ($this->storage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+        $this->script->setParam("sendAction", 'exp:eXpansion.Communication:guiSendMessage');
+
+        $this->sendWidget();
 
         $this->registerChatCommand("send", "sendPmChat", -1, true);
 
-        foreach ($this->storage->players as $login => $player) {
-            $this->onPlayerConnect($login, null);
-        }
-        foreach ($this->storage->spectators as $login => $player) {
-            $this->onPlayerConnect($login, null);
-        }
+        $this->updateMessager(null, "clearMessages");
 
         $this->lastCheck = time();
         $this->cachedIgnoreList = $this->connection->getIgnoreList(-1, 0);
     }
 
+    public function sendWidget()
+    {
+        $this->widget->setPosition($this->config->messaging_PosX, $this->config->messaging_PosY, 30);
+        $this->widget->show(null, true);
+    }
+
+    public function updateMessager($login, $action, $tab = "", $text = "")
+    {
+        if ($action != "sendMessage" && $action != "clearMessages" && $action != "closeTab" && $action != "openTab") {
+            return;
+        }
+
+        $tab = Gui::fixString($tab);
+        $text = Gui::fixString($text);
+
+        $script = 'main () {
+            declare Text[][Text] chatLiness for UI = Text[][Text];
+            declare Boolean isChatUpdated for UI;
+            declare Boolean forceUpdate for UI;
+            declare Text tab = "' . $tab . '";
+            declare Text chat = "' . $text . '";
+            declare Text action = "' . $action . '";
+
+            switch (action) {
+                case "sendMessage": {
+                    if (!chatLiness.existskey(tab)) {
+                        chatLiness[tab] = Text[];
+                    }
+                    chatLiness[tab].add(chat);
+                    isChatUpdated = True;
+                }
+                case "clearMessages": {
+                    chatLiness.clear(); 
+                    forceUpdate = True; 
+                }
+                case "closeTab": {
+                    chatLiness.removekey(tab);
+                    forceUpdate = True; 
+                }
+                case "openTab": {
+                    if (!chatLiness.existskey(tab)) {
+                        chatLiness[tab] = Text[];
+                    }
+                    forceUpdate = True; 
+                }
+            }
+        }';
+
+        $xml = '<manialink id="messager_update" version="2" name="messager_update">';
+        $xml .= '<script><!--';
+        $xml .= $script;
+        $xml .= '--></script>';
+        $xml .= '</manialink>';
+
+        try {
+            $this->connection->sendDisplayManialinkPage($login, $xml);
+        } catch (\Exception $e) {
+            $this->console('Could not send messager update to ' . $login . ': ' . $e->getMessage());
+        }
+    }
+
     public function onPlayerConnect($login, $isSpectator)
     {
-        Messager::Erase($login);
-        $info = Messager::Create($login);
-        $info->clearMessages();
-        $info->setTimeout(0.5);
-        $info->show();
+        $this->updateMessager($login, "clearMessages");
     }
 
     public function send($login, $tab, $text)
     {
         // undo replacing maniascript en hyphen to normal one, so message reaches the right person...
         $login = str_replace('–', '-', $login);
-        Messager::Erase($login);
-        $info = Messager::Create($login);
-        $info->sendChat($tab, $text);
-        $info->setTimeout(0.5);
-        $info->show();
+        $this->updateMessager($login, "sendMessage", $tab, $text);
     }
 
     public function sendPm($login, $target, $text)
     {
         if (!$this->checkPlayer($login)) {
             $this->send($login, $target, '$d00' . __("You are being ignored. Message not sent.", $login));
-
             return;
         }
 
         $fromPlayer = $this->storage->getPlayerObject($login);
         $this->send($login, $target, '$z$fffMe: ' . $text);
-        $this->send($target, $login, '$z$222' . Formatting::stripWideFonts($fromPlayer->nickName) . '$z$222: ' . $text);
+        $this->send($target, $login, '$z$222' . Formatting::stripWideFonts($fromPlayer->cleanNickName) . '$z$222: ' . $text);
     }
 
     /**
@@ -135,45 +220,49 @@ class Communication extends ExpPlugin
     {
         if ($params === false) {
             $this->eXpChatSendServerMessage($this->msg_help, $login);
-
             return;
         }
         $text = explode(" ", $params);
         $target = array_shift($text);
         $text = implode(" ", $text);
 
+        if (!array_key_exists($target, $this->storage->players) && !array_key_exists($target, $this->storage->spectators)) {
+            $this->eXpChatSendServerMessage($this->msg_noLogin, $login, array($target));
+            return;
+        }
+        if ($login == $target) {
+            $this->eXpChatSendServerMessage($this->msg_self, $login, array($target));
+            return;
+        }
+        if (empty($text)) {
+            $this->eXpChatSendServerMessage($this->msg_noMessage, $login);
+            return;
+        }
+
         $this->sendPm($login, $target, $text);
     }
 
     public function selectPlayer($login)
     {
-        $window = PlayerSelection::Create($login);
-        $window->setController($this);
-        $window->setTitle('Select Player');
-        $window->setSize(85, 100);
-        $window->populateList(array($this, 'openNewTab'), 'Select');
-        $window->centerOnScreen();
-        $window->show();
+        Gui::showPlayerSelection($login, array($this, 'openNewTab'), 'Select Player', 'Select');
     }
 
     public function openNewTab($login, $target)
     {
-        PlayerSelection::Erase($login);
-
-        $info = Messager::Create($login);
-        $info->openNewTab($target);
-        $info->setTimeout(0.5);
-        $info->show();
+        $this->updateMessager($login, "openTab", $target);
     }
 
     public function eXpOnUnload()
     {
-        Messager::EraseAll();
-        CommunicationWidget::EraseAll();
-        /** @var ActionHandler $actionH */
-        $actionH = ActionHandler::getInstance();
-        $actionH->deleteAction(CommunicationWidget::$action);
-        $actionH->deleteAction(CommunicationWidget::$selectPlayer);
+        $this->connection->sendDisplayManialinkPage(null, '<manialink id="messager_update"></manialink>', 0, false, true);
+        
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->script = null;
+        $this->trayScript = null;
+        $this->widget = null;
+
         parent::eXpOnUnload();
     }
 }

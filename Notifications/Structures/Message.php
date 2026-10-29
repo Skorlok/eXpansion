@@ -11,7 +11,7 @@ class Message
     public $callback;
     public $timestamp;
 
-    public function __construct($login = null, $icon, $message, $callback)
+    public function __construct($login, $icon, $message, $callback)
     {
         $this->login = $login;
         $this->message = $message;

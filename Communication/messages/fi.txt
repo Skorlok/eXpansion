@@ -1,2 +1,14 @@
 You are being ignored. Message not sent.
 Olet hiljennetty. Viestiä ei lähetetty.
+
+#personalmessage#Player with login "%1$s" is not found at server!
+#personalmessage#Pelaajaa #variable#"%1$s"#personalmessage# ei löytynyt palvelimelta!
+
+#personalmessage#No message to send to!
+#personalmessage#Ei viestiä lähetettäväksi!
+
+#personalmessage#You can't send a message to yourself.
+#personalmessage#Lähettäisitkö itsellsi viestin ? ehkä ei kuitenkaan.
+
+#personalmessage#Usage /send [login] your personal message here
+#personalmessage#Käyttö /send [login] yksityisviesti tähän

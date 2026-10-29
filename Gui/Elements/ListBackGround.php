@@ -2,72 +2,39 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-/**
- * Description of ListBackGround
- *
- * @author oliverde8
- */
-class ListBackGround extends \ManiaLivePlugins\eXpansion\Gui\Control
+use ManiaLivePlugins\eXpansion\Gui\Config;
+
+class ListBackGround
 {
-
-    protected $bg;
-    protected $config;
-
-    public function __construct($indexNumber, $sizeX, $sizeY)
+    public static function getXML($indexNumber, $sizeX, $sizeY, $action = null)
     {
-        $config = \ManiaLivePlugins\eXpansion\Gui\Config::getInstance();
-        $this->config = $config;
+        /** @var Config $config */
+        $config = Config::getInstance();
 
-        $this->bg = new \ManiaLib\Gui\Elements\Quad($sizeX, $sizeY);
-        $this->bg->setAlign('left', 'center');
-        $this->bg->setOpacity(0.8);
+        $w = $sizeX + (float)$config->style_list_sizeXOffset;
+        $h = $sizeY + (float)$config->style_list_sizeYOffset;
 
-        if (sizeof($config->style_list_bgStyle) == sizeof($config->style_list_bgSubStyle)
-            && sizeof($config->style_list_bgStyle) > 0
-        ) {
-            $this->bg->setStyle(
-                $config->style_list_bgStyle[$indexNumber % sizeof($config->style_list_bgStyle)]
-            );
-            $this->bg->setSubStyle(
-                $config->style_list_bgSubStyle[$indexNumber % sizeof($config->style_list_bgSubStyle)]
-            );
-            $this->bg->setModulateColor(
-                $config->style_list_bgColor[$indexNumber % sizeof($config->style_list_bgColor)]
-            );
-        } else {
-            $this->bg->setBgcolor(
-                $config->style_list_bgColor[$indexNumber % sizeof($config->style_list_bgColor)]
-            );
+        $style    = '';
+        $substyle = '';
+        $color    = '';
+
+        if (sizeof($config->style_list_bgStyle) == sizeof($config->style_list_bgSubStyle) && sizeof($config->style_list_bgStyle) > 0) {
+            $idx      = $indexNumber % sizeof($config->style_list_bgStyle);
+            $style    = $config->style_list_bgStyle[$idx];
+            $substyle = $config->style_list_bgSubStyle[$idx];
+            $color    = $config->style_list_bgColor[$idx];
         }
 
+        $xml = '<quad posn="' . $config->style_list_posXOffset . ' ' . $config->style_list_posYOffset . ' 0" sizen="' . $w . ' ' . $h . '" halign="left" valign="center" opacity="0.8"';
 
-        $this->bg->setPosition($config->style_list_posXOffset, $config->style_list_posYOffset);
+        if ($style !== '') {
+            $xml .= ' style="' . $style . '" substyle="' . $substyle . '" modulatecolor="' . $color . '"';
+        }
 
-        $this->addComponent($this->bg);
-        $this->setSize($sizeX, $sizeY);
-    }
+        if ($action !== null) {
+            $xml .= ' action="' . $action . '"';
+        }
 
-    public function setAction($action)
-    {
-        $this->bg->setAction($action);
-    }
-
-    public function onResize($oldX, $oldY)
-    {
-        $this->bg->setSize(
-            $this->getSizeX() + (float)$this->config->style_list_sizeXOffset,
-            $this->getSizeY() + (float)$this->config->style_list_sizeYOffset
-        );
-    }
-
-    public function onIsRemoved(\ManiaLive\Gui\Container $target)
-    {
-        parent::onIsRemoved($target);
-        $this->destroy();
-    }
-
-    public function destroy()
-    {
-        $this->config = null;
+        return $xml . '/>';
     }
 }

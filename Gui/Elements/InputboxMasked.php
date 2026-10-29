@@ -2,173 +2,60 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLib\Gui\Elements\Entry;
-use ManiaLib\Gui\Elements\Label;
-use ManiaLib\Gui\Elements\Quad;
-use ManiaLive\Gui\Container;
-use ManiaLivePlugins\eXpansion\Gui\Control;
-use ManiaLivePlugins\eXpansion\Gui\Config;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 
-class InputboxMasked extends Control
+class InputboxMasked
 {
-    protected $label;
-    protected $button;
-
-    /** @var Button */
-    protected $nonHidden;
-    protected $name;
-    protected $bgleft;
-    protected $bgcenter;
-    protected $bgright;
-
-    public function __construct($name, $sizeX = 35, $editable = true)
+    public static function getXML($mlClass, $name, $sizeX = 35, $editable = true, $label = null, $text = null, $showClearText = false, $id = null, $class = null, $isTextId = false)
     {
-        $config = Config::getInstance();
-        $this->name = $name;
+        // Debug for ManiaPlanet 4: attribute require capital P, otherwise the password is shown in clear text.
+        // I want to keep a backward compatibility with MP3
+        $passwordAttribute = (substr(Storage::getInstance()->version->build, 0, 4) >= 2017) ? 'Password' : 'password';
 
-        $this->createButton($editable);
-
-        $this->label = new Label(30, 3);
-        $this->label->setAlign('left', 'center');
-        $this->label->setTextSize(1);
-        $this->label->setStyle("TextCardMediumWhite");
-        $this->label->setTextEmboss();
-        $this->addComponent($this->label);
-
-        $this->bgcenter = new Quad(3, 6);
-        $this->bgcenter->setAlign("left", "center");
-        $this->bgcenter->setStyle("Bgs1InRace");
-        $this->bgcenter->setSubStyle("BgColorContour");
-        $this->bgcenter->setColorize("555");
-
-        $this->setSize($sizeX, 12);
-    }
-
-    protected function onResize($oldX, $oldY)
-    {
-        $yOffset = -7;
-
-        $this->button->setSize($this->getSizeX() - 2, 5);
-        $this->button->setPosition(1, $yOffset);
-
-        $this->bgcenter->setSize($this->getSizeX(), 6);
-        $this->bgcenter->setPosition(0, $yOffset);
-
-
-        $this->label->setSize($this->getSizeX(), 3);
-        $this->label->setAttribute("textfont","Oswald");
-        $this->label->setPosition(1, 0);
-
-        parent::onResize($oldX, $oldY);
-    }
-
-    protected function createButton($editable)
-    {
-        $text = "";
-        if ($this->button != null) {
-            $this->removeComponent($this->button);
-            $text = $this->getText();
+        if ($class) {
+            $class = " " . $class;
         }
 
         if ($editable) {
-            $this->button = new Entry($this->sizeX, 4.5);
-            $this->button->setAttribute("class", "isTabIndex isEditable");
-            $this->button->setAttribute("textformat", "password");
-            $this->button->setName($this->name);
-            $this->button->setId($this->name);
-            $this->button->setDefault($text);
-            $this->button->setScriptEvents(true);
-            $this->button->setTextColor("000");
-            $this->button->setFocusAreaColor1("222");
-            $this->button->setFocusAreaColor2("000");
-            $this->button->setTextSize(1);
+            $xml = '<entry id="' . $name . '" posn="1 -7 0" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="" scriptevents="1" class="isTabIndex isEditable' . $class . '" textformat="' . $passwordAttribute . '" textsize="1" textcolor="fff" focusareacolor1="222" focusareacolor2="000" name="' . ($id ? $id : $name) . '" default="' . $text . '"/>';
+
+            if ($showClearText) {
+                // Overlay label: hidden by default, shown on hover to reveal the current entry value.
+                $xml .= '<label id="' . $name . '_clear" posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="" hidden="1"/>';
+            }
+
+            $script = new Script("Gui/Scripts/InputboxMasked");
+            $script->setParam("btName", $name);
+            $mlClass->registerElementScript($script, $name);
         } else {
-            $this->button = new Label($this->sizeX, 5);
-            $this->button->setText($text);
-            $this->button->setTextSize(1.5);
+            if ($text === null) {
+                $text = "";
+            }
+            if ($showClearText) {
+                // Two labels: one with asterisks (visible), one with clear text (hidden).
+                // The script toggles them on MouseOver/MouseOut of the ugly square button.
+                $xml  = '<label id="' . $name . '_masked" posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . str_repeat("*", strlen($text)) . '"/>';
+                $xml .= '<label id="' . $name . '_clear"  posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . $text . '" hidden="1"/>';
+
+                $script = new Script("Gui/Scripts/InputboxMasked");
+                $script->setParam("btName", $name);
+                $mlClass->registerElementScript($script, $name);
+            } else {
+                $xml = '<label posn="1 -7 0.05" sizen="' . ($sizeX-2) . ' 5" halign="left" valign="center" style="TextStaticSmall" textsize="1.5" textcolor="fff" text="' . str_repeat("*", strlen($text)) . '"/>';
+            }
         }
 
-        $this->button->setAlign('left', 'center');
-        $this->button->setTextColor('fff');
-
-        $this->button->setPosition(2, -7);
-        $this->button->setSize($this->getSizeX() - 3, 4);
-        $this->addComponent($this->button);
-    }
-
-    public function setEditable($state)
-    {
-        if ($state && $this->button instanceof Label) {
-            $this->createButton($state);
-        } elseif (!$state && $this->button instanceof Entry) {
-            $this->createButton($state);
-        }
-    }
-
-    public function setShowClearText()
-    {
-        if ($this->nonHidden == null) {
-            $this->nonHidden = new Button(3, 3);
-            $this->nonHidden->setIcon("Icons64x64_1", "ClipPause");
-            $this->nonHidden->setPosition(-4, 0);
-            $this->nonHidden->setId($this->name . "_1");
-            $this->nonHidden->setDescription($this->getText());
-            $this->addComponent($this->nonHidden);
-        }
-    }
-
-    public function getLabel()
-    {
-        return $this->label->getText();
-    }
-
-    public function setLabel($text)
-    {
-        $this->label->setText($text);
-    }
-
-    public function getText()
-    {
-        if ($this->button instanceof Entry) {
-            return $this->button->getDefault();
+        if ($isTextId) {
+            $xml .= '<label posn="1 0 1.0E-5" sizen="' . $sizeX . ' 3" halign="left" valign="center" style="TextCardMediumWhite" textsize="1" textemboss="1" textid="' . $label . '"/>';
         } else {
-            return $this->button->getText();
+            $xml .= '<label posn="1 0 1.0E-5" sizen="' . $sizeX . ' 3" halign="left" valign="center" style="TextCardMediumWhite" textsize="1" textemboss="1" text="' . $label . '"/>';
         }
-    }
 
-    public function setText($text)
-    {
-        if ($this->button instanceof Entry) {
-            $this->button->setDefault($text);
-        } else {
-            $this->button->setText($text);
+        if ($showClearText) {
+            $xml .= '<frame posn="-4 0 1">' . Icon::getXML(3, 3, null, null, null, null, null, null, null, null, null, "Icons64x64_1", "ClipPause", $name . "_bt", null, null, false) . '</frame>';
         }
-    }
 
-    public function getName()
-    {
-        return $this->button->getName();
-    }
-
-    public function setName($text)
-    {
-        $this->button->setName($text);
-    }
-
-    public function setId($id)
-    {
-        $this->button->setId($id);
-        $this->button->setScriptEvents();
-    }
-
-    public function setClass($class)
-    {
-        $this->button->setAttribute("class", "isTabIndex isEditable " . $class);
-    }
-
-    public function onIsRemoved(Container $target)
-    {
-        parent::onIsRemoved($target);
-        parent::destroy();
+        return $xml;
     }
 }

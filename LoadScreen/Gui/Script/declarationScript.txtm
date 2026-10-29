@@ -1,0 +1,2 @@
+declare Window <=> Page.GetFirstChild("image");
+declare startTime = Now;

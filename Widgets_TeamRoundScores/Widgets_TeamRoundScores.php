@@ -4,6 +4,7 @@ namespace ManiaLivePlugins\eXpansion\Widgets_TeamRoundScores;
 
 use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
 use ManiaLivePlugins\eXpansion\Widgets_TeamRoundScores\Structures\RoundScore;
 
 /**
@@ -21,6 +22,10 @@ class Widgets_TeamRoundScores extends ExpPlugin
     private $roundNumber = 0;
     private $totalScores = array();
 
+    private $config;
+
+    private $widget;
+
     public function eXpOnLoad()
     {
         $this->roundScores = array();
@@ -29,54 +34,30 @@ class Widgets_TeamRoundScores extends ExpPlugin
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
+        $this->config = Config::getInstance();
         $this->reset();
-        $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
-    }
 
-    public function onBeginRound()
-    {
-        $this->hideWidget();
-        $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
-    }
+        $this->enableScriptEvents("Maniaplanet.EndRound_Start");
 
-    public function test()
-    {
-        $this->roundScores = array();
-
-        $ttlScore = array(0, 0);
-        $ttlScore[-1] = 0;
-        for ($x = 0; $x < 12; $x++) {
-            $teamScores = array(mt_rand(0, 27), mt_rand(0, 27));
-
-            arsort($teamScores, SORT_NUMERIC);
-            reset($teamScores);
-            $winnerTeam = key($teamScores);
-
-            if ($teamScores[0] == $teamScores[1]) {
-                $winnerTeam = -1;
-            }
-
-            $score = new RoundScore();
-            $score->roundNumber = $x;
-            $score->winningTeamId = $winnerTeam;
-
-            // assign scores
-            foreach ($teamScores as $team => $roundScore) {
-                $score->score[$team] = $roundScore;
-            }
-            $ttlScore[$winnerTeam]++;
-            $score->totalScore = $ttlScore;
-
-            $this->roundScores[] = $score;
-        }
-
+        $this->widget = new Widget("Widgets_TeamRoundScores\Gui\Widgets\RoundScoreWidget.xml");
+        $this->widget->setName("Round Scores for team mode");
+        $this->widget->setLayer("scorestable");
+        $this->widget->setParam("title", "Round Points");
 
         $this->showWidget();
     }
 
+    public function eXpOnModeScriptCallback($callback, $array)
+    {
+        switch ($callback) {
+            case "Maniaplanet.EndRound_Start":
+                $this->onEndRound(0);
+                break;
+        }
+    }
+
     public function onEndRound()
     {
-
         // get players infos and create array for counting points...
         $teamScores = array(0 => 0, 1 => 0);
 
@@ -105,41 +86,29 @@ class Widgets_TeamRoundScores extends ExpPlugin
         }
 
         // assign total scores
-        foreach ($this->expStorage->getCurrentRanking() as $ranking) {
-            $team = 0;
-            switch ($ranking->nickName) {
-                case "Red":
-                    $team = 1;
-                    break;
-                case "Blue":
-                    $team = 0;
-                    break;
-            }
-            $score->totalScore[$team] = $ranking->score;
+        foreach (Core::$rankings as $ranking) {
+            $score->totalScore[$ranking->login] = $ranking->score;
         }
 
         $this->roundScores[$this->roundNumber] = $score;
-        $this->hideWidget();
-        $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_NORMAL);
+        $this->showWidget();
 
         $this->roundNumber++;
     }
 
-    public function onBeginMap($map, $warmUp, $matchContinuation)
+    public function onBeginMatch()
     {
         $this->reset();
-        $this->hideWidget();
-        $this->showWidget(\ManiaLivePlugins\eXpansion\Gui\Widgets\Widget::LAYER_SCORES_TABLE);
+        $this->showWidget();
     }
 
-    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
+    public function onEndMatch($rankings_old, $winnerTeamOrMap)
     {
         $this->roundNumber = 0;
     }
 
     private function getScore($position)
     {
-        /** @var int[] */
         $total = count($this->storage->players);
         $points = $total - $position;
         if ($points < 0) {
@@ -156,19 +125,56 @@ class Widgets_TeamRoundScores extends ExpPlugin
         $this->totalScores[-1] = 0;
     }
 
-    private function showWidget($layer)
+    private function showWidget()
     {
-        $widget = Gui\Widgets\RoundScoreWidget::Create();
-        $widget->setSize(42, 56);
-        $widget->setScores($this->roundScores);
-        $widget->setLayer($layer);
-        $widget->setPosition(-124, 58);
-        $widget->show();
+        $teams = $this->storage->getTeamsDisplay(array('$3af', 'Blue', '$d00', 'Red'));
+
+        $rows = array();
+        foreach ($this->roundScores as $score) {
+            switch ($score->winningTeamId) {
+                case 0:
+                    $winner      = $teams[0]["color"] . $teams[0]["name"];
+                    $winnerColor = "fff";
+                    break;
+                case 1:
+                    $winner      = $teams[1]["color"] . $teams[1]["name"];
+                    $winnerColor = "fff";
+                    break;
+                default:
+                    $winner      = "Draw";
+                    $winnerColor = "aaa";
+                    break;
+            }
+
+            $rows[] = array(
+                'posY'        => -4 * count($rows),
+                'round'       => $score->roundNumber + 1,
+                'total1'      => $score->totalScore[0],
+                'total2'      => $score->totalScore[1],
+                'winner'      => $this->widget->handleSpecialChars($winner),
+                'winnerColor' => $winnerColor,
+                'score1'      => $score->score[0],
+                'score2'      => $score->score[1],
+            );
+            if (count($rows) >= $this->config->teamRoundScorePanel_nbFields) {
+                break;
+            }
+        }
+
+        $this->widget->setSize(42, (($this->config->teamRoundScorePanel_nbFields) * 4 + 4.75));
+        $this->widget->setPosition($this->config->teamRoundScorePanel_PosX, $this->config->teamRoundScorePanel_PosY, 0);
+        $this->widget->setParam("bgSizeY",     5 + $this->config->teamRoundScorePanel_nbFields * 4);
+        $this->widget->setParam("team1Color",  $this->widget->handleSpecialChars(str_replace('$', "", $teams[0]["color"])));
+        $this->widget->setParam("team2Color",  $this->widget->handleSpecialChars(str_replace('$', "", $teams[1]["color"])));
+        $this->widget->setParam("roundScores", $rows);
+        $this->widget->show(null, true);
     }
 
     private function hideWidget()
     {
-        Gui\Widgets\RoundScoreWidget::EraseAll();
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
     }
 
     public function eXpOnUnload()

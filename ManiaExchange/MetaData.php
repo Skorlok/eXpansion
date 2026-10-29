@@ -18,23 +18,22 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName("Mania-Exchange integration");
+        $this->setName("Maps: Mania-Exchange integration");
         $this->setDescription("Provides integration for Mania-Exchange.com");
         $this->setGroups(array('Maps', 'Connectivity'));
 
         $config = Config::getInstance();
 
+
         $var = new Boolean("juke_newmaps", "Autojuke newly added maps ?", $config, true, false);
         $var->setDefaultValue(true);
         $this->registerVariable($var);
 
-        $var = new Boolean(
-            "mxVote_enable",
-            "Allow players to temporarily add maps using votes ?",
-            $config,
-            false,
-            false
-        );
+        $var = new Boolean("announceMxRecord", "Announce mx record at the start of each map ?", $config, true, false);
+        $var->setDefaultValue(true);
+        $this->registerVariable($var);
+
+        $var = new Boolean("mxVote_enable", "Allow players to temporarily add maps using votes ?", $config, false, false);
         $var->setGroup("Voting");
         $var->setDefaultValue(false);
         $this->registerVariable($var);
@@ -68,13 +67,14 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeString('file_name', 'File Pattern', $config, true, false);
-        $var->setDefaultValue('{server_title}/{map_author}_{map_name}_{mx_id}.map.gbx');
+        $var->setDefaultValue('{server_login}/{map_author}_{map_name}_{mx_id}.map.gbx');
         $var->setDescription(
             array(
                 'Pattern to define where the map will be saved. Available variables : ',
+                '(relative to /UserData/Maps/Downloaded)',
                 '{map_author}, {map_name}, {map_environment}, {map_vehicle}, {map_type}',
-                '{map_style}, {mx_id}, {server_title}',
-                'You map use / to create sub directories.'
+                '{map_style}, {mx_id}, {server_title}, {server_login}',
+                'You can use / to create sub directories.'
             )
         );
         $this->registerVariable($var);

@@ -3,9 +3,7 @@ Void updateTabContents() {
     declare Text[][Text] chatLiness for UI = Text[][Text];
     declare Integer tabCounter = 0;
     declare Integer activeTab for UI = 0;
-    // reset lines
     for (i, 0, 4) {
-     //   LibManialink_AnimInsert("<label opacity=\"0.0\" id=\"line_"^i^"\" />", i*450, 750, "");
         declare label <=> (Page.GetFirstChild("line_"^i) as CMlLabel);
         label.Value = "";
 
@@ -29,13 +27,9 @@ Void updateTabContents() {
     tabBg.Style = "BgsPlayerCard";
     tabBg.Substyle = "BgMediaTracker";
 
-
-
     declare help <=> (Page.GetFirstChild("line_0") as CMlLabel);
     help.Value="Send personal messages: click (+) icon";
 
-
-    // generate tabs and lines
     foreach (tabTitle => texts in chatLiness) {
 
         if (tabCounter > 4) {
@@ -60,16 +54,14 @@ Void updateTabContents() {
                 if (startpos <= 0) {
                     startpos = -1;
                 }
-               // log("startpos: "^ startpos ^ "  endpos:" ^ texts.count-1);
 
                 declare Integer lineCount = 0;
                 for (i, startpos, texts.count-1) {
-                   declare label <=> (Page.GetFirstChild("line_"^lineCount) as CMlLabel);
+                    declare label <=> (Page.GetFirstChild("line_"^lineCount) as CMlLabel);
                     if (i < 0) {
                         continue;
                     }
                    label.Value = texts[i];
-              //      LibManialink_AnimInsert("<label opacity=\"1.0\" id=\"line_"^lineCount^"\"/>", i * 450, 750, "");
                    lineCount += 1;
                 }
             }
@@ -78,7 +70,6 @@ Void updateTabContents() {
     }
     declare addTab <=> (Page.GetFirstChild("addTab") as CMlQuad);
     addTab.RelativePosition.X = 1.0 * tabCounter * 22.0 + 2;
-
 }
 
 Void closeTab(Integer tabNb) {
@@ -94,7 +85,7 @@ Void closeTab(Integer tabNb) {
             chatLiness.removekey(tabTitle);
             updateTabContents();
             return;
-         }
+        }
 
         tabCounter += 1;
     }

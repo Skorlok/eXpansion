@@ -1,0 +1,17 @@
+<frame posn="0 -1 0">
+	<frame posn="0 0 1">
+		<exp:inputbox name="team1Country" sizeX="35" label="@Team1 Country" isTextId="true"/>
+	</frame>
+	<frame posn="0 -12 1">
+		<exp:inputbox name="team1Name" sizeX="35" label="@Team1 Name" isTextId="true"/>
+	</frame>
+	<frame posn="0 -24 1">
+		<exp:inputbox name="team2Country" sizeX="35" label="@Team2 Country" isTextId="true"/>
+	</frame>
+	<frame posn="0 -36 1">
+		<exp:inputbox name="team2Name" sizeX="35" label="@Team2 Name" isTextId="true"/>
+	</frame>
+	<frame posn="0 -48 1">
+		<exp:button sizeX="32" sizeY="6" text="@Ok" colorize="A54B4B" action="exp:eXpansion.ScoreDisplay:displayWidget" isTextId="true"/>
+	</frame>
+</frame>

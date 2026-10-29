@@ -1,8 +1,8 @@
 declare timeOrScore = (Page.GetFirstChild("timeOrScore") as CMlEntry);
 declare cpIndex = (Page.GetFirstChild("index") as CMlEntry);
-declare Integer TotalCheckpoints = <?php echo ($this->cpCount); ?>;
-declare Text cpAction = "<?php echo $this->cpAction; ?>";
-declare Text finishAction = "<?php echo $this->finishAction; ?>";
+declare Integer TotalCheckpoints = {{ cpCount }};
+declare Text cpAction = "{{ cpAction }}";
+declare Text finishAction = "{{ finishAction }}";
 
 foreach (Player in Players) {
     declare CheckpointsTimeLast for Player = Integer[Ident];

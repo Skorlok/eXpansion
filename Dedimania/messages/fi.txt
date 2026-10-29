@@ -16,8 +16,8 @@
 Cps
 Cps
 
-Dedimania -records for
-Dedimania -ennätykset
+Dedimania records for %s
+Dedimania ennätykset %s
 
 Dedimania cps for 
 Dedimania CP:t

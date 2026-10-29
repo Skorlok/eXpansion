@@ -1,0 +1,13 @@
+<frame id="Pager" scriptevents="1">
+    <exp:foreach items="items" as="item" index="n">
+    <frame>
+        <frame posn="0 0 1">
+            <exp:checkbox name="cb_{n}" active="{item.active}" textWidth="50" text="{item.text}"/>
+        </frame>
+    </frame>
+    </exp:foreach>
+</frame>
+<exp:pager sizeX="120" sizeY="82" itemSizeY="6"/>
+<frame posn="94 -85 1">
+    <exp:button sizeX="32" sizeY="6" text="@Apply" colorize="0D0" action="exp:eXpansion.Gui:configurationOk" isTextId="true"/>
+</frame>

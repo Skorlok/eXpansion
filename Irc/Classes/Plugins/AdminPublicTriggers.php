@@ -35,7 +35,7 @@ class AdminPublicTriggers implements \ManiaLivePlugins\eXpansion\Irc\Classes\Irc
     /** @var \Maniaplanet\DedicatedServer\Connection */
     private $connection;
 
-    /** @var ManiaLive\Data\Storage */
+    /** @var \ManiaLivePlugins\eXpansion\Helpers\Storage */
     private $storage;
     private $allowedLogins = array();
 
@@ -43,7 +43,7 @@ class AdminPublicTriggers implements \ManiaLivePlugins\eXpansion\Irc\Classes\Irc
     {
         $config = \ManiaLive\DedicatedApi\Config::getInstance();
         $this->connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
-        $this->storage = \ManiaLive\Data\Storage::getInstance();
+        $this->storage = \ManiaLivePlugins\eXpansion\Helpers\Storage::getInstance();
     }
 
     public function irc_onConnect($connection)

@@ -1,0 +1,1 @@
+<quad id="quad" posn="{posX} {posY} 0" sizen="{size} {size}" halign="center" valign="center" image="{imageUrl}" imagefocus="{imageFocusUrl}" action="exp:eXpansion.Minigame1:onClick" scriptevents="1"/>

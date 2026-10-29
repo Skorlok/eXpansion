@@ -1,0 +1,3 @@
+declare CMlEntry passwordEntry_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}") as CMlEntry);
+declare CMlLabel maskedLabel_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}_masked") as CMlLabel);
+declare CMlLabel clearLabel_{{ btName }} <=> (Page.GetFirstChild("{{ btName }}_clear") as CMlLabel);

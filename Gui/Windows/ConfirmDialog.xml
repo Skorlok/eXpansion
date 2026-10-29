@@ -1,0 +1,7 @@
+<label posn="3 0 0" sizen="57 12" style="TextStaticSmall" textid="{@{text}}"/>
+<frame posn="4 -6 1">
+<exp:button sizeX="32" sizeY="6" text="{@Yes}" colorize="0D0" id="yesButton" isTextId="true"/>
+</frame>
+<frame posn="30 -6 1">
+<exp:button sizeX="32" sizeY="6" text="{@No}" colorize="D00" id="noButton" isTextId="true"/>
+</frame>

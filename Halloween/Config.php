@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Halloween;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $spriteCount = 10;

@@ -9,13 +9,11 @@ use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
  *
  * @author De Cramer Oliver
  */
-class HashList extends Variable
+class HashList extends \ManiaLivePlugins\eXpansion\Core\types\config\Variable
 {
 
-    /** @var Variable */
     private $keyType = null;
 
-    /** @var  Variable */
     private $type;
 
     public function setType(Variable $type)
@@ -43,7 +41,7 @@ class HashList extends Variable
         if ($this->keyType != null && !$this->keyType->basicValueCheck($key)) {
             return false;
         }
-        if (!$this->type->basicValueCheck($value)) {
+        if ($this->type != null && !$this->type->basicValueCheck($value)) {
             return false;
         }
 
@@ -51,7 +49,7 @@ class HashList extends Variable
         if ($list == null) {
             $list = array();
         }
-        $list[$key] = $this->type->castValue($value);
+        $this->type != null ? $list[$key] = $this->type->castValue($value) : $list[$key] = $value;
 
         return $this->setRawValue($list);
     }
@@ -81,7 +79,7 @@ class HashList extends Variable
         $array = $this->getRawValue();
         $i = 0;
         foreach ($array as $key => $value) {
-            if ($i == $index) {
+            if ($key == $index) {
                 unset($array[$key]);
                 break;
             }

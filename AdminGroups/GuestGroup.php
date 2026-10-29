@@ -1,7 +1,7 @@
 <?php
 namespace ManiaLivePlugins\eXpansion\AdminGroups;
 
-use ManiaLive\Data\Storage;
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 
 /**
  * Description of Groups

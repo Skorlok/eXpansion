@@ -1,0 +1,49 @@
+// stolen from https://github.com/PRGfx/mQscripts/blob/master/lib/TextExt.Script.txt and adapted for eXpansion, we only need the StringLinks function
+Text stripLinks(Text string)
+{
+	declare Text result;
+	declare Integer length = TextLib::Length(string);
+	if (length < 2) return string;
+	declare Text[] lt = ["l", "h", "p"];
+	declare Text char;
+	declare Text ochar;
+	declare Text state = "0";
+	declare Text linktag = "";
+	for (i, 0, length-1) {
+		ochar = TextExt_CharAt(string, i);
+		char = TextExt_Lowercase(ochar);
+		switch (state) {
+			case "0": {
+				if (char == "$")
+					state = "tag";
+				else
+					result ^= ochar;
+			}
+			case "tag": {
+				if (lt.exists(char)) {
+					linktag = char;
+					state = "link";
+				} else {
+					result ^= "$" ^ ochar;
+					state = "0";
+				}
+			}
+			case "link": {
+				if (char == "[") {
+					state = "linkurl";
+				} else if (char == " ") {
+					result ^= ochar;
+					state = "0";
+				} else {
+					result ^= ochar;
+				}
+			}
+			case "linkurl": {
+				if (char == "]") {
+					state = "0";
+				}
+			}
+		}
+	}
+	return result;
+}

@@ -1,0 +1,17 @@
+<frame posn="0 -1 1">
+	<exp:inputbox name="team1Name" sizeX="35" label="@Team1 Name" isTextId="true"/>
+</frame>
+<label posn="0 -7 2.0E-5" sizen="35 12" style="TextStaticSmall" textid="{@Team1 Color (DO NOT ENTER $$)}"/>
+<frame posn="0 -13 9.0E-5">
+	<exp:colorchooser inputboxName="team1Color" sizeX="35" digits="3" hasPrefix="false"/>
+</frame>
+<frame posn="0 -25 1">
+	<exp:inputbox name="team2Name" sizeX="35" label="@Team2 Name" isTextId="true"/>
+</frame>
+<label posn="0 -31 5.0E-5" sizen="35 12" style="TextStaticSmall" textid="{@Team2 Color (DO NOT ENTER $$)}"/>
+<frame posn="0 -37 0.00012">
+	<exp:colorchooser inputboxName="team2Color" sizeX="35" digits="3" hasPrefix="false"/>
+</frame>
+<frame posn="5 -52 1">
+	<exp:button sizeX="32" sizeY="6" text="@Ok" action="exp:eXpansion.ChatAdmin:teamSetupOk" isTextId="true"/>
+</frame>

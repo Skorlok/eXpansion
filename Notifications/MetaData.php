@@ -16,7 +16,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Chat Notifications redirect");
+        $this->setName("Chat: Chat Notifications redirect");
         $this->setDescription("Redirect chat messages coming from plugins to a widget");
         $this->setGroups(array('Chat', 'Widgets'));
 
@@ -34,12 +34,12 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeFloat("posX", "Pos X", $config, false, false);
-        $var->setDefaultValue(40);
+        $var->setDefaultValue(28);
         $var->setDefaultValue(array());
         $this->registerVariable($var);
 
         $var = new TypeFloat("posY", "Pos Y", $config, false, false);
-        $var->setDefaultValue(-40);
+        $var->setDefaultValue(-67);
         $var->setDefaultValue(array());
         $this->registerVariable($var);
     }

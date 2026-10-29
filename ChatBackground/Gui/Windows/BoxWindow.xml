@@ -1,0 +1,2 @@
+<quad posn="0 {posY} {posZ}" sizen="{width} {height}" halign="center" valign="bottom" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="{opacity}" colorize="{color}"/>
+<quad posn="0 {posY} {posZ}" sizen="{widthHighlite} {height}" halign="center" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerLine" opacity="{opacity}" rot="180" colorize="{colorHighlite}"/>

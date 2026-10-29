@@ -17,8 +17,18 @@ if( (Now - eXp_lastNbPlayerUpdate) >= 1000 ){
     declare Real pp;
     declare Real sp;
 
-    pp = (1. * nbPlayer) / (1. * maxPlayers);
-    sp = (1.* nbSpec) / (1. * maxSpecs);
+    if (maxPlayers > 0) {
+        pp = (1. * nbPlayer) / (1. * maxPlayers);
+    } else {
+        pp = 1.0;
+    }
+
+    if (maxSpecs > 0) {
+        sp = (1.* nbSpec) / (1. * maxSpecs);
+    } else {
+        sp = 1.0;
+    }
+
     playerQ.Size.X = pp*div;
     specQ.Size.X = sp*div;
     eXp_lastNbPlayerUpdate = Now;

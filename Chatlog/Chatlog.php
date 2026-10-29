@@ -1,35 +1,34 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Chatlog;
 
-use ManiaLive\DedicatedApi\Callback\Event;
-use ManiaLivePlugins\eXpansion\Chatlog\Gui\Windows\ChatlogWindow;
-use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
-/**
- * Get all chat and logs it
- *
- * @author Reaby
- */
-class Chatlog extends ExpPlugin
+class Chatlog extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
 
     private $log = array();
 
+    /** @var Window */
+    protected $logWindow = null;
+
     public function eXpOnLoad()
     {
-        $this->enableDedicatedEvents(Event::ON_PLAYER_CHAT);
+        $this->enableDedicatedEvents();
         $this->registerChatCommand("chatlog", "showLog", 0, true);
         $this->setPublicMethod('showLog');
     }
 
-    /**
-     * When player chat we log it
-     *
-     * @param $playerUid
-     * @param $login
-     * @param $text
-     * @param $isRegistredCmd
-     */
+    public function eXpOnReady()
+    {
+        $this->registerManialinkCallback('showLog');
+
+        $this->logWindow = new Window("Chatlog\Gui\Windows\ChatlogWindow.xml");
+        $this->logWindow->setName("Chatlog");
+        $this->logWindow->setSize(140, 100);
+        $this->logWindow->setTitle('Chatlog');
+    }
+
     public function onPlayerChat($playerUid, $login, $text, $isRegistredCmd)
     {
         if ($playerUid == 0 || substr($text, 0, 1) == "/") {
@@ -39,31 +38,35 @@ class Chatlog extends ExpPlugin
         if ($player == null) {
             return;
         }
+        /** @var Config $config */
+        $config = Config::getInstance();
         $chatMessage = new Structures\ChatMessage(time(), $login, $player->nickName, $text);
         array_unshift($this->log, $chatMessage);
-        $this->log = array_slice($this->log, 0, Config::getInstance()->historyLenght, true);
+        $this->log = array_slice($this->log, 0, $config->historyLenght, true);
     }
 
-    /**
-     * Displays the chat log to the players
-     *
-     * @param $login
-     */
     public function showLog($login)
     {
-        /** @var ChatlogWindow $window */
-        $window = ChatlogWindow::Create($login);
-        $window->setTitle(__('Chatlog', $login));
+        $items = array();
+        $data  = array();
+        $x     = 0;
 
-        $window->setSize(140, 100);
-        $window->populateList(array_reverse($this->log));
-        $window->centerOnScreen();
-        $window->show();
+        foreach (array_reverse($this->log) as $message) {
+            $items[$x] = array(date("H:i", $message->time), $message->nickName, $message->text);
+            $data[$x]  = array(-1, -1, -1);
+            $x++;
+        }
+
+        $this->logWindow->setParam("chatItems", $items);
+        $this->logWindow->setParam("chatData", $data);
+        $this->logWindow->show($login);
     }
 
     public function eXpOnUnload()
     {
-        parent::eXpOnUnload();
-        Gui\Windows\ChatlogWindow::EraseAll();
+        if ($this->logWindow instanceof Window) {
+            $this->logWindow->erase();
+        }
+        $this->logWindow = null;
     }
 }

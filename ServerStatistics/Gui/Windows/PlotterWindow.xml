@@ -1,0 +1,40 @@
+<exp:foreach items="labelsX" as="label">
+<label posn="{label.posX} -99 1.0" sizen="15 7" halign="left" valign="right" style="TextStaticSmall" text="{label.text}"/>
+</exp:foreach>
+<exp:foreach items="labelsY" as="label">
+<label posn="7 {label.posY} 5.0" sizen="8 7" halign="right" valign="right" style="TextStaticSmall" text="{label.text}"/>
+</exp:foreach>
+<graph id="graph" min="0 0" max="720 {limitY}" posn="8 -3 10" sizen="152 96" halign="left" valign="top" scriptevents="1">
+    <exp:foreach items="curves" as="curve">
+    <exp:if test="useStyle">
+        <curve color="{curve.color}" style="thin">
+            <exp:foreach items="curve.points" as="point">
+            <point coords="{point.x} {point.y}"/>
+            </exp:foreach>
+        </curve>
+    <exp:else/>
+        <curve color="{curve.color}">
+            <exp:foreach items="curve.points" as="point">
+            <point coords="{point.x} {point.y}"/>
+            </exp:foreach>
+        </curve>
+    </exp:if>
+    </exp:foreach>
+    <exp:if test="useStyle">
+        <curve color="000" width="0.5" style="thin">
+            <point coords="0.00 0.00"/>
+            <point coords="0.001 {limitY}"/>
+        </curve>
+    <exp:else/>
+        <curve color="000" width="0.5">
+            <point coords="0.00 0.00"/>
+            <point coords="0.001 {limitY}"/>
+        </curve>
+    </exp:if>
+    <exp:foreach items="gridLines" as="gridY">
+    <curve color="000" width="0.5">
+        <point coords="0.00 {gridY}"/>
+        <point coords="720.00 {gridY}"/>
+    </curve>
+    </exp:foreach>
+</graph>

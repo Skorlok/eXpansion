@@ -10,8 +10,8 @@ Käytä
 Cancel
 Peruuta
 
-possible parameters: move, lock, reset
-Mahdolliset arvot: move, lock, reset
+possible parameters: move, lock, reset, config
+Mahdolliset arvot: move, lock, reset, config
 
 #error#Server Admin has disabled personal huds. Sorry!
 #error#Palvelimen ylläpitäjä on määrittänyt widgettien paikat!

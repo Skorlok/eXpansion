@@ -1,0 +1,12 @@
+<frame posn="0 -2 0">
+    <frame>
+        <exp:foreach items="checkpoints" as="cp">
+        <frame posn="{cp.posX} {cp.posY} 0">
+            <quad id="Bg_{cp.index}" posn="-2 0 0" sizen="35 5" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" colorize="{bgColorize}"/>
+            <label id="CpPos_{cp.index}" posn="2 0 1.0E-5" sizen="3 4" halign="right" valign="center" style="TextStaticSmall" textsize="1" textcolor="{rankColor}" text="{cp.rank}."/>
+            <label id="CpTime_{cp.index}" posn="2.5 0 2.0E-5" sizen="9 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" textcolor="{timeColor}" text="{cp.time}"/>
+            <label id="CpNick_{cp.index}" posn="12 0 3.0E-5" sizen="21 4" halign="left" valign="center" style="TextStaticSmall" textsize="1" text="{cp.nickname}"/>
+        </frame>
+        </exp:foreach>
+    </frame>
+</frame>

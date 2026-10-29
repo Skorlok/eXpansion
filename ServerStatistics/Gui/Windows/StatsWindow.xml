@@ -1,0 +1,109 @@
+<frame posn="2 -66 0">
+	<frame>
+		<frame posn="0 0 1" scale="1.066666667">
+			<exp:icon sizeX="6" sizeY="6" description="@Number of Players statistics" descSizeX="30" action="exp:eXpansion.ServerStatistics:showPlayers" icon="Icons128x128_1" iconSub="Rankings" isTextId="true"/>
+		</frame>
+		<frame posn="6.4 0 1" scale="1.066666667">
+			<exp:icon sizeX="6" sizeY="6" description="@Memory usage statistics" descSizeX="30" action="exp:eXpansion.ServerStatistics:showMemory" icon="https://cdn.skorlok.com/eXpansion/data/ServerStatistics/ramStat.png" isTextId="true"/>
+		</frame>
+		<frame posn="12.8 0 1" scale="1.066666667">
+			<exp:icon sizeX="6" sizeY="6" description="@Cpu  usage statistic" descSizeX="30" action="exp:eXpansion.ServerStatistics:showCpu" icon="https://cdn.skorlok.com/eXpansion/data/ServerStatistics/cpuStat.png" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="0 5 3.0E-5" scale="0.8">
+	<frame>
+		<frame>
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Comment}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{comment}" autonewline="1"/>
+			<frame posn="33 -12 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 24.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -26 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Dedicated Up Time}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{upTimeDedi}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -32 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@eXpansaion Up Time}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{upTime}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -38 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Map Count}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{mapCount}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -44 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Max Players}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{maxPlayers}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -50 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Average Players}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{avgPlayer}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -56 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Max Spectators}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{maxSpectators}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -62 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Average Spectators}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{avgSpec}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<frame posn="0 -68 0">
+			<label posn="0 -0.5 0" sizen="32 5" style="TextStaticSmall" textid="{@Ladder Limit}"/>
+			<frame posn="0 -2 1.0E-5">
+				<quad posn="-1 0 0" sizen="32 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="eee8"/>
+			</frame>
+			<label posn="33 -0.5 2.0E-5" sizen="60 25" style="TextStaticSmall" text="{ladderLimit}" autonewline="1"/>
+			<frame posn="33 -2 3.0E-5">
+				<quad posn="-1 0 0" sizen="60 4.75" halign="left" valign="center" style="BgsPlayerCard" substyle="BgRacePlayerName" opacity="0.8" modulatecolor="aaa8"/>
+			</frame>
+		</frame>
+		<label posn="0 -74 0" sizen="70 12" style="TextStaticSmall" textid="{visitedBy}"/>
+		<label posn="0 -78.5 0" sizen="70 12" style="TextStaticSmall" textid="{playedTogether}"/>
+	</frame>
+</frame>

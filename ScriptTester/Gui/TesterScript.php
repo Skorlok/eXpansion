@@ -24,22 +24,22 @@ class TesterScript extends \ManiaLivePlugins\eXpansion\Gui\Structures\Script
     }
 
 
-    public function getlibScript($win, $component)
+    public function getlibScript()
     {
         return "";
     }
 
-    public function getDeclarationScript($win, $component)
+    public function getDeclarationScript()
     {
         return "";
     }
 
-    public function getEndScript($win)
+    public function getEndScript()
     {
         return $this->str;
     }
 
-    public function getWhileLoopScript($win, $component)
+    public function getWhileLoopScript()
     {
         return "";
     }

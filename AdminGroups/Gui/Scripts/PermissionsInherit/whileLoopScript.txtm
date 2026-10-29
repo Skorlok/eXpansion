@@ -1,0 +1,37 @@
+if (expPrmNeedRefresh) {
+    expPrmNeedRefresh = False;
+    Page.GetClassChildren("permRow", Page.MainFrame, True);
+    foreach (expPrmControl in Page.GetClassChildren_Result) {
+        declare CMlFrame expPrmRow <=> (expPrmControl as CMlFrame);
+        if (expPrmRow != Null && expPrmRow.Controls.count >= 2) {
+            declare CMlFrame expPrmHave <=> (expPrmRow.Controls[0] as CMlFrame);
+            declare CMlFrame expPrmInheritFrame <=> (expPrmRow.Controls[1] as CMlFrame);
+            if (expPrmHave != Null && expPrmInheritFrame != Null && expPrmInheritFrame.Controls.count >= 1) {
+                declare CMlFrame expPrmInherit <=> (expPrmInheritFrame.Controls[0] as CMlFrame);
+                if (expPrmInherit != Null && expPrmHave.Controls.count >= 2 && expPrmInherit.Controls.count >= 2) {
+                    declare CMlQuad expPrmHavQ <=> (expPrmHave.Controls[0] as CMlQuad);
+                    declare CMlEntry expPrmHavE <=> (expPrmHave.Controls[1] as CMlEntry);
+                    declare CMlEntry expPrmInhE <=> (expPrmInherit.Controls[1] as CMlEntry);
+                    if (expPrmHavQ != Null && expPrmHavE != Null && expPrmInhE != Null) {
+                        if (expPrmInhE.Value == "1") {
+                            if (expPrmHavE.Value == "1") { expPrmHavQ.Colorize = eXp_checkBox_disabledActiveUrl; }
+                            else { expPrmHavQ.Colorize = eXp_checkBox_disabledUrl; }
+                        } else {
+                            if (expPrmHavE.Value == "1") { expPrmHavQ.Colorize = eXp_checkBox_ActiveUrl; }
+                            else { expPrmHavQ.Colorize = eXp_checkBox_InactiveUrl; }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+foreach (Event in PendingEvents) {
+    if (Event.Type == CMlEvent::Type::MouseClick) {
+        declare Text[] expPrmParts = TextLib::Split("_", Event.ControlId);
+        if (expPrmParts.count == 3 && expPrmParts[0] == "eXp" && expPrmParts[1] == "CheckboxQ") {
+            expPrmNeedRefresh = True;
+        }
+    }
+}

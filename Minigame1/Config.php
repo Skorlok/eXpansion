@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Minigame1;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
     public $mg1_displayIntervalMin = "2:00";
 
@@ -22,7 +22,7 @@ class Config extends \ManiaLib\Utils\Singleton
 
     public $mg1_connectionMessage = "Welcome to play minigame also, Just click the appearing image to win!";
 
-    public $mg1_imageUrl = "http://koti.mbnet.fi/reaby/xaseco/images/santa.png";
-    public $mg1_imageFocusUrl = "http://koti.mbnet.fi/reaby/xaseco/images/santa.png";
+    public $mg1_imageUrl = "https://cdn.skorlok.com/eXpansion/data/Minigame1/santa.png";
+    public $mg1_imageFocusUrl = "https://cdn.skorlok.com/eXpansion/data/Minigame1/santa.png";
     public $mg1_imageSize = 20;
 }

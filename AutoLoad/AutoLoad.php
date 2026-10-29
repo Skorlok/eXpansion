@@ -1,19 +1,18 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\AutoLoad;
 
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\PluginHandler\PluginHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
-use ManiaLivePlugins\eXpansion\AutoLoad\Gui\Windows\PluginList;
 use ManiaLivePlugins\eXpansion\AutoLoad\Structures\PluginNotFoundException;
 use ManiaLivePlugins\eXpansion\Core\ConfigManager;
 use ManiaLivePlugins\eXpansion\Core\Events\ConfigLoadEvent;
-use ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent;
 use ManiaLivePlugins\eXpansion\Core\types\config\MetaData as MetaDataType;
-use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window;
 
-class AutoLoad extends ExpPlugin
+class AutoLoad extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
     /**
      * @var string[] Plugins to be loaded.
@@ -45,11 +44,17 @@ class AutoLoad extends ExpPlugin
      */
     private $configPlugins = array();
 
+    /** @var Window */
+    protected $pluginListWindow;
+    protected $pluginListGroups        = array();
+    protected $pluginListPlayerState    = array();
+
     /**
      * @inheritdoc
      */
     public function eXpOnLoad()
     {
+        $this->enableDedicatedEvents(\ManiaLive\DedicatedApi\Callback\Event::ON_PLAYER_MANIALINK_PAGE_ANSWER);
         $this->setPublicMethod('showPluginsWindow');
         Dispatcher::register(ConfigLoadEvent::getClass(), $this, ConfigLoadEvent::ON_CONFIG_FILE_LOADED);
         $this->console("AutoLoading eXpansion pack ... ");
@@ -85,16 +90,16 @@ class AutoLoad extends ExpPlugin
 
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while loading Core plugins!" . $ex->getMessage());
-            AdminGroups::getInstance()
-                ->announceToPermission(Permission::SERVER_ADMIN,
-                    '[AutoLoad] Error while starting expansion core. See console for more info.'
-                );
+            $adminGroups = AdminGroups::getInstance();
+            if ($adminGroups !== null) {
+                $adminGroups->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting expansion core. See console for more info.');
+            }
         }
 
         // do event to inform autoload is complete;
         Dispatcher::dispatch(
-            new GlobalEvent(
-                GlobalEvent::ON_AUTOLOAD_COMPLETE
+            new \ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent(
+                \ManiaLivePlugins\eXpansion\Core\Events\GlobalEvent::ON_AUTOLOAD_COMPLETE
             )
         );
     }
@@ -104,6 +109,11 @@ class AutoLoad extends ExpPlugin
      */
     public function eXpOnReady()
     {
+        $this->registerManialinkCallback('pluginListShowConfig', false, true);
+        $this->registerManialinkCallback('pluginListToggle', true, true);
+        $this->registerManialinkCallback('pluginListSetGroup', true, true);
+        $this->registerManialinkCallback('pluginListSearch', true);
+        
         //We Need the plugin Handler
         $pHandler = PluginHandler::getInstance();
 
@@ -134,11 +144,7 @@ class AutoLoad extends ExpPlugin
             $this->autoLoadPlugins($this->config->plugins, $pHandler);
         } catch (\exception $ex) {
             $this->console("[AutoLoad] Error while AutoLoading additional plugins!" . $ex->getMessage());
-            AdminGroups::getInstance()
-                ->announceToPermission(
-                    '[AutoLoad] Error while starting optional plugins. See console for more info.',
-                    Permission::SERVER_ADMIN
-                );
+            AdminGroups::getInstance()->announceToPermission(Permission::SERVER_ADMIN, '[AutoLoad] Error while starting optional plugins. See console for more info.');
         }
 
         $this->autoLoadPlugins(array('\\ManiaLivePlugins\\eXpansion\\Menu\\Menu'), $pHandler);
@@ -151,6 +157,28 @@ class AutoLoad extends ExpPlugin
         $this->configPlugins = $this->config->plugins;
 
         AdminGroups::addAdminCommand('plugins', $this, 'showPluginsWindow', Permission::EXPANSION_PLUGIN_START_STOP);
+
+        // Compute groups from available plugins (same logic as old PluginList::populate firstDisplay)
+        $groups = array();
+        foreach ($this->availablePlugins as $metaData) {
+            if (count($metaData->getGroups()) == 0) {
+                $groups["Other"] = true;
+            }
+            foreach ($metaData->getGroups() as $name) {
+                if ($name != "Core") {
+                    $groups[$name] = true;
+                }
+            }
+        }
+        $groupNames = array_keys($groups);
+        sort($groupNames, SORT_STRING);
+        $this->pluginListGroups = $groupNames;
+
+        $this->pluginListWindow = new Window("AutoLoad\Gui\Windows\PluginList.xml");
+        $this->pluginListWindow->setName("PluginList");
+        $this->pluginListWindow->setSize(172, 90);
+        $this->pluginListWindow->setTitle("Plugin List");
+        $this->pluginListWindow->registerCloseCallback(array($this, 'onPluginListWindowClosed'));
     }
 
     /**
@@ -197,9 +225,10 @@ class AutoLoad extends ExpPlugin
      */
     private function cleanPluginsArray(&$plugins, $toRemove)
     {
-        for ($i = 0; $i < count($plugins); $i++) {
-            if (isset($plugins[$i]) && in_array($plugins[$i], $toRemove)) {
-                array_splice($plugins, $i, 1);
+        foreach ($toRemove as $plugin) {
+            $pos = array_search($plugin, $plugins);
+            if ($pos !== false) {
+                unset($plugins[$pos]);
             }
         }
     }
@@ -209,7 +238,7 @@ class AutoLoad extends ExpPlugin
      *
      * This method will try and solve dependecies, so start plugins needed to start the plugins asked.
      *
-     * @param string[] $plugins List of plugins to autoload
+     * @param string[]      $plugins  List of plugins to autoload
      * @param PluginHandler $pHandler The manialive plugin handler
      *
      * @throws \Maniaplanet\DedicatedServer\InvalidArgumentException
@@ -239,7 +268,7 @@ class AutoLoad extends ExpPlugin
             );
             $this->console(
                 "Not all required plugins were loaded, "
-                . "due to unmet dependencies or errors. list of not loaded plugins: "
+                ."due to unmet dependencies or errors. list of not loaded plugins: "
             );
             foreach ($recheck as $pname) {
                 $this->console($pname);
@@ -255,7 +284,7 @@ class AutoLoad extends ExpPlugin
     /**
      * Try to load multiple plugins.
      *
-     * @param string[] $list List of plugins to load.
+     * @param string[]      $list     List of plugins to load.
      * @param PluginHandler $pHandler The manialive plugin handler.
      *
      * @return array list of plugins that couldn't be loaded due to dependencies
@@ -281,13 +310,13 @@ class AutoLoad extends ExpPlugin
     /**
      * Try and load a plugin. Will check for dependecies all the other criteries that allows a plugin to start.
      *
-     * @param string $pluginName The name of the plugin to load
+     * @param string        $pname    The name of the plugin to load
      * @param PluginHandler $pHandler The manialive plugin handler.
      *
      * @return bool
      * @throws PluginNotFoundException
      */
-    public function loadPlugin($pluginName, PluginHandler $pHandler)
+    public function loadPlugin($pname, PluginHandler $pHandler)
     {
         //List of plugins that were disabled
         $disabled = Config::getInstance()->disable;
@@ -296,32 +325,32 @@ class AutoLoad extends ExpPlugin
         }
 
         try {
-            if (!$pHandler->isLoaded($pluginName)) {
-                if (in_array($pluginName, $disabled)) {
-                    $this->console("[" . $pluginName . "]...Disabled -> not loading");
+            if (!$pHandler->isLoaded($pname)) {
+                if (in_array($pname, $disabled)) {
+                    $this->console("[" . $pname . "]...Disabled -> not loading");
                 } else {
-                    if (!class_exists($pluginName)) {
-                        $this->console("[" . $pluginName . "]...Doesen't exist -> not loading");
-                        throw new PluginNotFoundException($pluginName);
+                    if (!class_exists($pname)) {
+                        $this->console("[" . $pname . "]...Doesen't exist -> not loading");
+                        throw new PluginNotFoundException($pname);
                     }
                     /** @var MetaDataType $metaData */
-                    $metaData = $pluginName::getMetaData();
+                    $metaData = $pname::getMetaData();
 
-                    $this->availablePlugins[$pluginName] = $metaData;
-                    self::$allAvailablePlugins[$pluginName] = $metaData;
+                    $this->availablePlugins[$pname] = $metaData;
+                    self::$allAvailablePlugins[$pname] = $metaData;
 
                     if (!$metaData->checkForPluginIncompatibility($pHandler->getLoadedPluginsList())) {
                         $this->console(
-                            "[" . $pluginName . "]...Disabled -> Not Compatible : either can't run with a certain plugin "
-                            . "or a loaded plugin can't with this plugin"
+                            "[" . $pname . "]...Disabled -> Not Compatible : either can't run with a certain plugin "
+                            ."or a loaded plugin can't with this plugin"
                         );
                         return false;
                     } elseif ($metaData->checkAll()) {
                         try {
-                            $status = $pHandler->load($pluginName, false);
+                            $status = $pHandler->load($pname, false);
                         } catch (\Exception $ex) {
                             try {
-                                $pHandler->unload($pluginName);
+                                $pHandler->unload($pname);
                             } catch (\Exception $ex) {
 
                             }
@@ -329,21 +358,21 @@ class AutoLoad extends ExpPlugin
                         }
 
                         if (!$status) {
-                            $this->console("[" . $pluginName . "]...FAIL -> will retry");
-                            $recheck[] = $pluginName;
+                            $this->console("[" . $pname . "]...FAIL -> will retry");
+                            $recheck[] = $pname;
                         } else {
-                            $this->debug("[" . $pluginName . "]...SUCCESS");
+                            $this->debug("[" . $pname . "]...SUCCESS");
                         }
                     } else {
                         // @TODO display in the logs why not compatible.
-                        $this->console("[" . $pluginName . "]...Disabled -> Not Compatible");
+                        $this->console("[" . $pname . "]...Disabled -> Not Compatible");
                     }
                 }
             }
         } catch (PluginNotFoundException $ex) {
             throw $ex;
         } catch (\Exception $ex) {
-            $this->console("[" . $pluginName . "]...FAIL -> will retry");
+            $this->console("[" . $pname . "]...FAIL -> will retry");
             return false;
         }
 
@@ -353,7 +382,7 @@ class AutoLoad extends ExpPlugin
     /**
      * Start or stop a certain plugin.
      *
-     * @param string $login Login of the user that tries to start or stop the process.
+     * @param string       $login    Login of the user that tries to start or stop the process.
      * @param MetaDataType $metaData The metadata of the plugin we try to start.
      */
     public function togglePlugin($login, MetaDataType $metaData)
@@ -435,6 +464,9 @@ class AutoLoad extends ExpPlugin
                     $this->loadAvailablePluginMetaDataFromPath($path);
                 } else {
                     foreach ($subFiles as $file) {
+                        if ($file === '.' || $file === '..') {
+                            continue;
+                        }
                         if (is_dir($path . '/' . $file)) {
                             $this->findAvailablePluginsInPath($path . '/' . $file, $depth - 1);
                         }
@@ -449,42 +481,43 @@ class AutoLoad extends ExpPlugin
     /**
      * Loads plugin metadata using plugins path.
      *
-     * @param string $path
+     * @param $path
      */
     protected function loadAvailablePluginMetaDataFromPath($path)
     {
         $classes = get_declared_classes();
-
-        require_once($path . DIRECTORY_SEPARATOR . 'MetaData.php');
+        require_once $path . '/MetaData.php';
         $diff = array_diff(get_declared_classes(), $classes);
         $className = reset($diff);
 
         $exploded = explode('\\', $className);
         array_pop($exploded);
         $size = sizeof($exploded);
-        $pluginId = implode('\\', $exploded) . '\\' . $exploded[$size - 1];
+		if ($size != 0) {
+			$pluginId = implode('\\', $exploded) . '\\' . $exploded[$size - 1];
 
-        if ($pluginId[0] != '\\') {
-            $pluginId = '\\' . $pluginId;
-        }
+			if ($pluginId[0] != '\\') {
+				$pluginId = '\\' . $pluginId;
+			}
 
-        if (class_exists($pluginId)) {
-            /**
-             * @var MetaDataType $metaData
-             */
-            $metaData = $className::getInstance($pluginId);
-            if ($metaData->getPlugin() == null) {
-                $metaData->setPlugin($pluginId);
-            } else {
-                $pluginId = $metaData->getPlugin();
-            }
+			if (class_exists($pluginId)) {
+				/**
+				 * @var MetaDataType $metaData
+				 */
+				$metaData = $className::getInstance($pluginId);
+				if ($metaData->getPlugin() == null) {
+					$metaData->setPlugin($pluginId);
+				} else {
+					$pluginId = $metaData->getPlugin();
+				}
 
-            $this->availablePlugins[$pluginId] = $metaData;
-            self::$allAvailablePlugins[$pluginId] = $metaData;
+				$this->availablePlugins[$pluginId] = $metaData;
+				self::$allAvailablePlugins[$pluginId] = $metaData;
 
-            uasort($this->availablePlugins, array($this, 'pluginNameCmp'));
-            uasort(self::$allAvailablePlugins, array($this, 'pluginNameCmp'));
-        }
+				uasort($this->availablePlugins, array($this, 'pluginNameCmp'));
+				uasort(self::$allAvailablePlugins, array($this, 'pluginNameCmp'));
+			}
+		}
     }
 
     /**
@@ -511,14 +544,180 @@ class AutoLoad extends ExpPlugin
      */
     public function showPluginsWindow($login)
     {
-        PluginList::Erase($login);
-        /** @var PluginList $win */
-        $win = PluginList::Create($login);
-        $win->setTitle("Plugin List");
-        $win->centerOnScreen();
-        $win->setSize(172, 90);
-        $win->populate($this, $this->availablePlugins);
-        $win->show();
+        $state        = isset($this->pluginListPlayerState[$login]) ? $this->pluginListPlayerState[$login] : array();
+        $groupIdx     = isset($state['groupIdx']) ? $state['groupIdx'] : 0;
+        $filterName   = isset($state['name'])     ? $state['name']     : '';
+        $filterAuthor = isset($state['author'])   ? $state['author']   : '';
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    private function pluginListBuildAndShow($login, $selectedGroupIdx = 0, $filterName = '', $filterAuthor = '')
+    {
+        $this->pluginListPlayerState[$login] = array(
+            'groupIdx' => $selectedGroupIdx,
+            'name'     => $filterName,
+            'author'   => $filterAuthor,
+        );
+
+        $pHandler  = PluginHandler::getInstance();
+        $configMgr = ConfigManager::getInstance();
+        $window    = $this->pluginListWindow;
+
+        $selectedGroupName = isset($this->pluginListGroups[$selectedGroupIdx])
+            ? $this->pluginListGroups[$selectedGroupIdx]
+            : (count($this->pluginListGroups) ? $this->pluginListGroups[0] : '');
+
+        $pluginsData = array();
+        $i = 0;
+        foreach ($this->availablePlugins as $pluginId => $metaData) {
+            if (in_array("Core", $metaData->getGroups())) {
+                continue;
+            }
+            if (!empty($filterName) && strpos(strtoupper($metaData->getName()), strtoupper($filterName)) === false) {
+                continue;
+            }
+            if (!empty($filterAuthor) && strpos(strtoupper($metaData->getAuthor()), strtoupper($filterAuthor)) === false) {
+                continue;
+            }
+            if ($selectedGroupName != '' && !in_array($selectedGroupName, $metaData->getGroups())) {
+                continue;
+            }
+
+            $metaData->checkAll();
+
+            $isLoaded  = $pHandler->isLoaded($pluginId);
+            $isInStart = $this->isInStartList($pluginId);
+
+            if ($isLoaded) {
+                $toggleColorize = '0f0';
+                $toggleTooltip  = "Plugin is running. Click to unload!";
+            } elseif ($isInStart) {
+                $toggleColorize = 'ff0';
+                $toggleTooltip  = "Plugin not compatible with game mode, title or server settings.\n Plugin will be enabled when possible.";
+            } else {
+                $toggleColorize = 'f00';
+                $toggleTooltip  = "Plugin not running. Click to load!";
+            }
+
+            $titleCompat   = $metaData->checkTitleCompatibility();
+            $gameCompat    = $metaData->checkGameCompatibility();
+            $otherIssues   = $metaData->checkOtherCompatibility();
+
+            $titleColorize = $titleCompat ? '090' : 'f00';
+            $titleTooltip  = $titleCompat
+                ? "This plugin is compatible with the current Title"
+                : "This plugin isn't compatible with the current Title";
+
+            $gameColorize  = $gameCompat ? '090' : 'f00';
+            $gameTooltip   = $gameCompat
+                ? "This plugin is compatible with the current Game mode"
+                : "This plugin isn't compatible with the current Game mode";
+
+            if (empty($otherIssues)) {
+                $otherColorize = '090';
+                $otherTooltip  = "This plugin is compatible with current installation";
+                $otherSizeY    = 5;
+            } else {
+                $otherColorize = 'f00';
+                $otherTooltip  = "This plugin has a few compatibility issues :\n" . implode("\n", $otherIssues);
+                $otherSizeY    = 5 * (count($otherIssues) + 1);
+            }
+
+            if ($isInStart || $isLoaded) {
+                $startText     = "Stop";
+                $startColorize = "F00";
+            } else {
+                $startText     = "Start";
+                $startColorize = "0D0";
+            }
+
+            $pluginsData[] = array(
+                'id'             => $pluginId,
+                'index'          => $i++,
+                'name'           => $window->handleSpecialChars($metaData->getName() == "" ? $pluginId : $metaData->getName()),
+                'desc'           => $window->handleSpecialChars($metaData->getDescription()),
+                'toggleColorize' => $toggleColorize,
+                'toggleTooltip'  => $window->handleSpecialChars($toggleTooltip),
+                'titleColorize'  => $titleColorize,
+                'titleTooltip'   => $window->handleSpecialChars($titleTooltip),
+                'gameColorize'   => $gameColorize,
+                'gameTooltip'    => $window->handleSpecialChars($gameTooltip),
+                'otherColorize'  => $otherColorize,
+                'otherTooltip'   => $window->handleSpecialChars($otherTooltip),
+                'otherSizeY'     => $otherSizeY,
+                'configAvailable' => (bool) $configMgr->getGroupedVariables($pluginId),
+                'startText'      => $startText,
+                'startColorize'  => $startColorize,
+            );
+        }
+
+        $groupsData = array();
+        foreach ($this->pluginListGroups as $idx => $groupName) {
+            $groupsData[] = array(
+                'name'     => $window->handleSpecialChars($groupName),
+                'posY'     => $idx * 6.5,
+                'selected' => ($idx == $selectedGroupIdx),
+            );
+        }
+
+        $window->setParam("plugins",         $pluginsData);
+        $window->setParam("groups",          $groupsData);
+        $window->setParam("groupNames",      $this->pluginListGroups);
+        $window->setParam("currentGroupIdx", $selectedGroupIdx);
+        $window->setParam("currentName",     $window->handleSpecialChars($filterName));
+        $window->setParam("currentAuthor",   $window->handleSpecialChars($filterAuthor));
+        $window->show($login);
+    }
+
+    public function pluginListSetGroup($login, $groupIdx, $params = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
+        $filterName   = isset($params['name'])   ? $params['name']   : '';
+        $filterAuthor = isset($params['author']) ? $params['author'] : '';
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    public function pluginListSearch($login, $params = array())
+    {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
+        $filterName   = isset($params['name'])   ? $params['name']   : '';
+        $filterAuthor = isset($params['author']) ? $params['author'] : '';
+        $groupIdx     = isset($params['group'])  ? intval($params['group']) : 0;
+        $this->pluginListBuildAndShow($login, $groupIdx, $filterName, $filterAuthor);
+    }
+
+    public function pluginListToggle($login, $pluginId)
+    {
+        if (!AdminGroups::hasPermission($login, Permission::EXPANSION_PLUGIN_START_STOP)) {
+            return;
+        }
+        if (isset($this->availablePlugins[$pluginId])) {
+            $this->togglePlugin($login, $this->availablePlugins[$pluginId]);
+        }
+    }
+
+    public function pluginListShowConfig($login, $pluginId)
+    {
+        $this->callPublicMethod('\ManiaLivePlugins\eXpansion\Core\Core', 'showExpSettings', $login, null, $pluginId);
+    }
+
+    public function onPluginListWindowClosed($login)
+    {
+        unset($this->pluginListPlayerState[$login]);
+    }
+
+    public function eXpOnUnload()
+    {
+        parent::eXpOnUnload();
+        if ($this->pluginListWindow instanceof Window) {
+            $this->pluginListWindow->erase();
+        }
+        $this->pluginListWindow      = null;
+        $this->pluginListPlayerState    = array();
     }
 
     /**

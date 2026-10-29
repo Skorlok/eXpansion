@@ -9,7 +9,10 @@ namespace ManiaLivePlugins\eXpansion\Maps\Structures;
  */
 class MapSortMode
 {
-
     public $sortMode = 0;
     public $column = "";
+    public $searchTerm = "";
+    public $searchField = "";
+    public $searchFilter = "";
+    public $filterParam = "";
 }

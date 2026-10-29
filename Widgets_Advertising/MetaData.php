@@ -33,7 +33,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Simple Advert");
+        $this->setName("Widget: Simple Advert");
         $this->setDescription("Provides a Custom Widget to put your advertisement in");
         $this->setGroups(array('Widgets', 'Tools'));
         $config = Config::getInstance();

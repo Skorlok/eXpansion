@@ -1,6 +1,5 @@
 
-declare Text[] playersToHide = <?php echo $this->hide; ?>;
-declare Window <=> Page.GetFirstChild("<?php echo $win->getId() ?>");
+declare Text[] playersToHide = {{ hide }};
 
 foreach (player in playersToHide) {
     if (player == InputPlayer.Login) {

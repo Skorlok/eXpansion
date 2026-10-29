@@ -1,8 +1,8 @@
 declare CMlEntry sendStamp <=> (Page.GetFirstChild("sendStamp") as CMlEntry);
 declare CMlEntry latency <=> (Page.GetFirstChild("latency") as CMlEntry);
 
-declare Integer updateFreq = <?php echo $this->updateFreq; ?>;
-declare Text action = "<?php echo $this->action; ?>";
+declare Integer updateFreq = {{ updateFreq }};
+declare Text action = "{{ action }}";
 declare Integer eXp_lastClockUpdate = 0;
 declare Boolean exp_NetstatAnswer for UI = False;
 declare Integer exp_RecvStamp for UI = 0;

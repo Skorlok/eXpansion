@@ -4,9 +4,7 @@ namespace ManiaLivePlugins\eXpansion\JoinLeaveMessage;
 
 use DateTime;
 use Exception;
-use ManiaLive\Features\Admin\AdminGroup;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
-use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Core\types\ExpPlugin;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
@@ -45,7 +43,7 @@ class JoinLeaveMessage extends ExpPlugin
 
     public function eXpOnReady()
     {
-        $cmd = $this->registerChatCommand("played", "showPlaytime", 0, true);
+        $cmd = $this->registerChatCommand("played", "showPlayTime", 0, true);
 
 
         foreach ($this->storage->players as $login => $player) {
@@ -62,14 +60,18 @@ class JoinLeaveMessage extends ExpPlugin
         $this->storage->getPlayerObject($login)->sessionJoinTime = new DateTime();
     }
 
-    public function getSessionTime($login)
+    public function getSessionTime($login, $leaved)
     {
         $playtime = "";
         if (!$login) {
             return $playtime;
         }
 
-        $player = $this->storage->getPlayerObject($login);
+        if ($leaved) {
+            $player = $this->storage->getDisconnectPlayerObject($login);
+        } else {
+            $player = $this->storage->getPlayerObject($login);
+        }
         $now = new DateTime();
 
         if (property_exists($player, "sessionJoinTime")) {
@@ -122,7 +124,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
         $this->eXpChatSendServerMessage(
             $this->playtimeMsg,
             $login,
-            array($this->getSessionTime($login), $this->getTotalPlaytime($login))
+            array($this->getSessionTime($login, false), $this->getTotalPlaytime($login))
         );
     }
 
@@ -137,13 +139,13 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
             if ($player === null) {
                 $msg = "#admin_error#a player with login '#variable#" . $login
                     . "#admin_error#' connected, but no player object for this login exist.";
-                AdminGroups::announceToPermission(Permission::SERVER_ADMIN, "");
+                AdminGroups::announceToPermission(\ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN, "");
 
                 return;
             }
             $this->setJoinTime($login);
 
-            $nick = $player->nickName;
+            $nick = $player->cleanNickName;
             $country = $this->getCountry($player);
 
             $spec = "";
@@ -153,16 +155,8 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
 
             $grpName = AdminGroups::getGroupName($login);
 
-            $admin = AdminGroups::getAdmin($login);
-            if ($admin) {
-                $group = $admin->getGroup();
-                if ($group->hasPermission(Permission::JOIN_MESSAGE_DISABLED) && $group->isMaster()) {
-                    return;
-                };
-            }
-
             $config = Config::getInstance();
-            $playTime = Helper::formatPastTime($this->expStorage->getDbPlayer($login)->getPlayTime(), 2);
+            $playTime = Helper::formatPastTime($this->storage->getDbPlayer($login)->getPlayTime(), 2);
             $joinTimeArgs = array('$z$s' . $nick . '$z$s', $login, $country, $spec, $grpName, $playTime);
             $joinArgs = array('$z$s' . $nick . '$z$s', $login, $country, $spec, $grpName);
 
@@ -170,13 +164,13 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
                 $ag = AdminGroups::getInstance();
                 if ($config->showTotalPlayOnJoin) {
                     $ag->announceToPermission(
-                        Permission::SERVER_ADMIN,
+                        \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                         $this->joinMsgTime,
                         $joinTimeArgs
                     );
                 } else {
                     $ag->announceToPermission(
-                        Permission::SERVER_ADMIN,
+                        \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                         $this->joinMsg,
                         $joinArgs
                     );
@@ -205,25 +199,25 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
         }
 
         try {
-            $player = $this->storage->getPlayerObject($login);
+            $player = $this->storage->getDisconnectPlayerObject($login);
             if ($player === null) {
                 $msg = "#admin_error#a player with login '#variable#" . $login
                     . "#admin_error#' disconnected, but no player object for this login exist.";
                 $ag = AdminGroups::getInstance();
-                $ag->announceToPermission(Permission::SERVER_ADMIN, $msg);
+                $ag->announceToPermission(\ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN, $msg);
 
                 return;
             }
-            $nick = $player->nickName;
+            $nick = $player->cleanNickName;
 
-            $playtime = $this->getSessionTime($login);
+            $playtime = $this->getSessionTime($login, true);
 
             $grpName = AdminGroups::getGroupName($login);
             $country = $this->getCountry($player);
             if ($config->hideFromPlayers) {
                 $ag = AdminGroups::getInstance();
                 $ag->announceToPermission(
-                    Permission::SERVER_ADMIN,
+                    \ManiaLivePlugins\eXpansion\AdminGroups\Permission::SERVER_ADMIN,
                     $this->leaveMsg,
                     array('$z$s' . $nick . '$z$s', $login, $country, $grpName, $playtime)
                 );
@@ -244,7 +238,7 @@ from `exp_players` WHERE `player_login` = " . $this->db->quote($login) . ";";
     {
         $path = str_replace("World|", "", $player->path);
         $country = explode("|", $path);
-        if (sizeof($country) > 0) {
+        if (sizeof($country) > 0 && isset($country[1])) {
             $country = $country[1];
         } else {
             $country = "Unknown";

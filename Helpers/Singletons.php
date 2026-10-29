@@ -23,7 +23,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Helpers;
 
-use ManiaLib\Utils\Singleton;
+use ManiaLive\Utilities\Singleton;
 
 class Singletons extends Singleton
 {

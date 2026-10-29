@@ -33,3 +33,12 @@ Most winning country
 
 Country with most players
 Country with most players
+
+#player#You have #variable#%1$s#player# wins!
+#player#You have #variable#%1$s#player# wins!
+
+#admin_error#There are no player with login #variable#%1$s#admin_error# on this server!
+#admin_error#There are no player with login #variable#%1$s#admin_error# on this server!
+
+#player#Player #variable#%s$s#player# was last online on: #variable#%s
+#player#Player #variable#%s$s#player# was last online on: #variable#%s

@@ -1,0 +1,19 @@
+<frame>
+    <exp:widgetbg sizeX="42" sizeY="{bgSizeY}"/>
+</frame>
+<quad posn="0 0 1.0E-5" sizen="42 4.2" style="UiSMSpectatorScoreBig" substyle="PlayerSlotCenter" colorize="3af"/>
+<label posn="21 -2 2.0E-5" sizen="30 5" halign="center" valign="center" style="TextCardScores2" textsize="1" textcolor="fff" textid="{@{title}}"/>
+<frame posn="2 -6.5 3.0E-5">
+    <frame>
+        <exp:foreach items="roundScores" as="s">
+        <frame posn="0 {s.posY} 0">
+            <label posn="3 0 0" sizen="5 4" halign="right" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="fff" text="r{s.round}"/>
+            <label posn="6 0 1.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="{team1Color}" text="{s.total1}"/>
+            <label posn="11 0 2.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="{team2Color}" text="{s.total2}"/>
+            <label posn="22 0 3.0E-5" sizen="16 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="{s.winnerColor}" text="{s.winner}"/>
+            <label posn="32 0 4.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="{team1Color}" text="{s.score1}"/>
+            <label posn="38 0 5.0E-5" sizen="7 5" halign="center" valign="center" style="TextCardSmallScores2" textsize="1" textcolor="{team2Color}" text="{s.score2}"/>
+        </frame>
+        </exp:foreach>
+    </frame>
+</frame>

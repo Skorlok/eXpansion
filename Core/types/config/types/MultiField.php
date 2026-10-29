@@ -31,7 +31,8 @@ use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
  */
 class MultiField extends Variable
 {
-    /** @var  Variable[] */
+
+
     protected $variableType;
 
     public function registerNewType($name, Variable $type)

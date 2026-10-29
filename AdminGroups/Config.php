@@ -1,7 +1,7 @@
 <?php
 namespace ManiaLivePlugins\eXpansion\AdminGroups;
 
-use ManiaLib\Utils\Singleton;
+use ManiaLive\Utilities\Singleton;
 
 /**
  * Description of Config

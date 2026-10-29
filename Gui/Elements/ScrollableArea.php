@@ -2,148 +2,53 @@
 
 namespace ManiaLivePlugins\eXpansion\Gui\Elements;
 
-use ManiaLib\Gui\Component;
 use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
-use ManiaLivePlugins\eXpansion\Helpers\Maniascript;
+use ManiaLivePlugins\eXpansion\Helpers\Helper;
 
-class ScrollableArea extends \ManiaLivePlugins\eXpansion\Gui\Control implements \ManiaLivePlugins\eXpansion\Gui\Structures\ScriptedContainer
+class ScrollableArea
 {
-
-    protected $area;
-
-    protected $scrollHBg;
-    protected $scrollH;
-    protected $scrollHLeft;
-    protected $scrollHRight;
-
-    protected $scrollVBg;
-    protected $scrollV;
-    protected $scrollVDown;
-    protected $scrollVUp;
-
-    protected $myScript;
-
-    public function __construct($sizeX = 120, $sizeY = 90)
-    {
-        $this->sizeX = $sizeX;
-        $this->sizeY = $sizeY;
-        $this->area = new FrameClipable($sizeX - 1, $sizeY + 2);
-
-        $this->area->setId("scrollableArea");
-
-        $this->addComponent($this->area);
-
-        $this->myScript = new Script("Gui\\Scripts\\ScrollableArea");
-
-        $this->scrollVBg = new \ManiaLib\Gui\Elements\Quad(4, 40);
-        $this->scrollVBg->setAlign("center", "top");
-        $this->scrollVBg->setStyle("Bgs1InRace");
-        $this->scrollVBg->setSubStyle('BgPlayerCard');
-        $this->scrollVBg->setId("scrollVBg");
-        $this->scrollVBg->setOpacity(0.9);
-        $this->addComponent($this->scrollVBg);
-
-        $this->scrollV = new \ManiaLib\Gui\Elements\Quad(3, 15);
-        $this->scrollV->setAlign("center", "top");
-        $this->scrollV->setStyle("BgsPlayerCard");
-        $this->scrollV->setSubStyle('BgRacePlayerName');
-        $this->scrollV->setId("scrollVBar");
-        $this->scrollV->setScriptEvents();
-        $this->addComponent($this->scrollV);
-
-        $this->scrollVDown = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
-        $this->scrollVDown->setAlign("center", "top");
-        $this->scrollVDown->setStyle("Icons64x64_1");
-        $this->scrollVDown->setSubStyle("ArrowDown");
-        $this->scrollVDown->setId("scrollVDown");
-        $this->scrollVDown->setScriptEvents();
-        $this->addComponent($this->scrollVDown);
-
-        $this->scrollVUp = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
-        $this->scrollVUp->setAlign("center", "bottom");
-        $this->scrollVUp->setStyle("Icons64x64_1");
-        $this->scrollVUp->setSubStyle("ArrowUp");
-        $this->scrollVUp->setId("scrollVUp");
-        $this->scrollVUp->setScriptEvents();
-        $this->addComponent($this->scrollVUp);
-
-
-        $this->scrollHBg = new \ManiaLib\Gui\Elements\Quad(40, 4);
-        $this->scrollHBg->setAlign("left", "top");
-        $this->scrollHBg->setBgcolor("111");
-        $this->scrollHBg->setId("scrollHBg");
-        $this->scrollHBg->setOpacity(0.9);
-        $this->addComponent($this->scrollHBg);
-
-        $this->scrollH = new \ManiaLib\Gui\Elements\Quad(15, 3);
-        $this->scrollH->setAlign("left", "top");
-        $this->scrollH->setStyle("BgsPlayerCard");
-        $this->scrollH->setSubStyle('BgRacePlayerName');
-        $this->scrollH->setId("scrollHBar");
-        $this->scrollH->setScriptEvents();
-        $this->addComponent($this->scrollH);
-
-        $this->scrollHLeft = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
-        $this->scrollHLeft->setAlign("left", "top");
-        $this->scrollHLeft->setStyle("Icons64x64_1");
-        $this->scrollHLeft->setSubStyle("ArrowPrev");
-        $this->scrollHLeft->setId("scrollHLeft");
-        $this->scrollHLeft->setScriptEvents();
-        $this->addComponent($this->scrollHLeft);
-
-        $this->scrollHRight = new \ManiaLib\Gui\Elements\Quad(6.5, 6.5);
-        $this->scrollHRight->setAlign("left", "top");
-        $this->scrollHRight->setStyle("Icons64x64_1");
-        $this->scrollHRight->setSubStyle("ArrowNext");
-        $this->scrollHRight->setId("scrollHRight");
-        $this->scrollHRight->setScriptEvents();
-        $this->addComponent($this->scrollHRight);
-
-
-        $this->setSize($sizeX, $sizeY);
-    }
-
-    public function setSize()
-    {
-        $args = func_get_args();
-        $this->sizeX = $args[0];
-        $this->sizeY = $args[1];
-        $this->area->setPositionY(-($this->area->sizeY / 2) + 3);
-        $this->area->setPositionX(-($this->area->sizeX / 2) - 3);
-
-        $this->scrollV->setPosition($this->sizeX - 3, 0);
-        $this->scrollVBg->setPosition($this->sizeX - 3);
-        $this->scrollVBg->setSizeY($this->sizeY - 5);
-
-        $this->scrollVDown->setPosition($this->sizeX - 3, -($this->sizeY - 6));
-        $this->scrollVUp->setPosition($this->sizeX - 3, -1);
-
-        $this->scrollH->setPosition(0, -$this->sizeY);
-        $this->scrollHBg->setPosition(0, -$this->sizeY + 0.5);
-        $this->scrollHBg->setSizeX($this->sizeX - 3);
-
-        $this->scrollHLeft->setPosition(-5, -($this->sizeY - 2));
-        $this->scrollHRight->setPosition($this->sizeX - 6, -($this->sizeY - 2));
-
-    }
-
-
-    public function setContent(Component $content)
-    {
-        $content->setId("content");
-        $this->myScript->setParam("contentSizeY", Maniascript::getReal($content->getRealSizeY()));
-        $this->myScript->setParam("contentSizeX", Maniascript::getReal($content->getRealSizeX()));
-        $this->area->addComponent($content);
-    }
-
-
     /**
-     * @return Script the script this container needs
+     * Generate the ScrollableArea XML structure (scrollable container + scrollbar chrome).
+     *
+     * @param \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window $mlClass   ManiaLink class name (e.g. "ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window")
+     * @param float  $sizeX  Total width
+     * @param float  $sizeY  Total height
+     * @param string $contentVarName  Name of the variable containing the pre-generated XML string of content to embed in the ScrollableArea frame
+     * @param float  $contentSizeY  Height of the content (used to calculate the scrollbar size)
+     * @return string
      */
-    public function getScript()
+    public static function getXML($mlClass, $sizeX = 120, $sizeY = 90, $contentVarName = '', $contentSizeY = 0)
     {
-        return $this->myScript;
+        if (!is_object($mlClass)) {
+            Helper::logError('ScrollableArea: Invalid $mlClass parameter', array("Gui", "ScrollableArea"));
+            return "";
+        }
+        if (!$mlClass instanceof \ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window) {
+            Helper::logError('ScrollableArea: $mlClass parameter must be an instance of ManiaLivePlugins\eXpansion\Gui\ManiaLink\Window', array("Gui", "ScrollableArea"));
+            return "";
+        }
+
+        $areaW    = ($sizeX * 2) - 1;
+        $areaH    = $sizeY + 2;
+        $vx     = $sizeX - 3;
+        $vBgH   = $sizeY - 5;
+        $vDownY = -($sizeY - 6);
+
+        $content = $mlClass->getParam($contentVarName);
+
+        $script = new Script("Gui\\Scripts\\ScrollableArea");
+        $script->setParam("contentSizeY", $contentSizeY);
+        $mlClass->registerOrOverrideScript($script);
+
+        return '<frame id="scrollableArea" posn="-3 3 0"'
+             . ' clip="True" clipposn="0 0" clipsizen="' . $areaW . ' ' . $areaH . '">'
+             . '<frame id="content" posn="0 0 0">'
+             . $content
+             . '</frame>'
+             . '</frame>'
+             . '<quad id="scrollVBg" posn="' . $vx . ' 0 0.5" sizen="4 ' . $vBgH . '" halign="center" valign="top" style="Bgs1InRace" substyle="BgPlayerCard" opacity="0.9"/>'
+             . '<quad id="scrollVBar" posn="' . $vx . ' 0 1" sizen="3 15" halign="center" valign="top" style="BgsPlayerCard" substyle="BgRacePlayerName" scriptevents="1"/>'
+             . '<quad id="scrollVUp" posn="' . $vx . ' -1 1" sizen="6.5 6.5" halign="center" valign="bottom" style="Icons64x64_1" substyle="ArrowUp" scriptevents="1"/>'
+             . '<quad id="scrollVDown" posn="' . $vx . ' ' . $vDownY . ' 1" sizen="6.5 6.5" halign="center" valign="top" style="Icons64x64_1" substyle="ArrowDown" scriptevents="1"/>';
     }
-
-
 }

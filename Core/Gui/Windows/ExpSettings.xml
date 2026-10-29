@@ -1,0 +1,94 @@
+<frame posn="{colWidth} 3 0">
+    <frame id="Pager" scriptevents="1">
+        <exp:foreach items="settings" as="setting">
+        <frame>
+            <exp:listbg indexNumber="{setting.index}" sizeX="{itemBgWidth}" sizeY="10"/>
+            <label posn="7 4 0" sizen="{labelSizeX} 5" style="TextStaticSmall" text="{setting.label}"/>
+            <exp:if test="setting.isList">
+                <label id="column_{setting.index}_1" posn="7 -1 2.0E-5" sizen="{labelSizeX} 5" scale="0.9" style="TextStaticSmall" text="{setting.previewValue}"/>
+                <exp:if test="setting.openAction">
+                    <frame posn="{listChangePosX} 0 1">
+                        <exp:button sizeX="25" sizeY="6" text="@Change" action="{setting.openAction}" isTextId="true"/>
+                    </frame>
+                </exp:if>
+                <exp:if test="setting.desc">
+                    <exp:if test="setting.resetAction">
+                        <frame posn="{listIconPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="{setting.resetAction}" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>
+                        </frame>
+                        <frame posn="{listHelpPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="{setting.desc}" descSizeX="120" descLines="{setting.descLines}" icon="UIConstructionSimple_Buttons" iconSub="Help"/>
+                        </frame>
+                    <exp:else/>
+                        <frame posn="{listIconPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="{setting.desc}" descSizeX="120" descLines="{setting.descLines}" icon="UIConstructionSimple_Buttons" iconSub="Help"/>
+                        </frame>
+                    </exp:if>
+                <exp:else/>
+                    <exp:if test="setting.resetAction">
+                        <frame posn="{listIconPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="{setting.resetAction}" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>
+                        </frame>
+                    </exp:if>
+                </exp:if>
+            <exp:else/>
+                <frame posn="7 -2 1">
+                    <exp:if test="setting.isCheckbox">
+                        <exp:checkbox name="{setting.varName}" active="{setting.value}" textWidth="1"/>
+                    <exp:else/>
+                        <exp:if test="setting.isColor">
+                            <exp:colorchooser inputboxName="{setting.varName}" sizeX="35" digits="{setting.colorDigits}" hasPrefix="{setting.colorPrefix}" color="{setting.value}"/>
+                        <exp:else/>
+                            <exp:inputbox name="{setting.varName}" sizeX="{inputSizeX}" text="{setting.value}"/>
+                        </exp:if>
+                    </exp:if>
+                </frame>
+                <exp:if test="setting.desc">
+                    <exp:if test="setting.resetAction">
+                        <frame posn="{resetPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="{setting.resetAction}" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>
+                        </frame>
+                        <frame posn="{helpPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="{setting.desc}" descSizeX="120" descLines="{setting.descLines}" icon="UIConstructionSimple_Buttons" iconSub="Help"/>
+                        </frame>
+                    <exp:else/>
+                        <frame posn="{helpPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="{setting.desc}" descSizeX="120" descLines="{setting.descLines}" icon="UIConstructionSimple_Buttons" iconSub="Help"/>
+                        </frame>
+                    </exp:if>
+                <exp:else/>
+                    <exp:if test="setting.resetAction">
+                        <frame posn="{resetOnlyPosX} 0 1">
+                            <exp:icon sizeX="8" sizeY="8" description="@Reset the settings !" descSizeX="40" action="{setting.resetAction}" icon="Icons128x128_1" iconSub="Default" isTextId="true"/>
+                        </frame>
+                    </exp:if>
+                </exp:if>
+            </exp:if>
+            <frame posn="0 0 1">
+                <exp:if test="setting.isGlobal">
+                    <exp:icon sizeX="7" sizeY="7" description="@Global Setting, Saved for all servers sharing this configuration" descSizeX="130" icon="Icons64x64_1" iconSub="IconLeaguesLadder" isTextId="true"/>
+                <exp:else/>
+                    <exp:icon sizeX="7" sizeY="7" description="@Server Setting, Saved for this server only" descSizeX="90" icon="Icons64x64_1" iconSub="IconServers" isTextId="true"/>
+                </exp:if>
+            </frame>
+        </frame>
+        </exp:foreach>
+    </frame>
+    <exp:pager sizeX="{pagerSizeX}" sizeY="92" itemSizeY="10"/>
+</frame>
+<frame posn="0 0 0.00034">
+    <frame posn="-2 0 0">
+        <exp:foreach items="groups" as="group">
+        <frame posn="0 -{group.posY} 1">
+            <exp:if test="group.selected">
+                <exp:button sizeX="{menuBtnW}" sizeY="6" text="{group.name}" colorize="0b0" action="{group.action}"/>
+            <exp:else/>
+                <exp:button sizeX="{menuBtnW}" sizeY="6" text="{group.name}" action="{group.action}"/>
+            </exp:if>
+        </frame>
+        </exp:foreach>
+    </frame>
+</frame>
+<frame posn="{savePosX} -95 1">
+    <exp:button sizeX="32" sizeY="6" text="@Save" action="{saveAction}" isTextId="true"/>
+</frame>

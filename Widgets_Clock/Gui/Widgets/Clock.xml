@@ -1,0 +1,4 @@
+<frame>
+    <exp:widgetbg sizeX="16.5" sizeY="6"/>
+</frame>
+<label id="Time" posn="0 -1 1" sizen="20 6" halign="left" valign="top" style="TextValueSmallSm" textsize="3"/>

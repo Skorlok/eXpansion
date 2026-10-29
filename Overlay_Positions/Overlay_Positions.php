@@ -2,7 +2,12 @@
 
 namespace ManiaLivePlugins\eXpansion\Overlay_Positions;
 
+use ManiaLive\Utilities\Time;
+use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\Structures\ExpPlayer;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
+use ManiaLivePlugins\eXpansion\Helpers\Formatting;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 /**
  * Description of Overlay_Positions
@@ -17,21 +22,20 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     private $isPodium = false;
     private $wasWarmup = false;
 
-    public function eXpOnInit()
-    {
-        $this->exp_addTitleSupport("TM");
-        $this->exp_addTitleSupport("Trackmania");
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS);
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM);
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS);
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP);
-        $this->exp_addGameModeCompability(\Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT);
-    }
+    /** @var Widget */
+    private $widget;
 
     public function eXpOnReady()
     {
         $this->enableDedicatedEvents();
         $this->enableTickerEvent();
+
+        $this->widget = new Widget('Overlay_Positions\Gui\Widgets\PositionPanel.xml');
+        $this->widget->setName("Position Panel");
+        $this->widget->setLayer("normal");
+        $this->widget->setSize(80, 70);
+        $this->widget->setPosition(-158, 40, -60);
+
         $this->update = true;
     }
 
@@ -61,7 +65,7 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $this->isPodium = true;
         $this->update = false;
         $this->retiredPlayers = array();
-        Gui\Widgets\PositionPanel::EraseAll();
+        $this->widget->erase();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
@@ -71,17 +75,13 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 
     public function hideWidget($login)
     {
-        Gui\Widgets\PositionPanel::Erase($login);
+        $this->widget->erase($login);
     }
 
     public function showWidget($login)
     {
-        $pospanel = Gui\Widgets\PositionPanel::Create($login);
-        $pospanel->setSize(80, 90);
-        $pospanel->setPosition(-158, 40);
-
         $teamMaxPoint = 10;
-        if ($this->storage->gameInfos->gameMode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
+        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_SCRIPT) {
             $settings = $this->connection->getModeScriptSettings();
             if (array_key_exists("S_MaxPointsPerRound", $settings)) {
                 $teamMaxPoint = $settings['S_MaxPointsPerRound'];
@@ -90,13 +90,151 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $teamMaxPoint = $this->storage->gameInfos->teamPointsLimit;
         }
 
-        $pospanel->setData(
-            \ManiaLivePlugins\eXpansion\Core\Core::$playerInfo,
-            self::eXpGetCurrentCompatibilityGameMode(),
-            $teamMaxPoint
+        $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+        $players = Core::$playerInfo;
+
+        // total number of playing players, capped to the points at stake
+        $total = 0;
+        foreach ($players as $player) {
+            if ($player->isPlaying) {
+                $total++;
+            }
+        }
+        if ($total > $teamMaxPoint) {
+            $total = $teamMaxPoint;
+        }
+
+        $rows = array();
+        $teamPoints = array(0 => 0, 1 => 0);
+        $cpCount = 0;
+        $x = 0;
+        $posY = 0;
+
+        foreach ($players as $player) {
+            if (!$player->isPlaying) {
+                continue;
+            }
+
+            $cpindex = $player->curCpIndex;
+            if ($cpindex < 0) {
+                $cpindex = 0;
+            }
+            $cpCount += $cpindex;
+
+            if ($player->teamId >= 0 && !$player->hasRetired) {
+                $points = ($total + 1) - ($player->position + 1);
+                if ($points < 0) {
+                    $points = 0;
+                }
+                $teamPoints[$player->teamId] += $points;
+            }
+
+            if ($x < 15) {
+                $row = $this->buildRow($player, $login, $gamemode);
+                $row['posY'] = $posY;
+                $rows[] = $row;
+                $posY -= 4.5;
+            }
+            $x++;
+        }
+
+        $this->widget->setParam("rows", $rows);
+        $this->widget->setParam("teamScore", $this->getTeamScore($gamemode, $teamPoints, $cpCount));
+        $this->widget->show($login);
+    }
+
+    /**
+     * @param ExpPlayer $player
+     * @param string $login the player the panel is built for, he gets his own color
+     * @param int $gamemode
+     *
+     * @return array one row of the panel, every cell ready to be written in the template
+     */
+    private function buildRow(ExpPlayer $player, $login, $gamemode)
+    {
+        $color = 'eee';
+        if ($player->teamId === 0) {
+            $color = '2cf';
+        }
+        if ($player->teamId === 1) {
+            $color = 'f22';
+        }
+        if ($player->login == $login) {
+            $color = '5d5';
+        }
+        if ($player->teamId === 0 && $player->login == $login) {
+            $color = "0bf";
+        }
+        if ($player->teamId === 1 && $player->login == $login) {
+            $color = "f00";
+        }
+        if ($player->hasRetired && !$player->isFinished) {
+            $color = '999';
+        }
+
+        $nickname = $player->nickName;
+        if ($player->hasRetired) {
+            $nickname = Formatting::stripColors($player->nickName);
+        }
+
+        $time = $this->stripLeadingZeros(Time::fromTM($player->time));
+        if ($player->hasRetired && !$player->isFinished) {
+            $time = "";
+        }
+
+        $diff = "+" . $this->stripLeadingZeros(Time::fromTM($player->deltaTimeTop1));
+        if ($player->deltaCpCountTop1 > 0) {
+            $diff = "+" . $player->deltaCpCountTop1 . "cp";
+        }
+        if ($player->hasRetired && !$player->isFinished) {
+            $diff = "Out";
+        }
+        if ($player->deltaTimeTop1 == -1) {
+            $diff = "Err";
+        }
+
+        $score = ($gamemode == GameInfos::GAMEMODE_TEAM) ? $player->matchScore : $player->score;
+        if (empty($score)) {
+            $score = 0;
+        }
+        $points = ($gamemode == GameInfos::GAMEMODE_LAPS) ? "lap " . $player->curLap : $score . " pts";
+
+        return array(
+            'color'  => $color,
+            'index'  => ($player->position + 1) . ".",
+            'nick'   => $this->widget->handleSpecialChars($nickname),
+            'time'   => $this->widget->handleSpecialChars($time),
+            'diff'   => $this->widget->handleSpecialChars($diff),
+            'points' => $this->widget->handleSpecialChars($points),
         );
-        $pospanel->setScale(1.1);
-        $pospanel->show();
+    }
+
+    private function stripLeadingZeros($time)
+    {
+        if (substr($time, 0, 3) === "0:0") {
+            return substr($time, 3);
+        }
+        if (substr($time, 0, 2) === "0:") {
+            return substr($time, 2);
+        }
+
+        return $time;
+    }
+
+    private function getTeamScore($gamemode, $teamPoints, $cpCount)
+    {
+        if ($gamemode != GameInfos::GAMEMODE_TEAM) {
+            return "";
+        }
+
+        if ($teamPoints[0] == $teamPoints[1] || $cpCount == 0) {
+            return '$fffTeams Score is Draw';
+        }
+        if ($teamPoints[1] < $teamPoints[0]) {
+            return '$00fTeam Blue is Winning  $fff' . $teamPoints[0] . " vs " . $teamPoints[1];
+        }
+
+        return '$f00Team Red is Winning $fff' . $teamPoints[1] . "vs" . $teamPoints[0];
     }
 
     public function onPlayerInfoChanged($playerInfo)
@@ -169,5 +307,10 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         $this->disableTickerEvent();
+
+        if ($this->widget instanceof Widget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
     }
 }

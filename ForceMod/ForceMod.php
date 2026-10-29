@@ -30,27 +30,14 @@ class ForceMod extends ExpPlugin
         try {
             $rnd_mod = array();
             $mods = $this->getMods();
-            if ($this->expStorage->version->titleId == "Trackmania_2@nadeolabs") {
-
-                foreach ($mods as $env => $mod) {
-                    $index = mt_rand(0, (count($mod) - 1));
-                    if (array_key_exists($index, $mod)) {
-                        $rnd_mod[] = $mod[$index];
-                    }
-                }
-            } else {
-                $env = $this->fixEnv($this->expStorage->version->titleId);
-                if (array_key_exists($env, $mods)) {
-                    $mods = $mods[$env];
-                    if (count($mods) > 0) {
-                        $index = mt_rand(0, (count($mods) - 1));
-                        if (array_key_exists($index, $mods)) {
-                            $rnd_mod[] = $mods[$index];
-                            $this->console("Enabling forced mod at url: " . $rnd_mod[0]->url);
-                        }
-                    }
-                }
-            }
+			
+			
+			foreach ($mods as $env => $mod) {
+				$index = mt_rand(0, (count($mod) - 1));
+				if (array_key_exists($index, $mod)) {
+					$rnd_mod[] = $mod[$index];
+				}
+			}
 
             foreach ($rnd_mod as $key => $mod) {
                 $rnd_mod[$key] = $this->fixEnv($mod);
@@ -64,7 +51,7 @@ class ForceMod extends ExpPlugin
             Helper::logDebug(print_r($rnd_mod, true), array('eXpansion', 'ForceMod'));
             Helper::logDebug("=========================\n", array('eXpansion', 'ForceMod'));
 
-            $this->connection->setForcedMods(true, $rnd_mod);
+            $this->connection->setForcedMods($this->config->override, $rnd_mod);
         } catch (Exception $e) {
             $this->console(
                 "[eXp\\ForceMod] error while enabling the mod:" . $e->getMessage() . " line:" . $e->getLine()
@@ -86,7 +73,7 @@ class ForceMod extends ExpPlugin
             foreach ($this->config->mods as $url => $envString) {
                 $env = $envString;
                 if (empty($envString)) {
-                    $env = $this->expStorage->version->titleId;
+                    $env = $this->storage->version->titleId;
                 }
 
                 $mod = new Mod();
@@ -119,8 +106,6 @@ class ForceMod extends ExpPlugin
             $this->console("Disabling forced mods");
             $this->connection->setForcedMods(true, array());
         } catch (Exception $e) {
-            $this->console("[eXp\\ForceMod] error while disabling the mods:" . $e->getMessage());
-
             return;
         }
     }

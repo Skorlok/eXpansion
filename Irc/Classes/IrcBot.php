@@ -61,7 +61,7 @@ class IrcBot
     {
         $this->config = $config;
         $this->socket = \socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if ($this->socket === false || !is_resource($this->socket)) {
+        if ($this->socket === false || !is_resource($this->socket) && !($this->socket instanceof \Socket)) {
             $this->throwError();
         }
 
@@ -89,7 +89,7 @@ class IrcBot
             return false;
         }
 
-        if (is_resource($this->socket) === false) {
+        if (is_resource($this->socket) === false && !($this->socket instanceof \Socket)) {
             return false;
         }
 
@@ -132,7 +132,7 @@ class IrcBot
 
     private function processRead($socket)
     {
-        $data = @socket_read($socket, 4096, PHP_NORMAL_READ);
+        $data = socket_read($socket, 4096, PHP_NORMAL_READ);
 
         if ($data === false) {
             $this->throwError();

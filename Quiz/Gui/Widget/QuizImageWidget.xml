@@ -1,0 +1,14 @@
+<exp:widgetbg sizeX="24" sizeY="21.75"/>
+<exp:widgettitle sizeX="24" sizeY="4" text="@Question"/>
+<frame posn="2 -4 3">
+    <quad id="image" sizen="{imageSize}" image="{imageUrl}" scriptevents="1" class="quad"/>
+    <quad id="quad_0" posn="{colX0} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_1" posn="{colX0} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_2" posn="{colX0} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_3" posn="{colX1} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_4" posn="{colX1} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_5" posn="{colX1} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_6" posn="{colX2} {rowY0} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_7" posn="{colX2} {rowY1} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+    <quad id="quad_8" posn="{colX2} {rowY2} 1" sizen="{cellSize}" bgcolor="000" opacity="{quadOpacity}" scriptevents="1" class="quad"/>
+</frame>

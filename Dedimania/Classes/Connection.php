@@ -2,18 +2,15 @@
 
 namespace ManiaLivePlugins\eXpansion\Dedimania\Classes;
 
-//require_once('Webaccess.php');
-
 use Exception;
-use ManiaLib\Utils\Singleton;
+use ManiaLive\Utilities\Singleton;
 use ManiaLive\Application\Listener as AppListener;
-use ManiaLive\Data\Player;
-use ManiaLive\Data\Storage;
+use ManiaLivePlugins\eXpansion\Helpers\PlayerStorage;
 use ManiaLive\Event\Dispatcher;
 use ManiaLive\Features\Tick\Event as TickEvent;
 use ManiaLive\Features\Tick\Listener as TickListener;
-use ManiaLivePlugins\eXpansion\Core\Classes\Webaccess;
 use ManiaLivePlugins\eXpansion\Core\Core;
+use ManiaLivePlugins\eXpansion\Core\DataAccess;
 use ManiaLivePlugins\eXpansion\Dedimania\Classes\Request as dediRequest;
 use ManiaLivePlugins\eXpansion\Dedimania\Config;
 use ManiaLivePlugins\eXpansion\Dedimania\Events\Event as dediEvent;
@@ -21,11 +18,10 @@ use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediMap;
 use ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer;
 use ManiaLivePlugins\eXpansion\Helpers\Helper;
 use ManiaLivePlugins\eXpansion\Helpers\Singletons;
-use ManiaLivePlugins\eXpansion\Helpers\Storage as eXpStorage;
+use ManiaLivePlugins\eXpansion\Helpers\Storage;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 use Maniaplanet\DedicatedServer\Structures\Map;
-use /** @noinspection PhpUndefinedClassInspection */
-    Maniaplanet\DedicatedServer\Xmlrpc\Request;
+use Maniaplanet\DedicatedServer\Xmlrpc\Request;
 
 /**
  * Class Connection
@@ -33,9 +29,6 @@ use /** @noinspection PhpUndefinedClassInspection */
  */
 class Connection extends Singleton implements AppListener, TickListener
 {
-    // used for dedimania
-    private $version = 0.16;
-
     /** @var integer */
     public static $serverMaxRank = 15;
 
@@ -44,9 +37,6 @@ class Connection extends Singleton implements AppListener, TickListener
 
     /** @var \ManiaLivePlugins\eXpansion\Dedimania\Structures\DediPlayer[] Cached players from dedimania */
     public static $players = array();
-
-    /** @var Webaccess */
-    private $webaccess;
 
     /** @var \Maniaplanet\DedicatedServer\Connection */
     private $connection;
@@ -59,15 +49,25 @@ class Connection extends Singleton implements AppListener, TickListener
 
     /** @var string $sessionId dedimania session id */
     private $sessionId = null;
-    // these are used for async webaccess
-    private $read;
-    private $write;
-    private $except;
+
+    /** @var DataAccess */
+    public $dataAccess;
+
     // cached records from dedimania
     private $dediRecords = array();
     private $dediBest = 0;
     private $dediUid = null;
     private $lastUpdate = 0;
+
+    /** @var array|null */
+    private $currentRequest = null;
+    private $requestQueue = array();
+    private $isSending = false;
+    private $sendingSince = 0;
+    private $requestId = 0;
+    private $nextSendTime = 0;
+    private $retryCount = 0;
+    private $isProcessingQueue = false;
 
     /**
      * Connection constructor.
@@ -76,17 +76,13 @@ class Connection extends Singleton implements AppListener, TickListener
     {
         parent::__construct();
 
-        $this->webaccess = new Webaccess();
-
         // if you are developing change port to 8081, othervice use 8082
         $this->url = "http://dedimania.net:8082/Dedimania";
 
         /** @var \Maniaplanet\DedicatedServer\Connection connection */
+        $this->dataAccess = DataAccess::getInstance();
         $this->connection = Singletons::getInstance()->getDediConnection();
         $this->storage = Storage::getInstance();
-        $this->read = array();
-        $this->write = array();
-        $this->except = array();
         $this->lastUpdate = time();
         Dispatcher::register(TickEvent::getClass(), $this);
     }
@@ -96,7 +92,6 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function __destruct()
     {
-        $this->webaccess = null;
         Dispatcher::unregister(TickEvent::getClass(), $this);
     }
 
@@ -105,9 +100,9 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function onTick()
     {
-        try {
-            $this->webaccess->select($this->read, $this->write, $this->except, 0, 0);
+        $this->processRequestQueue();
 
+        try {
             if ($this->sessionId !== null && (time() - $this->lastUpdate) > 240) {
                 $this->debug("Dedimania connection keepalive!");
                 $this->updateServerPlayers($this->storage->currentMap);
@@ -142,67 +137,11 @@ class Connection extends Singleton implements AppListener, TickListener
             throw new Exception("Server code is not configured! \n");
         }
 
-        if (strtolower($serverInfo->login) != strtolower($config->login)) {
-            throw new Exception(
-                "Your dedicated server login differs from configured server login, please check your configuration."
-            );
-        }
-
         if ($packmask == "") {
             $packmask = $version->titleId;
         }
 
-        switch ($packmask) {
-            case "TMStadium":
-            case 'BaF1@mcrobert':
-            case 'Dirt_World_TM2@bernatf':
-            case 'Dirt_@mr.dvd':
-            case 'edenia@nexxusdrako':
-            case 'ESLTitlePack@nilakite2':
-            case 'Nations_Forever@citiroller':
-            case 'Nations_ESWC@tm-jinzo':
-            case 'Minimalize@mvv0105':
-            case 'only_stadium_car@adamkooo':
-            case 'RPG@tmrpg':
-            case 'SRE@tm-nascar':
-            case 'StadiumPlatform@darkpuddle_':
-            case 'Ultimate_Challenge_2@mr.dvd':
-            case 'esl_comp@lt_forever':
-                $packmask = "Stadium";
-                break;
-            case "TMCanyon":
-            case "Acrobatic@mr.dvd":
-            case "_f00Canyon_00fStar@mcmart1":
-            case 'CanyonCity@darkpuddle_':
-            case 'Canyon_Inverted_edk@edk':
-            case 'DD_RailwaySystem@divingduck':
-            case 'Glide@darmaya':
-            case 'LEGO_Racing@macio6':
-            case 'POLSO@darmaya':
-            case 'Raid@meuh21':
-            case 'TM2_Canyon_Sparkstedition@sparkster':
-            case 'Mr.DvDCanyon_dvd@mr.dvd':
-            case 'Wastelands@mpmandark':
-            case 'wtc@woutre':
-                $packmask = "Canyon";
-                break;
-            case "TMValley":
-            case 'adrenalin@flighthigh':
-            case 'endless_Valley@flighthigh':
-            case 'F1_Abu_Dhabi@darkpuddle_':
-            case 'miniahoy3@kaeptniglu':
-            case 'RaidValley@meuh21':
-            case 'ValleyCity@darkpuddle_':
-            case 'Valley_Extensions@dag_bert':
-                $packmask = "Valley";
-                break;
-
-            // Trust eXpansion that the plugin won't run on Shootmania :D.
-            case "Trackmania_2@nadeolabs":
-            default:
-                $packmask = "Trackmania_2@nadeolabs";
-                break;
-        }
+        $packmask = $this->storage->currentMap->environnement;
 
         $args = array(
             array(
@@ -232,38 +171,21 @@ class Connection extends Singleton implements AppListener, TickListener
      * @param string $greplay ghost Replay
      *
      */
-    public function setChallengeTimes(Map $map, $rankings, $vreplay, $greplay)
+    public function setChallengeTimes(Map $map, $rankings, $vreplay, $greplay, $AllCps)
     {
-
         // disabled for relay server
-        if (eXpStorage::getInstance()->isRelay) {
+        if ($this->storage->isRelay) {
             return;
         }
 
-        // special rounds mode disabled
-        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_ROUNDS
-            && (!isset($map->lapRace) || $map->lapRace)
-            && $this->storage->gameInfos->roundsForcedLaps
-            && $this->storage->gameInfos->roundsForcedLaps != 0
-        ) {
-            $this->console("[Warning] Special rounds mode with forced laps ignored!");
-
-            return;
-        }
-
-        // only special maps under 8 seconds are allowed
-        if ($map->authorTime < 8000 && strtolower($map->author) != 'nadeo') {
-            $this->console("[Notice] Author time under 8 seconds, will not send records.");
-
+        // only special maps under 6.2 seconds are allowed
+        if ($map->authorTime < 6200 && strtolower($map->author) != 'nadeo') {
+            $this->console("[Notice] Author time under 6.2 seconds, will not send records.");
             return;
         }
 
         if ($this->dediUid != $map->uId) {
-            $this->console(
-                "[Warning] Map UId mismatch! Map UId differs from dedimania"
-                ." recieved uid for the map. Times are not sent."
-            );
-
+            $this->console("[Warning] Map UId mismatch! Map UId differs from dedimania recieved uid for the map. Times are not sent.");
             return;
         }
 
@@ -285,40 +207,29 @@ class Connection extends Singleton implements AppListener, TickListener
         usort($times, array($this, "dbsort"));
 
         if (sizeof($times) == 0) {
-            $this->debug("No new records, skipping dedimania send.");
-
+            $this->console("No new records, skipping dedimania send.");
             return;
         }
 
         $Vchecks = "";
-        if ($this->storage->gameInfos->gameMode == GameInfos::GAMEMODE_LAPS) {
-            $Vchecks = implode(",", $rankings[0]['AllCheckpoints']);
+        if (Core::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) {
+            $Vchecks = $AllCps;
         }
 
         if (empty($vreplay)) {
             $this->console("Validation replay is empty, cancel sending times.");
-
             return;
         }
         $base64Vreplay = new IXR_Base64($vreplay);
 
         $base64Greplay = "";
-        if (($this->dediBest == null && sizeof($this->dediRecords['Records']) == 0)
-            || $times[0]['Best'] < $this->dediBest
-        ) {
+        if (($this->dediBest == null && sizeof($this->dediRecords['Records']) == 0) || $times[0]['Best'] < $this->dediBest) {
             $base64Greplay = new IXR_Base64($greplay);
         }
 
-
         $replays = array("VReplay" => $base64Vreplay, "VReplayChecks" => $Vchecks, "Top1GReplay" => $base64Greplay);
 
-        $args = array(
-            $this->sessionId,
-            $this->_getMapInfo($map),
-            $this->_getGameMode(),
-            $times,
-            $replays,
-        );
+        $args = array($this->sessionId,$this->_getMapInfo($map),$this->_getGameMode(),$times,$replays,);
 
         $request = new dediRequest("dedimania.SetChallengeTimes", $args);
         $this->send($request, array($this, "xSetChallengeTimes"));
@@ -330,15 +241,96 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     public function send(dediRequest $request, $callback)
     {
-        $this->webaccess->request(
-            $this->url,
-            array(array($this, '_process'), $callback),
-            $request->getXml(),
-            true,
-            600,
-            3,
-            5
-        );
+        if (function_exists('gzdeflate')) {
+            $headers = array('Cache-Control: no-cache', 'Accept-Encoding: deflate', 'Content-Type: text/xml; charset=UTF-8', 'Content-Encoding: deflate', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
+
+            $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => gzdeflate($request->getXml()));
+        } else {
+            $headers = array('Cache-Control: no-cache', 'Content-Type: text/xml; charset=UTF-8', 'Keep-Alive: timeout=600, max=2000', 'Connection: Keep-Alive');
+
+            $options = array(CURLOPT_CONNECTTIMEOUT => 60, CURLOPT_TIMEOUT => 300, CURLOPT_POST => true, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => $request->getXml());
+        }
+
+        $this->requestQueue[] = array("options" => $options, "callback" => $callback);
+
+        $this->processRequestQueue();
+    }
+
+    public function processRequestQueue()
+    {
+        if ($this->isProcessingQueue) {
+            return;
+        }
+        $this->isProcessingQueue = true;
+
+        if ($this->isSending && time() - $this->sendingSince > 360) {
+            $this->console("[Dedimania Error] Request got no answer, sending it again");
+            $this->isSending = false;
+        }
+
+        if (!$this->isSending && microtime(true) >= $this->nextSendTime) {
+            if ($this->currentRequest === null && !empty($this->requestQueue)) {
+                $this->currentRequest = array_shift($this->requestQueue);
+                $this->retryCount = 0;
+            }
+            if ($this->currentRequest !== null) {
+                $this->isSending = true;
+                $this->sendingSince = time();
+                $this->requestId++;
+                $this->dataAccess->httpCurl($this->url, array($this, "handleRequestResponse"), array("requestId" => $this->requestId), $this->currentRequest['options']);
+            }
+        }
+
+        $this->isProcessingQueue = false;
+    }
+
+    public function handleRequestResponse($job, $jobData)
+    {
+        $additionalData = $job->__additionalData;
+        if (!isset($additionalData['requestId']) || $additionalData['requestId'] !== $this->requestId) {
+            return;
+        }
+        $this->isSending = false;
+
+        $info = $job->getCurlInfo();
+        $code = is_null($info) ? 0 : (int)$info['http_code'];
+        $data = $job->getResponse();
+
+        if ($code == 0) {
+            $this->retryCount++;
+            if ($this->retryCount <= 3) {
+                $retryDelay = 5 * $this->retryCount;
+                $this->nextSendTime = microtime(true) + $retryDelay;
+                $this->console("[Dedimania Error] No answer from dedimania (" . $job->getCurlError() . "), retrying again in " . $retryDelay . " seconds");
+                return;
+            }
+            $this->console("[Dedimania Error] No answer from dedimania (" . $job->getCurlError() . "), request dropped after 3 retries");
+            $this->currentRequest = null;
+            $this->processRequestQueue();
+            return;
+        }
+
+        $callback = $this->currentRequest['callback'];
+        $this->currentRequest = null;
+        $this->processRequestQueue();
+
+        if ($code != 200) {
+            $this->console("[Dedimania Error] Dedimania returned error code: " . $code);
+            return;
+        }
+
+        if ($data == null || $data == false) {
+            $this->console("[Dedimania Error] Can't find Message from Dedimania reply");
+            return;
+        }
+
+        if (function_exists('gzinflate')) {
+            $response = array('Message' => gzinflate($data));
+        } else {
+            $response = array('Message' => $data);
+        }
+
+        $this->_process($response, $callback);
     }
 
     /**
@@ -437,10 +429,10 @@ class Connection extends Singleton implements AppListener, TickListener
     /**
      * PlayerConnect
      *
-     * @param Player $player
+     * @param PlayerStorage $player
      * @param bool $isSpec
      */
-    public function playerConnect(Player $player, $isSpec)
+    public function playerConnect(PlayerStorage $player, $isSpec)
     {
 
         if ($this->sessionId === null) {
@@ -470,7 +462,7 @@ class Connection extends Singleton implements AppListener, TickListener
     /**
      * playerMultiConnect
      *
-     * @param Player[] $players
+     * @param PlayerStorage[] $players
      */
     public function playerMultiConnect($players)
     {
@@ -489,7 +481,7 @@ class Connection extends Singleton implements AppListener, TickListener
 
         foreach ($players as $player) {
 
-            if (is_a($player[0], "\\ManiaLive\\Data\\Player")) {
+            if (is_a($player[0], 'ManiaLivePlugins\eXpansion\Helpers\PlayerStorage')) {
 
                 if ($player[0]->login == $this->storage->serverLogin) {
                     $this->debug("[Dedimania Warning] Tried to send server login.");
@@ -598,10 +590,7 @@ class Connection extends Singleton implements AppListener, TickListener
      */
     private function _getGameMode()
     {
-        switch ($this->storage->gameInfos->gameMode) {
-            case GameInfos::GAMEMODE_SCRIPT:
-                $gamemode = $this->detectScriptName();
-                break;
+        switch (Core::eXpGetCurrentCompatibilityGameMode()) {
             case GameInfos::GAMEMODE_LAPS:
             case GameInfos::GAMEMODE_TIMEATTACK:
                 $gamemode = "TA";
@@ -611,52 +600,14 @@ class Connection extends Singleton implements AppListener, TickListener
             case GameInfos::GAMEMODE_ROUNDS:
                 $gamemode = "Rounds";
                 break;
-            case GameInfos::GAMEMODE_STUNTS:
-                $gamemode = "";
-                break;
             default:
-                $gamemode = "";
+                $gamemode = "TA";
                 break;
         }
-
+        if ($this->storage->getCleanGamemodeName() == "endurocup") {
+            return "TA";
+        }
         return $gamemode;
-    }
-
-    /**
-     * @return string
-     */
-    public function detectScriptName()
-    {
-        $scriptNameArr = $this->connection->getScriptName();
-        $scriptName = $scriptNameArr['CurrentValue'];
-
-        // Workaround for a 'bug' in setModeScriptText.
-        if ($scriptName === '<in-development>') {
-            $scriptName = $scriptNameArr['NextValue'];
-        }
-
-        $scriptName = strtolower($scriptName);
-        switch ($scriptName) {
-            case "timeattack.script.txt":
-                return "TA";
-                break;
-            case "laps.script.txt":
-                return "TA";
-                break;
-            case "rounds.script.txt":
-                return "Rounds";
-                break;
-            case "team.script.txt":
-                return "Rounds";
-                break;
-            case "cup.script.txt":
-                return "Rounds";
-                break;
-            default:
-                return "";
-                break;
-        }
-
     }
 
     /**
@@ -676,8 +627,11 @@ class Connection extends Singleton implements AppListener, TickListener
                 if (count($errors) > 0 && array_key_exists('methods', $errors[0])) {
                     foreach ($errors[0]['methods'] as $error) {
                         if (!empty($error['errors'])) {
-                            $this->console('[Dedimania service return error] Method:'.$error['methodName']);
-                            $this->console('Error string:'.$error['errors']);
+                            if ($error['errors'] == "Warning in method_handler.php(470): Stadium is limited to maxrank 15 in TA for not upgraded servers! For premium accounts, see Dedimania forum and tm2stats page.") {
+                                continue;
+                            }
+                            $this->console('[Dedimania service return error] Method: '.$error['methodName']);
+                            $this->console('Error string: '.$error['errors']);
                         }
                     }
                 }
@@ -689,13 +643,11 @@ class Connection extends Singleton implements AppListener, TickListener
 
                 if (array_key_exists("faultString", $array[0])) {
                     $this->console("Fault from dedimania server: ".$array[0]['faultString']);
-
                     return;
                 }
 
                 if (!empty($array[0][0]['Error'])) {
                     $this->console("Error from dedimania server: ".$array[0][0]['Error']);
-
                     return;
                 }
 
@@ -749,7 +701,6 @@ class Connection extends Singleton implements AppListener, TickListener
         }
         if (!empty($data[0][0]['Error'])) {
             $this->console("Authentication Error occurred: ".$data[0][0]['Error']);
-
             return;
         }
     }
@@ -768,7 +719,6 @@ class Connection extends Singleton implements AppListener, TickListener
 
         if (!empty($data[0]['Error'])) {
             $this->console("Error from dediserver: ".$data[0]['Error']);
-
             return;
         }
 
@@ -778,7 +728,7 @@ class Connection extends Singleton implements AppListener, TickListener
         self::$serverMaxRank = intval($data[0]['ServerMaxRank']);
         $maplimit = intval($data[0]['ServerMaxRank']);
 
-        if (count($data[0]['Records']) > 0) {
+        if ($data[0]['Records'] && count($data[0]['Records']) > 0) {
             $maplimit = count($data[0]['Records']);
         }
 
@@ -787,7 +737,6 @@ class Connection extends Singleton implements AppListener, TickListener
 
         if (!$data[0]['Records']) {
             $this->debug("No records found.");
-
             return;
         }
 
@@ -834,7 +783,7 @@ class Connection extends Singleton implements AppListener, TickListener
             try {
                 $player = $this->storage->getPlayerObject($dediplayer->login);
                 $this->connection->chatSendServerMessage(
-                    "Player".$player->nickName.'$z$s$fff['.$player->login.'] is $f00BANNED$fff from dedimania.'
+                    "Player".$player->cleanNickName.'$z$s$fff['.$player->login.'] is $f00BANNED$fff from dedimania.'
                 );
             } catch (Exception $e) {
 
@@ -857,7 +806,7 @@ class Connection extends Singleton implements AppListener, TickListener
                 try {
                     $pla = $this->storage->getPlayerObject($dediPlayer->login);
                     $this->connection->chatSendServerMessage(
-                        "Player".$pla->nickName.'$z$s$fff['.$pla->login.'] is $f00BANNED$fff from dedimania.'
+                        "Player".$pla->cleanNickName.'$z$s$fff['.$pla->login.'] is $f00BANNED$fff from dedimania.'
                     );
                 } catch (Exception $e) {
 

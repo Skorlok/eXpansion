@@ -1,0 +1,4 @@
+<frame posn="32.25 -48 1">
+<exp:button sizeX="32" sizeY="6" text="{@Close}" action="{closeAction}" isTextId="true"/>
+</frame>
+<label posn="45 -5 0" sizen="80 50" halign="center" valign="center" style="TextStaticSmall" textid="{textId}"/>

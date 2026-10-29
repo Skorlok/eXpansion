@@ -22,16 +22,11 @@
 
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
+use ManiaLivePlugins\eXpansion\Core\Core;
+use Maniaplanet\DedicatedServer\Structures\GameInfos;
+
 class LocalRecords extends LocalBase
 {
-
-    /**
-     * The last time of the players past the checkpoints
-     *
-     * @var array login => array( int => int)
-     */
-    protected $checkpoints = array();
-
     /**
      * onPlayerFinish()
      * Function called when a player finishes.
@@ -45,47 +40,36 @@ class LocalRecords extends LocalBase
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
     {
         //Checking for valid time
-        if (isset($this->storage->players[$login]) && $timeOrScore > 0) {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
+        if ($timeOrScore > 0) {
+            
             //If laps mode we need to ignore. Laps has it's own end map event(end finish lap)
             //Laps mode has it own on Player finish event
-            if ($gamemode == \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS
-                && $this->config->lapsModeCount1lap
-            ) {
+            if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && !$this->config->lapsModeCountAllLaps) {
                 return;
             }
 
-            $time = microtime();
+            $playerinfo = Core::$playerInfo;
+
+            $time = microtime(true);
             //We add the record to the buffer
-            $this->addRecord($login, $timeOrScore, $gamemode, $this->checkpoints[$login]);
-
-            if (($this->debug & self::DEBUG_RECPROCESSTIME) == self::DEBUG_RECPROCESSTIME) {
-                $this->debug("#### NEW RANK IN : " . (microtime() - $time) . "s BAD?");
+            if (isset($playerinfo[$login]) && $timeOrScore < 8388608) {
+                $this->addRecord($login, $timeOrScore, $playerinfo[$login]->checkpoints);
             }
-        }
-        //We reset the checkPoints
-        $this->checkpoints[$login] = array();
 
+            $this->debug("#### NEW RANK IN : " . (microtime(true) - $time) . "s BAD?");
+        }
         parent::onPlayerFinish($playerUid, $login, $timeOrScore);
     }
 
     /**
-     * @param \ManiaLive\Data\Player $player
+     * @param \ManiaLivePlugins\eXpansion\Helpers\PlayerStorage $player
      * @param                        $time
      * @param                        $checkpoints
      * @param int $nbLap
      */
     public function onPlayerFinishLap($player, $time, $checkpoints, $nbLap)
     {
-
-        if ($this->config->lapsModeCount1lap && isset($this->storage->players[$player->login]) && $time > 0) {
-            $gamemode = self::eXpGetCurrentCompatibilityGameMode();
-
-            //Laps mode has it own on Player finish event
-            if ($gamemode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS) {
-                return;
-            }
+        if ((($this->config->lapsModeCountAllLaps && self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS) || $this->storage->getCleanGamemodeName() == "endurocup") && $time > 0 && $time < 8388608) {
 
             // if normal map, don't trigger the event for first lap :)
             if ($this->storage->currentMap->nbLaps == 0) {
@@ -93,28 +77,9 @@ class LocalRecords extends LocalBase
                 return;
             }
 
-            $this->addRecord($player->login, $time, $gamemode, $this->checkpoints[$player->login]);
-            $this->checkpoints[$player->login] = array();
+            $this->addRecord($player->login, $time, $checkpoints);
         }
-
         parent::onPlayerFinishLap($player, $time, $checkpoints, $nbLap);
-    }
-
-
-    /**
-     * Function called when someone passes a checkpoint.
-     *
-     * @param $playerUid
-     * @param $login
-     * @param $score
-     * @param $curLap
-     * @param $checkpointIndex
-     *
-     * turn void
-     */
-    public function onPlayerCheckpoint($playerUid, $login, $score, $curLap, $checkpointIndex)
-    {
-        $this->checkpoints[$login][$checkpointIndex] = $score;
     }
 
     /**
@@ -124,8 +89,6 @@ class LocalRecords extends LocalBase
     public function onPlayerConnect($login, $isSpectator)
     {
         parent::onPlayerConnect($login, $isSpectator);
-
-        $this->checkpoints[$login] = array();
     }
 
     /**
@@ -135,10 +98,6 @@ class LocalRecords extends LocalBase
     public function onPlayerDisconnect($login, $reason = null)
     {
         parent::onPlayerDisconnect($login, $reason);
-
-        //Remove all checkpoints data
-        $this->checkpoints[$login] = array();
-        unset($this->checkpoints[$login]);
     }
 
     /**
@@ -156,6 +115,9 @@ class LocalRecords extends LocalBase
      */
     public function formatScore($score)
     {
+        if (!is_numeric($score)) {
+            return $score;
+        }
         $time = \ManiaLive\Utilities\Time::fromTM($score);
         if (substr($time, 0, 2) === "0:") {
             $time = substr($time, 2);
@@ -211,40 +173,42 @@ class LocalRecords extends LocalBase
      */
     public function getNbOfLaps()
     {
-        if ($this->storage->gameInfos->gameMode != \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_SCRIPT) {
-            switch ($this->storage->gameInfos->gameMode) {
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS:
-                    if ($this->storage->gameInfos->roundsForcedLaps == 0) {
-                        return $this->storage->currentMap->nbLaps;
+        if ($this->storage->currentMap->lapRace) {
+
+            $scriptSettings = $this->connection->getModeScriptSettings();
+            
+            if (isset($scriptSettings['S_ForceLapsNb']) && $scriptSettings['S_ForceLapsNb'] > 0) {
+
+                if (self::eXpGetCurrentCompatibilityGameMode() == GameInfos::GAMEMODE_LAPS && $this->config->lapsModeCountAllLaps) {
+                    return 1;
+                }
+
+                return ($scriptSettings['S_ForceLapsNb']);
+            } else {
+                $gamemode = self::eXpGetCurrentCompatibilityGameMode();
+
+                if ($gamemode == GameInfos::GAMEMODE_LAPS) {
+                    if ($this->config->lapsModeCountAllLaps) {
+                        return 1;
                     } else {
-                        return $this->storage->gameInfos->roundsForcedLaps;
+                        return ($this->storage->currentMap->nbLaps);
                     }
+                }
 
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP:
-                    return $this->storage->currentMap->nbLaps;
-                    break;
+                if ($this->storage->getCleanGamemodeName() == "endurocup") {
+                    return 1; // Endurance is consired as cup so let this above Cup check
+                }
 
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS:
-                    return $this->storage->gameInfos->lapsNbLaps;
-                    break;
-
-                default:
-                    return 1;
+                if ($gamemode == GameInfos::GAMEMODE_ROUNDS || $gamemode == GameInfos::GAMEMODE_CUP || $gamemode == GameInfos::GAMEMODE_TEAM) {
+                    return ($this->storage->currentMap->nbLaps);
+                }
+                
+                
+                return 1;
             }
+
         } else {
-            $settings = $this->connection->getModeScriptSettings();
-            switch (self::eXpGetCurrentCompatibilityGameMode()) {
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_ROUNDS:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_TEAM:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_CUP:
-                case \Maniaplanet\DedicatedServer\Structures\GameInfos::GAMEMODE_LAPS:
-                    return $settings['S_ForceLapsNb'] == -1 ? 1 : $settings['S_ForceLapsNb'];
-                    break;
-
-                default:
-                    return 1;
-            }
+            return 1;
         }
     }
 }

@@ -18,6 +18,6 @@ class TimeConversion
     {
         $time = intval($time);
 
-        return gmdate("i:s", $time / 1000);
+        return gmdate("i:s", intval($time / 1000));
     }
 }

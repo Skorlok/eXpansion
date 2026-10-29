@@ -13,7 +13,8 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Tutorial");
+        $this->setName("Tutorial");
+        $this->setGroups(array('Tools'));
         $this->setDescription("Provides onetime popup tutorial for players on how to use eXpansion");
     }
 }

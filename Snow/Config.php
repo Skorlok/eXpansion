@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\Snow;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
 
     public $particleCount = 25;

@@ -2,7 +2,7 @@
 
 namespace ManiaLivePlugins\eXpansion\AdminGroups\types;
 
-use ManiaLib\Utils\Singleton;
+use ManiaLive\Utilities\Singleton;
 
 /**
  * Description of absChecker

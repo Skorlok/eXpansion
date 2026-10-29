@@ -17,7 +17,7 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
     public function onBeginLoad()
     {
         parent::onBeginLoad();
-        $this->setName(" Minigame 1");
+        $this->setName("Games: Minigame 1");
         $this->setDescription("An image appears on screen at random position every now and then, to win just click");
         $this->setGroups(array('Games'));
 
@@ -28,11 +28,11 @@ class MetaData extends \ManiaLivePlugins\eXpansion\Core\types\config\MetaData
         $this->registerVariable($var);
 
         $var = new TypeString("mg1_imageUrl", "Image url, normal", $config, false, false);
-        $var->setDefaultValue("http://koti.mbnet.fi/reaby/xaseco/images/santa.png");
+        $var->setDefaultValue("https://cdn.skorlok.com/eXpansion/data/Minigame1/santa.png");
         $this->registerVariable($var);
 
         $var = new TypeString("mg1_imageFocusUrl", "Image url, hover", $config, false, false);
-        $var->setDefaultValue("http://koti.mbnet.fi/reaby/xaseco/images/santa.png");
+        $var->setDefaultValue("https://cdn.skorlok.com/eXpansion/data/Minigame1/santa.png");
         $this->registerVariable($var);
 
         $var = new BoundedTypeInt("mg1_imageSize", "Size of the image", $config, false, false);

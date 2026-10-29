@@ -1,0 +1,26 @@
+<quad posn="0 4 0" sizen="165 90" style="Bgs1InRace" substyle="BgList"/>
+
+<label posn="82.5 3 1.0E-5" sizen="120 6" halign="center" style="TextStaticSmall" textsize="4" textcolor="fff" textid="{@Score Rankings}"/>
+<label posn="82.5 -90 2.0E-5" sizen="30 6" halign="center" style="TextStaticSmall" textsize="1" textcolor="fff" textid="{pointsLimit}"/>
+<label posn="82.5 -94 3.0E-5" sizen="30 6" halign="center" style="TextStaticSmall" textsize="1" textcolor="fff" textid="{@$sGame Mode: ESL cup}"/>
+
+<quad posn="156 5 4.0E-5" sizen="8 8" style="Icons64x64_1" substyle="ArrowNext" action="exp:eXpansion.ESLcup:nextPage" hidden="{hideNext}"/>
+<quad posn="149 5 5.0E-5" sizen="8 8" style="Icons64x64_1" substyle="ArrowPrev" action="exp:eXpansion.ESLcup:prevPage" hidden="{hidePrev}"/>
+
+<frame posn="2 -3 6.0E-5">
+    <exp:foreach items="rows" as="r">
+    <frame posn="{r.posX} {r.posY} 0">
+        <quad sizen="80 10" bgcolor="{r.bg}"/>
+        <quad posn="0 0 1.0E-5" sizen="10 10" bgcolor="{r.rankBg}"/>
+        <exp:if test="r.quit">
+            <quad posn="5 -5 2.0E-5" sizen="4 4" style="Icons64x64_1" substyle="QuitRace"/>
+        </exp:if>
+        <label posn="2.5 -2.5 3.0E-5" sizen="10 5" style="TextStaticSmall" textsize="3" textcolor="fff" text="{r.index}"/>
+        <label posn="14 -2.5 4.0E-5" sizen="50 7" style="TextStaticSmall" textsize="3" textcolor="fff" text="{r.nick}"/>
+        <label posn="75 -3.5 5.0E-5" sizen="10 7" scale="1.2" halign="center" valign="top" style="TextStaticSmall" textsize="1" textcolor="fff" text="{r.score}"/>
+        <exp:if test="r.place">
+            <label posn="70 0 6.0E-5" sizen="10 7" scale="1.2" style="TextStaticSmall" textsize="1" textcolor="fff" text="{r.place}"/>
+        </exp:if>
+    </frame>
+    </exp:foreach>
+</frame>

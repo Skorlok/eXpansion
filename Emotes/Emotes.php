@@ -2,21 +2,13 @@
 
 namespace ManiaLivePlugins\eXpansion\Emotes;
 
-use ManiaLivePlugins\eXpansion\Emotes\Gui\Windows\EmotePanel;
-
 class Emotes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
-    private $timeStamps = "";
-    public static $action_GG;
-    public static $action_Afk;
-    public static $action_Lol;
-    public static $action_Bg;
+    private $config;
 
     public function eXpOnLoad()
     {
         $this->enableDedicatedEvents();
-        EmotePanel::$emotePlugin = $this;
         $this->config = Config::getInstance();
 
         $commands = array(
@@ -34,38 +26,24 @@ class Emotes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $cmd = $this->registerChatCommand($command, $command, 0, true);
             $cmd->help = $help;
         }
-
-        foreach ($this->storage->players as $player) {
-            $this->onPlayerConnect($player->login, false);
-        }
-        foreach ($this->storage->spectators as $player) {
-            $this->onPlayerConnect($player->login, true);
-        }
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        if (isset($this->timeStamps[$login])) {
-            unset($this->timeStamps[$login]);
-        }
     }
 
     public function bootme($login)
     {
         $player = $this->storage->getPlayerObject($login);
-        $nick = $player->nickName;
+        $nick = $player->cleanNickName;
         $message = (string)$this->config->bootme[rand(0, count($this->config->bootme) - 1)];
 
-        $this->eXpChatSendServerMessage($nick . ' $z$s #emote#' . $message);
+        $this->eXpChatSendServerMessage('%s $z$s #emote#%s', null, array($nick, $message));
         $this->connection->kick($login, "thanks for playing");
     }
 
     public function rq($login)
     {
         $player = $this->storage->getPlayerObject($login);
-        $nick = $player->nickName;
+        $nick = $player->cleanNickName;
         $message = (string)$this->config->ragequit[rand(0, count($this->config->ragequit) - 1)];
-        $this->eXpChatSendServerMessage($nick . ' $z$s #emote#' . $message);
+        $this->eXpChatSendServerMessage('%s $z$s #emote#%s', null, array($nick, $message));
         $this->connection->kick($login, "thanks for playing");
     }
 
@@ -238,31 +216,32 @@ class Emotes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         if (count($args) >= 0) {
             if (($nick = $this->getPlayerNick($args[0])) == "") {
                 $text = implode(" ", $args);
-                $this->eXpChatSendServerMessage($player->nickName . '$z$s #emote#' . $message . " #emote#" . $text);
+                $this->eXpChatSendServerMessage(
+                    '%s$z$s #emote#%s #emote#%s',
+                    null,
+                    array($player->cleanNickName, $message, $text)
+                );
             } else {
                 array_shift($args);
                 $text = implode(" ", $args);
                 $this->eXpChatSendServerMessage(
-                    $player->nickName . '$z$s #emote#' . $message2 . ", " . $nick . " #emote#" . $text
+                    '%s$z$s #emote#%s, %s #emote#%s',
+                    null,
+                    array($player->cleanNickName, $message2, $nick, $text)
                 );
             }
         } else {
-            $this->eXpChatSendServerMessage($player->nickName . '$z$s #emote#' . $message);
+            $this->eXpChatSendServerMessage('%s$z$s #emote#%s', null, array($player->cleanNickName, $message));
         }
     }
 
     public function getPlayerNick($login)
     {
-        try {
-            $player = $this->storage->getPlayerObject($login);
-            if ($player instanceof \ManiaLive\Data\Player) {
-                return $player->nickName;
-            }
-
-            return "";
-        } catch (Exception $ex) {
-            return "";
+        $player = $this->storage->getPlayerObject($login);
+        if ($player instanceof \ManiaLivePlugins\eXpansion\Helpers\PlayerStorage) {
+            return $player->cleanNickName;
         }
+        return "";
     }
 
     /**
@@ -280,11 +259,10 @@ class Emotes extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         $lines = explode("\n", $data);
         $message = (string)$lines[rand(0, count($lines) - 1)];
         $player = $this->storage->getPlayerObject($login);
-        $this->eXpChatSendServerMessage($player->nickName . '$z$s #emote#' . trim($message) . '$z$s');
-    }
-
-    public function eXpOnUnload()
-    {
-        EmotePanel::EraseAll();
+        $this->eXpChatSendServerMessage(
+            '%s$z$s #emote#%s$z$s',
+            null,
+            array($player->cleanNickName, trim($message))
+        );
     }
 }

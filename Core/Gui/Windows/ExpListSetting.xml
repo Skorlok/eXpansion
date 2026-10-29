@@ -1,0 +1,95 @@
+<frame posn="0 5 0">
+    <label sizen="128 10" style="TextStaticSmall" text="{help}"/>
+</frame>
+<frame posn="0 -5 1">
+    <frame posn="0 0 1" hidden="{hideKeyInput}"><exp:inputbox name="key" sizeX="50" editable="true" label="@Key" isTextId="true"/></frame>
+    <frame posn="{valueFieldPosX} 0 1"><exp:inputbox name="value" sizeX="{valueWidth}" editable="true" label="@Value" isTextId="true"/></frame>
+    <frame posn="117 0 1"><exp:button sizeX="32" sizeY="6" text="@Add" action="{addAction}" isTextId="true"/></frame>
+</frame>
+<frame posn="0 -14 1.0E-5" id="Pager" scriptevents="1">
+    <frame posn="0 0 0.0001" scale="0.8" id="row_0">
+        <exp:listbg indexNumber="0" sizeX="160" sizeY="7"/>
+        <label id="column_0_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_0_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_0_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -5.6 0.0001" scale="0.8" id="row_1">
+        <exp:listbg indexNumber="1" sizeX="160" sizeY="7"/>
+        <label id="column_1_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_1_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_1_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -11.2 0.0001" scale="0.8" id="row_2">
+        <exp:listbg indexNumber="2" sizeX="160" sizeY="7"/>
+        <label id="column_2_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_2_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_2_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -16.8 0.0001" scale="0.8" id="row_3">
+        <exp:listbg indexNumber="3" sizeX="160" sizeY="7"/>
+        <label id="column_3_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_3_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_3_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -22.4 0.0001" scale="0.8" id="row_4">
+        <exp:listbg indexNumber="4" sizeX="160" sizeY="7"/>
+        <label id="column_4_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_4_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_4_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -28 0.0001" scale="0.8" id="row_5">
+        <exp:listbg indexNumber="5" sizeX="160" sizeY="7"/>
+        <label id="column_5_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_5_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_5_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -33.6 0.0001" scale="0.8" id="row_6">
+        <exp:listbg indexNumber="6" sizeX="160" sizeY="7"/>
+        <label id="column_6_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_6_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_6_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -39.2 0.0001" scale="0.8" id="row_7">
+        <exp:listbg indexNumber="7" sizeX="160" sizeY="7"/>
+        <label id="column_7_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_7_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_7_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -44.8 0.0001" scale="0.8" id="row_8">
+        <exp:listbg indexNumber="8" sizeX="160" sizeY="7"/>
+        <label id="column_8_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_8_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_8_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -50.4 0.0001" scale="0.8" id="row_9">
+        <exp:listbg indexNumber="9" sizeX="160" sizeY="7"/>
+        <label id="column_9_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_9_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_9_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -56 0.0001" scale="0.8" id="row_10">
+        <exp:listbg indexNumber="10" sizeX="160" sizeY="7"/>
+        <label id="column_10_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_10_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_10_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -61.6 0.0001" scale="0.8" id="row_11">
+        <exp:listbg indexNumber="11" sizeX="160" sizeY="7"/>
+        <label id="column_11_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_11_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_11_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -67.2 0.0001" scale="0.8" id="row_12">
+        <exp:listbg indexNumber="12" sizeX="160" sizeY="7"/>
+        <label id="column_12_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_12_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_12_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <frame posn="0 -72.8 0.0001" scale="0.8" id="row_13">
+        <exp:listbg indexNumber="13" sizeX="160" sizeY="7"/>
+        <label id="column_13_0" posn="0 2 1.0E-5" sizen="66.5 5" style="TextStaticSmall"/>
+        <label id="column_13_1" posn="{valuePosX} 2 2.0E-5" sizen="67.5 5" style="TextStaticSmall"/>
+        <frame posn="139 0 0.01"><exp:button sizeX="25" sizeY="6" text="@Remove" action="eXpOptimizedPagerAction" id="column_13_2" class="eXpOptimizedPagerAction" isTextId="true"/></frame>
+    </frame>
+    <exp:optimizedpager sizeX="137" sizeY="84" itemsVarName="listItems" dataVarName="listData" rowsPerPage="13" itemsPerRow="2" varName="explist"/>
+</frame>

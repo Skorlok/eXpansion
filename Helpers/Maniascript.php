@@ -73,7 +73,7 @@ class Maniascript
      */
     public static function stringifyAsArray($data)
     {
-        throw new Exception("not implemented yet");
+        throw new \Exception("not implemented yet");
     }
 
     /**

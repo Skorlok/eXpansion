@@ -23,7 +23,7 @@ namespace ManiaLivePlugins\eXpansion\Irc\Classes;
  *
  * @author Petri
  */
-class IrcConnection extends \ManiaLib\Utils\Singleton
+class IrcConnection extends \ManiaLive\Utilities\Singleton
 {
 
     private $irc;

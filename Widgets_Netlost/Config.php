@@ -2,7 +2,10 @@
 
 namespace ManiaLivePlugins\eXpansion\Widgets_Netlost;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
     public $showOnlyAdmins = true;
+
+    public $netlostWidget_PosX = -115;
+    public $netlostWidget_PosY = -50;
 }

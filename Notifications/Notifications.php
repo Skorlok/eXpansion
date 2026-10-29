@@ -2,17 +2,19 @@
 
 namespace ManiaLivePlugins\eXpansion\Notifications;
 
-use ManiaLivePlugins\eXpansion\Notifications\Gui\Widgets\Panel2 as NotificationPanel;
+use ManiaLivePlugins\eXpansion\Core\I18n\Message as I18nMessage;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
+use ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj;
 use ManiaLivePlugins\eXpansion\Notifications\Structures\Message;
-
-//use \ManiaLivePlugins\eXpansion\Notifications\Gui\Widgets\Panel2 as NotifiPanel2;
 
 class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
 {
-
     private $publicMessages = array();
 
     private $personalMessages = array(array());
+
+    /** @var StaticWidget */
+    private $panel;
 
     public function eXpOnInit()
     {
@@ -23,14 +25,13 @@ class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     {
         $this->enableDedicatedEvents();
 
+        $this->panel = new StaticWidget('Notifications\Gui\Widgets\NotificationPanel.xml');
+        $this->panel->setName("Notifications");
+        $this->panel->setLayer("normal");
+
         $this->checkRedirect();
 
-        foreach ($this->storage->players as $login => $player) {
-            $this->onPlayerConnect($login, false);
-        } // force update...
-        foreach ($this->storage->spectators as $login => $player) {
-            $this->onPlayerConnect($login, true);
-        } // force update...
+        $this->reDraw();
     }
 
     public function send($login, $message, $icon = null, $callback = null, $pluginid = null)
@@ -51,59 +52,63 @@ class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             }
 
             $this->reDraw();
-        } else {
         }
     }
 
     protected function reDraw()
     {
         try {
-            foreach (NotificationPanel::GetAll() as $window) {
-                $login = $window->getRecipient();
-                $personal = array();
-                if (array_key_exists($login, $this->personalMessages)) {
-                    $personal = $this->personalMessages[$login];
-                }
-
-                $messages = array_merge($personal, $this->publicMessages);
-                \ManiaLivePlugins\eXpansion\Helpers\ArrayOfObj::sortDesc($messages, "timestamp");
-                $messages = array_slice($messages, 0, 6);
-                $messages = array_reverse($messages);
-
-                /** @var Config $config */
-                $config = Config::getInstance();
-
-                $window->setPositionX($config->posX);
-                $window->setPositionY($config->posY);
-                $window->setMessages($messages);
-                $window->redraw();
+            foreach ($this->storage->players as $login => $player) {
+                $this->showPanel($login);
+            }
+            foreach ($this->storage->spectators as $login => $player) {
+                $this->showPanel($login);
             }
         } catch (\Exception $e) {
             $this->console("error:" . $e->getMessage());
         }
     }
 
-    function onPlayerConnect($login, $isSpectator)
+    private function showPanel($login)
     {
         /** @var Config $config */
         $config = Config::getInstance();
 
-        NotificationPanel::Erase($login);
+        $personal = array();
+        if (array_key_exists($login, $this->personalMessages)) {
+            $personal = $this->personalMessages[$login];
+        }
 
+        $messages = array_merge($personal, $this->publicMessages);
+        ArrayOfObj::sortDesc($messages, "timestamp");
+        $messages = array_slice($messages, 0, 6);
+        $messages = array_reverse($messages);
+
+        $player = $this->storage->getPlayerObject($login);
+        $lang = $player ? $player->language : null;
+
+        for ($i = 0; $i < 6; $i++) {
+            $text = "";
+            if (isset($messages[$i])) {
+                $text = $messages[$i]->message;
+                if ($text instanceof I18nMessage) {
+                    $text = $text->getParsedMessage($lang);
+                }
+            }
+            $this->panel->setParam("msg" . $i, $this->panel->handleSpecialChars($text));
+        }
+
+        $this->panel->setPosition($config->posX, $config->posY, -60);
+        $this->panel->show($login);
+    }
+
+    function onPlayerConnect($login, $isSpectator)
+    {
         if (array_key_exists($login, $this->personalMessages)) {
             unset($this->personalMessages[$login]);
         }
 
-        $info = NotificationPanel::Create($login, true);
-        $info->setSize(100, 40);
-        $info->setMessages($this->publicMessages);
-        $info->setPosition($config->posX, $config->posY);
-        $info->show();
-    }
-
-    public function onPlayerDisconnect($login, $reason = null)
-    {
-        NotificationPanel::Erase($login);
+        $this->showPanel($login);
     }
 
     private function checkRedirect()
@@ -111,6 +116,7 @@ class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
         /**
          * Redirecting The Announcements of the Admin Groups plugin
          */
+        /** @var Config $config */
         $config = Config::getInstance();
 
         foreach (\ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad::getAvailablePlugins() as $plugin => $meta) {
@@ -136,7 +142,12 @@ class Notifications extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
     public function eXpOnUnload()
     {
         parent::eXpOnUnload();
-        NotificationPanel::EraseAll();
+
+        if ($this->panel instanceof StaticWidget) {
+            $this->panel->erase();
+        }
+        $this->panel = null;
+
         foreach (\ManiaLivePlugins\eXpansion\AutoLoad\AutoLoad::getAvailablePlugins() as $plugin => $meta) {
             if ($this->isPluginLoaded($plugin)) {
                 $this->callPublicMethod((string)$plugin, 'eXpDeactivateChatRedirect', array($this, 'send'));

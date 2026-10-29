@@ -24,8 +24,8 @@
 
 namespace ManiaLivePlugins\eXpansion\KnockOut;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
-
+    public $nbKicks = array(8 => 1, 16 => 2, 32 => 4, 64 => 8);
     public $koColor = '$0d0';
 }

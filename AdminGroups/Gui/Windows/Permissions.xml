@@ -1,0 +1,19 @@
+<frame id="Pager" scriptevents="1">
+    <exp:foreach items="permissions" as="perm" index="n">
+    <frame>
+        <exp:listbg indexNumber="{n}" sizeX="130" sizeY="4"/>
+        <frame posn="0 0 1" class="permRow">
+            <exp:checkbox name="cb_have_{perm.name}" active="{perm.haveActive}" textWidth="{cbHaveWidth}" enabled="{perm.haveEnabled}" text="{perm.label}"/>
+            <exp:if test="hasInherits">
+                <frame posn="100 0 0">
+                    <exp:checkbox name="cb_inherit_{perm.name}" active="{perm.inheritActive}" textWidth="25" text="{inheritLabel}"/>
+                </frame>
+            </exp:if>
+        </frame>
+    </frame>
+    </exp:foreach>
+</frame>
+<exp:pager sizeX="134" sizeY="88" itemSizeY="4"/>
+<frame posn="49 -95 1">
+    <exp:button sizeX="32" sizeY="6" text="@OK" action="exp:eXpansion.AdminGroups:permissionsOk:{groupName}" isTextId="true"/>
+</frame>

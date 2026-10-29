@@ -1,0 +1,3 @@
+<frame posn="-1 3 0">
+<exp:scrollablearea sizeX="167" sizeY="87" contentVarName="contentXml" contentSizeY="{contentSizeY}"/>
+</frame>

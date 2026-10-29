@@ -23,32 +23,35 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_ChatEnhancement;
 
 use ManiaLive\Event\Dispatcher;
-use ManiaLive\Gui\ActionHandler;
 use ManiaLivePlugins\eXpansion\AdminGroups\AdminGroups;
 use ManiaLivePlugins\eXpansion\AdminGroups\Permission;
 use ManiaLivePlugins\eXpansion\Chat\MetaData as ChatMetaData;
 use ManiaLivePlugins\eXpansion\Core\Events\PluginSettingChange;
 use ManiaLivePlugins\eXpansion\Core\Events\PluginSettingChangeListener;
 use ManiaLivePlugins\eXpansion\Core\types\config\Variable;
+use ManiaLivePlugins\eXpansion\Gui\ManiaLink\StaticWidget;
+use ManiaLivePlugins\eXpansion\Gui\Structures\Script;
 
 class Widgets_ChatEnhancement extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin implements PluginSettingChangeListener
 {
-    private $action_chatLog;
-    private $action_chatStatus;
-
-    public function eXpOnLoad()
-    {
-    }
+    /** @var StaticWidget */
+    private $widget;
 
     public function eXpOnReady()
     {
-        /** @var ActionHandler $actionH */
-        $actionH = ActionHandler::getInstance();
-
-        $this->action_chatLog = $actionH->createAction(array($this, "showChatLog"));
-        $this->action_chatStatus = $actionH->createAction(array($this, "toogleChatStatus"));
-
         $this->enableDedicatedEvents();
+
+        $this->registerManialinkCallback('showChatLog');
+        $this->registerManialinkCallback('toogleChatStatus');
+
+        $this->widget = new StaticWidget('Widgets_ChatEnhancement\Gui\Widgets\Chat.xml');
+        $this->widget->setName("Chat Enhancement");
+        $this->widget->setLayer("normal");
+        $this->widget->setPosition(-161, -66, -60);
+        if ($this->storage->simpleEnviTitle == "TM") {
+            $this->widget->registerScript(new Script("Gui/Scripts/EdgeWidget"));
+        }
+
         $this->updateWidget();
 
         Dispatcher::register(PluginSettingChange::getClass(), $this);
@@ -56,32 +59,30 @@ class Widgets_ChatEnhancement extends \ManiaLivePlugins\eXpansion\Core\types\Exp
 
     public function updateWidget($login = null)
     {
-        $localRecs = Gui\Widgets\Chat::GetAll();
-        if ($login == null) {
-            //Gui\Widgets\AroundMe::EraseAll();
-            $panelMain = Gui\Widgets\Chat::Create($login, true, $this->action_chatLog, $this->action_chatStatus);
-            $panelMain->setPosition(-161, -66);
-            $panelMain->show();
-        } elseif (isset($localRecs[0]) && !$localRecs[0]->isDestroyed()) {
-            $localRecs[0]->show($login);
+        $this->widget->setParam("hideChatLog", !$this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Chatlog\Chatlog'));
+        $this->widget->setParam("chatStateIcon", $this->isPublicChatActive() ? "LvlGreen" : "LvlRed");
+        $this->widget->show($login, $login === null);
+    }
+
+    private function isPublicChatActive()
+    {
+        if (!$this->isPluginLoaded('\ManiaLivePlugins\eXpansion\Chat\Chat')) {
+            return true;
         }
+
+        /** @var ChatMetaData $chatMeta */
+        $chatMeta = ChatMetaData::getInstance();
+
+        return (bool)$chatMeta->getVariable('publicChatActive')->getRawValue();
     }
 
     public function hideWidget()
     {
-        Gui\Widgets\Chat::EraseAll();
-    }
-
-    public function onEndMap($rankings, $map, $wasWarmUp, $matchContinuesOnNextMap, $restartMap)
-    {
-        if (!$wasWarmUp) {
-            $this->hideWidget();
-        }
+        $this->widget->erase();
     }
 
     public function onBeginMap($map, $warmUp, $matchContinuation)
     {
-        $this->hideWidget();
         $this->updateWidget();
     }
 
@@ -99,10 +100,7 @@ class Widgets_ChatEnhancement extends \ManiaLivePlugins\eXpansion\Core\types\Exp
                 $var = ChatMetaData::getInstance()->getVariable('publicChatActive');
                 $var->setRawValue(!$var->getRawValue());
 
-                $this->eXpChatSendServerMessage(
-                    "#admin_action#Public chat is now #variable#" . ($var->getRawValue() ? "Enable" : "Disable")
-                );
-
+                $this->eXpChatSendServerMessage("#admin_action#Public chat is now #variable#" . ($var->getRawValue() ? "Enable" : "Disable"));
             } else {
                 $this->eXpChatSendServerMessage("#admin_error#Custom Chat plugin needs to be enabled", $login);
             }
@@ -118,7 +116,6 @@ class Widgets_ChatEnhancement extends \ManiaLivePlugins\eXpansion\Core\types\Exp
     public function onPluginSettingsChange($pluginId, Variable $var)
     {
         if ($pluginId == '\ManiaLivePlugins\eXpansion\Chat\Chat' && $var->getName() == "publicChatActive") {
-            $this->hideWidget();
             $this->updateWidget();
         }
     }
@@ -127,13 +124,11 @@ class Widgets_ChatEnhancement extends \ManiaLivePlugins\eXpansion\Core\types\Exp
     {
         parent::eXpOnUnload();
 
-        /** @var ActionHandler $actionH */
-        $actionH = ActionHandler::getInstance();
+        if ($this->widget instanceof StaticWidget) {
+            $this->widget->erase();
+        }
+        $this->widget = null;
 
-        $actionH->deleteAction($this->action_chatLog);
-        $actionH->deleteAction($this->action_chatStatus);
-
-        Gui\Widgets\Chat::EraseAll();
         Dispatcher::unregister(PluginSettingChange::getClass(), $this);
     }
 }

@@ -1,0 +1,67 @@
+<frame posn="0 1 0">
+	<frame posn="0 0 1">
+		<exp:inputbox name="serverName" sizeX="152" editable="{canName}" label="@Server Name" text="{serverName}" isTextId="true"/>
+	</frame>
+	<textedit hidden="{canComment}" id="serverComment" posn="0 -3 2.0E-5" sizen="96 32" scale="0.75" scriptevents="1" default="{serverComment}" textformat="default" name="serverComment" showlinenumbers="0" autonewline="0"/>
+	<frame posn="0 -36 1">
+		<exp:inputbox name="maxPlayers" sizeX="12" editable="{canMaxPlayer}" label="@Players" text="{nextMaxPlayers}" isTextId="true"/>
+	</frame>
+	<frame posn="15 -36 1">
+		<exp:inputbox name="maxSpec" sizeX="12" editable="{canMaxSpec}" label="@Spectators" text="{nextMaxSpectators}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -48 1">
+		<exp:inputbox name="ladderMin" sizeX="35" editable="false" label="@Ladderpoints minimum" text="{ladderServerLimitMin}" isTextId="true"/>
+	</frame>
+	<frame posn="38 -48 1">
+		<exp:inputbox name="ladderMax" sizeX="35" editable="false" label="@Ladderpoints Maximum" text="{ladderServerLimitMax}" isTextId="true"/>
+	</frame>
+	<frame posn="0 -60 1">
+		<exp:inputboxmasked name="serverPass" sizeX="76" editable="{canPassword}" label="@Password for server" text="{serverPassword}" showClearText="true" isTextId="true"/>
+	</frame>
+	<frame posn="0 -73 1">
+		<exp:inputboxmasked name="serverSpecPass" sizeX="76" editable="{canSpecPwd}" label="@Password for spectators" text="{serverSpecPass}" showClearText="true" isTextId="true"/>
+	</frame>
+	<frame posn="0 -86 1">
+		<exp:inputboxmasked name="refereePass" sizeX="76" editable="false" label="@Referee password" text="{refereePassword}" showClearText="{canRefPwd}" isTextId="true"/>
+	</frame>
+</frame>
+<frame posn="100 -18 0">
+	<frame>
+		<frame posn="0 0 0">
+			<exp:checkbox name="publicServer" active="{hideServer}" textWidth="50" enabled="false" text="@Show Server in public server list" isTextId="true"/>
+		</frame>
+		<frame posn="0 -6 0">
+			<exp:checkbox name="ladderServer" active="{currentLadderMode}" textWidth="50" enabled="false" text="@Ladder server" isTextId="true"/>
+		</frame>
+		<frame posn="0 -12 0">
+			<exp:checkbox name="allowMapDownload" active="{allowMapDownload}" textWidth="50" enabled="{canGenericOpts}" text="@Allow map download using ingame menu" isTextId="true"/>
+		</frame>
+		<frame posn="0 -18 0">
+			<exp:checkbox name="p2pDownload" active="{isP2PDownload}" textWidth="50" enabled="{canGenericOpts}" text="@Allow Peer-2-Peer download" isTextId="true"/>
+		</frame>
+		<frame posn="0 -24 0">
+			<exp:checkbox name="p2pUpload" active="{isP2PUpload}" textWidth="50" enabled="{canGenericOpts}" text="@Allow Peer-2-Peer upload" isTextId="true"/>
+		</frame>
+		<frame posn="0 -30 0">
+			<exp:checkbox name="refereeMode" active="{refereeMode}" textWidth="50" enabled="false" text="@Enable Referee-mode" isTextId="true"/>
+		</frame>
+		<frame posn="0 -36 0">
+			<exp:checkbox name="DisableHorns" active="{disableHorns}" textWidth="50" text="@Disable Horns" isTextId="true"/>
+		</frame>
+		<frame posn="0 -42 0">
+			<exp:checkbox name="DisableAnnounces" active="{disableServiceAnnounces}" textWidth="50" text="@Disable Announces" isTextId="true"/>
+		</frame>
+		<frame posn="0 -48 0">
+			<exp:checkbox name="AutosaveReplays" active="{autoSaveReplays}" textWidth="50" text="@Autosave All Replays" isTextId="true"/>
+		</frame>
+		<frame posn="0 -54 0">
+			<exp:checkbox name="AutosaveValidation" active="{autoSaveValidationReplays}" textWidth="50" text="@Autosave Validation Replays" isTextId="true"/>
+		</frame>
+		<frame posn="0 -60 0">
+			<exp:checkbox name="KeepPlayerSlots" active="{keepPlayerSlots}" textWidth="50" text="@Keep Player Slots" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="126 -93 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" action="exp:eXpansion.Adm:serverOptionsOk" isTextId="true"/>
+</frame>

@@ -2,8 +2,8 @@
 
 namespace ManiaLivePlugins\eXpansion\TM_Scoretable;
 
-class Config extends \ManiaLib\Utils\Singleton
+class Config extends \ManiaLive\Utilities\Singleton
 {
     public $tm_score_columns = 2;
-    public $tm_score_lines = 8;
+    public $tm_score_lines = 7;
 }

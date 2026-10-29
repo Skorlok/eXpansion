@@ -1,0 +1,115 @@
+Text[] getColor (Integer totalCps, Integer cpIndex) {
+	declare colors = ["3AF", "3AF", "3BD", "3BD", "3CA", "3C8", "3D7", "3D5", "3E3", "3E2", "3F0"];
+
+	// gauge
+	declare Real divGrad = 1.0;
+	if (totalCps > 1) {
+		divGrad = 1.0 / totalCps;
+	}
+
+	declare Real ratio = cpIndex * divGrad;
+	if (ratio >= 1.0) {
+		ratio = 1.0;
+	}
+	declare Integer index = ML::NearestInteger(ratio * 10);
+
+	declare Text color = "3AF";
+	if (colors.existskey(index)) {
+		color = colors[index];
+	}
+
+	return [color, TextLib::ToText(ratio)];
+}
+
+Void putRecordTo (Integer i, Integer Rank, Integer Score, Text Login, Integer CP, Text nick, Boolean mine, Integer totalCps) {
+	declare nickLabel = (Page.GetFirstChild("RecNick_"^i) as CMlLabel);
+	declare timeLabel = (Page.GetFirstChild("RecTime_"^i) as CMlLabel);
+	declare cpLabel = (Page.GetFirstChild("RecCpNumber_"^i) as CMlLabel);
+	declare ratioLabel = (Page.GetFirstChild("RecRatio_"^i) as CMlGauge);
+
+	if (nickLabel != Null) {
+		nickLabel.Value = TextLib::Trim(nick);
+		timeLabel.Value = TimeToText(Score);
+		cpLabel.Value = "CP-" ^ CP;
+
+		declare Text[] color = getColor(totalCps, CP);
+
+		ratioLabel.Ratio = TextLib::ToReal(color[1]);
+		ratioLabel.Color = TextLib::ToColor(color[0]);
+		ratioLabel.Show();
+
+		declare rank = (Page.GetFirstChild("RecRank_"^i) as CMlLabel);
+		rank.SetText(""^Rank^".");
+
+		declare bg = (Page.GetFirstChild("RecBgBlink_"^i) as CMlQuad);
+
+		if (mine) {
+			bg.Show();
+		} else {
+			bg.Hide();
+		}
+	}
+}
+
+Text getMinimum(Integer[Text] array) {
+	declare Text minKey;
+	foreach (Key => Value in array) {
+		if (minKey == "") {
+			minKey = Key;
+		} else {
+			if (Value < array[minKey]) {
+				minKey = Key;
+			}
+		}
+	}
+	return minKey;
+}
+
+Integer[Text] tri_selection(Integer[Text] array) {
+	declare Integer[Text] sortedArray = Integer[Text];
+	if (array.count > 0) {
+		declare Integer[Text] temp = array;
+		declare Integer[Text] temp2 = Integer[Text];
+		declare Text minKey = getMinimum(temp);
+
+		while (temp.count > 0) {
+			sortedArray[minKey] = temp[minKey];
+			temp2[minKey] = temp[minKey];
+			temp.removekey(minKey);
+			minKey = getMinimum(temp);
+		}
+	} else {
+		sortedArray = array;
+	}
+	return sortedArray;
+}
+
+Text[] getSortedRank(Integer[Text] playerTimes, Integer[Text] playerCPs, Integer totalCps) {
+	declare playerTimesSorted = tri_selection(playerTimes);
+	declare Text[] playerRank = Text[];
+	declare Text[][Integer] playersByCPS = Text[][Integer];
+
+	foreach (Login => cpIndex in playerCPs) {
+		if (!playersByCPS.existskey(cpIndex)) {
+			playersByCPS[cpIndex] = Text[];
+		}
+		playersByCPS[cpIndex].add(Login);
+	}
+
+	declare Integer indexRank = totalCps;
+	while (indexRank >= 0) {
+		if (playersByCPS.existskey(indexRank)) {
+			while (playersByCPS[indexRank].count > 0) {
+				foreach (Login => Score in playerTimesSorted) {
+					if (playersByCPS[indexRank].exists(Login)) {
+						playerRank.add(Login);
+						playersByCPS[indexRank].remove(Login);
+					}
+				}
+			}
+		}
+		indexRank -= 1;
+	}
+
+	return playerRank;
+}

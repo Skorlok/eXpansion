@@ -1,9 +1,8 @@
 <?php
+
 namespace ManiaLivePlugins\eXpansion\Core\Events;
 
-use ManiaLive\Event\Event;
-
-class ExpansionEvent extends Event
+class ExpansionEvent extends \ManiaLive\Event\Event
 {
 
     const ON_RESTART_START = 1;
@@ -30,7 +29,7 @@ class ExpansionEvent extends Event
                 $listener->eXp_onRestartStart();
                 break;
             case self::ON_RESTART_END:
-                $listener->eXp_onRestartStop();
+                $listener->eXp_onRestartEnd();
                 break;
         }
     }

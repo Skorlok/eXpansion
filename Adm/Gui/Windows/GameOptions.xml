@@ -1,0 +1,98 @@
+<frame posn="124 0 0">
+	<frame>
+		<label posn="0 0 1" sizen="25 6" textsize="1" textid="{@Choose Gamemode:}"/>
+		<frame posn="0 -6 1">
+			<exp:ratiobutton group="gamemode" index="0" entryName="TimeAttack" active="{isTaMode}" textWidth="30" text="@Time Attack" isTextId="true"/>
+		</frame>
+		<frame posn="0 -11 1">
+			<exp:ratiobutton group="gamemode" index="1" entryName="Rounds" active="{isRoundsMode}" textWidth="30" text="@Rounds" isTextId="true"/>
+		</frame>
+		<frame posn="0 -16 1">
+			<exp:ratiobutton group="gamemode" index="2" entryName="Cup" active="{isCupMode}" textWidth="30" text="@Cup" isTextId="true"/>
+		</frame>
+		<frame posn="0 -21 1">
+			<exp:ratiobutton group="gamemode" index="3" entryName="Laps" active="{isLapsMode}" textWidth="30" text="@Laps" isTextId="true"/>
+		</frame>
+		<frame posn="0 -26 1">
+			<exp:ratiobutton group="gamemode" index="4" entryName="Team" active="{isTeamMode}" textWidth="30" text="@Team" isTextId="true"/>
+		</frame>
+		<label posn="0 -32 1" sizen="25 8" textsize="1" textid="{@Additional Options:}"/>
+		<frame posn="-1 -39 1">
+			<exp:checkbox name="roundsUseNewRules" active="{roundsUseNewRules}" textWidth="30" text="@Rounds: use new rules" isTextId="true"/>
+		</frame>
+		<frame posn="-1 -45 1">
+			<exp:checkbox name="teamUseNewRules" active="{teamUseNewRules}" textWidth="30" text="@Team: use new rules" isTextId="true"/>
+		</frame>
+		<frame posn="-1 -51 1">
+			<exp:checkbox name="DisableRespawn" active="{disableRespawn}" textWidth="30" text="@Disable Respawn" isTextId="true"/>
+		</frame>
+		<frame posn="-1 -57 1">
+			<exp:checkbox name="ForceShowAllOpponents" active="{forceShowAllOpponents}" textWidth="30" text="@Force Show All Opponents" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="0 -5 0">
+	<frame>
+		<frame posn="0 0 1">
+			<exp:inputbox name="ChatTime" sizeX="35" label="@Podium: Chat Time" text="{chatTime}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="AllWarmupDuration" sizeX="35" label="@All: Warmup Duration" text="{allWarmUpDuration}" isTextId="true"/>
+		</frame>
+		<frame posn="78 0 1">
+			<exp:inputbox name="finishTimeOut" sizeX="35" label="@All: Finish Timeout" text="{finishTimeout}" isTextId="true"/>
+		</frame>
+	</frame>
+	<frame posn="0 -10 0">
+		<frame posn="0 0 1">
+			<exp:inputbox name="timeAttackLimit" sizeX="35" label="@TimeAttack: Time Limit" text="{timeAttackLimit}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="timeAttackSynchStartPeriod" sizeX="35" label="@TimeAttack: Synch Start Period" text="{timeAttackSynchStartPeriod}" isTextId="true"/>
+		</frame>
+	</frame>
+	<frame posn="0 -20 0">
+		<frame posn="0 0 1">
+			<exp:inputbox name="roundsPointsLimit" sizeX="35" label="@Rounds: Points Limit" text="{roundsPointsLimit}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="roundsForcedLaps" sizeX="35" label="@Rounds: Set Number of Forced Laps" text="{roundsForcedLaps}" isTextId="true"/>
+		</frame>
+		<frame posn="78 0 1">
+			<exp:inputbox name="roundsPointsLimitNewRules" sizeX="35" label="@Rounds: Points Limit (NewRules)" text="{roundsPointsLimitNewRules}" isTextId="true"/>
+		</frame>
+	</frame>
+	<frame posn="0 -30 0">
+		<frame posn="0 0 1">
+			<exp:inputbox name="teamPointsLimit" sizeX="35" label="@Team: Points Limit" text="{teamPointsLimit}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="teamMaxPoints" sizeX="35" label="@Team: Max Points For a Round" text="{teamMaxPoints}" isTextId="true"/>
+		</frame>
+		<frame posn="78 0 1">
+			<exp:inputbox name="teamPointsLimitNewRules" sizeX="35" label="@Team: Points Limit (NewRules)" text="{teamPointsLimitNewRules}" isTextId="true"/>
+		</frame>
+	</frame>
+	<frame posn="0 -40 0">
+		<frame posn="0 0 1">
+			<exp:inputbox name="cupPointsLimit" sizeX="35" label="@Cup: Points Limit" text="{cupPointsLimit}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="cupNbWinners" sizeX="35" label="@Cup: Number of Winners" text="{cupNbWinners}" isTextId="true"/>
+		</frame>
+		<frame posn="78 0 1">
+			<exp:inputbox name="cupRoundsPerMap" sizeX="35" label="@cup Rounds Per Map" text="{cupRoundsPerMap}" isTextId="true"/>
+		</frame>
+	</frame>
+	<frame posn="0 -50 0">
+		<frame posn="0 0 1">
+			<exp:inputbox name="lapsNbLaps" sizeX="35" label="@Laps: Number of Laps" text="{lapsNbLaps}" isTextId="true"/>
+		</frame>
+		<frame posn="39 0 1">
+			<exp:inputbox name="lapsTimeLimit" sizeX="35" label="@Laps: Time Limit" text="{lapsTimeLimit}" isTextId="true"/>
+		</frame>
+	</frame>
+</frame>
+<frame posn="131 -76 0">
+	<exp:button sizeX="32" sizeY="6" text="@Apply" action="exp:eXpansion.Adm:gameOptionsOk" isTextId="true"/>
+</frame>
