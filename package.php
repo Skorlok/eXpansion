@@ -1,5 +1,5 @@
 <?php
-require 'libraries/autoload.php';
+require 'vendor/autoload.php';
 
 use Phine\Phar\Builder;
 use Phine\Phar\Stub;
