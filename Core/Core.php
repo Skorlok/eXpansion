@@ -539,7 +539,6 @@ EOT;
 
             case 'Trackmania.Scores':
             case 'Shootmania.Scores':
-                echo "Trackmania.Scores", PHP_EOL;
                 if (isset($params['useteams'])) {
                     self::$useTeams = $params['useteams'];
                 }

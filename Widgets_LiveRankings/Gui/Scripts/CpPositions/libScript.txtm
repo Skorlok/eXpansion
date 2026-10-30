@@ -1,4 +1,13 @@
 // stolen from https://github.com/PRGfx/mQscripts/blob/master/lib/TextExt.Script.txt and adapted for eXpansion, we only need the StringLinks function
+
+Text TextExt_CharAt(Text string, Integer offset)
+{
+	if (offset <= TextLib::Length(string)) {
+		return TextLib::SubString(string, offset, 1);
+	}
+	return "";
+}
+
 Text stripLinks(Text string)
 {
 	declare Text result;
@@ -11,7 +20,7 @@ Text stripLinks(Text string)
 	declare Text linktag = "";
 	for (i, 0, length-1) {
 		ochar = TextExt_CharAt(string, i);
-		char = TextExt_Lowercase(ochar);
+		char = TextLib::ToLowerCase(ochar);
 		switch (state) {
 			case "0": {
 				if (char == "$")
