@@ -26,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.3.0";
+    const EXP_VERSION = "1.3.1";
 
     const EXP_REQUIRE_MANIALIVE = "5.0";
 
@@ -157,6 +157,7 @@ class Core extends types\ExpPlugin
         $this->configManager->loadSettings();
 
         if (!defined("DEBUG")) {
+            /** @var Config $config */
             $config = Config::getInstance();
             define("DEBUG", filter_var($config->debug, FILTER_VALIDATE_BOOLEAN));
         }
@@ -174,8 +175,11 @@ class Core extends types\ExpPlugin
         /** @var Config $config */
         $config = Config::getInstance();
 
+        /** @var I18n $i18n */
+        $i18n = I18n::getInstance();
+
         //Start multi lang system for eXpansion. Gogo languages
-        I18n::getInstance()->start();
+        $i18n->start();
 
         $expansion = <<<'EOT'
    
@@ -228,9 +232,9 @@ EOT;
 
         //List of supported languages found
         $this->console('');
-        $this->console('Language support detected for: ' . implode(",", I18n::getInstance()->getSupportedLocales()) . '!');
+        $this->console('Language support detected for: ' . implode(",", $i18n->getSupportedLocales()) . '!');
         $this->console('Enabling default locale: ' . $config->defaultLanguage . '');
-        I18n::getInstance()->setDefaultLanguage($config->defaultLanguage);
+        $i18n->setDefaultLanguage($config->defaultLanguage);
 
         $this->console('');
 
@@ -720,7 +724,9 @@ EOT;
      */
     public static function optimizeScriptCallbacks()
     {
-        $connection = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance()->getDediConnection();
+        /** @var \ManiaLivePlugins\eXpansion\Helpers\Singletons $singleton */
+        $singleton = \ManiaLivePlugins\eXpansion\Helpers\Singletons::getInstance();
+        $connection = $singleton->getDediConnection();
         if (sizeof(self::$enabledCallbacks) > 0) {
             $connection->triggerModeScriptEvent("LibXmlRpc_BlockAllCallbacks", "");
             foreach (self::$enabledCallbacks as $callback) {
@@ -1253,7 +1259,9 @@ EOT;
 
         /** @var \ManiaLive\PluginHandler\PluginHandler $pHandler */
         $pHandler = \ManiaLive\PluginHandler\PluginHandler::getInstance();
-        foreach (\ManiaLivePlugins\eXpansion\AutoLoad\Config::getInstance()->plugins as $plugin_id) {
+        /** @var \ManiaLivePlugins\eXpansion\AutoLoad\Config $autoloadConfig */
+        $autoloadConfig = \ManiaLivePlugins\eXpansion\AutoLoad\Config::getInstance();
+        foreach ($autoloadConfig->plugins as $plugin_id) {
             $className = $plugin_id;
             if (class_exists($className)) {
                 if ($className::getMetaData()->checkAll() && !$this->isPluginLoaded($plugin_id)) {
@@ -1697,13 +1705,6 @@ EOT;
             $this->expPlayers[$login]->isWaiting = false;
             $this->expPlayers[$login]->isFinished = false;
         }
-
-        $rankings = $this->storage->getCurrentRanking();
-        foreach ($rankings as $player) {
-            if (!empty($player->login) && array_key_exists($player->login, $this->expPlayers)) {
-                $this->expPlayers[$player->login]->score = $player->score;
-            }
-        }
     }
 
     public function onPlayerFinish($playerUid, $login, $timeOrScore)
@@ -1925,11 +1926,6 @@ EOT;
         } elseif ($a->rank < $b->rank) {
             return -1;
         } elseif ($a->rank > $b->rank) {
-            return 1;
-        } elseif ($a->score > 0 && $b->score > 0 && $a->score > $b->score) {
-            // same check check, time and rank (only in team or beginning?), so test general scores
-            return -1;
-        } elseif ($a->score > 0 && $b->score > 0 && $a->score < $b->score) {
             return 1;
         } elseif ($a->bestTime > 0 && $b->bestTime > 0 && $a->bestTime < $b->bestTime) {
             // same check check, time, rank and general score, so test besttime

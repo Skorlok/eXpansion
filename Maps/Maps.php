@@ -431,6 +431,10 @@ class Maps extends ExpPlugin
             $country = explode("|", $path);
             if (sizeof($country) > 0 && isset($country[1])) {
                 $country = $country[1];
+            } else if (sizeof($country) > 0 && isset($country[0])) {
+                $country = $country[0];
+            } else {
+                $country = "Other%20Countries";
             }
         }
 

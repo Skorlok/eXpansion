@@ -4,7 +4,8 @@
 <frame posn="0 -13 1">
 	<exp:inputbox name="team2Clublink" sizeX="35" label="@Link to the Clublink for the second team" isTextId="true"/>
 </frame>
-<label posn="0 -19 1" sizen="50 12" style="TextStaticSmall" textid="{@These settings will override&#10; the team colors settings !}"/>
+<label posn="0 -19 1" sizen="50 12" style="TextStaticSmall" textid="{@These settings will override
+the team colors settings !}"/>
 <frame posn="5 -40 1">
 	<exp:button sizeX="32" sizeY="6" text="@Ok" action="exp:eXpansion.ChatAdmin:clubLinksOk" isTextId="true"/>
 </frame>

@@ -14,7 +14,7 @@
 			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="{@Windows can be moved with drag'n'drop from title bar.}"/>
 		</frame>
 		<frame posn="6 -19 4.0E-5">
-			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="{@90&#37; of chat commands you already are familiar works here too!}"/>
+			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" textid="{@90%% of chat commands you already are familiar works here too!}"/>
 		</frame>
 		<frame posn="0 -23 5.0E-5">
 			<label sizen="240 5" halign="left" valign="center" style="TextCardMedium" textsize="1" textcolor="fff" text=""/>

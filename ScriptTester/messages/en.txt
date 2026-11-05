@@ -4,8 +4,8 @@ Manialink editor
 Maniascript editor
 Maniascript editor
 
-Save &amp; Test
-Save &amp; Test
+Save & Test
+Save & Test
 
 Close
 Close

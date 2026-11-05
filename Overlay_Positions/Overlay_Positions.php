@@ -193,10 +193,10 @@ class Overlay_Positions extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             $diff = "Err";
         }
 
-        $score = ($gamemode == GameInfos::GAMEMODE_TEAM) ? $player->matchScore : $player->score;
-        if (empty($score)) {
+        //$score = ($gamemode == GameInfos::GAMEMODE_TEAM) ? $player->matchScore : $player->score;
+        //if (empty($score)) {
             $score = 0;
-        }
+        //}
         $points = ($gamemode == GameInfos::GAMEMODE_LAPS) ? "lap " . $player->curLap : $score . " pts";
 
         return array(

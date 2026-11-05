@@ -4,8 +4,8 @@ Manialink editor
 Maniascript editor
 Éditeur de Maniascript
 
-Save &amp; Test
-Enregistrer &amp; tester
+Save & Test
+Enregistrer & tester
 
 Close
 Fermer

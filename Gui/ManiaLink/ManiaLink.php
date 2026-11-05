@@ -594,7 +594,7 @@ class ManiaLink extends Singletons
         foreach ($dico as $lang => $values) {
             $dicoXml .= "<language id=\"" . $lang . "\">" . PHP_EOL;
             foreach ($values as $key => $value) {
-                $dicoXml .= "<" . $key . ">" . $value . "</" . $key . ">" . PHP_EOL;
+                $dicoXml .= "<" . $key . ">" . $this->handleSpecialChars($value) . "</" . $key . ">" . PHP_EOL;
             }
             $dicoXml .= "</language>" . PHP_EOL;
         }

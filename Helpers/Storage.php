@@ -255,6 +255,9 @@ class Storage extends Singleton implements ServerListener, AppListener
         // eXpansion
 
         $this->playerTimes = array();
+		foreach ($this->players + $this->spectators as $player) {
+			$player->bestTime = 0;
+		}
 
         $this->loadBlackList();
         $this->loadGuestList();
@@ -547,6 +550,9 @@ class Storage extends Singleton implements ServerListener, AppListener
     public function onBeginMatch()
     {
         $this->playerTimes = array();
+		foreach ($this->players + $this->spectators as $player) {
+			$player->bestTime = 0;
+		}
     }
 
     /**
@@ -568,6 +574,11 @@ class Storage extends Singleton implements ServerListener, AppListener
                 $this->playerTimes[$login] = $timeOrScore;
             }
         }
+		
+		$player = $this->getPlayerObject($login);
+		if ($player) {
+			$player->bestTime = $this->playerTimes[$login];
+		}
     }
 
     public function onPreLoop()

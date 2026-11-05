@@ -123,6 +123,8 @@ class PlayerStorage extends \Maniaplanet\DedicatedServer\Structures\Player
 	public $lastTimeUpdate;
 	/** @var int */
 	public $sessionJoinTime;
+	/** @var int */
+	public $bestTime;
 
 	/**
 	 * @param \Maniaplanet\DedicatedServer\Structures\Player $data
