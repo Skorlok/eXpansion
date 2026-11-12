@@ -544,6 +544,15 @@ class Storage extends Singleton implements ServerListener, AppListener
 		return $teams;
 	}
 
+	public function getPlayerCheckpoints($login)
+	{
+		if (isset($this->checkpoints[$login])) {
+			return $this->checkpoints[$login];
+		} else {
+			return array();
+		}
+	}
+
     /**
      * Method called when the Race Begin
      */

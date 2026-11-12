@@ -59,11 +59,13 @@ class Dedimania extends DedimaniaAbstract
             return;
         }
 
-        $playerinfo = Core::$playerInfo;
-        if (!isset($playerinfo[$login])) {
+        $checkpoints = $this->storage->getPlayerCheckpoints($login);
+        if (end($checkpoints) != $time) {
+            $this->console("Player $login has a finish time of $time but his last checkpoint is " . end($checkpoints) . ". Ignoring.");
             return;
         }
-        $checkpoints = implode(",", $playerinfo[$login]->checkpoints);
+
+        $checkpoints = implode(",", $checkpoints);
 
         $this->handlePlayerFinish($playerUid, $login, $time, $checkpoints);
     }

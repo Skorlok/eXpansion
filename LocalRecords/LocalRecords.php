@@ -22,7 +22,6 @@
 
 namespace ManiaLivePlugins\eXpansion\LocalRecords;
 
-use ManiaLivePlugins\eXpansion\Core\Core;
 use Maniaplanet\DedicatedServer\Structures\GameInfos;
 
 class LocalRecords extends LocalBase
@@ -48,12 +47,15 @@ class LocalRecords extends LocalBase
                 return;
             }
 
-            $playerinfo = Core::$playerInfo;
-
             $time = microtime(true);
             //We add the record to the buffer
-            if (isset($playerinfo[$login]) && $timeOrScore < 8388608) {
-                $this->addRecord($login, $timeOrScore, $playerinfo[$login]->checkpoints);
+            $checkpoints = $this->storage->getPlayerCheckpoints($login);
+            if (end($checkpoints) != $timeOrScore) {
+                $this->console("Player $login has a finish time of $timeOrScore but his last checkpoint is " . end($checkpoints) . ". Ignoring.");
+                return;
+            }
+            if ($timeOrScore < 8388608) {
+                $this->addRecord($login, $timeOrScore, $checkpoints);
             }
 
             $this->debug("#### NEW RANK IN : " . (microtime(true) - $time) . "s BAD?");

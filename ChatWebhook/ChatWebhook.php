@@ -176,6 +176,10 @@ class ChatWebhook extends ExpPlugin
             return;
         }
 
+        if (trim($text) == "") {
+            return;
+        }
+
         if (strlen($text) < 2000) {
             $this->webConnection->sendWebhookMessage($text, array("name" => Formatting::stripStyles($player->nickName), "flag" => $this->getFlag($player)));
         } else {

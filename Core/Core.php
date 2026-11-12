@@ -26,7 +26,7 @@ use Maniaplanet\DedicatedServer\Structures\ServerOptions;
 class Core extends types\ExpPlugin
 {
 
-    const EXP_VERSION = "1.3.1";
+    const EXP_VERSION = "1.3.2";
 
     const EXP_REQUIRE_MANIALIVE = "5.0";
 

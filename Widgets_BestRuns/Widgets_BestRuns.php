@@ -3,7 +3,6 @@
 namespace ManiaLivePlugins\eXpansion\Widgets_BestRuns;
 
 use ManiaLive\Utilities\Time;
-use ManiaLivePlugins\eXpansion\Core\Core;
 use ManiaLivePlugins\eXpansion\Core\ColorParser;
 use ManiaLivePlugins\eXpansion\Gui\Config as guiConfig;
 use ManiaLivePlugins\eXpansion\Gui\ManiaLink\Widget;
@@ -44,10 +43,16 @@ class Widgets_BestRuns extends \ManiaLivePlugins\eXpansion\Core\types\ExpPlugin
             return;
         }
 
+        $checkpoints = $this->storage->getPlayerCheckpoints($login);
+        if (end($checkpoints) != $time) {
+            $this->console("Player $login has a finish time of $time but his last checkpoint is " . end($checkpoints) . ". Ignoring.");
+            return;
+        }
+
         $data = new \Maniaplanet\DedicatedServer\Structures\PlayerRanking();
         $data->bestTime = $time;
         $data->nickName = $this->storage->getPlayerObject($login)->nickName;
-        $data->bestCheckpoints = Core::$playerInfo[$login]->checkpoints;
+        $data->bestCheckpoints = $checkpoints;
 
         $this->bestRuns[] = new Run($data);
 

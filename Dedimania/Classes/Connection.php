@@ -624,7 +624,7 @@ class Connection extends Singleton implements AppListener, TickListener
 
                 $errors = end($msg[1]);
 
-                if (count($errors) > 0 && array_key_exists('methods', $errors[0])) {
+                if (count($errors) > 0 && isset($errors[0]) && array_key_exists('methods', $errors[0])) {
                     foreach ($errors[0]['methods'] as $error) {
                         if (!empty($error['errors'])) {
                             if ($error['errors'] == "Warning in method_handler.php(470): Stadium is limited to maxrank 15 in TA for not upgraded servers! For premium accounts, see Dedimania forum and tm2stats page.") {
