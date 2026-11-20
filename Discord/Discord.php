@@ -295,7 +295,7 @@ class Discord extends ExpPlugin
             if (substr($data['content'], 0, 1) == "!") {
                 $this->handleAdminCommand($data);
             } else {
-                $this->eXpChatSendServerMessage('$z$s$ff0[' . $this->getDiscordUserName($data) . '$z$ff0$s]$fff ' . $data['content']);
+                $this->connection->chatSendServerMessage('$z$s$ff0[' . $this->getDiscordUserName($data) . '$z$ff0$s]$fff ' . $data['content']);
             }
         }
 
@@ -405,7 +405,7 @@ class Discord extends ExpPlugin
 
                     $map = $this->connection->getMapInfo($file);
 
-                    $this->eXpChatSendServerMessage('$z$s$i$78D Discord: Map $z' . $map->name . ' $z$s$i$78Dadded to the list by $z$s$fff' . $this->getDiscordUserName($discordMessage));
+                    $this->eXpChatSendServerMessage('$z$s$i$78D Discord: Map $z%s $z$s$i$78Dadded to the list by $z$s$fff%s', null, array($map->name, $this->getDiscordUserName($discordMessage)));
                     $this->discord->sendDiscordMessage("Map added to the server: **" . Formatting::stripStyles($map->name) . "** by **" . Formatting::stripStyles($map->author) . "**");
                 } catch (\Exception $e) {
                     $this->discord->sendDiscordMessage("Error while adding map from discord: **" . Formatting::stripStyles($gbxReader->name) . "** (" . $e->getMessage() . ")");
